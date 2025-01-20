@@ -16,7 +16,7 @@ import ProductGridFiveContainer from "../../wrappers/product/ProductGridFiveCont
 import BannerTwentyEight from "../../wrappers/banner/BannerTwentyEight";
 import BannerSix from "../../wrappers/banner/BannerSix";
 import BannerSeven from "../../wrappers/banner/BannerSeven";
-
+import NewProductGrid from "../../wrappers/product/NewProductGrid";
 const HomeFashionSix = () => {
   return (
     <Fragment>
@@ -62,14 +62,15 @@ const HomeFashionSix = () => {
         />
         <BannerFifteen spaceTopClass="pt-10" spaceBottomClass="pb-85" />
         <BannerSeven spaceTopClass="pt-95" spaceBottomClass="pb-70" />
+        <NewProductGrid category="accessories" limit={10} />
 
         {/* newsletter */}
         <NewsletterTwo spaceBottomClass="pb-100" />
-        <ProductGridFiveContainer
+        {/* <ProductGridFiveContainer
           spaceTopClass="pt-100"
           spaceBottomClass="pb-100"
           category="accessories"
-        />
+        /> */}
         <BannerSixteen spaceTopClass="pt-95" />
 
         {/* image slider */}
