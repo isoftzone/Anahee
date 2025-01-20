@@ -13,6 +13,9 @@ import TabProductFive from "../../wrappers/product/TabProductFive";
 import BannerFifteen from "../../wrappers/banner/BannerFifteen";
 import BannerSixteen from "../../wrappers/banner/BannerSixteen";
 import ProductGridFiveContainer from "../../wrappers/product/ProductGridFiveContainer";
+import BannerTwentyEight from "../../wrappers/banner/BannerTwentyEight";
+import BannerSix from "../../wrappers/banner/BannerSix";
+import BannerSeven from "../../wrappers/banner/BannerSeven";
 
 const HomeFashionSix = () => {
   return (
@@ -27,6 +30,8 @@ const HomeFashionSix = () => {
         {/* section title */}
         <SectionTitleWithText spaceTopClass="pt-95" spaceBottomClass="pb-90" />
         {/* tab product */}
+        <BannerTwentyEight spaceTopClass="pt-100" spaceBottomClass="pb-70" />
+
         <TabProductEight
           spaceBottomClass="pb-70"
           category="fashion"
@@ -47,6 +52,8 @@ const HomeFashionSix = () => {
           sectionTitle="Best Products"
         />
 
+        <BannerSix spaceTopClass="pt-100" spaceBottomClass="pb-80" />
+
         <BannerNine spaceBottomClass="pb-70" />
         <TabProductFive
           spaceTopClass="pt-95"
@@ -54,6 +61,7 @@ const HomeFashionSix = () => {
           category="cosmetics"
         />
         <BannerFifteen spaceTopClass="pt-10" spaceBottomClass="pb-85" />
+        <BannerSeven spaceTopClass="pt-95" spaceBottomClass="pb-70" />
 
         {/* newsletter */}
         <NewsletterTwo spaceBottomClass="pb-100" />

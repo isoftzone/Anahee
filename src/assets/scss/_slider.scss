@@ -1297,9 +1297,9 @@
   position: absolute;
   top: auto;
   right: 50%;
-  bottom: 20px; /* Adjust this value to fine-tune the distance from the bottom */
+  bottom: 20px; 
   left: auto;
-  transform: translateX(50%); /* Center horizontally */
+  transform: translateX(50%);
 
   display: inline-block;
 
@@ -1314,11 +1314,11 @@
   background: transparent;
 
   &.swiper-button-prev {
-    margin-right: -70px; /* Adjust spacing between the prev and next buttons */
+    margin-right: -70px;
   }
 
   &.swiper-button-next {
-    margin-left: -70px; /* Adjust spacing between the prev and next buttons */
+    margin-left: -70px; 
   }
 
   @media #{$xs-layout} {
@@ -1328,11 +1328,11 @@
     height: 60px;
 
     &.swiper-button-prev {
-      margin-right: -50px; /* Adjust spacing for smaller screens */
+      margin-right: -50px; 
     }
 
     &.swiper-button-next {
-      margin-left: -50px; /* Adjust spacing for smaller screens */
+      margin-left: -50px;
     }
   }
 
@@ -1344,8 +1344,8 @@
 
 .swiper-button-prev img,
 .swiper-button-next img {
-  width: 100%; /* Full button width */
-  height: auto; /* Maintain aspect ratio */
+  width: 100%; 
+  height: auto;
 }
 
 
@@ -2408,11 +2408,11 @@
 .prev-radio,
 .next-radio {
     appearance: none; /* Remove default radio styling */
-    width: 24px;
-    height: 24px;
+    width: 14px;
+    height: 14px;
     border: 2px solid #ccc;
     border-radius: 50%;
-    background-color: white;
+    background-color: rgb(2, 2, 2);
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
