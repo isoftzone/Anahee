@@ -1228,7 +1228,7 @@
 /* slider 6 hm7 */
 
 .slider-height-5 {
-  height: 850px;
+  height:960px;
   @media #{$xx-layout} {
     height: 600px;
   }
@@ -1314,7 +1314,7 @@
   background: transparent;
 
   &.swiper-button-prev {
-    margin-right: -70px;
+    margin-right: -35px;
   }
 
   &.swiper-button-next {
