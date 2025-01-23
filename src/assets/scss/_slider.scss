@@ -18793,3 +18793,179 @@ a, .header-toolbar__btn, .header-contact-list li span, .header-contact-list li a
     min-height: 90rem;
     background: transparent;
 }
+
+
+
+/*****************************
+31 - Components - Slider
+*****************************/
+
+
+/*-- 31.00 - Slider Height --*/
+
+.slider{
+	&-height{
+		height: 83rem;
+		@include breakpoint(xxalarge){
+			height: 80rem; 
+		}
+		@include breakpoint(xxblarge){
+			height: 65rem; 
+		}
+		@include breakpoint(xblarge){
+			height: 58rem; 
+		}
+		@include breakpoint(xclarge){
+			height: 55rem; 
+		}
+		@include breakpoint(large){
+			height: 65rem;
+		} 
+		@include breakpoint(blarge){
+			height: 63rem;
+		}
+		@include breakpoint(medium){
+			height: 60rem;
+		}
+		&-2{
+			height: 100vh;
+		}
+		&-3{
+			height: 78rem;
+			@include breakpoint(xxalarge){
+				height: 75rem; 
+			}
+			@include breakpoint(xxblarge){
+				height: 60rem; 
+			}
+			@include breakpoint(xblarge){
+				height: 52rem; 
+			}
+			@include breakpoint(xclarge){
+				height: 55rem; 
+			}
+			@include breakpoint(large){
+				height: 60rem;
+			}
+			@include breakpoint(blarge){
+				height: 59rem;
+			}
+			@include breakpoint(medium){
+				height: 53rem;
+			}
+		}
+	}
+}
+
+/*-- 31.01 - Slider Content BG Shape --*/
+.bg-shape{
+	// @extend %posrelative;
+	&:after, 
+	&:before{
+		// @extend %pseudo;
+		background-color: rgba(250, 251, 248, 0.42);
+		z-index: 1;
+	}
+	&:after{
+		width: 100%;
+		height: 100%;
+		left: 0;
+		top: 0;
+	}
+	&:before{
+		width: 94%;
+		height: 91%;
+		left: 50%;
+		top: 50%;
+		@include transform(translate(-50%, -50%));
+	}  
+	* {
+		// @extend %posrelative;
+		z-index: 2;
+	}
+	&.red-bg{
+		&:before{
+			background-color: #e81214;
+		}
+	}
+}
+
+.transparent-bg-shape{
+	background-color: rgba(0, 0, 0, 0.702);
+}
+
+/*-- 31.02 - Accordion Slider --*/
+
+.accordion-slider, .accordion-click-slider{
+	// @extend %flexbox;
+	// @extend %flex-wrap;
+	&-wrapper{
+		overflow: hidden;
+		// @extend %posrelative;
+	}
+	&__item{
+		// @include flex-grow(1);
+		// @include transition(flex .6s ease);
+		// @extend %flexbox;
+		// @extend %justify-center;
+		// @extend %align-center;
+		cursor: pointer;
+		.slider-content{
+			width: 0;
+			@include transform(scale(0,0));
+			@include transition(all .5s ease);
+		}
+		&:not(.active){
+			@include breakpoint(small){
+				height: 40rem;
+				width: 33.333%;
+			}
+			@include breakpoint(xsmall){
+				height: 20rem;
+			}
+		}
+		&.active{
+			@include flex-grow(8);
+			@include breakpoint(medium){
+				@include flex-grow(4);
+			}
+			@include breakpoint(small){
+				@include flex-basis(100%);
+				min-width: 100%;
+				@include order(-1);
+			}
+			@include breakpoint(xsmall){
+				height: 55rem;
+			}
+			.slider-content{
+				width: 485px;
+				@include transform(scale(1,1));
+				@include breakpoint(medium){
+					width: 400px;
+				}
+				@include breakpoint(small){
+					width: 350px;
+				}
+				@include breakpoint(xsmall){
+					width: 300px;
+				}
+			}
+		}
+	}
+	&__btn{
+		@extend .slick-btn;
+		&.prev{
+			margin-right: -2px;
+		}
+		&.next{
+			margin-left: -2px;
+		}
+		&-group{
+			@extend %posabsolute !optional;
+			top: 50%;
+			@include transform(translateY(-50%));
+			right: 20.5%;
+		}
+	}
+}
+
