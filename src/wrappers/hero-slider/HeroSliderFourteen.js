@@ -16,7 +16,7 @@ const params = {
   autoHeight: false,
 };
 
-const HeroSliderFourteen = ({data}) => {
+const HeroSliderFourteen = () => {
   return (
     <>
       <div className="slider-area">
@@ -96,7 +96,7 @@ const HeroSliderFourteen = ({data}) => {
         <div
           className="full-width-banner-area parallax-window"
           data-parallax="scroll"
-          data-image-src="assets/img/banner/banner-68.jpg"
+          img src="assets/img/banner/banner-68.jpg" alt="Banner" 
         ></div>
 
         <div className="banner-area">
