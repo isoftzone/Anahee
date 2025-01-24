@@ -4,28 +4,28 @@ const currencySlice = createSlice({
     name: "currency",
     initialState: {
         currencySymbol: "₹",
-        currencyName: "EUR",
+        currencyName: "INR",
         currencyRate: 1
     },
     reducers: {
         setCurrency(state, action) {
             const currencyName = action.payload;
 
-            if (currencyName === "USD") {
+            if (currencyName === "INR") {
                 return state = {
                     currencySymbol: "₹",
                     currencyRate: 1,
                     currencyName
                 };
             }
-            if (currencyName === "EUR") {
+            if (currencyName === "INR") {
                 return state = {
                     currencySymbol: "₹",
                     currencyRate: 1,
                     currencyName
                 };
             }
-            if (currencyName === "GBP") {
+            if (currencyName === "INR") {
                 return state = {
                     currencySymbol: "₹",
                     currencyRate: 1,
