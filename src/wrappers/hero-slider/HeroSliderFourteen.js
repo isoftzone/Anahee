@@ -46,7 +46,9 @@ const HeroSliderFourteen = () => {
                           <span className="heading__primary--sub">
                             Perfect Collection
                           </span>
-                          <span className="heading__primary--main">For Women</span>
+                          <span className="heading__primary--main">
+                            For Women
+                          </span>
                         </h2>
                         <Link
                           // href="shop.html"
@@ -74,7 +76,9 @@ const HeroSliderFourteen = () => {
                           <span className="heading__primary--sub">
                             Perfect Accesories
                           </span>
-                          <span className="heading__primary--main">For Women</span>
+                          <span className="heading__primary--main">
+                            For Women
+                          </span>
                         </h2>
                         <Link
                           // href="shop.html"
@@ -96,7 +100,9 @@ const HeroSliderFourteen = () => {
         <div
           className="full-width-banner-area parallax-window"
           data-parallax="scroll"
-          img src="assets/img/banner/banner-68.jpg" alt="Banner" 
+          img
+          src="assets/img/banner/banner-68.jpg"
+          alt="Banner"
         ></div>
 
         <div className="banner-area">
@@ -143,7 +149,9 @@ const HeroSliderFourteen = () => {
                           <span className="heading__primary--sub">
                             Perfect Accesories
                           </span>
-                          <span className="heading__primary--main">For Men</span>
+                          <span className="heading__primary--main">
+                            For Men
+                          </span>
                         </h2>
                         <Link
                           // href="shop.html"
