@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import Rating from "./sub-components/ProductRating";
 import { getDiscountPrice } from "../../helpers/product";
 import ProductModal from "./ProductModal";
-import { addToCart } from "../../store/slices/cart-slice";
+// import { addToCart } from "../../store/slices/cart-slice";
 import { addToWishlist } from "../../store/slices/wishlist-slice";
 
 const ProductGridSingle = ({
@@ -87,25 +87,25 @@ const ProductGridSingle = ({
                 <Link to={`${process.env.PUBLIC_URL}/product/${product.id}`}>
                   Select Option
                 </Link>
-              ) : product.stock && product.stock > 0 ? (
-                <button
-                  onClick={() => dispatch(addToCart(product))}
-                  className={
-                    cartItem !== undefined && cartItem.quantity > 0
-                      ? "active"
-                      : ""
-                  }
-                  disabled={cartItem !== undefined && cartItem.quantity > 0}
-                  title={
-                    cartItem !== undefined ? "Added to cart" : "Add to cart"
-                  }
-                >
-                  {" "}
-                  <i className="pe-7s-cart"></i>{" "}
-                  {cartItem !== undefined && cartItem.quantity > 0
-                    ? "Added"
-                    : "Add to cart"}
-                </button>
+              // ) : product.stock && product.stock > 0 ? (
+              //   <button
+              //     onClick={() => dispatch(addToCart(product))}
+              //     className={
+              //       cartItem !== undefined && cartItem.quantity > 0
+              //         ? "active"
+              //         : ""
+              //     }
+              //     disabled={cartItem !== undefined && cartItem.quantity > 0}
+              //     title={
+              //       cartItem !== undefined ? "Added to cart" : "Add to cart"
+              //     }
+              //   >
+              //     {" "}
+              //     <i className="pe-7s-cart"></i>{" "}
+              //     {cartItem !== undefined && cartItem.quantity > 0
+              //       ? "Added"
+              //       : "Add to cart"}
+              //   </button>
               ) : (
                 <button disabled className="active">
                   Out of Stock
