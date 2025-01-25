@@ -1433,3 +1433,17 @@
   }
 }
 
+.banner-box{
+	%posrelative {
+  position: relative;
+}
+
+	overflow: hidden;
+	.banner{
+		&-image{
+			img{
+				width: 100%;
+			}
+		}
+  }
+}
