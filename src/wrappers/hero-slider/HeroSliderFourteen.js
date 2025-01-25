@@ -3,6 +3,7 @@ import Swiper, { SwiperSlide } from "../../components/swiper";
 import heroSliderData from "../../data/hero-sliders/hero-slider-fourteen.json";
 import HeroSliderFourteenSingle from "../../components/hero-slider/HeroSliderFourteenSingle.js";
 import { Link } from "react-router-dom";
+import SectionTitleWithText from "../../components/section-title/SectionTitleWithText";
 
 const params = {
   effect: "fade",
@@ -96,14 +97,13 @@ const HeroSliderFourteen = () => {
             </div>
           </div>
         </div>
+        <SectionTitleWithText spaceTopClass="pt-95" spaceBottomClass="pb-90" />
 
-        <div
-          className="full-width-banner-area parallax-window"
-          data-parallax="scroll"
-          img
-          src="assets/img/banner/banner-68.jpg"
-          alt="Banner"
-        ></div>
+        {/* <div
+           class="full-width-banner-area parallax-window"
+           data-parallax="scroll"
+           data-image-src="assets/img/banner/banner-68.jpg"
+        ></div> */}
 
         <div className="banner-area">
           <div className="container-fluid p-0">
