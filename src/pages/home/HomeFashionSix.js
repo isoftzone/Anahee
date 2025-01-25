@@ -3,7 +3,7 @@ import SEO from "../../components/seo";
 import LayoutSeven from "../../layouts/LayoutSeven";
 import HeroSliderFourteen from "../../wrappers/hero-slider/HeroSliderFourteen";
 import HeroSliderTen from "../../wrappers/hero-slider/HeroSliderTen";
-import SectionTitleWithText from "../../components/section-title/SectionTitleWithText";
+// import SectionTitleWithText from "../../components/section-title/SectionTitleWithText";
 import FeatureIconFour from "../../wrappers/feature-icon/FeatureIconFour";
 import TabProductEight from "../../wrappers/product/TabProductEight";
 import NewsletterTwo from "../../wrappers/newsletter/NewsletterTwo";
@@ -36,7 +36,7 @@ const HomeFashionSix = () => {
         {/* hero slider */}
         <HeroSliderFourteen />
         {/* section title */}
-        <SectionTitleWithText spaceTopClass="pt-95" spaceBottomClass="pb-90" />
+        {/* <SectionTitleWithText spaceTopClass="pt-95" spaceBottomClass="pb-90" /> */}
         <HeroSliderTen />
         {/* tab product */}
         <BannerTwentyEight spaceTopClass="pt-100" spaceBottomClass="pb-70" />
