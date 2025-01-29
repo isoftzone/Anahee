@@ -20,17 +20,17 @@ const params = {
 const HeroSliderFourteen = () => {
   return (
     <>
-      <div className="slider-area">
-        <div className="slider-active-2 nav-style-3">
-          <Swiper options={params} className="overflow-hidden">
-            {heroSliderData?.map((single, key) => (
-              <SwiperSlide key={key}>
-                <HeroSliderFourteenSingle data={single} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-      </div>
+       <div className="slider-area">  
+      <div className="slider-active-2 nav-style-3">  
+        <Swiper options={params} className="overflow-hidden">  
+          {heroSliderData?.map((single, key) => (  
+            <SwiperSlide key={key}>  
+              <HeroSliderFourteenSingle data={single} />  
+            </SwiperSlide>  
+          ))}  
+        </Swiper>  
+      </div>  
+    </div>  
       <div className="main-content-wrapper">
         <div className="banner-area">
           <div className="container-fluid p-0">
