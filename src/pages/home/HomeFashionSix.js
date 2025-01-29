@@ -4,7 +4,7 @@ import LayoutSeven from "../../layouts/LayoutSeven";
 import HeroSliderFourteen from "../../wrappers/hero-slider/HeroSliderFourteen";
 import HeroSliderTen from "../../wrappers/hero-slider/HeroSliderTen";
 // import SectionTitleWithText from "../../components/section-title/SectionTitleWithText";
-import FeatureIconFour from "../../wrappers/feature-icon/FeatureIconFour";
+// import FeatureIconFour from "../../wrappers/feature-icon/FeatureIconFour";
 import TabProductEight from "../../wrappers/product/TabProductEight";
 import NewsletterTwo from "../../wrappers/newsletter/NewsletterTwo";
 import ImageSliderOne from "../../wrappers/image-slider/ImageSliderOne";
@@ -24,6 +24,7 @@ import BannerTwo from "../../wrappers/banner/BannerTwo";
 import CategoryTwoSlider from "../../wrappers/category/CategoryTwoSlider";
 import BannerTwentySix from "../../wrappers/banner/BannerTwentySix";
 import BannerThirtyThree from "../../wrappers/banner/BannerThirtyThree";
+// import Banner from "../../wrappers/banner/Banner";
 
 const HomeFashionSix = () => {
   return (
@@ -40,7 +41,7 @@ const HomeFashionSix = () => {
         <HeroSliderTen />
         {/* tab product */}
         <BannerTwentyEight spaceTopClass="pt-100" spaceBottomClass="pb-70" />
-      <CategoryTwoSlider spaceTopClass="pt-100" spaceBottomClass="pb-95" />
+        <CategoryTwoSlider spaceTopClass="pt-100" spaceBottomClass="pb-95" />
 
         <TabProductEight
           spaceBottomClass="pb-70"
@@ -48,22 +49,22 @@ const HomeFashionSix = () => {
           sectionTitle={false}
         />
         {/* feature icon */}
-        <FeatureIconFour
+        {/* <FeatureIconFour
           bgImg="/assets/img/bg/shape.png"
           containerClass="container-fluid"
           gutterClass="padding-10-row-col"
           spaceTopClass="pt-50"
           spaceBottomClass="pb-40"
-        />
+        /> */}
 
         <TabProductTwelve
           category="kids"
           spaceTopClass="pt-95"
           sectionTitle="Best Products"
         />
-                <ProductSliderThree category="fashion" />
-                <BannerTwo spaceTopClass="pt-80" spaceBottomClass="pb-60" />
-        
+        <ProductSliderThree category="fashion" />
+        <BannerTwo spaceTopClass="pt-80" spaceBottomClass="pb-60" />
+
         <BannerTwentySix spaceBottomClass="pb-70" />
 
         <BannerSix spaceTopClass="pt-100" spaceBottomClass="pb-80" />
@@ -92,6 +93,7 @@ const HomeFashionSix = () => {
         {/* image slider */}
         <ImageSliderOne />
       </LayoutSeven>
+      {/* <Banner /> */}
     </Fragment>
   );
 };
