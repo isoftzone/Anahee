@@ -2520,3 +2520,29 @@
   -ms-overflow-style: none; 
   scrollbar-width: none;
 }
+
+
+.header-area {  
+  transition: all 0.3s ease-in-out; /* Smooth transition for the header */  
+}  
+
+.logo img {  
+  transition: opacity 0.3s ease-in-out; /* Smooth transition for the logo */  
+  display: block; /* Ensure block display for smooth opacity */  
+}  
+
+.sticky-block img {  
+  opacity: 1; /* Fully visible when in navbar */  
+}  
+
+.sticky-none img {  
+  opacity: 0; /* Invisible when not scrolled */  
+}  
+
+/* Optional: Adjust sticky-navbar styles */  
+.stick {  
+  position: fixed;  
+  top: 0;  
+  width: 100%;  
+  z-index: 999; /* High z-index for navbar */  
+}
