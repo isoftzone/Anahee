@@ -42,7 +42,7 @@ const BannerSix = ({ spaceTopClass, spaceBottomClass }) => {
               <div className="banner-content-3 banner-position-hm15-2 pink-banner">
                 <h3>Pink Tulip </h3>
                 <p>
-                  Starting At <span>$99.00</span>
+                  Starting At <span>₹99.00</span>
                 </p>
                 <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
                   <i className="fa fa-long-arrow-right" />
@@ -61,7 +61,7 @@ const BannerSix = ({ spaceTopClass, spaceBottomClass }) => {
               <div className="banner-content-3 banner-position-hm17-1 pink-banner">
                 <h3>Pink Tulip </h3>
                 <p>
-                  Starting At <span>$99.00</span>
+                  Starting At <span>₹99.00</span>
                 </p>
                 <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
                   <i className="fa fa-long-arrow-right" />
