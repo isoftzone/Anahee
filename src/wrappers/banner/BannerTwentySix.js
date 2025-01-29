@@ -18,9 +18,9 @@ const BannerTwentySix = ({ spaceBottomClass }) => {
                 />
               </a>
               <div className="banner-content-33-2 banner-content-33-2-position1">
-                <h4>Covid - 19</h4>
+                <h4>Branded</h4>
                 <h2>
-                  Medix Mask <br />
+                  Clothes <br />
                   Up To 40% Off
                 </h2>
                 <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
@@ -41,7 +41,7 @@ const BannerTwentySix = ({ spaceBottomClass }) => {
               </a>
               <div className="banner-content-33-2 banner-content-33-2-position2">
                 <h2>
-                  Hand Gloves <br />
+                  Women Shirts <br />
                   Up To 30% Off
                 </h2>
                 <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
@@ -61,9 +61,9 @@ const BannerTwentySix = ({ spaceBottomClass }) => {
                 />
               </a>
               <div className="banner-content-33-2 banner-content-33-2-position3">
-                <h4>Covid - 19</h4>
+                <h4>New</h4>
                 <h2>
-                  Hand Sanitizer <br />
+                  SweatShirts<br />
                   Up To 40% Off
                 </h2>
                 <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
