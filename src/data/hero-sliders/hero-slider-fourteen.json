@@ -1,11 +1,13 @@
 [
   {
-    "id": 1,
-    "title": "Welcome to Flone",
-    "subtitle": "30% off Summer Vacation",
-    "image": "/assets/img/slider/slider-5.jpg",
-    "url": "/shop-grid-standard"
-  },
+    "id": 1,  
+    "title": "",  
+    "subtitle": "",  
+    "image": "/assets/img/slider/slider-39.png",  
+    "url": "/shop-grid-standard",  
+    "titleImage": "/assets/img/slider/logo.png" 
+  }
+  , 
   {
     "id": 2,
     "title": "Smart Products",
