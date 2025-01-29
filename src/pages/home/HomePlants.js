@@ -12,7 +12,7 @@ const HomePlants = () => {
     <Fragment>
       <SEO
         titleTemplate="Plants Home"
-        description="Plants home of flone react minimalist eCommerce template."
+        description="Plants home of Anahee react minimalist eCommerce template."
       />
       <LayoutTwo footerBgClass="bg-gray-4">
         {/* hero slider */}

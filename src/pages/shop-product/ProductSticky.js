@@ -19,7 +19,7 @@ const ProductSticky = () => {
     <Fragment>
       <SEO
         titleTemplate="Product Page"
-        description="Product page of flone react minimalist eCommerce template."
+        description="Product page of Anahee react minimalist eCommerce template."
       />
 
       <LayoutOne headerTop="visible">
