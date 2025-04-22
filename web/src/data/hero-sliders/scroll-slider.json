@@ -1,0 +1,59 @@
+[
+  {
+    "id": "1",
+    "title": "2020 Fashion For Womens",
+    "subtitle": "-20% Spring <br /> Snickers",
+    "image": "/assets/img/slider/A1.avif",
+    "url": "/shop-grid-full-width"
+  },
+  {
+    "id": "2",
+    "title": "2020 Fashion For Mens",
+    "subtitle": "-30% Spring <br /> Shoes",
+    "image": "/assets/img/slider/A2.avif",
+    "url": "/shop-grid-full-width"
+  },
+  {
+    "id": "3",
+    "title": "2020 Fashion For Kids",
+    "subtitle": "-40% Spring <br /> Shoes",
+    "image": "/assets/img/slider/A3.avif",
+    "url": "/shop-grid-full-width"
+  },
+  {
+    "id": "4",
+    "title": "2020 Fashion For Kids",
+    "subtitle": "-40% Spring <br /> Shoes",
+    "image": "/assets/img/slider/A4.jpeg",
+    "url": "/shop-grid-full-width"
+  },
+  {
+    "id": "5",
+    "title": "2020 Fashion For Kids",
+    "subtitle": "-40% Spring <br /> Shoes",
+    "image": "/assets/img/slider/A5.webp",
+    "url": "/shop-grid-full-width"
+  },
+  {
+    "id": "6",
+    "title": "2020 Fashion For Kids",
+    "subtitle": "-40% Spring <br /> Shoes",
+    "image": "/assets/img/slider/A6.webp",
+    "url": "/shop-grid-full-width"
+  },
+  {
+    "id": "7",
+    "title": "2020 Fashion For Kids",
+    "subtitle": "-40% Spring <br /> Shoes",
+    "image": "/assets/img/slider/A7.webp",
+    "url": "/shop-grid-full-width"
+  },
+  {
+    "id": "8",
+    "title": "2020 Fashion For Kids",
+    "subtitle": "-40% Spring <br /> Shoes",
+    "image": "/assets/img/slider/A8.webp",
+    "url": "/shop-grid-full-width"
+  }
+  
+]

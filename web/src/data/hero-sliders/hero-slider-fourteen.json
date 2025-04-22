@@ -1,0 +1,25 @@
+[
+  {
+    "id": 1,  
+    "title": "",  
+    "subtitle": "",  
+    "image": "/assets/img/banner/banner-87.jpg",
+    "url": "/shop-grid-standard",  
+    "titleImage": "/assets/img/slider/logo.png" 
+  }
+  , 
+  {
+    "id": 2,
+    "title": "Female Clothes",
+    "subtitle": "40% off Female Clothes",
+    "image": "/assets/img/banner/banner-88.jpg",
+    "url": "/shop-grid-standard"
+  },
+  {
+    "id": 3,
+    "title": "Female Fashion",
+    "subtitle": "30% off Female Clothes",
+    "image": "/assets/img/banner/banner-83.jpg",
+    "url": "/shop-grid-standard"
+  }
+]

@@ -1,0 +1,133 @@
+.tippy-box[data-theme~='primary'] {
+    background-color: #4361ee;
+}
+
+.tippy-box[data-theme~='primary'][data-placement^='top'] > .tippy-arrow::before {
+    border-top-color: #4361ee;
+}
+
+.tippy-box[data-theme~='success'] {
+    background-color: #00ab55;
+}
+
+.tippy-box[data-theme~='success'][data-placement^='top'] > .tippy-arrow::before {
+    border-top-color: #00ab55;
+}
+
+.tippy-box[data-theme~='info'] {
+    background-color: #2196f3;
+}
+
+.tippy-box[data-theme~='info'][data-placement^='top'] > .tippy-arrow::before {
+    border-top-color: #2196f3;
+}
+
+.tippy-box[data-theme~='danger'] {
+    background-color: #e7515a;
+}
+
+.tippy-box[data-theme~='danger'][data-placement^='top'] > .tippy-arrow::before {
+    border-top-color: #e7515a;
+}
+
+.tippy-box[data-theme~='warning'] {
+    background-color: #e2a03f;
+}
+
+.tippy-box[data-theme~='warning'][data-placement^='top'] > .tippy-arrow::before {
+    border-top-color: #e2a03f;
+}
+
+.tippy-box[data-theme~='secondary'] {
+    background-color: #805dca;
+}
+
+.tippy-box[data-theme~='secondary'][data-placement^='top'] > .tippy-arrow::before {
+    border-top-color: #805dca;
+}
+
+.tippy-box[data-theme~='dark'] {
+    background-color: #3b3f5c;
+}
+
+.tippy-box[data-theme~='dark'][data-placement^='top'] > .tippy-arrow::before {
+    border-top-color: #3b3f5c;
+}
+
+.bodyy {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+form {
+    margin-top: 20px;
+}
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+/* input[type="text"], input[type="date"] {
+    width: calc(100% - 22px);
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+} */
+input[type="submit"] {
+    background-color:blue;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 78%;
+    margin-top: 20px;
+    width: 20%; /* Make button take full width */
+    box-sizing: border-box; /* Ensure button width includes padding */
+}
+input[type="submit"]:hover {
+    background-color: rgb(37, 86, 116);
+}
+.row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.row > div {
+    width: calc(33.33% - 10px);
+}
+
+.alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    color: white;
+    z-index: 1000;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.alert-success {
+    background-color: #4CAF50;
+}
+
+.alert-error {
+    background-color: #F44336;
+}
+

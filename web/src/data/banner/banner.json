@@ -1,0 +1,19 @@
+[
+    {
+      "id": 1,
+      "image": "/assets/img/banner/banner-80.png",
+      "title": "",
+      "subtitle": "",
+      "link": "/shop-grid-standard",
+      "textAlign": "right"
+    },
+    {
+      "id": 2,
+      "image": "/assets/img/banner/banner-81.png",
+      "title": "",
+      "subtitle": "",
+      "link": "/shop-grid-standard",
+      "textAlign": "left"
+    }
+  ]
+  
