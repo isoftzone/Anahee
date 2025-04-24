@@ -424,9 +424,7 @@ exports.getallitems = (req, res) => {
             color: item.COLOR, // Use color from the data
             image: (item.PHOTO && item.PHOTO.split(",")[0]) || "", // Use the first image in PHOTO if it exists
             size: [
-              { name: "x", stock: 3 },
-              { name: "m", stock: 2 },
-              { name: "xl", stock: 5 },
+              { name: item.I_SIZE, stock:item.MAXQTY }
             ],
           },
         ],

@@ -50,7 +50,7 @@ const HeroSliderFourteen = () => {
             </SwiperSlide>  
           ))}  */}
           {banners.length >= 2 && (
-            banners.slice(36, 39).map((single, key) => (
+            banners.slice(35, 38).map((single, key) => (
               <SwiperSlide key={key}>  
                 <HeroSliderFourteenSingle data={single} />  
               </SwiperSlide>  
@@ -213,10 +213,10 @@ const HeroSliderFourteen = () => {
             </figure>
             <div className="banner-info">
               <div className="banner-info--inner text-center">
-                <h2 className="heading__primary color--white mb--20">
+                {/* <h2 className="heading__primary color--white mb--20">
                   <span className="heading__primary--sub">Perfect Collection</span>
                   <span className="heading__primary--main">For Women</span>
-                </h2>
+                </h2> */}
                 <Link to={"/shop-grid-standard"} className="btn btn-no-bg btn-color-white">
                   Shop Now <i className="fa fa-angle-double-right"></i>
                 </Link>
@@ -234,10 +234,10 @@ const HeroSliderFourteen = () => {
             </figure>
             <div className="banner-info">
               <div className="banner-info--inner text-center">
-                <h2 className="heading__primary color--white mb--20">
+                {/* <h2 className="heading__primary color--white mb--20">
                   <span className="heading__primary--sub">Perfect Accessories</span>
                   <span className="heading__primary--main">For Women</span>
-                </h2>
+                </h2> */}
                 <Link to={"/shop-grid-standard"} className="btn btn-no-bg btn-color-white">
                   Shop Now <i className="fa fa-angle-double-right"></i>
                 </Link>
@@ -255,10 +255,10 @@ const HeroSliderFourteen = () => {
             </figure>
             <div className="banner-info">
               <div className="banner-info--inner text-center">
-                <h2 className="heading__primary color--white mb--20">
+                {/* <h2 className="heading__primary color--white mb--20">
                   <span className="heading__primary--sub">Orange Balzer</span>
                   <span className="heading__primary--main">Winter Shop</span>
-                </h2>
+                </h2> */}
                 <Link to={"/shop-grid-standard"} className="btn btn-no-bg btn-color-white">
                   Shop Now <i className="fa fa-angle-double-right"></i>
                 </Link>

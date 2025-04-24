@@ -9,6 +9,8 @@ import { addToWishlist } from "../../store/slices/wishlist-slice";
 import { addToCompare } from "../../store/slices/compare-slice";
 import { BASE_URL } from "../../config"
 import axios from 'axios'; 
+import Modal from 'react-bootstrap/Modal';
+import SizeChartModal from "./SizeChart";
 
 const ProductDescriptionInfo = ({
   product,
@@ -44,7 +46,7 @@ const ProductDescriptionInfo = ({
     setOpenDropdown(openDropdown === dropdown ? null : dropdown); // If the same dropdown is clicked again, close it.
   };
   const { id } = useParams();
-
+  const [show, setShow] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -122,7 +124,51 @@ const ProductDescriptionInfo = ({
             </div>
           </div> */}
           <div className="pro-details-size">
-            <span>Size</span>
+            <div class="sizeheading  d-flex mb-2">
+                   Size
+                  
+                  <div className="sizechart d-flex align-items-center ms-2" onClick={() => setShow(true)}>
+                    | Size Chart
+                    <img
+                      src="/assets/img/icon-img/sizecharticon.webp"
+                      alt="Size Chart"
+                      className="ms-1"
+                      style={{ width: "20px", height: "20px" }}
+                    />
+                  </div>
+            </div> 
+            {/* size model */}
+            <Modal
+              show={show}
+              onHide={() => setShow(false)}
+              dialogClassName="modal-90w"
+              aria-labelledby="example-custom-modal-styling-title"
+            >
+              <Modal.Header className="d-flex justify-content-between align-items-center">
+                <div>
+                  <Modal.Title id="example-custom-modal-styling-title">
+                    Size Chart (inches)
+                  </Modal.Title>
+                </div>
+                <button
+                  onClick={() => setShow(false)}
+                  style={{
+                    border: "none",
+                    fontSize: "3.2rem",
+                    lineHeight: "1",
+                    padding: "0.25rem 0.5rem",
+                  }}
+                >
+                  &times;
+                </button>
+              </Modal.Header>
+
+              <Modal.Body>
+                <SizeChartModal />
+              </Modal.Body>
+            </Modal>
+
+            {/* <span>Size</span> */}
             <div className="pro-details-size-content">
               {product.variation &&
                 product.variation.map(single => {
@@ -204,7 +250,7 @@ const ProductDescriptionInfo = ({
         </div>
       ) : (
         <div className="pro-details-quality">
-          <div className="cart-plus-minus">
+          {/* <div className="cart-plus-minus">
             <button
               onClick={() =>
                 setQuantityCount(quantityCount > 1 ? quantityCount - 1 : 1)
@@ -231,7 +277,7 @@ const ProductDescriptionInfo = ({
             >
               +
             </button>
-          </div>
+          </div> */}
           <div className="pro-details-cart btn-hover">
             {productStock && productStock > 0 ? (
               <button
