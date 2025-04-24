@@ -127,7 +127,7 @@ useEffect(() => {
           "Content-Type": "application/json"
         }
       });
-      console.log("Combined API response 00011:", response.data.data);
+      //console.log("Combined API response 00011:", response.data.data);
       
       store.dispatch(setProducts(response.data.data));
     } catch (error) {
