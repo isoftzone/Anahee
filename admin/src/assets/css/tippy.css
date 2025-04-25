@@ -131,3 +131,8 @@ input[type="submit"]:hover {
     background-color: #F44336;
 }
 
+.d-flex-btn {
+    display: flex;
+    justify-content: start;
+   
+}
