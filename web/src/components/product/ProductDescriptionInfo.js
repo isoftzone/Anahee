@@ -21,7 +21,7 @@ const ProductDescriptionInfo = ({
   cartItems,
   wishlistItem,
   compareItem,
-}) => {  console.log('product',product);
+}) => {  
   const dispatch = useDispatch();
   const [selectedProductColor, setSelectedProductColor] = useState(
     product.variation ? product.variation[0].color : ""
@@ -394,8 +394,25 @@ const ProductDescriptionInfo = ({
 </div>
 
       {/* Product Details */}
-      <div>
-      <div className="product-details-dropdown">
+    <div>
+      {product.Product_Details ? (
+        <div className="product-details-dropdown">
+          <button onClick={() => toggleDropdown("productDetails")}>
+            Product Details
+          </button>
+          {openDropdown === "productDetails" && (
+            <div className="dropdown-content">
+             <div
+                className="prose mt-2"
+                dangerouslySetInnerHTML={{ __html: product.Product_Details || "<p>No details available.</p>" }}
+              />
+            </div>
+          )}
+        </div>
+      ) : (
+        ""
+      )}
+      {/* <div className="product-details-dropdown">
         <button onClick={() => toggleDropdown("productDetails")}>
           Product Details
         </button>
@@ -417,7 +434,7 @@ const ProductDescriptionInfo = ({
             </ul>
           </div>
         )}
-      </div>
+      </div> */}
 
       <div className="product-details-dropdown">
         <button onClick={() => toggleDropdown("shipping")}>

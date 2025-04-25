@@ -1,39 +1,11 @@
-// const express = require("express");
-// const con = require('../config')
-
-//  exports.getItem = async (req, res) => {
-//     await con.query('SELECT * FROM itemmaster', (err, result) => {
-//          if (err) {
-//              throw err;
-//          }
-//          res.json(result);
-//      });
-//  };
-
 const express = require("express");
 const con = require("../config"); // Ensure this is correctly set up
 const multer = require("multer");
 const path = require("path");
-const fs = require("fs");
 const mysql = require("mysql"); // Ensure MySQL is properly required
-
-// const con = require("../config");
 
 const router = express.Router();
 
-// const storage = multer.diskStorage({
-//   destination: "public/images/banner/",
-//   filename: (req, file, cb) => {
-//     cb(null, file.originalname);
-//   },
-// });                      // original
-// const con = mysql.createConnection({
-//     host: "4.213.43.18",
-//   user: "isrbs",
-//   password: "isoft@1209ISZ",
-//   database: "madhuban",
-//   port: 3306,
-// });
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -44,14 +16,6 @@ const storage = multer.diskStorage({
   },
 });
 
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, "public/images/banner/"); // Save in "public/images/banner" folder
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, file.originalname);
-//   },
-// });
 
 const upload = multer({ storage: storage }).array("images", 5); // 'images' is the field name, 5 is the max number of files
 // const upload = multer({ storage: storage }).array('PHOTO', 5); // 'PHOTO' is the field name, 5 is the max number of files
@@ -247,6 +211,7 @@ exports.addItem = async (req, res) => {
       Section,
       Status,
       DESCRIPTION,
+      Product_Details,
     } = req.body;
     let images = req.body.images;
     if (typeof images === "object") {
@@ -291,6 +256,7 @@ exports.addItem = async (req, res) => {
       Section,
       Status,
       DESCRIPTION,
+      Product_Details,
     };
     //images, PHOTO: JSON.stringify(uploadedImages ) // Store images as JSON string
 
@@ -315,46 +281,6 @@ exports.addItem = async (req, res) => {
     }
   });
 };
-
-// exports.addItem = async (req, res) => {
-
-//     console.log("Received Data:", req.body); // Debugging
-//     console.log("Received File:", req.file); // Debugging
-
-//     const {
-//         CompanyID, Barcode, ItemName, ItemId, BoxSize, HSNCode, Rate, Tax, PurPrice, MarkUp, MRP, MarkDown,
-//         SalePrice, ExpiryDays, LookUp, Remark, Product, Brand, sColor, Color, I_Size, Style,
-//         SubGroup, Gender, Buyer, SubCategory, Category, Material, Company, Season,
-//         Packing, Unit, Section, Status,
-//     } = req.body;
-
-//     const image = req.file ? req.file.filename : null; // Handle Image Upload
-
-//     const newItem = {
-//         CompanyID, Barcode, ItemName, ItemId, BoxSize, HSNCode, Rate, Tax, PurPrice, MarkUp, MRP, MarkDown,
-//         SalePrice, ExpiryDays, LookUp, Remark, Product, Brand, sColor, Color, I_Size, Style,
-//         SubGroup, Gender, Buyer, SubCategory, Category, Material, Company, Season,
-//         Packing, Unit, Section, Status, photo: image
-//     };
-
-//     console.log("New Item Object:", newItem); // Debugging
-
-//     try {
-//         con.query('INSERT INTO itemmaster SET ?', newItem, (err, result) => {
-//             if (err) {
-//                 console.error("❌ Error inserting item:", err);
-//                 return res.status(500).json({ error: "Database error" });
-//             }
-//             console.log("✅ Insert Success:", result);
-//             res.json({ success: true, message: "Item added successfully!", itemID: result.insertId });
-//         });
-//     } catch (error) {
-//         console.error("❌ Unexpected error:", error);
-//         res.status(500).json({ error: "Server error" });
-//     }
-// };
-
-// ✅ Get Items
 
 exports.getItems = (req, res) => {
   const { id } = req.params;
@@ -432,6 +358,7 @@ exports.getallitems = (req, res) => {
         // shortDescription: "Short description here",  // Placeholder for short description
         shortDescription: item.DESCRIPTION,
         fullDescription: "Full description here", // Placeholder for full description
+        Product_Details: item.PRODUCT_DETAILS, // Assuming Product_Details is a string, convert to array
       };
     });
 
@@ -440,106 +367,6 @@ exports.getallitems = (req, res) => {
   });
 };
 
-// ✅ Update Item
-// exports.updateItem = async (req, res) => {
-//     const { id } = req.params;
-//     const {
-//         barcode, itemid, lookup, product, brand, i_size, color, style, unit, category,
-//         rate, tax, purprice, mrp, status, remark, buyer, season, gender, material,
-//         company, subgroup, subcategory, packing, boxing, boxsize, markup,
-//         saleprice, section, discount, sup_color, itemtype
-//     } = req.body;
-
-//     const updatedItem = {
-//         barcode, itemid, lookup, product, brand, i_size, color, style, unit, category,
-//         rate, tax, purprice, mrp, status, remark, buyer, season, gender, material,
-//         company, subgroup, subcategory, packing, boxing, boxsize, markup,
-//         saleprice, section, discount, sup_color, itemtype
-//     };
-
-//     if (req.file) {
-//         updatedItem.photo = req.file.filename;
-//     }
-
-//     try {
-//         await con.query("UPDATE itemmaster SET ? WHERE id = ?", [updatedItem, id], (err, result) => {
-//             if (err) {
-//                 console.error("❌ Error updating item:", err);
-//                 return res.status(500).json({ error: "Database error" });
-//             }
-//             res.json({ success: true, message: "✅ Item updated successfully!" });
-//         });
-//     } catch (error) {
-//         console.error("❌ Unexpected error:", error);
-//         res.status(500).json({ error: "Server error" });
-//     }
-// };
-
-// exports.updateItem = async (req, res) => {
-//     const { id } = req.params; // Ensure id is coming from URL params
-
-//     if (!id) {
-//         return res.status(400).json({ error: "Missing item ID" });
-//     }
-
-//     const updatedItem = {
-//         barcode: req.body.barcode,
-//         ItemId: req.body.ItemId,
-//         lookup: req.body.lookup,
-//         product: req.body.product,
-//         brand: req.body.brand,
-//         i_size: req.body.i_size,
-//         color: req.body.color,
-//         style: req.body.style,
-//         unit: req.body.unit,
-//         category: req.body.category,
-//         rate: req.body.rate,
-//         tax: req.body.tax,
-//         purprice: req.body.purprice,
-//         mrp: req.body.mrp,
-//         status: req.body.status,
-//         remark: req.body.remark,
-//         buyer: req.body.buyer,
-//         season: req.body.season,
-//         gender: req.body.gender,
-//         material: req.body.material,
-//         company: req.body.company,
-//         subgroup: req.body.subgroup,
-//         subcategory: req.body.subcategory,
-//         packing: req.body.packing,
-//         // boxing: req.body.boxing,
-//         boxsize: req.body.boxsize,
-//         markup: req.body.markup,
-//         saleprice: req.body.saleprice,
-//         section: req.body.section,
-//         discount: req.body.discount,
-//         sup_color: req.body.sup_color,
-//         itemtype: req.body.itemtype,
-//     };
-
-//     if (req.file) {
-//         updatedItem.photo = req.file.filename;
-//     }
-
-//     try {
-//         await con.query(
-//             "UPDATE itemmaster SET ? WHERE ItemId = ?",
-//             [updatedItem, id],
-//             (err, result) => {
-//                 if (err) {
-//                     console.error("❌ Error updating item:", err);
-//                     return res.status(500).json({ error: "Database error" });
-//                 }
-//                 res.json({ success: true, message: "✅ Item updated successfully!" });
-//             }
-//         );
-//     } catch (error) {
-//         console.error("❌ Unexpected error:", error);
-//         res.status(500).json({ error: "Server error" });
-//     }
-// };
-
-// ✅ Delete Item
 exports.updateItem = async (req, res) => {
   const { id } = req.params; // Ensure id is coming from URL params
   console.log("Received Item ID for Update:", id);
@@ -599,6 +426,7 @@ exports.updateItem = async (req, res) => {
   if (req.body.SECTION) updatedItem.SECTION = req.body.SECTION;
   if (req.body.STATUS) updatedItem.STATUS = req.body.STATUS;
   if (req.body.DESCRIPTION) updatedItem.DESCRIPTION = req.body.DESCRIPTION;
+  if (req.body.Product_Details) updatedItem.Product_Details = req.body.Product_Details;
 
   // If there are images, include them in the update
   if (images.length > 0) {

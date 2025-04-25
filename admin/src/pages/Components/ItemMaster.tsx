@@ -4,7 +4,8 @@ import axios from 'axios'; // Import Axios
 import { BASE_URL } from '../../config';
 import { cl } from '@fullcalendar/core/internal-common';
 import ImageUploading, { ImageListType } from 'react-images-uploading';
-
+import ReactQuill from "react-quill";
+import { Row, Col } from 'react-bootstrap';
 interface ItemState {
     [key: string]: string | File | null | File[];
     // images: File[];
@@ -55,12 +56,60 @@ const ItemMaster: React.FC = () => {
         // PHOTO: [],
         // images: [],
         DESCRIPTION: '',
+        Product_Details: '',
     });
 
     interface Record {
         PRIMENAME: string;
     }
+  // Add product variations state
+  const [variations, setVariations] = useState([{
+    color: '',
+    image: '',
+    sizes: [{ name: '', stock: '' }],
+}]);
 
+// Add variation functions
+const addVariation = () => {
+    setVariations([
+        ...variations,
+        {
+            color: '',
+            image: '',
+            sizes: [{ name: '', stock: '' }],
+        },
+    ]);
+};
+
+const removeVariation = (index: number) => {
+    const updated = [...variations];
+    updated.splice(index, 1);
+    setVariations(updated);
+};
+
+const handleVariationChange = (index: number, field: string, value: string) => {
+    const updated = [...variations];
+    updated[index][field] = value;
+    setVariations(updated);
+};
+
+const addSize = (varIndex: number) => {
+    const updated = [...variations];
+    updated[varIndex].sizes.push({ name: '', stock: '' });
+    setVariations(updated);
+};
+
+const removeSize = (varIndex: number, sizeIndex: number) => {
+    const updated = [...variations];
+    updated[varIndex].sizes.splice(sizeIndex, 1);
+    setVariations(updated);
+};
+
+const handleSizeChange = (varIndex: number, sizeIndex: number, field: string, value: string) => {
+    const updated = [...variations];
+    updated[varIndex].sizes[sizeIndex][field] = value;
+    setVariations(updated);
+};
     const [dropdownValues, setDropdownValues] = useState<{ [key: string]: string[] }>({});
     const [items, setItems] = useState<ItemState[]>([]); // Store fetched items
     const [editId, setEditId] = useState<number | null>(null);
@@ -86,20 +135,6 @@ const ItemMaster: React.FC = () => {
     const [selectedImages, setSelectedImages] = useState<File[]>([]);
 
     const maxNumber = 6; // Maximum number of images allowed
-
-
-    
-
-    // useEffect(() => {
-    //     axios
-    //         .get(`${BASE_URL}/dropdowns`)
-    //         .then((res) => {
-    //             setDropdownValues(res.data);
-    //         })
-    //         .catch((err) => {
-    //             console.error('Error fetching dropdown values:', err);
-    //         });
-    // }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -189,6 +224,7 @@ const ItemMaster: React.FC = () => {
             addExp: '',
             // images: [],
             // PHOTO: [],
+            Product_Details: '',    
         });
         setImages([]); // Clear the images state
     };
@@ -246,15 +282,12 @@ const ItemMaster: React.FC = () => {
             Section: item.Section,
             Status: item.Status,
             DESCRIPTION: item.Description,
+            Product_Details: item.Product_Details,
             // image: item.image instanceof File ? item.image : null,
             // PHOTO: item.PHOTO instanceof File ? item.PHOTO : null,
 
         };
-        // Object.keys(item).forEach((key) => {
-        //     if (item[key] !== null && key !== 'images') {
-        //         formData.append(key, item[key] as string);
-        //     }
-        // });
+
         Object.keys(item).forEach((key) => {
             if (item[key] !== null && key !== 'photo') {
                 formData.append(key, item[key] as string);
@@ -267,7 +300,7 @@ const ItemMaster: React.FC = () => {
             }
         });
         
-        
+        formData.append('variations', JSON.stringify(variations)); // Append variations to formData
         console.log(data); // Debugging
         images.forEach((image, index) => {
             formData.append('photo', image.file); // Correct
@@ -278,20 +311,21 @@ const ItemMaster: React.FC = () => {
 
             if (editId) {
                 // Update existing item
-                await axios.put(`${BASE_URL}/update/${editId}`, formData, {   //data
+                const res =  await axios.put(`${BASE_URL}/update/${editId}`, formData, {   //data
                     headers: {
                         'Content-Type': 'application/json', //'multipart/form-data'  // application/json
                     },
                 });
                 itemId = editId; // Assign editId to itemId
+                alert(res.data.message);
             } else {
                 // Add new item
-                await axios.post(`${BASE_URL}/addItem`, formData, {         //data
+               const res = await axios.post(`${BASE_URL}/addItem`, formData, {         //data
                     headers: {
                         'Content-Type': 'application/json', //  'multipart/form-data'  
                     },
                 });
-                
+                alert(res.data.message);
             }
 
             // Fetch updated data and reset form
@@ -354,6 +388,7 @@ const ItemMaster: React.FC = () => {
             STATUS: item.STATUS,
             DESCRIPTION:item.DESCRIPTION,
             image: item.image instanceof File ? item.image : null,
+            Product_Details: item.Product_Details,
         };
 
         console.log(data); // Debugging
@@ -407,7 +442,9 @@ const ItemMaster: React.FC = () => {
         const { name, value } = e.target;
         setItem((prev) => ({ ...prev, [name]: value }));
     };
-  
+    const handleProductDetailsChange = (value: string) => {
+        setItem((prev) => ({ ...prev, Product_Details: value }));
+    };
     const handleEditItem = async (id: number) => {
         console.log('Editing Item ID:', id);
         setEditId(id); // Set the editId state
@@ -442,25 +479,9 @@ const ItemMaster: React.FC = () => {
         setSelectedImages(imageFiles);
     };
 
-    // const fetchImagesFromAPI = async () => {
-    //     const formData = new FormData();
-    //     selectedImages.forEach((file) => {
-    //         formData.append("photo", file); // Ensure this key matches the backend
-    //     });
-    //     try {
-    //         const response = await axios.post(`${BASE_URL}/photoupload`, formData, {
-    //             headers: { "Content-Type": "multipart/form-data" },
-    //         });
-    //         console.log("Upload Success:", response.data);
-    //         alert("Images uploaded successfully!");
-    //     } catch (error) {
-    //         console.error("Error uploading images:", error);
-    //         alert("An error occurred while uploading images.");
-    //     }
-    // };
     const fetchImagesFromAPI = async () => {
         const formData = new FormData();
-        formData.append('ItemId', item.ItemId);
+        formData.append('ItemId', item.ItemId as string); // Append the ItemId to the form data
             console.log(item);
         images.forEach((image) => {
             formData.append("photo", image.file);
@@ -478,20 +499,12 @@ const ItemMaster: React.FC = () => {
         }
     };
     
-    
-    
-    
-    
-    
-    
-    
-
     return (
         <div className="max-w-6xl mx-auto p-6 bg-white shadow-md rounded-lg">
             <h2 className="text-2xl font-semibold mb-4 text-center">Item Master</h2>
             <Tab.Group>
                 <Tab.List className="mt-3 flex flex-wrap border-b border-gray-300">
-                    {['Additional Details', 'Descriptions', 'Product Images'].map((tab) => (
+                    {[ 'General Detail', 'Additional Details', 'Descriptions', 'Product Images'].map((tab) => (
                         <Tab as={Fragment} key={tab}>
                             {({ selected }) => <button className={`${selected ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'} px-4 py-2 focus:outline-none`}>{tab}</button>}
                         </Tab>
@@ -499,6 +512,175 @@ const ItemMaster: React.FC = () => {
                 </Tab.List>
 
                 <Tab.Panels>
+                <Tab.Panel>
+                        <div className="space-y-6 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {[
+                                    { field: 'ItemId', type: 'input' },
+                                    { field: 'ItemName', type: 'input' },
+                                    { field: 'Product_Details', type: 'quill', fullWidth: true },
+                                    { field: 'Rate', type: 'input' },
+                                    { field: 'Tax', type: 'input' },
+                                    { field: 'PurPrice', type: 'input' },
+                                    { field: 'MRP', type: 'input' },
+                                    { field: 'SalePrice', type: 'input' },
+                                    { field: 'DESCRIPTION', type: 'textarea', fullWidth: true },
+                                    
+                                ].map(({ field, type, fullWidth }) => (
+                                    <div key={field} className={fullWidth ? 'col-span-full' : ''}>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            {field}
+                                        </label>
+                                        {type === 'input' && (
+                                            <input
+                                            type="text"
+                                            name={field}
+                                            value={item[field] as string}
+                                            onChange={handleChange}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300"
+                                            placeholder={`Enter ${field}`}
+                                            />
+                                        )}
+                                        {type === 'textarea' && (
+                                            <textarea
+                                            name={field}
+                                            value={item[field] as string}
+                                            onChange={handleChange}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-500"
+                                            rows={3}
+                                            />
+                                        )}
+                                        {type === 'quill' && (
+                                            <ReactQuill
+                                            theme="snow"
+                                            className="border border-gray-300 rounded-md shadow-sm quill-editor"
+                                            modules={{
+                                                toolbar: [
+                                                [{ font: [] }, { size: [] }],
+                                                ['bold', 'italic', 'underline', 'strike'],
+                                                [{ color: [] }, { background: [] }],
+                                                [{ script: 'super' }, { script: 'sub' }],
+                                                [
+                                                    { header: [false, 1, 2, 3, 4, 5, 6] },
+                                                    'blockquote',
+                                                    'code-block',
+                                                ],
+                                                [
+                                                    { list: 'ordered' },
+                                                    { list: 'bullet' },
+                                                    { indent: '-1' },
+                                                    { indent: '+1' },
+                                                ],
+                                                ['direction', { align: [] }],
+                                                ['link', 'image', 'video'],
+                                                ['clean'],
+                                                ],
+                                            }}
+                                            value={item[field] as string}
+                                            onChange={handleProductDetailsChange}
+                                            placeholder={`Edit Product Details Here...`}
+                                            />
+                                        )}
+                                    </div>
+                                ))}
+
+                                
+                            </div>
+                        </div>
+
+                        {/* New Product Variations Tab */}
+                        
+                        <div className="container mt-4">
+                            <h3 className="text-xl font-semibold mb-4">Product Variations</h3>
+                            <div className="space-y-6">
+                                {variations.map((variation, varIndex) => (
+                                    <div key={varIndex} className="border p-3 mb-3 rounded-lg">
+                                        <div className="flex gap-2"> {/* Changed row to flex with gap */}
+                                            <div className="flex-1"> {/* Changed col-6 to flex-1 */}
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
+                                                <input
+                                                    type="text"
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300"
+                                                    value={variation.color}
+                                                    onChange={(e) => handleVariationChange(varIndex, 'color', e.target.value)}
+                                                    placeholder="Enter Color"
+                                                />
+                                            </div>
+                                            <div className="flex-1"> {/* Changed col-6 to flex-1 */}
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                                                <input
+                                                    type="text"
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300"
+                                                    value={variation.image}
+                                                    onChange={(e) => handleVariationChange(varIndex, 'image', e.target.value)}
+                                                    placeholder="Enter Image URL"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-3">
+                                            <strong className="block text-sm font-medium text-gray-700 mb-2">Sizes:</strong>
+                                            {variation.sizes.map((size, sizeIndex) => (
+                                                <div key={sizeIndex} className="flex gap-2 mt-2"> {/* Changed row to flex with gap */}
+                                                    <div className="flex-1"> {/* Changed col-md-5 to flex-1 */}
+                                                        <input
+                                                            type="text"
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300"
+                                                            placeholder="Enter Size Name"
+                                                            value={size.name}
+                                                            onChange={(e) => handleSizeChange(varIndex, sizeIndex, 'name', e.target.value)}
+                                                            
+                                                        />
+                                                    </div>
+                                                    <div className="flex-1"> {/* Changed col-md-5 to flex-1 */}
+                                                        <input
+                                                            type="number"
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300"
+                                                            placeholder="Enter Stock"
+                                                            value={size.stock}
+                                                            onChange={(e) => handleSizeChange(varIndex, sizeIndex, 'stock', e.target.value)}
+                                                            required
+                                                        />
+                                                    </div>
+                                                    <div className="w-auto"> {/* Changed col-md-2 to w-auto */}
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-outline-danger"
+                                                            onClick={() => removeSize(varIndex, sizeIndex)}
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            <div className="flex gap-2 mt-2"> {/* Changed d-flex-btn to flex with gap */}
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-secondary flex-1"
+                                                    onClick={() => addSize(varIndex)}
+                                                >
+                                                    + Add Size
+                                                </button>
+                                                <div className="flex-1"> {/* Changed col-md-4 to flex-1 */}
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-danger w-full"
+                                                        onClick={() => removeVariation(varIndex)}
+                                                    >
+                                                        Remove Variation
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                                
+                                <button type="button" className="btn btn-primary ms-3" onClick={addVariation}>
+                                    + Add Variation
+                                </button>
+                            </div>
+                        </div>
+                    </Tab.Panel>
                     <Tab.Panel>
                         <div className="grid grid-cols-4 gap-4 p-4 border rounded">
                             {['Barcode', 'ItemId', 'ItemName', 'BoxSize', 'HSNCode', 'Rate', 'Tax', 'PurPrice', 'MarkUp', 'MRP', 'MarkDown', 'SalePrice', 'ExpiryDays','DESCRIPTION'].map((field) => (
