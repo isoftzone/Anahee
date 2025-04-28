@@ -1025,6 +1025,9 @@ const Sidebar = () => {
                                             <NavLink to="/components/exchange-policy">Exchange Policy</NavLink>
                                         </li>
                                         <li>
+                                            <NavLink to="/components/privacy-policy">Privacy Policy</NavLink>
+                                        </li>
+                                        <li>
                                             <NavLink to="/components/terms-conditions">Terms And Conditions</NavLink>
                                         </li>
 

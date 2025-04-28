@@ -9,7 +9,7 @@ const SectionTitleHome = ({ spaceTopClass, spaceBottomClass }) => {
           <h5>Who Are We</h5>
           <h1>Welcome To Anahee</h1>
           <p>
-          At Anahee, we craft timeless styles that blend tradition with modern elegance. Rooted in Indian heritage and inspired by minimalism, our pieces celebrate modest fashion with a contemporary touch — effortless, graceful, and deeply soulful.
+          At Anahee (Anand Fashion), we craft timeless styles that blend tradition with modern elegance. Rooted in Indian heritage and inspired by minimalism, our pieces celebrate modest fashion with a contemporary touch — effortless, graceful, and deeply soulful.
           </p>
         </div>
       </div>

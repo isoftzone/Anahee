@@ -5,7 +5,6 @@ import { BASE_URL } from '../../config';
 import { cl } from '@fullcalendar/core/internal-common';
 import ImageUploading, { ImageListType } from 'react-images-uploading';
 import ReactQuill from "react-quill";
-import { Row, Col } from 'react-bootstrap';
 interface ItemState {
     [key: string]: string | File | null | File[];
     // images: File[];
@@ -145,7 +144,7 @@ const handleSizeChange = (varIndex: number, sizeIndex: number, field: string, va
                 "Content-Type": "application/json"
               }
             });
-            console.log("Combined API response:", response.data);
+            console.log("Combined API response:11", response.data);
             setProducts(response.data.Product);
             setStatuses(response.data.Status);
             setBrands(response.data.Brand);
@@ -595,18 +594,27 @@ const handleSizeChange = (varIndex: number, sizeIndex: number, field: string, va
                             <div className="space-y-6">
                                 {variations.map((variation, varIndex) => (
                                     <div key={varIndex} className="border p-3 mb-3 rounded-lg">
-                                        <div className="flex gap-2"> {/* Changed row to flex with gap */}
+                                        <div className="flex gap-4"> {/* Changed row to flex with gap */}
                                             <div className="flex-1"> {/* Changed col-6 to flex-1 */}
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
-                                                <input
+                                                {/* <input
                                                     type="text"
                                                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300"
                                                     value={variation.color}
                                                     onChange={(e) => handleVariationChange(varIndex, 'color', e.target.value)}
                                                     placeholder="Enter Color"
-                                                />
+                                                /> */}
+                                                <select  value={variation.color} onChange={(e) => handleVariationChange(varIndex, 'color', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300">
+                                                    <option value="" selected disabled>Select a color</option>
+                                                    {dropdownValues["color"]?.map((option, idx) => (
+                                                        <option key={idx} value={option}>
+                                                            {option}
+                                                        </option>
+                                                    ))}
+                                                </select>
                                             </div>
-                                            <div className="flex-1"> {/* Changed col-6 to flex-1 */}
+                                             {/* Changed col-6 to flex-1 */}
+                                            {/* <div className="flex-1">
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
                                                 <input
                                                     type="text"
@@ -615,22 +623,30 @@ const handleSizeChange = (varIndex: number, sizeIndex: number, field: string, va
                                                     onChange={(e) => handleVariationChange(varIndex, 'image', e.target.value)}
                                                     placeholder="Enter Image URL"
                                                 />
-                                            </div>
+                                            </div> */}
                                         </div>
 
                                         <div className="mt-3">
                                             <strong className="block text-sm font-medium text-gray-700 mb-2">Sizes:</strong>
                                             {variation.sizes.map((size, sizeIndex) => (
-                                                <div key={sizeIndex} className="flex gap-2 mt-2"> {/* Changed row to flex with gap */}
+                                                <div key={sizeIndex} className="flex gap-4 mt-2"> {/* Changed row to flex with gap */}
                                                     <div className="flex-1"> {/* Changed col-md-5 to flex-1 */}
-                                                        <input
+                                                        {/* <input
                                                             type="text"
                                                             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300"
                                                             placeholder="Enter Size Name"
                                                             value={size.name}
                                                             onChange={(e) => handleSizeChange(varIndex, sizeIndex, 'name', e.target.value)}
                                                             
-                                                        />
+                                                        /> */}
+                                                        <select value={size.name}  onChange={(e) => handleSizeChange(varIndex, sizeIndex, 'name', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300">
+                                                            <option value="" selected disabled>Select a size</option>
+                                                            {dropdownValues["size"]?.map((option, idx) => (
+                                                                <option key={idx} value={option}>
+                                                                    {option}
+                                                                </option>
+                                                            ))}
+                                                        </select>
                                                     </div>
                                                     <div className="flex-1"> {/* Changed col-md-5 to flex-1 */}
                                                         <input
@@ -653,7 +669,7 @@ const handleSizeChange = (varIndex: number, sizeIndex: number, field: string, va
                                                     </div>
                                                 </div>
                                             ))}
-                                            <div className="flex gap-2 mt-2"> {/* Changed d-flex-btn to flex with gap */}
+                                            <div className="flex gap-4 mt-2"> {/* Changed d-flex-btn to flex with gap */}
                                                 <button
                                                     type="button"
                                                     className="btn btn-secondary flex-1"

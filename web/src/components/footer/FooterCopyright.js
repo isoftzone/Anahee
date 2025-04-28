@@ -17,9 +17,9 @@ const FooterCopyright = ({ footerLogo, spaceBottomClass, colorClass }) => {
           rel="noopener noreferrer"
           target="_blank"
         >
-          Anahee
+          Anahee <br /> (Anand Fashion)
         </a>
-        .<br /> All Rights Reserved
+        .<br /> All Rights Reserved 
       </p>
     </div>
   );

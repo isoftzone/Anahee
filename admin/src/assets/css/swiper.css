@@ -28,6 +28,15 @@
     height: 20px;
 }
 
+.swiper-button-prev,
+.swiper-button-next{
+    display: flex;
+}
+
+.pyb-1{
+    padding-bottom: -2px;
+}
+
 @media only screen and (max-width: 1200px) {
     #slider3 .swiper-wrapper,
     #slider4 .swiper-wrapper {
