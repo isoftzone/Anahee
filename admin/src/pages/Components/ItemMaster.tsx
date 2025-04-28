@@ -89,7 +89,7 @@ const removeVariation = (index: number) => {
 
 const handleVariationChange = (index: number, field: string, value: string) => {
     const updated = [...variations];
-    updated[index][field] = value;
+    // updated[index][field] = value;
     setVariations(updated);
 };
 
@@ -107,7 +107,7 @@ const removeSize = (varIndex: number, sizeIndex: number) => {
 
 const handleSizeChange = (varIndex: number, sizeIndex: number, field: string, value: string) => {
     const updated = [...variations];
-    updated[varIndex].sizes[sizeIndex][field] = value;
+    // updated[varIndex].sizes[sizeIndex][field] = value;
     setVariations(updated);
 };
     const [dropdownValues, setDropdownValues] = useState<{ [key: string]: string[] }>({});
