@@ -2,6 +2,7 @@ import { Suspense, lazy, useEffect } from "react";
 import ScrollToTop from "./helpers/scroll-top";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ExchangePolicy from "./pages/other/ExchangePolicy";
+import PrivacyPolicy from "./pages/other/PrivacyPolicy";
 import TermsAndConditions from "./pages/other/TermsAndConditions";
 import ExchangeProcess from "./pages/other/ExchangeProcess";
 import CancellationPolicy from "./pages/other/CancellationPolicy";
@@ -404,6 +405,10 @@ useEffect(() => {
               <Route
                 path={process.env.PUBLIC_URL + "/exchange-policy"}
                 element={<ExchangePolicy/>}
+              />
+               <Route
+                path={process.env.PUBLIC_URL + "/privacy-policy"}
+                element={<PrivacyPolicy/>}
               />
                <Route
                 path={process.env.PUBLIC_URL + "/terms-conditions"}
