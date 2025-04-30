@@ -408,13 +408,13 @@ const NavMenu = ({ menuWhiteClass, sidebarMenu }) => {
             </Link>
             <ul className="submenu">
               <li>
-                <Link to={process.env.PUBLIC_URL + "/cart"}>
+                <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
                   {t("Kurta Sets")}
                 </Link>
               </li>
             </ul>
           </li>
-          <li>
+          {/* <li>
             <Link to={process.env.PUBLIC_URL + "/"}>
               {t("Western Wear")}
               {sidebarMenu ? (
@@ -473,7 +473,7 @@ const NavMenu = ({ menuWhiteClass, sidebarMenu }) => {
             <Link to={process.env.PUBLIC_URL + "/contact"}>
               {t("Kidswear")}
             </Link>
-          </li>
+          </li> */}
           {/* <li>
             <Link to={process.env.PUBLIC_URL + "/blog-standard"}>
               {t("blog")}
@@ -508,11 +508,11 @@ const NavMenu = ({ menuWhiteClass, sidebarMenu }) => {
               </li>
             </ul>
           </li> */}
-          {/* <li>
+          <li>
             <Link to={process.env.PUBLIC_URL + "/contact"}>
               {t("Contact")}
             </Link>
-          </li> */}
+          </li>
         </ul>
       </nav>
     </div>

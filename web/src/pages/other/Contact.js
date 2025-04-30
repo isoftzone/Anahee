@@ -35,8 +35,7 @@ const Contact = () => {
                       <i className="fa fa-phone" />
                     </div>
                     <div className="contact-info-dec">
-                      <p>+012 345 678 102</p>
-                      <p>+012 345 678 102</p>
+                      <p>+91 9799906182</p>
                     </div>
                   </div>
                   <div className="single-contact-info">
@@ -45,13 +44,13 @@ const Contact = () => {
                     </div>
                     <div className="contact-info-dec">
                       <p>
-                        <a href="mailto:yourname@email.com">
-                          yourname@email.com
+                        <a href="mailto:sahiba@anahee.in">
+                          sahiba@anahee.in
                         </a>
                       </p>
                       <p>
-                        <a href="https://yourwebsitename.com">
-                          yourwebsitename.com
+                        <a href="http://anahee.in/">
+                          anahee.in
                         </a>
                       </p>
                     </div>
@@ -61,8 +60,14 @@ const Contact = () => {
                       <i className="fa fa-map-marker" />
                     </div>
                     <div className="contact-info-dec">
-                      <p>Address goes here, </p>
-                      <p>street, Crossroad 123.</p>
+                    <p> Building No./Flat No.: 58</p>
+                     <p> Road/Street: Shree Chamatkaareshvar Mahadev Road</p>
+                     <p> Nearby Landmark: Jaipur Nagar Nigam</p>
+                     <p> Locality/Sub Locality: INDRA COLONY BANI PARK</p>
+                     <p> City/Town/Village: Jaipur</p>
+                     <p> District: Jaipur</p>
+                     <p> State: Rajasthan</p>
+                     <p> PIN Code: 302016</p>
                     </div>
                   </div>
                   <div className="contact-social text-center">

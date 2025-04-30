@@ -60,6 +60,11 @@ const FooterOne = ({
                     </Link>
                   </li>
                   <li>
+                    <Link to={process.env.PUBLIC_URL + "/privacy-policy"}>
+                    Privacy Policy
+                    </Link>
+                  </li>
+                  <li>
                     <Link to={process.env.PUBLIC_URL + "/exchange-process"}>Exchange Process</Link>
                   </li>
                 </ul>

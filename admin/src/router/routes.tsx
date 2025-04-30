@@ -3,6 +3,7 @@ import HideSeek from '../pages/Components/HideSeek';
 import ImageUpdates from '../pages/Components/ImageUpdate';
 import ItemMaster from '../pages/Components/ItemMaster';
 import ExchangePolicy from '../pages/Components/ExchangePolicy';
+import PrivacyPolicy from '../pages/Components/PrivacyPolicy';
 import TermsAndConditions from '../pages/Components/TermsAndConditions';
 import ExchangeProcess from '../pages/Components/ExchangeProcess';
 import CancellationPolicy from '../pages/Components/CancellationPolicy';
@@ -341,6 +342,10 @@ const routes = [
     {
         path: '/components/exchange-policy',
         element: <ExchangePolicy/>
+    },
+    {
+        path: '/components/privacy-policy',
+        element: <PrivacyPolicy/>
     },
     {
         path: '/components/terms-conditions',
