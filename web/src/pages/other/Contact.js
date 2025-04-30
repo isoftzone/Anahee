@@ -64,7 +64,7 @@ const Contact = () => {
                       <p> near Pani Paech Chaurah, Jaipur - 302016</p>
                     </div>
                   </div>
-                  <div className="single-contact-info">
+                  {/* <div className="single-contact-info">
                     <div className="contact-icon">
                       <i className="fa fa-map-marker" />
                     </div>
@@ -72,7 +72,7 @@ const Contact = () => {
                       <p> <b> Branch  :  </b> 73, Second floor,</p>
                       <p> The White House Society, Sector-57, 122003</p>
                     </div>
-                  </div>
+                  </div> */}
                   <div className="contact-social text-center">
                     <h3>Follow Us</h3>
                     <ul>
