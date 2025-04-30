@@ -170,7 +170,7 @@ const upload = multer({
 router.use(bodyParser.json({ limit: '50mb' }));
 router.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-exports.addItem = (req, res) => {
+exports.addItem = (req, res) => { console.log('colled');
   upload(req, res, async (err) => {
     if (err) {
       console.error("❌ Upload error:", err);
