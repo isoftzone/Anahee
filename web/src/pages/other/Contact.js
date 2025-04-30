@@ -60,14 +60,8 @@ const Contact = () => {
                       <i className="fa fa-map-marker" />
                     </div>
                     <div className="contact-info-dec">
-                    <p> Building No./Flat No.: 58</p>
-                     <p> Road/Street: Shree Chamatkaareshvar Mahadev Road</p>
-                     <p> Nearby Landmark: Jaipur Nagar Nigam</p>
-                     <p> Locality/Sub Locality: INDRA COLONY BANI PARK</p>
-                     <p> City/Town/Village: Jaipur</p>
-                     <p> District: Jaipur</p>
-                     <p> State: Rajasthan</p>
-                     <p> PIN Code: 302016</p>
+                      <p> 58, Indira Colony Bani Park,</p>
+                      <p> near Pani Paech Chaurah, Jaipur - 302016</p>
                     </div>
                   </div>
                   <div className="contact-social text-center">
