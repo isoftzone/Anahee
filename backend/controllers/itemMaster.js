@@ -1,283 +1,298 @@
+// const express = require("express");
+// const con = require("../config"); // Ensure this is correctly set up
+// const multer = require("multer");
+// const mysql = require("mysql"); // Ensure MySQL is properly required
+
+// const router = express.Router();
+
+
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "public/images/banner/"); // Save in "public/images/banner" folder
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, file.originalname);
+//   },
+// });
+
+
+// const upload = multer({ storage: storage }).array("images", 5); // 'images' is the field name, 5 is the max number of files
+
+
+// exports.addItem = async (req, res) => {
+//   upload(req, res, function (err) {
+//     if (err) {
+//       console.error("❌ Error uploading files:", err);
+//       return res.status(500).json({ error: "File upload error" });
+//     }
+
+//     const {
+//       CompanyID,
+//       Barcode,
+//       ItemName,
+//       ItemId,
+//       BoxSize,
+//       HSNCode,
+//       Rate,
+//       Tax,
+//       PurPrice,
+//       MarkUp,
+//       MRP,
+//       MarkDown,
+//       SalePrice,
+//       ExpiryDays,
+//       LookUp,
+//       Remark,
+//       Product,
+//       Brand,
+//       sColor,
+//       Color,
+//       I_Size,
+//       Style,
+//       SubGroup,
+//       Gender,
+//       Buyer,
+//       SubCategory,
+//       Category,
+//       Material,
+//       Company,
+//       Season,
+//       Packing,
+//       Unit,
+//       Section,
+//       Status,
+//       DESCRIPTION,
+//       Product_Details,
+//     } = req.body;
+//     let images = req.body.images;
+//     if (typeof images === "object") {
+//       images = JSON.stringify(images); // Convert to JSON string
+//     }
+
+//     // const uploadedImages  = req.files ? req.files.map(file => `public/images/banner/${file.filename}`) : [];
+//     // const uploadedImages = req.file.originalname;
+//     const newItem = {
+//       CompanyID,
+//       Barcode,
+//       ItemName,
+//       ItemId,
+//       BoxSize,
+//       HSNCode,
+//       Rate,
+//       Tax,
+//       PurPrice,
+//       MarkUp,
+//       MRP,
+//       MarkDown,
+//       SalePrice,
+//       ExpiryDays,
+//       LookUp,
+//       Remark,
+//       Product,
+//       Brand,
+//       sColor,
+//       Color,
+//       I_Size,
+//       Style,
+//       SubGroup,
+//       Gender,
+//       Buyer,
+//       SubCategory,
+//       Category,
+//       Material,
+//       Company,
+//       Season,
+//       Packing,
+//       Unit,
+//       Section,
+//       Status,
+//       DESCRIPTION,
+//       Product_Details,
+//     };
+//     //images, PHOTO: JSON.stringify(uploadedImages ) // Store images as JSON string
+
+//     console.log("New Item Object:", newItem); // Debugging
+
+//     try {
+//       con.query("INSERT INTO itemmaster SET ?", newItem, (err, result) => {
+//         if (err) {
+//           console.error("❌ Error inserting item:", err);
+//           return res.status(500).json({ error: "Database error" });
+//         }
+//         console.log("✅ Insert Success:", result);
+//         res.json({
+//           success: true,
+//           message: "Item added successfully!",
+//           itemID: result.insertId,
+//         });
+//       });
+//     } catch (error) {
+//       console.error("❌ Unexpected error:", error);
+//       res.status(500).json({ error: "Server error" });
+//     }
+//   });
+// };
+
 const express = require("express");
-const con = require("../config"); // Ensure this is correctly set up
+const con = require("../config");
 const multer = require("multer");
 const path = require("path");
-const mysql = require("mysql"); // Ensure MySQL is properly required
-
+const fs = require("fs");
+const bodyParser = require("body-parser");
 const router = express.Router();
 
 
+// Configure storage for item images
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "public/images/banner/"); // Save in "public/images/banner" folder
+    const uploadDir = "public/images/banner/";
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  },
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'item-' + uniqueSuffix + path.extname(file.originalname));
+  }
 });
 
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10 MB per file
+    files: 50,                  // Max 50 files
+    fieldSize: 5 * 1024 * 1024, // ⬅️ Increase max field size to 5MB (adjust as needed)
+    fields: 100                 // Optional: increase number of non-file fields
+  }
+}).any();
 
-const upload = multer({ storage: storage }).array("images", 5); // 'images' is the field name, 5 is the max number of files
-// const upload = multer({ storage: storage }).array('PHOTO', 5); // 'PHOTO' is the field name, 5 is the max number of files
+router.use(bodyParser.json({ limit: '50mb' }));
+router.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-// Add a New Item
-
-// ✅ Add Item
-// exports.addItem = async (req, res) => {
-//     const {
-//         barcode, itemid, lookup, product, brand, i_size, color, style, unit, category,
-//         rate, tax, purprice, mrp, status, remark, buyer, season, gender, material,
-//         company, subgroup, subcategory, packing, markup,
-//         saleprice, section, discount, sup_color, itemtype
-//     } = req.body;
-
-//     const image = req.file ? req.file.filename : null;
-
-//     const newItem = {
-//         barcode, itemid, lookup, product, brand, i_size, color, style, unit, category,
-//         rate, tax, purprice, mrp, status, remark, buyer, season, gender, material,
-//         company, subgroup, subcategory, packing, markup,
-//         saleprice, section, discount, sup_color, itemtype, photo: image
-//     };
-
-//     try {
-//         await con.query('INSERT INTO itemmaster SET ?', newItem, (err, result) => {
-//             if (err) {
-//                 console.error("❌ Error inserting item:", err);
-//                 return res.status(500).json({ error: "Database error" });
-//             }
-//             res.json({ success: true, message: "✅ Item added successfully!", itemID: result.insertId });
-//         });
-//     } catch (error) {
-//         console.error("❌ Unexpected error:", error);
-//         res.status(500).json({ error: "Server error" });
-//     }
-// };
-
-// exports.addItem = async (req, res) => {
-//     console.log("Received Data:", req.body); // Debugging
-
-// // barcode, itemid, lookup, product, brand, i_size, color, style, unit, category,
-// //         rate, tax, purprice, mrp, status, remark, buyer, season, gender, material,
-// //         company, subgroup, subcategory, packing, markup,
-// //         saleprice, section, discount, sup_color, itemtype
-
-//     const {
-//         Barcode, ItemName, BoxSize, HSNCode, Rate, Tax, PurPrice, MarkUp, MRP, MarkDown,
-//         SalePrice, ExpiryDays, LookUp, Remark, Product, Brand, sColor, Color, I_Size, Style,
-//         SubGroup, Gender, Buyer, SubCategory, Category, Material, Company, Season,
-//         Packing, Unit, Section, Status,
-//     } = req.body;
-
-//     const image = req.file ? req.file.filename : null; // Handle Image Upload
-
-//     const newItem = {
-//         Barcode, ItemName, BoxSize, HSNCode, Rate, Tax, PurPrice, MarkUp, MRP, MarkDown,
-//         SalePrice, ExpiryDays, LookUp, Remark, Product, Brand, sColor, Color, I_Size, Style,
-//         SubGroup, Gender, Buyer, SubCategory, Category, Material, Company, Season,
-//         Packing, Unit, Section, Status, photo: image
-//     };
-
-//     console.log("New Item Object:", newItem); // Debugging
-
-//     try {
-//         con.query('INSERT INTO itemmaster SET ?', newItem, (err, result) => {
-//             if (err) {
-//                 console.error("❌ Error inserting item:", err);
-//                 return res.status(500).json({ error: "Database error" });
-//             }
-//             console.log("✅ Insert Success:", result);
-//             res.json({ success: true, message: "Item added successfully!", itemID: result.insertId });
-//         });
-//     } catch (error) {
-//         console.error("❌ Unexpected error:", error);
-//         res.status(500).json({ error: "Server error" });
-//     }
-// };
-
-// exports.addItem = async (req, res) => {
-//     console.log("Received Data:", req.body); // Debugging
-
-//     const {
-//        CompanyID, Barcode, ItemName, ItemId, BoxSize, HSNCode, Rate, Tax, PurPrice, MarkUp, MRP, MarkDown,
-//         SalePrice, ExpiryDays, LookUp, Remark, Product, Brand, sColor, Color, I_Size, Style,
-//         SubGroup, Gender, Buyer, SubCategory, Category, Material, Company, Season,
-//         Packing, Unit, Section, Status,
-//     } = req.body;
-
-//     const image = req.file ? req.file.filename : null; // Handle Image Upload
-
-//     const newItem = {
-//         CompanyID, Barcode, ItemName, ItemId, BoxSize, HSNCode, Rate, Tax, PurPrice, MarkUp, MRP, MarkDown,
-//         SalePrice, ExpiryDays, LookUp, Remark, Product, Brand, sColor, Color, I_Size, Style,
-//         SubGroup, Gender, Buyer, SubCategory, Category, Material, Company, Season,
-//         Packing, Unit, Section, Status, photo: image
-//     };
-
-//     console.log("New Item Object:", newItem); // Debugging
-
-//     try {
-//         con.query('INSERT INTO itemmaster SET ?', newItem, (err, result) => {
-//             if (err) {
-//                 console.error("❌ Error inserting item:", err);
-//                 return res.status(500).json({ error: "Database error" });
-//             }
-//             console.log("✅ Insert Success:", result);
-//             res.json({ success: true, message: "Item added successfully!", itemID: result.insertId });
-//         });
-//     } catch (error) {
-//         console.error("❌ Unexpected error:", error);
-//         res.status(500).json({ error: "Server error" });
-//     }
-// };
-
-// exports.addItem = async (req, res) => {
-//     console.log("Received Data:", req.body); // Debugging
-
-//     const {
-//         CompanyID, Barcode, ItemName, ItemId, BoxSize, HSNCode, Rate, Tax, PurPrice, MarkUp, MRP, MarkDown,
-//         SalePrice, ExpiryDays, LookUp, Remark, Product, Brand, sColor, Color, I_Size, Style,
-//         SubGroup, Gender, Buyer, SubCategory, Category, Material, Company, Season,
-//         Packing, Unit, Section, Status,image
-//     } = req.body;
-
-//     // const images = req.files ? req.files.map(file => file.filename) : [];
-//     const images = req.files ? req.files.map(file => `/images/banner/${file.filename}`) : [];
-
-//     const newItem = {
-//         CompanyID, Barcode, ItemName, ItemId, BoxSize, HSNCode, Rate, Tax, PurPrice, MarkUp, MRP, MarkDown,
-//         SalePrice, ExpiryDays, LookUp, Remark, Product, Brand, sColor, Color, I_Size, Style,
-//         SubGroup, Gender, Buyer, SubCategory, Category, Material, Company, Season, image,
-//         Packing, Unit, Section, Status, PHOTO: JSON.stringify(images) // Store images as JSON string
-//     };
-
-//     console.log("New Item Object:", newItem); // Debugging
-
-//     try {
-//         con.query('INSERT INTO itemmaster SET ?', newItem, (err, result) => {
-//             if (err) {
-//                 console.error("❌ Error inserting item:", err);
-//                 return res.status(500).json({ error: "Database error" });
-//             }
-//             console.log("✅ Insert Success:", result);
-//             res.json({ success: true, message: "Item added successfully!", itemID: result.insertId });
-//         });
-//     } catch (error) {
-//         console.error("❌ Unexpected error:", error);
-//         res.status(500).json({ error: "Server error" });
-//     }
-// };
-
-exports.addItem = async (req, res) => {
-  upload(req, res, function (err) {
+exports.addItem = (req, res) => {
+  upload(req, res, async (err) => {
     if (err) {
-      console.error("❌ Error uploading files:", err);
-      return res.status(500).json({ error: "File upload error" });
+      console.error("❌ Upload error:", err);
+      return res.status(500).json({
+        success: false,
+        message: "File upload failed",
+        error: err.message
+      });
     }
-
-    const {
-      CompanyID,
-      Barcode,
-      ItemName,
-      ItemId,
-      BoxSize,
-      HSNCode,
-      Rate,
-      Tax,
-      PurPrice,
-      MarkUp,
-      MRP,
-      MarkDown,
-      SalePrice,
-      ExpiryDays,
-      LookUp,
-      Remark,
-      Product,
-      Brand,
-      sColor,
-      Color,
-      I_Size,
-      Style,
-      SubGroup,
-      Gender,
-      Buyer,
-      SubCategory,
-      Category,
-      Material,
-      Company,
-      Season,
-      Packing,
-      Unit,
-      Section,
-      Status,
-      DESCRIPTION,
-      Product_Details,
-    } = req.body;
-    let images = req.body.images;
-    if (typeof images === "object") {
-      images = JSON.stringify(images); // Convert to JSON string
-    }
-
-    // const uploadedImages  = req.files ? req.files.map(file => `public/images/banner/${file.filename}`) : [];
-    // const uploadedImages = req.file.originalname;
-    const newItem = {
-      CompanyID,
-      Barcode,
-      ItemName,
-      ItemId,
-      BoxSize,
-      HSNCode,
-      Rate,
-      Tax,
-      PurPrice,
-      MarkUp,
-      MRP,
-      MarkDown,
-      SalePrice,
-      ExpiryDays,
-      LookUp,
-      Remark,
-      Product,
-      Brand,
-      sColor,
-      Color,
-      I_Size,
-      Style,
-      SubGroup,
-      Gender,
-      Buyer,
-      SubCategory,
-      Category,
-      Material,
-      Company,
-      Season,
-      Packing,
-      Unit,
-      Section,
-      Status,
-      DESCRIPTION,
-      Product_Details,
-    };
-    //images, PHOTO: JSON.stringify(uploadedImages ) // Store images as JSON string
-
-    console.log("New Item Object:", newItem); // Debugging
 
     try {
-      con.query("INSERT INTO itemmaster SET ?", newItem, (err, result) => {
+      // 1. Insert main item data
+      const itemData = {
+        CompanyID: req.body.CompanyID,
+        Barcode: req.body.Barcode,
+        ItemName: req.body.ItemName,
+        ItemId: req.body.ItemId,
+        BoxSize: req.body.BoxSize,
+        HSNCode: req.body.HSNCode,
+        Rate: req.body.Rate,
+        Tax: req.body.Tax,
+        PurPrice: req.body.PurPrice,
+        MarkUp: req.body.MarkUp,
+        MRP: req.body.MRP,
+        MarkDown: req.body.MarkDown,
+        SalePrice: req.body.SalePrice,
+        ExpiryDays: req.body.ExpiryDays,
+        LookUp: req.body.LookUp,
+        Remark: req.body.Remark,
+        Product: req.body.Product,
+        Brand: req.body.Brand,
+        sColor: req.body.sColor,
+        Color: req.body.Color,
+        I_Size: req.body.I_Size,
+        Style: req.body.Style,
+        SubGroup: req.body.SubGroup,
+        Gender: req.body.Gender,
+        Buyer: req.body.Buyer,
+        SubCategory: req.body.SubCategory,
+        Category: req.body.Category,
+        Material: req.body.Material,
+        Company: req.body.Company,
+        Season: req.body.Season,
+        Packing: req.body.Packing,
+        Unit: req.body.Unit,
+        Section: req.body.Section,
+        Status: req.body.Status,
+        DESCRIPTION: req.body.DESCRIPTION,
+        Product_Details: req.body.Product_Details
+      };
+
+      // Insert item
+      con.query("INSERT INTO itemmaster SET ?", itemData, async (err, result) => {
         if (err) {
           console.error("❌ Error inserting item:", err);
           return res.status(500).json({ error: "Database error" });
         }
-        console.log("✅ Insert Success:", result);
+
+        const itemId = result.insertId;
+
+        // Process variations if present
+        if (req.body.variations) {
+          const variations = JSON.parse(req.body.variations);
+          const files = req.files || [];
+
+          // Map files to variations
+          const variationImages = {};
+          files.forEach(file => {
+            const matches = file.fieldname.match(/variation_(\d+)_image_(\d+)/);
+            if (matches) {
+              const varIndex = matches[1];
+              if (!variationImages[varIndex]) {
+                variationImages[varIndex] = [];
+              }
+              variationImages[varIndex].push(`/images/banner/${file.filename}`);
+            }
+          });
+
+          // Use promises to manage inserts
+          for (const [index, variation] of variations.entries()) {
+            const photoUrls = variationImages[index]?.join(',') || '';
+
+            const variationInsertResult = await new Promise((resolve, reject) => {
+              con.query(`INSERT INTO variations (ITEMID, color, PHOTO) VALUES (?, ?, ?)`, 
+                [itemId, variation.color, photoUrls], 
+                (err, result) => {
+                  if (err) return reject(err);
+                  resolve(result);
+              });
+            });
+
+            const variationId = variationInsertResult.insertId;
+
+            // Insert sizes
+            if (variation.sizes?.length) {
+              const sizeValues = variation.sizes.map(size => [variationId, size.name, size.stock || 0]);
+              await new Promise((resolve, reject) => {
+                con.query(`INSERT INTO variationsizes (variation_id, size, stock) VALUES ?`, 
+                  [sizeValues], (err, result) => {
+                  if (err) return reject(err);
+                  resolve(result);
+                });
+              });
+            }
+          }
+        }
+
+        // Final response after all inserts
         res.json({
           success: true,
-          message: "Item added successfully!",
-          itemID: result.insertId,
+          message: "Item added successfully with all variations!",
+          itemId: itemId
         });
       });
+
     } catch (error) {
-      console.error("❌ Unexpected error:", error);
-      res.status(500).json({ error: "Server error" });
+      console.error("❌ Processing error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Item save failed",
+        error: error.message
+      });
     }
   });
 };

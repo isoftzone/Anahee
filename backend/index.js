@@ -8,17 +8,6 @@ require("./config")
 const path = require("path");
 app.use(express.json())
 
-// Uncaught Exception Handling
-process.on('uncaughtException', (err) => {
-    console.error('Uncaught Exception: ', err);
-    process.exit(1); 
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection: ', reason);
-    process.exit(1); // Exit the process after cleanup
-});
-
 app.use(cors({
     origin: true,
     methods:["GET", "POST", "PUT", "DELETE"],
