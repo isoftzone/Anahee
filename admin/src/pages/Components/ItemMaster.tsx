@@ -87,11 +87,17 @@ const ItemMaster: React.FC = () => {
         ]);
     };
 
+
     const removeVariation = (index: number) => {
         const updated = [...variations];
         updated.splice(index, 1);
         setVariations(updated);
     };
+const handleVariationChange = (index: number, field: string, value: string) => {
+    const updated = [...variations];
+    // updated[index][field] = value;
+    setVariations(updated);
+};
 
     const handleVariationChange = (index: number, field: string, value: string) => {
         const updated = [...variations];
@@ -104,6 +110,7 @@ const ItemMaster: React.FC = () => {
         updated[index].images = imageList;
         setVariations(updated);
     };
+
 
     const addSize = (varIndex: number) => {
         const updated = [...variations];
@@ -122,6 +129,13 @@ const ItemMaster: React.FC = () => {
         updated[varIndex].sizes[sizeIndex][field] = value;
         setVariations(updated);
     };
+
+const handleSizeChange = (varIndex: number, sizeIndex: number, field: string, value: string) => {
+    const updated = [...variations];
+    // updated[varIndex].sizes[sizeIndex][field] = value;
+    setVariations(updated);
+};
+
     const [dropdownValues, setDropdownValues] = useState<{ [key: string]: string[] }>({});
     const [items, setItems] = useState<ItemState[]>([]); // Store fetched items
     const [editId, setEditId] = useState<number | null>(null);
