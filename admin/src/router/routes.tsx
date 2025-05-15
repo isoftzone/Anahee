@@ -2,6 +2,7 @@ import { lazy } from 'react';
 import HideSeek from '../pages/Components/HideSeek';
 import ImageUpdates from '../pages/Components/ImageUpdate';
 import ItemMaster from '../pages/Components/ItemMaster';
+import AllItems from '../pages/Components/AllItems';
 import ExchangePolicy from '../pages/Components/ExchangePolicy';
 import PrivacyPolicy from '../pages/Components/PrivacyPolicy';
 import TermsAndConditions from '../pages/Components/TermsAndConditions';
@@ -325,6 +326,14 @@ const routes = [
     },
     {
         path: '/Components/item-master',
+        element: <ItemMaster/>
+    },
+    {
+        path: '/Components/items',
+        element: <AllItems/>
+    },
+    {
+        path: '/Components/item-master/:id',
         element: <ItemMaster/>
     },
     {

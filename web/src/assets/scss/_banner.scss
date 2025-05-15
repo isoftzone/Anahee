@@ -1353,7 +1353,6 @@
   }
 }
 
-
 .col-width-banner33-1 {
   position: relative;
 
@@ -1433,17 +1432,141 @@
   }
 }
 
-.banner-box{
-	%posrelative {
-  position: relative;
+.banner-box {
+  %posrelative {
+    position: relative;
+  }
+
+  overflow: hidden;
+  .banner {
+    &-image {
+      img {
+        width: 100%;
+      }
+    }
+  }
+}
+// Proper overlay style
+.slider-content-overlay {
+  background-color: rgba(0, 0, 0, 0.6);
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  transform: translateY(-50%);
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5rem;
 }
 
-	overflow: hidden;
-	.banner{
-		&-image{
-			img{
-				width: 100%;
-			}
-		}
+// Pink text color
+.text-pink {
+  color: #d988ba;
+}
+
+// Text block layout
+.slider-content-collection {
+  position: relative;
+  z-index: 2;
+  text-align: start;
+  padding-left: 3rem;
+  border-left: 1px solid #d988ba;
+
+  h2,
+  h1,
+  p {
+    margin: 0;
+    line-height: 1;
+    letter-spacing: 1px;
+    padding-bottom: 5px;
+  }
+
+  .unleash-text {
+    font-weight: 700;
+    font-size: 4rem;
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: #f5f3f3;
+    margin-bottom: 1rem;
+  }
+
+  .signature-text {
+    font-size: 5.5rem;
+    font-weight: bold;
+    margin: 1rem 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .look-text {
+    font-size: 6rem;
+    font-weight: 300;
+    color: #f5f3f3;
+    letter-spacing: 5px;
+    margin-top: 0.5rem;
+  }
+}
+.slider-btn-collection-5 {
+  padding-left: 3rem;
+  text-align: start;
+  .see-collection-btn {
+    align-items: center;
+    background-color: #fff;
+    color: #000;
+    border-radius: 4px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 2rem;
+    line-height: 1;
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease-in-out 0s;
+
+    span {
+      margin-left: 0.5rem;
+      transition: margin-left 0.3s ease;
+    }
+
+    &:hover {
+      background-color: #d988ba;
+      color: #fff;
+
+      span {
+        margin-left: 1rem;
+      }
+    }
+  }
+}
+// Responsive adjustments
+@media (max-width: 768px) {
+  .slider-content-overlay {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 3rem;
+  }
+  .slider-content-collection {
+    .unleash-text {
+      font-size: 3rem;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+    }
+
+    .signature-text {
+      font-size: 3.5rem;
+    }
+
+    .look-text {
+      font-size: 3rem;
+    }
   }
 }

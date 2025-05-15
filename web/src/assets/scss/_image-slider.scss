@@ -13,3 +13,28 @@
     transform: scale(1.1);
   }
 }
+
+.single-image-text {
+  h1 {
+    font-size: 30px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    margin: 8px 0 30px;
+    color: #433f3f;
+    position: relative;
+    display: inline-block;
+    padding: 0 0 23px;
+    line-height: 1;
+    &:before {
+      position: absolute;
+      background-color: #D988BA;
+      height: 3px;
+      width: 70px;
+      content: "";
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: 0 auto;
+    }
+  }
+}

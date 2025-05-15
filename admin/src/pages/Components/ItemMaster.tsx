@@ -1,25 +1,40 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { Tab } from '@headlessui/react';
-import axios from 'axios'; // Import Axios
+import axios from 'axios';
 import { BASE_URL } from '../../config';
-import { cl } from '@fullcalendar/core/internal-common';
 import ImageUploading, { ImageListType } from 'react-images-uploading';
 import ReactQuill from 'react-quill';
+import { useParams, useNavigate } from 'react-router-dom';
+
 interface ItemState {
     [key: string]: string | File | null | File[];
-    // images: File[];
-    // PHOTO: File[];
 }
+
 interface Variation {
     color: string;
     images: ImageListType;
     sizes: { name: string; stock: string }[];
 }
 
+interface Record {
+    PRIMENAME: string;
+}
+type SlabItem = {
+    id: number;
+    QuantityFrom: string;
+    QuantityTo: string;
+    SALEPRICE: string;
+    sp1: string;
+    sp2: string;
+    sp3: string;
+    sp4: string;
+};
+
 const ItemMaster: React.FC = () => {
-    //To fill combo box
+    const { id } = useParams();
+    const navigate = useNavigate();
+
     const [item, setItem] = useState<ItemState>({
-        // CompanyID:'',
         PRODUCT: '',
         BRAND: '',
         SCOLOR: '',
@@ -55,35 +70,149 @@ const ItemMaster: React.FC = () => {
         EXPIRYDAYS: '',
         LOOKUP: '',
         REMARK: '',
-        // image: null,
         addExp: '',
-        // PHOTO: [],
-        // images: [],
         DESCRIPTION: '',
         Product_Details: '',
     });
 
-    interface Record {
-        PRIMENAME: string;
-    }
-    const [variations, setVariations] = useState<Variation[]>([
-        {
-            color: '',
-            images: [],
-            sizes: [{ name: '', stock: '' }],
-        },
+    const [variations, setVariations] = useState<Variation[]>([{ color: '', images: [], sizes: [{ name: '', stock: '' }] }]);
+    const [dropdownValues, setDropdownValues] = useState<{ [key: string]: string[] }>({});
+    const [loading, setLoading] = useState<boolean>(false);
+    const [slabs, setSlabs] = useState<SlabItem[]>([
+        // {
+        //     id: Date.now(),
+        //     QuantityFrom: '',
+        //     QuantityTo: '',
+        //     SALEPRICE: '',
+        //     sp1: '',
+        //     sp2: '',
+        //     sp3: '',
+        //     sp4: '',
+        // },
     ]);
 
-    // Add variation functions
+    // Fetch item data if in edit mode
+    useEffect(() => {
+        const fetchItemData = async () => {
+            if (id) {
+                try {
+                    setLoading(true);
+                    const response = await axios.get(`${BASE_URL}/getItemsById/${id}`, {
+                        headers: { 'Content-Type': 'application/json' },
+                        withCredentials: true,
+                    });
+
+                    if (response.data.success && response.data.data) {
+                        const itemData = response.data.data;
+                        setItem({
+                            BARCODE: itemData.BARCODE || '',
+                            ITEMNAME: itemData.ITEMNAME || '',
+                            ITEMID: itemData.ITEMID || '',
+                            BOXSIZE: itemData.BOXSIZE || '',
+                            HSNCODE: itemData.HSNCODE || '',
+                            RATE: itemData.RATE || 0,
+                            TAX: itemData.TAX || 0,
+                            PURPRICE: itemData.PURPRICE || 0,
+                            MARKUP: itemData.MARKUP || '',
+                            MRP: itemData.MRP || 0,
+                            MARKDOWN: itemData.MARKDOWN || '',
+                            SALEPRICE: itemData.SALEPRICE || 0,
+                            EXPIRYDAYS: itemData.EXPIRYDAYS || 0,
+                            LOOKUP: itemData.LOOKUP || '',
+                            REMARK: itemData.REMARK || '',
+                            PRODUCT: itemData.PRODUCT || '',
+                            BRAND: itemData.BRAND || '',
+                            SCOLOR: itemData.SCOLOR || '',
+                            COLOR: itemData.COLOR || '',
+                            I_SIZE: itemData.I_SIZE || '',
+                            STYLE: itemData.STYLE || '',
+                            SUBGROUP: itemData.SUBGROUP || '',
+                            GENDER: itemData.GENDER || '',
+                            BUYER: itemData.BUYER || '',
+                            SUBCATEGORY: itemData.SUBCATEGORY || '',
+                            CATEGORY: itemData.CATEGORY || '',
+                            MATERIAL: itemData.MATERIAL || '',
+                            COMPANY: itemData.COMPANY || '',
+                            SEASON: itemData.SEASON || '',
+                            PACKING: itemData.PACKING || '',
+                            UNIT: itemData.UNIT || '',
+                            SECTION: itemData.SECTION || '',
+                            STATUS: itemData.STATUS || 'Active',
+                            DESCRIPTION: itemData.DESCRIPTION || '',
+                            Product_Details: itemData.PRODUCT_DETAILS || '',
+                            PHOTO: itemData.PHOTO || '',
+                        });
+
+                        if (itemData.variations && itemData.variations.length > 0) {
+                            setVariations(
+                                itemData.variations.map((v) => ({
+                                    color: v.color || '',
+                                    images: (v.images || []).map((imgUrl: string) => ({
+                                        dataURL: imgUrl.startsWith('http') ? imgUrl : `${BASE_URL}/public/images/banner/${imgUrl}`,
+                                    })),
+                                    sizes:
+                                        v.sizes?.map((s) => ({
+                                            name: s.name || '',
+                                            stock: s.stock || 0,
+                                        })) || [],
+                                }))
+                            );
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching item data:', error);
+                    alert('Failed to load item data');
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchItemData();
+    }, [id]);
+
+    // Fetch dropdown values
+    useEffect(() => {
+        const fetchDropdownData = async () => {
+            try {
+                const response = await axios.post(
+                    `${BASE_URL}/postcmbAW`,
+                    {
+                        TblName: 'MASTER',
+                        FldName: 'PRIMENAME',
+                        FldCode: 'PRIMEKEYID',
+                        OrdBy: 'SEQUENCE',
+                        WhFldName: ['Product', 'Status', 'Colour', 'Brand', 'Style', 'Size', 'Buyer', 'Season', 'Company', 'Section', 'Category'],
+                    },
+                    {
+                        headers: { 'Content-Type': 'application/json' },
+                    }
+                );
+
+                setDropdownValues({
+                    product: response.data.Product.map((item: Record) => item.PRIMENAME),
+                    status: response.data.Status.map((item: Record) => item.PRIMENAME),
+                    brand: response.data.Brand.map((item: Record) => item.PRIMENAME),
+                    color: response.data.Colour.map((item: Record) => item.PRIMENAME),
+                    style: response.data.Style.map((item: Record) => item.PRIMENAME),
+                    size: response.data.Size.map((item: Record) => item.PRIMENAME),
+                    buyer: response.data.Buyer.map((item: Record) => item.PRIMENAME),
+                    season: response.data.Season.map((item: Record) => item.PRIMENAME),
+                    company: response.data.Company.map((item: Record) => item.PRIMENAME),
+                    section: response.data.Section.map((item: Record) => item.PRIMENAME),
+                    category: response.data.Category.map((item: Record) => item.PRIMENAME),
+                });
+            } catch (error) {
+                console.error('Error fetching dropdown data', error);
+            }
+        };
+
+        fetchDropdownData();
+    }, []);
+
+    // Variation handlers
     const addVariation = () => {
-        setVariations([
-            ...variations,
-            {
-                color: '',
-                images: [],
-                sizes: [{ name: '', stock: '' }],
-            },
-        ]);
+        setVariations([...variations, { color: '', images: [], sizes: [{ name: '', stock: '' }] }]);
     };
 
     const removeVariation = (index: number) => {
@@ -122,509 +251,515 @@ const ItemMaster: React.FC = () => {
         setVariations(updated);
     };
 
-    const [dropdownValues, setDropdownValues] = useState<{ [key: string]: string[] }>({});
-    const [items, setItems] = useState<ItemState[]>([]); // Store fetched items
-    const [editId, setEditId] = useState<number | null>(null);
-
-    const [loading, setLoading] = useState<boolean>(true); // Track loading state
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.post(
-                    `${BASE_URL}/postcmbAW`,
-                    {
-                        TblName: 'MASTER',
-                        FldName: 'PRIMENAME',
-                        FldCode: 'PRIMEKEYID',
-                        OrdBy: 'SEQUENCE',
-                        WhFldName: ['Product', 'Status', 'Colour', 'Brand', 'Style', 'Size', 'Buyer', 'Season', 'Company', 'Section', 'Category'], // Modify your backend to handle an array of field names
-                    },
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    }
-                );
-                console.log('Combined API response:', response.data);
-
-                setDropdownValues({
-                    product: response.data.Product.map((item: Record) => item.PRIMENAME),
-                    status: response.data.Status.map((item: Record) => item.PRIMENAME),
-                    brand: response.data.Brand.map((item: Record) => item.PRIMENAME),
-                    color: response.data.Colour.map((item: Record) => item.PRIMENAME),
-                    style: response.data.Style.map((item: Record) => item.PRIMENAME),
-                    size: response.data.Size.map((item: Record) => item.PRIMENAME),
-                    buyer: response.data.Buyer.map((item: Record) => item.PRIMENAME),
-                    season: response.data.Season.map((item: Record) => item.PRIMENAME),
-                    company: response.data.Company.map((item: Record) => item.PRIMENAME),
-                    section: response.data.Section.map((item: Record) => item.PRIMENAME),
-                    category: response.data.Category.map((item: Record) => item.PRIMENAME),
-                });
-            } catch (error) {
-                console.error('Error fetching data', error);
-            }
-        };
-        fetchData();
-    }, []);
-
     const resetForm = () => {
         setItem({
-            // CompanyID: '',
-            Product: '',
-            Brand: '',
-            sColor: '',
-            Color: '',
-            I_Size: '',
-            Style: '',
-            SubGroup: '',
+            PRODUCT: '',
+            BRAND: '',
+            SCOLOR: '',
+            COLOR: '',
+            I_SIZE: '',
+            STYLE: '',
+            SUBGROUP: '',
             Group: '',
-            Gender: '',
-            Buyer: '',
-            SubCategory: '',
-            Category: '',
-            Material: '',
-            Company: '',
-            Season: '',
-            Packing: '',
-            Unit: '',
-            Dealer: '',
-            Section: '',
-            Status: '',
-            Barcode: '',
-            ItemName: '',
-            BoxSize: '',
-            HSNCode: '',
-            Rate: '',
-            Tax: '',
-            PurPrice: '',
-            MarkUp: '',
+            GENDER: '',
+            BUYER: '',
+            SUBCATEGORY: '',
+            CATEGORY: '',
+            MATERIAL: '',
+            COMPANY: '',
+            SEASON: '',
+            PACKING: '',
+            UNIT: '',
+            DEALER: '',
+            SECTION: '',
+            STATUS: '',
+            BARCODE: '',
+            ITEMID: '',
+            ITEMNAME: '',
+            BOXSIZE: '',
+            HSNCODE: '',
+            RATE: '',
+            TAX: '',
+            PURPRICE: '',
+            MARKDOWN: '',
             MRP: '',
-            MarkDown: '',
-            SalePrice: '',
-            ExpiryDays: '',
-            LookUp: '',
-            Remark: '',
-            Description: '',
-            // image: null,
+            MARKUP: '',
+            SALEPRICE: '',
+            EXPIRYDAYS: '',
+            LOOKUP: '',
+            REMARK: '',
             addExp: '',
-            // images: [],
-            // PHOTO: [],
+            DESCRIPTION: '',
             Product_Details: '',
         });
-    };
-
-    const fetchHometableData = async () => {
-        try {
-            const response = await axios.get(`${BASE_URL}/items}`, {
-                headers: { 'Content-Type': 'application/json' },
-                withCredentials: true,
-            });
-            console.log('hello', response);
-            setItems(response.data.items);
-            console.log('object1111', response.data.items);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
-
-    const SaveData = async () => {
-        // Create the data object with all necessary fields
-        const formData = new FormData();
-
-        // Append all item data
-        Object.keys(item).forEach((key) => {
-            if (item[key] !== null) {
-                formData.append(key, item[key] as string);
-            }
-        });
-
-        // Append variations data
-        formData.append('variations', JSON.stringify(variations));
-
-        // Add images with proper field names
-        variations.forEach((variation, varIndex) => {
-          variation.images.forEach((image, imgIndex) => {
-            if (image.file) {
-              formData.append(`variation_${varIndex}_image_${imgIndex}`, image.file);
-            }
-          });
-        });
-
-        try {
-            setLoading(true); // Set loading state to true
-            let itemId: number | undefined;
-
-            if (editId) {
-                // Update existing item
-                const res = await axios.put(`${BASE_URL}/update/${editId}`, formData, {
-                    //data
-                    // headers: {
-                    //     'Content-Type': 'application/json', //'multipart/form-data'  // application/json
-                    // },
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-                itemId = editId; // Assign editId to itemId
-                alert(res.data.message);
-            } else {
-                // Add new item
-                const res = await axios.post(`${BASE_URL}/addItem`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-                alert(res.data.message);
-            }
-
-            // Fetch updated data and reset form
-
-            fetchHometableData();
-            resetForm();
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while saving the item.');
-        } finally {
-            setLoading(false); // Set loading state to false
-        }
-    };
-
-    const handleUpdateItem = async (id: number) => {
-        console.log('Updating Item ID___:', id);
-        if (!id) {
-            alert('Invalid item ID');
-            return;
-        }
-
-        // Create the data object with all necessary fields
-        const data = {
-            BARCODE: item.BARCODE,
-            ITEMNAME: item.ITEMNAME,
-            ITEMID: item.ITEMID,
-            BOXSIZE: item.BOXSIZE,
-            HSNCODE: item.HSNCODE,
-            RATE: item.RATE,
-            TAX: item.TAX,
-            PURPRICE: item.PURPRICE,
-            MARKUP: item.MARKUP,
-            MRP: item.MRP,
-            MARKDOWN: item.MARKDOWN,
-            SALEPRICE: item.SALEPRICE,
-            EXPIRYDAYS: item.EXPIRYDAYS,
-            LOOKUP: item.LOOKUP,
-            REMARK: item.REMARK,
-            PRODUCT: item.PRODUCT,
-            BRAND: item.BRAND,
-            SCOLOR: item.SCOLOR,
-            COLOR: item.COLOR,
-            I_SIZE: item.I_SIZE,
-            STYLE: item.STYLE,
-            SUBGROUP: item.SUBGROUP,
-            GENDER: item.GENDER,
-            BUYER: item.BUYER,
-            SUBCATEGORY: item.SUBCATEGORY,
-            CATEGORY: item.CATEGORY,
-            MATERIAL: item.MATERIAL,
-            COMPANY: item.COMPANY,
-            SEASON: item.SEASON,
-            PACKING: item.PACKING,
-            UNIT: item.UNIT,
-            SECTION: item.SECTION,
-            STATUS: item.STATUS,
-            DESCRIPTION: item.DESCRIPTION,
-            image: item.image instanceof File ? item.image : null,
-            Product_Details: item.Product_Details,
-        };
-
-        console.log(data); // Debugging
-
-        setLoading(true); // Set loading state to true
-
-        try {
-            const response = await axios.put(`${BASE_URL}/update/${id}`, data, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (response.data.success) {
-                alert('Item updated successfully!');
-                console.log(response);
-            } else {
-                alert('Error updating item');
-            }
-
-            fetchHometableData();
-            resetForm();
-        } catch (error) {
-            console.error('Error updating item:', error);
-            alert('An error occurred while updating the item.');
-        } finally {
-            setLoading(false); // Set loading state to false
-        }
-    };
-
-    const handleDeleteItem = async (id: number) => {
-        try {
-            const response = await axios.delete(`${BASE_URL}/delete/${id}`);
-            if (response.data.success) {
-                alert('Item deleted successfully!');
-                setItems(items.filter((item) => Number(item.id) !== id)); // Remove the item from the state
-            } else {
-                alert('Error deleting item');
-            }
-        } catch (error) {
-            console.error('Error deleting item:', error);
-            alert('An error occurred while deleting the item.');
-        }
+        setVariations([{ color: '', images: [], sizes: [{ name: '', stock: '' }] }]);
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setItem((prev) => ({ ...prev, [name]: value }));
     };
+
     const handleProductDetailsChange = (value: string) => {
         setItem((prev) => ({ ...prev, Product_Details: value }));
     };
-    const handleEditItem = async (id: number) => {
-        console.log('Editing Item ID:', id);
-        setEditId(id); // Set the editId state
 
+    const handleSubmit = async () => {
+        setLoading(true);
         try {
-            const response = await axios.get(`${BASE_URL}/items/${id}`, {
-                headers: { 'Content-Type': 'application/json' },
-                withCredentials: true,
+            const formData = new FormData();
+
+            Object.keys(item).forEach((key) => {
+                if (item[key] !== null) {
+                    formData.append(key, item[key] as string);
+                }
             });
 
-            if (response.data.items && response.data.items.length > 0) {
-                setItem(response.data.items[0]); // Set the item state with the fetched data
-                console.log('Fetched Item Data:', response.data.items[0]);
-            } else {
-                console.error('Item data is undefined or missing:', response.data);
-                alert('Item data is missing or undefined.');
+            formData.append('variations', JSON.stringify(variations));
+
+            variations.forEach((variation, varIndex) => {
+                variation.images.forEach((image, imgIndex) => {
+                    if (image.file) {
+                        formData.append(`variation_${varIndex}_image_${imgIndex}`, image.file);
+                    }
+                });
+            });
+
+            const endpoint = id ? `${BASE_URL}/updateItemById/${id}` : `${BASE_URL}/addItem`;
+            const method = id ? 'put' : 'post';
+
+            const response = await axios[method](endpoint, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            alert(response.data.message);
+            if (!id) {
+                resetForm();
             }
         } catch (error) {
-            console.error('Error fetching item data:', error);
-            alert('An error occurred while fetching the item data.');
+            console.error('Error:', error);
+            alert(`Error ${id ? 'updating' : 'saving'} item`);
+        } finally {
+            setLoading(false);
         }
     };
 
+    const handleDelete = async () => {
+        if (!id) return;
+
+        if (confirm('Are you sure you want to delete this item?')) {
+            try {
+                setLoading(true);
+                const response = await axios.delete(`${BASE_URL}/delete/${id}`);
+                if (response.data.success) {
+                    alert('Item deleted successfully!');
+                }
+            } catch (error) {
+                console.error('Error deleting item:', error);
+                alert('Failed to delete item');
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
+    const handleAddSlab = () => {
+        setSlabs((prev) => [
+            ...prev,
+            {
+                id: Date.now() + Math.random(),
+                QuantityFrom: '',
+                QuantityTo: '',
+                SALEPRICE: '',
+                sp1: '',
+                sp2: '',
+                sp3: '',
+                sp4: '',
+            },
+        ]);
+    };
+
+    // Handle removing a slab
+    const handleRemoveSlab = (id: number) => {
+        setSlabs((prev) => prev.filter((slab) => slab.id !== id));
+    };
+
+    const handleChanges = (e: React.ChangeEvent<HTMLInputElement>, id: number) => {
+        const { name, value } = e.target;
+        setSlabs((prev) => prev.map((slab) => (slab.id === id ? { ...slab, [name]: value } : slab)));
+    };
+
     return (
-        <div className="max-w-6xl mx-auto p-6 bg-white shadow-md rounded-lg">
-            <h2 className="text-2xl font-semibold mb-4 text-center">Item Master</h2>
+        <div className="w-full p-3 mx-auto bg-white rounded-lg shadow-md">
+            <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">{id ? 'Edit Item' : 'Add New Item'}</h2>
+
+            {loading && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-xl">
+                        <p className="text-lg font-medium">Loading...</p>
+                    </div>
+                </div>
+            )}
+
             <Tab.Group>
-                <Tab.List className="mt-3 flex flex-wrap border-b border-gray-300">
-                    {['General Detail'].map((tab) => (
+                <Tab.List className="flex border-b border-gray-200 mb-6">
+                    {['General Detail', 'Additional Details'].map((tab) => (
                         <Tab as={Fragment} key={tab}>
-                            {({ selected }) => <button className={`${selected ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'} px-4 py-2 focus:outline-none`}>{tab}</button>}
+                            {({ selected }) => (
+                                <button
+                                    className={`${
+                                        selected ? 'border-b-2 border-blue-500 text-blue-600 font-medium' : 'text-gray-600 hover:text-gray-800'
+                                    } px-4 py-2 text-sm font-medium focus:outline-none`}
+                                >
+                                    {tab}
+                                </button>
+                            )}
                         </Tab>
                     ))}
                 </Tab.List>
 
                 <Tab.Panels>
                     <Tab.Panel>
-                        <div className="space-y-6 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {[
-                                    { field: 'ItemId', type: 'input' },
-                                    { field: 'ItemName', type: 'input' },
-                                    { field: 'Product_Details', type: 'quill', fullWidth: true },
-                                    { field: 'Rate', type: 'input' },
-                                    { field: 'Tax', type: 'input' },
-                                    { field: 'PurPrice', type: 'input' },
-                                    { field: 'MRP', type: 'input' },
-                                    { field: 'SalePrice', type: 'input' },
-                                    { field: 'DESCRIPTION', type: 'textarea', fullWidth: true },
-                                ].map(({ field, type, fullWidth }) => (
-                                    <div key={field} className={fullWidth ? 'col-span-full' : ''}>
+                        <div className="space-y-6 p-3 bg-white">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-3 border border-gray-200 rounded-lg">
+                                {['ITEMNAME', 'BARCODE', 'PRODUCT', 'BRAND', 'CATEGORY', 'SUBCATEGORY', 'PRODUCT DETAIL'].map((field) => (
+                                    <div key={field}>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">{field}</label>
-                                        {type === 'input' && (
+                                        {['CATEGORY', 'SUBCATEGORY', 'BRAND', 'PRODUCT'].includes(field) ? (
+                                            <select
+                                                name={field}
+                                                value={typeof item[field] === 'string' ? item[field] : ''}
+                                                onChange={handleChange}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                            >
+                                                <option value="">Select</option>
+                                                {dropdownValues[field.toLowerCase()]?.map((option, idx) => (
+                                                    <option key={idx} value={option}>
+                                                        {option}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        ) : (
                                             <input
                                                 type="text"
                                                 name={field}
                                                 value={item[field] as string}
                                                 onChange={handleChange}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                                 placeholder={`Enter ${field}`}
-                                            />
-                                        )}
-                                        {type === 'textarea' && (
-                                            <textarea
-                                                name={field}
-                                                value={item[field] as string}
-                                                onChange={handleChange}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-500"
-                                                rows={3}
-                                            />
-                                        )}
-                                        {type === 'quill' && (
-                                            <ReactQuill
-                                                theme="snow"
-                                                className="border border-gray-300 rounded-md shadow-sm quill-editor"
-                                                modules={{
-                                                    toolbar: [
-                                                        [{ font: [] }, { size: [] }],
-                                                        ['bold', 'italic', 'underline', 'strike'],
-                                                        [{ color: [] }, { background: [] }],
-                                                        [{ script: 'super' }, { script: 'sub' }],
-                                                        [{ header: [false, 1, 2, 3, 4, 5, 6] }, 'blockquote', 'code-block'],
-                                                        [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
-                                                        ['direction', { align: [] }],
-                                                        ['link', 'image', 'video'],
-                                                        ['clean'],
-                                                    ],
-                                                }}
-                                                value={item[field] as string}
-                                                onChange={handleProductDetailsChange}
-                                                placeholder={`Edit Product Details Here...`}
                                             />
                                         )}
                                     </div>
                                 ))}
                             </div>
-                        </div>
 
-                        {/* New Product Variations Tab */}
+                            {/* Product Variations Section */}
 
-                        <div className="container mt-4">
-                            <h3 className="text-xl font-semibold mb-4">Product Variations</h3>
-                            <div className="space-y-6">
-                                {variations.map((variation, varIndex) => (
-                                    <div key={varIndex} className="border p-3 mb-3 rounded-lg">
-                                        <div className="mb-4">
-                                            <label className="block font-medium">Upload Images (Max 6 per color)</label>
-                                            <ImageUploading
-                                                multiple
-                                                value={variation.images}
-                                                onChange={(imageList) => handleVariationImageChange(varIndex, imageList)}
-                                                maxNumber={6} // Limit to 6 images per variant
-                                                dataURLKey="dataURL"
-                                            >
-                                                {({ imageList, onImageUpload, onImageRemoveAll, onImageUpdate, onImageRemove, isDragging, dragProps }) => (
-                                                    <div className="upload__image-wrapper">
-                                                        <button type="button" onClick={onImageUpload} className="w-full p-2 border rounded bg-gray-500 text-white" {...dragProps}>
-                                                            Choose Images (Max 6)
-                                                        </button>
-                                                        <div className="grid gap-4 sm:grid-cols-3 grid-cols-1 mt-2">
-                                                            {imageList.map((image, index) => (
-                                                                <div key={index} className="custom-file-container__image-preview relative">
-                                                                    <button
-                                                                        type="button"
-                                                                        className="custom-file-container__image-clear bg-dark-light dark:bg-dark dark:text-white-dark rounded-full block w-fit p-0.5 absolute top-0 left-0"
-                                                                        title="Clear Image"
-                                                                        onClick={() => onImageRemove(index)}
-                                                                    >
-                                                                        ×
-                                                                    </button>
-                                                                    <img src={image.dataURL} alt="img" className="object-cover shadow rounded w-full !max-h-48" />
+                            <div>
+                                <div className="flex my-3 justify-between items-center flex-col md:flex-row">
+                                    <h3 className="text-xl font-bold text-gray-800 mb-3 ">Product Variations</h3>
+                                    <button type="button" className="btn btn-primary" onClick={addVariation}>
+                                        + Add Variation
+                                    </button>
+                                </div>
+
+                                <div className="space-y-6">
+                                    {variations.map((variation, varIndex) => (
+                                        <div key={varIndex} className="border border-gray-200 rounded-lg p-3 shadow-sm">
+                                            <div className="my-3 ">
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Color Images (Max 6)</label>
+                                                <ImageUploading
+                                                    multiple
+                                                    value={variation.images}
+                                                    onChange={(imageList) => handleVariationImageChange(varIndex, imageList)}
+                                                    maxNumber={6}
+                                                    dataURLKey="dataURL"
+                                                >
+                                                    {({ imageList, onImageUpload, onImageRemoveAll, onImageUpdate, onImageRemove, isDragging, dragProps }) => (
+                                                        <div className="space-y-4">
+                                                            <div
+                                                                {...dragProps}
+                                                                onClick={onImageUpload}
+                                                                className={`border-2 border-dashed rounded-lg p-3 text-center cursor-pointer ${
+                                                                    isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                                                                }`}
+                                                            >
+                                                                <div className="flex flex-col items-center justify-center space-y-2">
+                                                                    <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                        <path
+                                                                            strokeLinecap="round"
+                                                                            strokeLinejoin="round"
+                                                                            strokeWidth={2}
+                                                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                                        />
+                                                                    </svg>
+                                                                    <p className="text-sm text-gray-600">Drag & drop images here or click to browse</p>
+                                                                    <p className="text-xs text-gray-500">Supports JPG, PNG up to 5MB</p>
                                                                 </div>
-                                                            ))}
+                                                            </div>
+
+                                                            {imageList.length > 0 && (
+                                                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                                                    {imageList.map((image, index) => (
+                                                                        <div key={index} className="relative group">
+                                                                            <img src={image.dataURL} alt={`Variation ${varIndex + 1}`} className="w-full h-32 object-cover rounded-md shadow-sm" />
+                                                                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 flex items-center justify-center rounded-md transition-all duration-200">
+                                                                                <button
+                                                                                    type="button"
+                                                                                    onClick={() => onImageRemove(index)}
+                                                                                    className="opacity-0 group-hover:opacity-100 text-white bg-red-500 rounded-full p-1 hover:bg-red-600 focus:outline-none transition-all duration-200"
+                                                                                >
+                                                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                                                    </svg>
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </ImageUploading>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
+                                                    <select
+                                                        value={variation.color}
+                                                        onChange={(e) => handleVariationChange(varIndex, 'color', e.target.value)}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                                    >
+                                                        <option value="" disabled>
+                                                            Select a color
+                                                        </option>
+                                                        {dropdownValues['color']?.map((option, idx) => (
+                                                            <option key={idx} value={option}>
+                                                                {option}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+
+                                                <div className="pt-4 border-t border-gray-200">
+                                                    <div className="flex justify-between items-center mb-4 flex-col md:flex-row md:items-center">
+                                                        <h4 className="text-sm font-medium text-gray-700 mb-2 md:mb-0">Sizes</h4>
+                                                        <div className="flex flex-col items-center md:flex-row md:space-x-4">
+                                                            <div className="flex flex-col items-center md:flex-row md:space-x-4 mb-2 md:mb-0">
+                                                                <label className="flex items-center space-x-2 text-sm">
+                                                                    <input type="checkbox" className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+                                                                    <span>Same Size</span>
+                                                                </label>
+                                                                <label className="flex items-center space-x-2 text-sm">
+                                                                    <input type="checkbox" className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+                                                                    <span>Same Slab</span>
+                                                                </label>
+                                                            </div>
+                                                            <button type="button" onClick={() => addSize(varIndex)} className="mt-2 btn btn-primary md:mt-0">
+                                                                + Add Size
+                                                            </button>
                                                         </div>
                                                     </div>
-                                                )}
-                                            </ImageUploading>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <div className="flex-1">
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
-                                                <select
-                                                    value={variation.color}
-                                                    onChange={(e) => handleVariationChange(varIndex, 'color', e.target.value)}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300"
-                                                >
-                                                    <option value="" selected disabled>
-                                                        Select a color
-                                                    </option>
-                                                    {dropdownValues['color']?.map((option, idx) => (
-                                                        <option key={idx} value={option}>
-                                                            {option}
-                                                        </option>
+
+                                                    {variation.sizes.map((size, sizeIndex) => (
+                                                        <div key={sizeIndex} className="mb-6 p-3 border border-gray-200 rounded-lg shadow-sm">
+                                                            <div className="flex justify-end pt-2">
+                                                                <button type="button" onClick={() => removeSize(varIndex, sizeIndex)} className="btn btn-danger">
+                                                                    Remove Size
+                                                                </button>
+                                                            </div>
+                                                            <div className="mb-4">
+                                                                <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
+                                                                <select
+                                                                    value={size.name}
+                                                                    onChange={(e) => handleSizeChange(varIndex, sizeIndex, 'name', e.target.value)}
+                                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                                                >
+                                                                    <option value="" disabled>
+                                                                        Select a size
+                                                                    </option>
+                                                                    {dropdownValues['size']?.map((option, idx) => (
+                                                                        <option key={idx} value={option}>
+                                                                            {option}
+                                                                        </option>
+                                                                    ))}
+                                                                </select>
+                                                            </div>
+
+                                                            <div className="space-y-4">
+                                                                <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                                                    {[
+                                                                        { label: 'Rate', field: 'RATE' },
+                                                                        { label: 'Tax', field: 'TAX' },
+                                                                        { label: 'Purchase Price', field: 'PURPRICE' },
+                                                                        { label: 'MarkUp(%)', field: 'MARKUP' },
+                                                                        { label: 'MRP', field: 'MRP' },
+                                                                        { label: 'Mark Down(%)', field: 'MARKDOWN' },
+                                                                        { label: 'Sale Price', field: 'SALEPRICE' },
+                                                                        { label: 'SP1', field: 'SP1' },
+                                                                        { label: 'SP2', field: 'SP2' },
+                                                                        { label: 'SP3', field: 'SP3' },
+                                                                        { label: 'SP4', field: 'SP4' },
+                                                                        { label: 'Length (cm)', field: 'lengthcm' },
+                                                                        { label: 'Width (cm)', field: 'widthcm' },
+                                                                        { label: 'Height (cm)', field: 'heightcm' },
+                                                                        { label: 'Volumetric Weight', field: 'volumetricweight' },
+                                                                        { label: 'Net Weight', field: 'netweight' },
+                                                                        { label: 'Gross Weight', field: 'grossweight' },
+                                                                        { label: 'Shipping Weight', field: 'shippingweight' },
+                                                                    ].map(({ label, field }) => (
+                                                                        <div key={field}>
+                                                                            <label className="block text-xs font-medium text-gray-700 mb-1">{label}</label>
+                                                                            <input
+                                                                                type="text"
+                                                                                name={field}
+                                                                                value={(item[field] as string) || ''}
+                                                                                onChange={handleChange}
+                                                                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                                            />
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+
+                                                                {/* Slab Rate Section */}
+                                                                <div className="mt-6">
+                                                                    <div className="flex justify-end items-center mb-4">
+                                                                        <div className="flex justify-end">
+                                                                            <button type="button" onClick={handleAddSlab} className="btn btn-primary">
+                                                                                + Add Slab Rate
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* Only render this section when there are slabs to show */}
+                                                                    {slabs.length > 0 && (
+                                                                        <div className="space-y-4">
+                                                                            {slabs.map((slab) => (
+                                                                                <div key={slab.id} className="p-3 border border-gray-200 rounded-lg">
+                                                                                    <div className="flex justify-between items-start md:items-center mb-3">
+                                                                                        <h5 className="text-sm font-bold text-gray-700">Slab Rate</h5>
+                                                                                        <button type="button" onClick={() => handleRemoveSlab(slab.id)} className="btn btn-danger text-xs">
+                                                                                            Remove Slab
+                                                                                        </button>
+                                                                                    </div>
+                                                                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-4">
+                                                                                        {[
+                                                                                            { label: 'Qty From', field: 'QuantityFrom' },
+                                                                                            { label: 'Qty To', field: 'QuantityTo' },
+                                                                                            { label: 'Sale Price', field: 'SALEPRICE' },
+                                                                                            { label: 'SP1', field: 'sp1' },
+                                                                                            { label: 'SP2', field: 'sp2' },
+                                                                                            { label: 'SP3', field: 'sp3' },
+                                                                                            { label: 'SP4', field: 'sp4' },
+                                                                                        ].map(({ label, field }) => (
+                                                                                            <div key={field}>
+                                                                                                <label className="block text-xs font-medium text-gray-700 mb-1">{label}</label>
+                                                                                                <input
+                                                                                                    type="text"
+                                                                                                    name={field}
+                                                                                                    value={slab[field as keyof SlabItem]}
+                                                                                                    onChange={(e) => handleChanges(e, slab.id)}
+                                                                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                                                                />
+                                                                                            </div>
+                                                                                        ))}
+                                                                                    </div>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     ))}
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div className="mt-3">
-                                            <strong className="block text-sm font-medium text-gray-700 mb-2">Sizes:</strong>
-                                            {variation.sizes.map((size, sizeIndex) => (
-                                                <div key={sizeIndex} className="flex gap-2 mt-2">
-                                                    <div className="flex-1">                                                  
-                                                        <select
-                                                            value={size.name}
-                                                            onChange={(e) => handleSizeChange(varIndex, sizeIndex, 'name', e.target.value)}
-                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300"
-                                                        >
-                                                            <option value="" selected disabled>
-                                                                Select a size
-                                                            </option>
-                                                            {dropdownValues['size']?.map((option, idx) => (
-                                                                <option key={idx} value={option}>
-                                                                    {option}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-                                                    <div className="flex-1">
-                                                      
-                                                        <input
-                                                            type="number"
-                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300"
-                                                            placeholder="Enter Stock"
-                                                            value={size.stock}
-                                                            onChange={(e) => handleSizeChange(varIndex, sizeIndex, 'stock', e.target.value)}
-                                                            required
-                                                        />
-                                                    </div>
-                                                    <div className="w-auto">
-                                                        <button type="button" className="btn btn-outline-danger" onClick={() => removeSize(varIndex, sizeIndex)}>
-                                                            ×
-                                                        </button>
-                                                    </div>
                                                 </div>
-                                            ))}
-                                            <div className="flex gap-2 mt-2">
-                                       
-                                                <button type="button" className="btn btn-secondary flex-1" onClick={() => addSize(varIndex)}>
-                                                    + Add Size
-                                                </button>
-                                                <div className="flex-1">
 
-                                                    <button type="button" className="btn btn-danger w-full" onClick={() => removeVariation(varIndex)}>
+                                                <div className="flex justify-center pt-4 border-t border-gray-200">
+                                                    <button type="button" onClick={() => removeVariation(varIndex)} className="px-4 py-2 btn btn-danger">
                                                         Remove Variation
                                                     </button>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="flex items-center mt-6">
+                                <input
+                                    type="checkbox"
+                                    name="addExp"
+                                    checked={item.addExp === 'true'}
+                                    onChange={(e) =>
+                                        handleChange({
+                                            target: {
+                                                name: 'addExp',
+                                                value: e.target.checked ? 'true' : 'false',
+                                            },
+                                        } as React.ChangeEvent<HTMLInputElement>)
+                                    }
+                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                />
+                                <label className="m-2 block text-sm text-gray-700">Add Exp.</label>
+                            </div>
 
-                                <button type="button" className="btn btn-primary ms-3" onClick={addVariation}>
-                                    + Add Variation
+                            <div className="flex justify-center space-x-4 pt-6 border-t border-gray-200">
+                                <button type="button" onClick={() => navigate('/Components/item-manager')} className="px-4 py-2 btn btn-danger">
+                                    Cancel
+                                </button>
+                                {id && (
+                                    <button
+                                        type="button"
+                                        onClick={handleDelete}
+                                        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                    >
+                                        Delete
+                                    </button>
+                                )}
+                                <button type="button" onClick={handleSubmit} className="px-4 py-2 btn btn-primary">
+                                    {id ? 'Update' : 'Save'}
                                 </button>
                             </div>
                         </div>
-                        <div className="mb-4 flex items-center gap-2">
-                            <input type="checkbox" name="addExp" onChange={handleChange} className="w-4 h-4" />
-                            <label className="font-medium">Add Exp.</label>
-                        </div>
-                        <div className="flex justify-center gap-4 mt-6">
-                            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded" onClick={SaveData}>
-                                Save
-                            </button>
-                            <button
-                                type="button"
-                                className="px-4 py-2 bg-blue-500 text-white rounded"
-                                onClick={() => handleUpdateItem(Number(item.ItemId))} // Ensure item.id is set>
-                            >
-                                Update
-                            </button>
-                            <button type="button" className="px-4 py-2 bg-blue-500 text-white rounded" onClick={() => handleEditItem(Number(item.ItemId))}>
-                                Edit
-                            </button>
-                            <button type="button" className="px-4 py-2 bg-red-500 text-white rounded" onClick={() => handleDeleteItem(Number(item.ItemId))}>
-                                Cancel
-                            </button>
+                    </Tab.Panel>
+                    <Tab.Panel>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-3 border border-gray-200 rounded-lg">
+                            {[
+                                'PRODUCT',
+                                'BRAND',
+                                'STYLE',
+                                'SUBGROUP',
+                                'Group',
+                                'GENDER',
+                                'BUYER',
+                                'SUBCATEGORY',
+                                'CATEGORY',
+                                'MATERIAL',
+                                'COMPANY',
+                                'SEASON',
+                                'PACKING',
+                                'UNIT',
+                                'DEALER',
+                                'SECTION',
+                                'STATUS',
+                            ].map((field) => (
+                                <div key={field}>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{field}</label>
+                                    <select
+                                        name={field}
+                                        value={typeof item[field] === 'string' ? item[field] : ''}
+                                        onChange={handleChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                    >
+                                        <option value="">Select</option>
+                                        {dropdownValues[field.toLowerCase()]?.map((option, idx) => (
+                                            <option key={idx} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            ))}
                         </div>
                     </Tab.Panel>
                 </Tab.Panels>

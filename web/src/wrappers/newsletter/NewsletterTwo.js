@@ -13,8 +13,10 @@ const NewsletterTwo = ({
         <div className="row">
           <div className="col-xl-5 col-lg-7 col-md-10 ms-auto me-auto">
             <div className="subscribe-style-3 text-center">
-              <h2>Subscribe </h2>
-              <p>Subscribe to our newsletter to receive news on update</p>
+              <div className="subscribe-content">
+              <h1>Sign up now & get 10% off </h1>
+              <p>Be the first to know about our new arrivals and exclusive offers.</p>
+              </div>
               {/* subscription form */}
               <SubscribeEmailTwo
                 mailchimpUrl="//devitems.us11.list-manage.com/subscribe/post?u=6bbb9b6f5827bd842d9640c82&amp;id=05d85f18ef"
