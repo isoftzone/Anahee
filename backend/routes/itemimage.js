@@ -38,32 +38,32 @@ const upload = multer({ storage });
 //   });
 // });
 
-router.post("/photoupload", upload.array("photo", 6), async (req, res) => {
+router.post("/photoupload", upload.array("photo", 50), async (req, res) => { console.log("photo api called");
   try {
-    const itemId = req.body.ItemId;
+   // const itemId = req.body.ItemId;
     
     // Ensure files are uploaded correctly
-    if (!req.files || req.files.length === 0) {
-        return res.status(400).json({ error: "No image file uploaded" });
-    }
+    // if (!req.files || req.files.length === 0) {
+    //     return res.status(400).json({ error: "No image file uploaded" });
+    // }
 
-    if (!itemId) {
-      return res.status(400).json({ error: 'ItemId is required' });
-    }
+    // if (!itemId) {
+    //   return res.status(400).json({ error: 'ItemId is required' });
+    // }
 
     // Collect all photo URLs and join them as a comma-separated string
     const photoUrls = req.files.map(file => `/images/banner/${file.filename}`).join(',');
 
     // Insert the comma-separated photo URLs into the database
-    await new Promise((resolve, reject) => {
-      con.query("INSERT INTO itemimage (PHOTO, ITEMID) VALUES (?, ?)", [photoUrls, itemId], (err, result) => {
-        if (err) {
-          reject(err); 
-        } else {
-          resolve(result);
-        }
-      });
-    });
+    // await new Promise((resolve, reject) => {
+    //   con.query("INSERT INTO itemimage (PHOTO, ITEMID) VALUES (?, ?)", [photoUrls, itemId], (err, result) => {
+    //     if (err) {
+    //       reject(err); 
+    //     } else {
+    //       resolve(result);
+    //     }
+    //   });
+    // });
 
     // Return success response with all photo URLs
     res.json({ success: true, images: photoUrls });

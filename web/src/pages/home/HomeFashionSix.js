@@ -4,7 +4,7 @@ import axios from "axios";
 import { BASE_URL } from "../../config";
 import LayoutSeven from "../../layouts/LayoutSeven";
 import LayoutOne from "../../layouts/LayoutOne";
-
+import SectionTitleHome from "../../components/section-title/SectionTitleHome.js";
 import HeroSliderFourteen from "../../wrappers/hero-slider/HeroSliderFourteen";
 import HeroSliderTen from "../../wrappers/hero-slider/HeroSliderTen";
 // import SectionTitleWithText from "../../components/section-title/SectionTitleWithText";
@@ -20,6 +20,7 @@ import BannerSixteen from "../../wrappers/banner/BannerSixteen";
 import BannerEleven from "../../wrappers/banner/BannerEleven";
 // import ProductGridFiveContainer from "../../wrappers/product/ProductGridFiveContainer";
 import BannerTwentyEight from "../../wrappers/banner/BannerTwentyEight";
+import PromoBanner from "../../wrappers/banner/PromoBanner";
 import BannerSix from "../../wrappers/banner/BannerSix";
 import BannerSeven from "../../wrappers/banner/BannerSeven";
 import NewProductGrid from "../../wrappers/product/NewProductGrid";
@@ -28,6 +29,8 @@ import BannerTwo from "../../wrappers/banner/BannerTwo";
 import CategoryTwoSlider from "../../wrappers/category/CategoryTwoSlider";
 import BannerTwentySix from "../../wrappers/banner/BannerTwentySix";
 import BannerThirtyThree from "../../wrappers/banner/BannerThirtyThree";
+import PromoBannerText from "../../wrappers/banner/PromoBannerText.js";
+import ShopByCollection from "../../wrappers/banner/ShopByCollection.js";
 // import Banner from "../../wrappers/banner/Banner";
 
 const HomeFashionSix = () => {
@@ -64,6 +67,16 @@ const HomeFashionSix = () => {
       case "gridtwo":
         return (
           <BannerTwentyEight spaceTopClass="pt-100" spaceBottomClass="pb-70" />
+        );
+      case "promobanner":
+        return <PromoBanner spaceTopClass="pt-100" spaceBottomClass="pb-70" />;
+      case "promobannertext":
+        return (
+          <PromoBannerText spaceTopClass="pt-100" spaceBottomClass="pb-70" />
+        );
+      case "shopbycollection":
+        return (
+          <ShopByCollection spaceTopClass="pt-100" spaceBottomClass="pb-70" />
         );
       case "collection":
         return (
@@ -113,7 +126,7 @@ const HomeFashionSix = () => {
       case "newarrivalfullwidth":
         return <NewProductGrid category="accessories" limit={10} />;
       case "subscribe":
-        return <NewsletterTwo spaceBottomClass="pb-100" />;
+        return <NewsletterTwo spaceBottomClass="pb-0" />;
       case "twocoallonerow":
         return <BannerSixteen spaceTopClass="pt-95" />;
       case "wearsection":
@@ -124,9 +137,15 @@ const HomeFashionSix = () => {
           />
         );
       case "imageslider":
-        return <ImageSliderOne />;
-        case "bannertwo":
-          return <HeroSliderTen/>
+        return (
+          <ImageSliderOne spaceTopClass="pt-40" spaceBottomClass="pb-85" />
+        );
+      case "video":
+        return <HeroSliderTen spaceTopClass="pt-40" spaceBottomClass="pb-85" />;
+      case "welcome":
+        return (
+          <SectionTitleHome spaceTopClass="pt-0" spaceBottomClass="pb-90" />
+        );
       default:
         return null; // No matching component
     }

@@ -9,15 +9,15 @@ const CustomForm = ({
   spaceTopClass,
   subscribeBtnClass
 }) => {
-  let email;
+  let mobile;
   const submit = () => {
-    email &&
-      email.value.indexOf("@") > -1 &&
+    mobile &&
+      mobile.value.length > 9 &&
       onValidated({
-        EMAIL: email.value
+        mobile: mobile.value
       });
 
-    email.value = "";
+    mobile.value = "";
   };
 
   return (
@@ -25,10 +25,10 @@ const CustomForm = ({
       <div className="mc-form">
         <div>
           <input
-            className="email"
-            ref={node => (email = node)}
-            type="email"
-            placeholder="Your Email Address"
+            className="mobile"
+            ref={node => (mobile = node)}
+            type="text"
+            placeholder="Enter Your Mobile Number"
             required
           />
         </div>
@@ -50,8 +50,8 @@ const CustomForm = ({
         <div
           className={`clear-3 ${subscribeBtnClass ? subscribeBtnClass : ""}`}
         >
-          <button className="button" onClick={submit}>
-            SUBSCRIBE
+          <button className="send_btn" onClick={submit}>
+            Send
           </button>
         </div>
       </div>

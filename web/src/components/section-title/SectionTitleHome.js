@@ -11,6 +11,7 @@ const SectionTitleHome = ({ spaceTopClass, spaceBottomClass }) => {
           <p>
           At Anahee (Anand Fashion), we craft timeless styles that blend tradition with modern elegance. Rooted in Indian heritage and inspired by minimalism, our pieces celebrate modest fashion with a contemporary touch — effortless, graceful, and deeply soulful.
           </p>
+          <p className="brand_name">@anahee</p>
         </div>
       </div>
       {/* <div className="container">

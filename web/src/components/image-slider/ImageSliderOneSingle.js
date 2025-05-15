@@ -14,6 +14,7 @@ const ImageSliderOneSingle = ({ data }) => {
     <div className="single-image">
       <Link to={data.link || "/"}>
         <img
+        className=""
           src={imageUrl || "https://via.placeholder.com/300"}
           alt={data.alt || "Image Slider"}
           onError={(e) => {

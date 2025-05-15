@@ -20,6 +20,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/public", express.static("public"));
 app.use("/public/images/banner", express.static("public/images/banner"));
 app.use("/images", express.static(path.join(__dirname, "public/images/")));
+app.use("/videos", express.static(path.join(__dirname, "public/videos")));
 app.use("/api/user", userRoutes);
 app.use("itemimage",express.static(path.join(__dirname, "public/images/banner")));
 app.use(express.static(path.join(__dirname, 'public')));

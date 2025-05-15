@@ -129,7 +129,7 @@ const HeroSliderFourteen = () => {
 
         
         {/* <SectionTitleWithText spaceTopClass="pt-95" spaceBottomClass="pb-90" /> */}
-        <SectionTitleHome spaceTopClass="pt-95" spaceBottomClass="pb-90" />
+        {/* <SectionTitleHome spaceTopClass="pt-95" spaceBottomClass="pb-90" /> */}
 
 
         {/* <div
@@ -202,7 +202,7 @@ const HeroSliderFourteen = () => {
             </div>
           </div>
         </div> */}
-        <div className="banner-area">
+        {/* <div className="banner-area">
   <div className="container-fluid p-0">
     <div className="row g-0">
       <div className="col-md-4">
@@ -213,10 +213,10 @@ const HeroSliderFourteen = () => {
             </figure>
             <div className="banner-info">
               <div className="banner-info--inner text-center">
-                {/* <h2 className="heading__primary color--white mb--20">
+                <h2 className="heading__primary color--white mb--20">
                   <span className="heading__primary--sub">Perfect Collection</span>
                   <span className="heading__primary--main">For Women</span>
-                </h2> */}
+                </h2> 
                 <Link to={"/shop-grid-standard"} className="btn btn-no-bg btn-color-white">
                   Shop Now <i className="fa fa-angle-double-right"></i>
                 </Link>
@@ -234,10 +234,10 @@ const HeroSliderFourteen = () => {
             </figure>
             <div className="banner-info">
               <div className="banner-info--inner text-center">
-                {/* <h2 className="heading__primary color--white mb--20">
+                <h2 className="heading__primary color--white mb--20">
                   <span className="heading__primary--sub">Perfect Accessories</span>
                   <span className="heading__primary--main">For Women</span>
-                </h2> */}
+                </h2> 
                 <Link to={"/shop-grid-standard"} className="btn btn-no-bg btn-color-white">
                   Shop Now <i className="fa fa-angle-double-right"></i>
                 </Link>
@@ -255,10 +255,10 @@ const HeroSliderFourteen = () => {
             </figure>
             <div className="banner-info">
               <div className="banner-info--inner text-center">
-                {/* <h2 className="heading__primary color--white mb--20">
+                <h2 className="heading__primary color--white mb--20">
                   <span className="heading__primary--sub">Orange Balzer</span>
                   <span className="heading__primary--main">Winter Shop</span>
-                </h2> */}
+                </h2> 
                 <Link to={"/shop-grid-standard"} className="btn btn-no-bg btn-color-white">
                   Shop Now <i className="fa fa-angle-double-right"></i>
                 </Link>
@@ -269,8 +269,8 @@ const HeroSliderFourteen = () => {
         </div>
       </div>
     </div>
-  </div>
-    </div>
+  </div> 
+    </div>*/}
 
       </div>
     </>
