@@ -41,26 +41,43 @@ const settings = {
 const ImageSliderOne = ({ spaceTopClass, spaceBottomClass }) => {
   const [images, setImages] = useState([]);
 
+  // useEffect(() => {
+  //   axios
+  //     .get(`${BASE_URL}/videos/productsvideo.mp4`)
+  //     .then((response) => {
+  //       console.log("✅ API Response:", response.data);
+  //       setImages(response.data.images);
+  //     })
+  //     .catch((error) => {
+  //       console.error("❌ Error fetching image slider:", error);
+  //     });
+  // }, []);
+
   useEffect(() => {
-    axios
-      .get(`${BASE_URL}/images`)
-      .then((response) => {
-        console.log("✅ API Response:", response.data);
-        setImages(response.data.images);
-      })
-      .catch((error) => {
-        console.error("❌ Error fetching image slider:", error);
-      });
-  }, []);
+  const files = ["video1.mp4", "video2.webm", "clip.ogg"]; // hardcoded
+
+  const videoFiles = files.filter((file) =>
+    /\.(mp4|webm|ogg|mov)$/i.test(file)
+  );
+
+  const videoURLs = videoFiles.map((filename) => ({
+    images: `${BASE_URL}/videos/productsvideo.mp4`,
+    link: "/",
+    alt: filename,
+  }));
+
+  setImages(videoURLs);
+}, []);
+
 
   return (
     <div className={`image-slider-area ${spaceTopClass} ${spaceBottomClass}`}>
       <div className="image-slider-active mx-sm-5 px-sm-5">
         <div className="text-center single-image-text flex mx-5 px-5">
           <h1 className="">Social Media Pressence</h1>
-          {images.length >= 4 ? (
+          {images.length  ? (
             <Swiper options={settings}>
-              {images.slice(31, 35).map((single, key) => (
+              {images.map((single, key) => (
                 <SwiperSlide key={key}>
                   <ImageSliderOneSingle data={single} />
                 </SwiperSlide>

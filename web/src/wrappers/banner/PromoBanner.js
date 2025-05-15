@@ -54,7 +54,8 @@ const PromoBanner = ({ spaceTopClass, spaceBottomClass }) => {
               <div className="row justify-content-center">
                 {/* Free Shipping */}
                 <div className="col-4 col-md-4 col-sm-4 promo-banner__feature">
-                  <div className="promo-banner__icon">🚚</div>
+                  {/* <div className="promo-banner__icon text-white">🚚</div> */}
+                  <img className="promo-banner__icon" src="assets\img\logo\shipping.png" />
                   <div>
                     <h3 className="promo-banner__feature-title">
                       Free Shipping
@@ -67,7 +68,7 @@ const PromoBanner = ({ spaceTopClass, spaceBottomClass }) => {
 
                 {/* Secure Payment */}
                 <div className="col-4 col-md-4 col-sm-4 promo-banner__feature">
-                  <div className="promo-banner__icon">🔒</div>
+                 <img className="promo-banner__icon" src="assets\img\logo\secure.png" />
                   <div>
                     {" "}
                     <h3 className="promo-banner__feature-title">
@@ -81,7 +82,7 @@ const PromoBanner = ({ spaceTopClass, spaceBottomClass }) => {
 
                 {/* Easy Returns */}
                 <div className="col-4 col-md-4 col-sm-4 promo-banner__feature mt-3 mt-md-0">
-                  <div className="promo-banner__icon">🔄</div>
+                  <img className="promo-banner__icon" src="assets\img\logo\Group.png" />
                   <div>
                     <h3 className="promo-banner__feature-title">
                       Easy Returns

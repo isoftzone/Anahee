@@ -1,26 +1,44 @@
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
-const BASE_IMAGE_URL = process.env.REACT_APP_BASE_IMAGE_URL || "http://localhost:3000/images";
+// Use "/" if files are inside public folder directly
+
+const BASE_IMAGE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3000";
+
 
 const ImageSliderOneSingle = ({ data }) => {
-  const imageUrl = data.images?.startsWith("http")
-    ? data.images
-    : `${BASE_IMAGE_URL}/${data.images}`;
+  const fileName = data?.images || "";
+  const mediaUrl = fileName.startsWith("http")
+    ? fileName
+    : `${BASE_IMAGE_URL}${fileName.startsWith("/") ? "" : "/"}${fileName}`;
 
-  console.log("🖼️ Final Image URL:", imageUrl);
+  const isImage = /\.(jpeg|jpg|png|gif|webp|svg)$/i.test(fileName);
 
   return (
     <div className="single-image">
       <Link to={data.link || "/"}>
-        <img
-        className=""
-          src={imageUrl || "https://via.placeholder.com/300"}
-          alt={data.alt || "Image Slider"}
-          onError={(e) => {
-            console.error("❌ Image failed to load:", e.target.src);
-          }}
-        />
+        {isImage ? (
+          <img
+            src={mediaUrl}
+            alt={data.alt || "Image Slider"}
+            onError={(e) => {
+              console.error("❌ Image failed to load:", e.target.src);
+              e.target.src = "https://via.placeholder.com/300";
+            }}
+          />
+        ) : (
+          <video
+            src={mediaUrl}
+            autoPlay
+            muted
+            loop
+            playsInline
+            style={{ width: "100%", height: "auto" }}
+            onError={(e) => {
+              console.error("❌ Video failed to load:", e.target.src);
+            }}
+          />
+        )}
       </Link>
     </div>
   );
@@ -28,10 +46,10 @@ const ImageSliderOneSingle = ({ data }) => {
 
 ImageSliderOneSingle.propTypes = {
   data: PropTypes.shape({
-    image: PropTypes.string,
+    images: PropTypes.string,
     link: PropTypes.string,
     alt: PropTypes.string,
-  }),
+  }).isRequired,
 };
 
 export default ImageSliderOneSingle;
