@@ -19333,12 +19333,12 @@ th {
 // }
 .magnifying-lens {
   position: absolute;
-  width: 150px;
-  height: 150px;
+  // width: 200px;
+  // height: 200px;
   border: 2px solid #ddd;
   background-repeat: no-repeat;
   pointer-events: none;
-  border-radius: 50%;
+  border-radius: 10%;
   z-index: 10;
 }
 
