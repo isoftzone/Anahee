@@ -7,7 +7,7 @@ const PromoBanner = ({ spaceTopClass, spaceBottomClass }) => {
       <img
         src="assets/img/banner/promo_banner.png"
         alt="Fashion Model"
-        className="promo-banner__model-img d-none d-lg-block"
+        className="promo-banner__model-img"
       />
 
       {/* First section - white background */}
@@ -49,54 +49,37 @@ const PromoBanner = ({ spaceTopClass, spaceBottomClass }) => {
       {/* Third section - maroon background */}
       <div className="promo-banner__section promo-banner__section--bottom">
         <div className="container">
-          <div className="row">
-            <div className="col-12">
               <div className="row justify-content-center">
-                {/* Free Shipping */}
-                <div className="col-4 col-md-4 col-sm-4 promo-banner__feature">
-                  {/* <div className="promo-banner__icon text-white">🚚</div> */}
-                  <img className="promo-banner__icon" src="assets\img\logo\shipping.png" />
-                  <div>
-                    <h3 className="promo-banner__feature-title">
-                      Free Shipping
-                    </h3>
-                    <p className="promo-banner__feature-desc">
-                      A wonderful speed
-                    </p>
-                  </div>
-                </div>
+  {/* Free Shipping */}
+  <div className="col-12 col-md-4 promo-banner__feature mb-4 mb-md-0">
+    <img className="promo-banner__icon img img-fluid" src="assets/img/logo/shipping.png" />
+    <div>
+      <h3 className="promo-banner__feature-title">Free Shipping</h3>
+      <p className="promo-banner__feature-desc">A wonderful speed</p>
+    </div>
+  </div>
 
-                {/* Secure Payment */}
-                <div className="col-4 col-md-4 col-sm-4 promo-banner__feature">
-                 <img className="promo-banner__icon" src="assets\img\logo\secure.png" />
-                  <div>
-                    {" "}
-                    <h3 className="promo-banner__feature-title">
-                      Secure Payment
-                    </h3>
-                    <p className="promo-banner__feature-desc">
-                      Feel safe for transactions
-                    </p>
-                  </div>
-                </div>
+  {/* Secure Payment */}
+  <div className="col-12 col-md-4 promo-banner__feature mb-4 mb-md-0">
+    <img className="promo-banner__icon" src="assets/img/logo/secure.png" />
+    <div>
+      <h3 className="promo-banner__feature-title">Secure Payment</h3>
+      <p className="promo-banner__feature-desc">Feel safe for transactions</p>
+    </div>
+  </div>
 
-                {/* Easy Returns */}
-                <div className="col-4 col-md-4 col-sm-4 promo-banner__feature mt-3 mt-md-0">
-                  <img className="promo-banner__icon" src="assets\img\logo\Group.png" />
-                  <div>
-                    <h3 className="promo-banner__feature-title">
-                      Easy Returns
-                    </h3>
-                    <p className="promo-banner__feature-desc">
-                      15 Days Return Policy
-                    </p>
-                  </div>
-                </div>
-              </div>
+  {/* Easy Returns */}
+  <div className="col-12 col-md-4 promo-banner__feature">
+    <img className="promo-banner__icon" src="assets/img/logo/Group.png" />
+    <div>
+      <h3 className="promo-banner__feature-title">Easy Returns</h3>
+      <p className="promo-banner__feature-desc">15 Days Return Policy</p>
+    </div>
+  </div>
+</div>
+
             </div>
-          </div>
         </div>
-      </div>
     </div>
   );
 };
