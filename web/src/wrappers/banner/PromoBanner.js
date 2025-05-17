@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { Link } from "react-router-dom";
 
 const PromoBanner = ({ spaceTopClass, spaceBottomClass }) => {
   return (
@@ -40,7 +41,10 @@ const PromoBanner = ({ spaceTopClass, spaceBottomClass }) => {
                   Are Live!
                 </span>
               </h2>
-              <button className="promo-banner__shop-btn">SHOP NOW</button>
+              {/* <button className="promo-banner__shop-btn">SHOP NOW</button> */}
+              <Link to="/shop-grid-standard" className="promo-banner__shop-btn">
+  Shop Now
+</Link>
             </div>
           </div>
         </div>

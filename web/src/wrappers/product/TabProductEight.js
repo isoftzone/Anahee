@@ -15,21 +15,22 @@ const TabProductEight = ({
       <div className="container">
         <Tab.Container defaultActiveKey="bestSeller">
           <Nav variant="pills" className="product-tab-list pb-30 text-center">
-            <Nav.Item>
+            {/* <Nav.Item>
               <Nav.Link eventKey="newArrival">
                 <h4>New Arrivals</h4>
               </Nav.Link>
-            </Nav.Item>
+            </Nav.Item> */}
             <Nav.Item>
               <Nav.Link eventKey="bestSeller">
                 <h4>Best Sellers</h4>
+                <div className="subscribe-content p-3"/>
               </Nav.Link>
             </Nav.Item>
-            <Nav.Item>
+            {/* <Nav.Item>
               <Nav.Link eventKey="saleItems">
                 <h4>Sale Items</h4>
               </Nav.Link>
-            </Nav.Item>
+            </Nav.Item> */}
           </Nav>
           <Tab.Content>
             <Tab.Pane eventKey="newArrival">
