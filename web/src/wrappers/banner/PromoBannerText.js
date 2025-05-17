@@ -38,10 +38,6 @@ const PromoBannerText = ({ spaceTopClass, spaceBottomClass }) => {
               font-size: 4vw !important;
               margin-right: 6vw !important;
             }
-
-            .promo-banner {
-              height: 48px !important;
-            }
           }
 
           @media (max-width: 480px) {
@@ -50,9 +46,7 @@ const PromoBannerText = ({ spaceTopClass, spaceBottomClass }) => {
               margin-right: 8vw !important;
             }
 
-            .promo-banner {
-              height: 42px !important;
-            }
+           
           }
         `}
       </style>
