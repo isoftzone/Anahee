@@ -108,7 +108,7 @@ exports.addSalesMaster = async (req, res) => {
           return res.status(500).json({ error: "Database error" });
         }
         console.log("✅ Insert Success:", result);
-        res.json({ success: true, message: "Sale record added successfully!" });
+        res.json({ success: true, saleId:result.insertId, message: "Sale record added successfully!" });
       }
     );
   } catch (error) {
@@ -322,3 +322,51 @@ exports.salesMasterPaginated = (req, res) => {
 //         res.status(500).json({ error: "Server error" });
 //     }
 // };
+
+exports.updateSalesMaster = async (req, res) => {
+  const {
+    merchant_order_id,
+    payment_mode,
+    provider_reference_id,
+    phonepe_status,
+    payment_status,
+    transaction_id,
+    saleId
+  } = req.body;
+  const updateFields = {
+    PAYMENT_MODE: payment_mode,
+    PROVIDER_REFERENCE_ID: provider_reference_id,
+    PHONEPE_STATUS: phonepe_status,
+    PAYMENT_STATUS: payment_status,
+    TRANSACTION_ID: transaction_id,
+    MERCHANT_ORDER_ID:merchant_order_id
+  };
+  try {
+    await con.query(
+      'UPDATE madhuban.salesmaster SET ? WHERE SALEID = ?',
+      [updateFields, saleId],
+      (err, result) => {
+        if (err) {
+          console.error(":x: Error updating sale record:", err);
+          return res.status(500).json({ error: "Database error" });
+        }
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ error: "Record not found" });
+        }
+        console.log(":white_tick: Update Success:", result);
+        res.json({ success: true, message: "Sale record updated successfully!" });
+      }
+    );
+  } catch (error) {
+    console.error(":x: Unexpected error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+
+
+
+
+
+
+
