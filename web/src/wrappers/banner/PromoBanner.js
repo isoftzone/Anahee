@@ -8,6 +8,7 @@ const PromoBanner = ({ spaceTopClass, spaceBottomClass }) => {
         src="assets/img/banner/promo_banner.png"
         alt="Fashion Model"
         className="promo-banner__model-img"
+        className="promo-banner__model-img"
       />
       {/* First section - white background */}
       <div className="promo-banner__section promo-banner__section--top">
