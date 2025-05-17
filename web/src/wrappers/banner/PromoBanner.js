@@ -34,7 +34,7 @@ const PromoBanner = ({ spaceTopClass, spaceBottomClass }) => {
             <div className="col offset-lg-1">
               <h2 className="promo-banner__discount-text">
                 <p className="promo-banner__text">Get Set, Style!</p>
-                <span className="promo-banner__brand">Myntra </span>
+                <span className="promo-banner__brand">Anahee </span>
                 <span className="promo-banner__discount-phrase">
                   Discounts
                   <br />

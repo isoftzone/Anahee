@@ -245,6 +245,8 @@
 
       &__icon {
         font-size: 2.5rem;
+        height: 25px;
+        width: auto;
       }
 
       &__feature-title {
@@ -319,7 +321,7 @@
       padding-left: 180px;
     }
     .promo-banner__title {
-      font-size: 22px;
+      font-size: 19px;
     }
     .promo-banner__subtitle {
       font-size: 9px !important;
