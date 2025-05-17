@@ -910,9 +910,9 @@ a:hover {
 }
 
 .pb-70 {
-  padding-bottom: 70px;
+  // padding-bottom: 70px;
   padding-top: 30px;
-  @media #{$xs-layout} {
+  @media #{$sm-layout} {
     padding-bottom: 30px;
   }
 }
@@ -1965,7 +1965,46 @@ button:disabled {
   position: relative;
 }
 
+// suceess css
+.success-box {
+  background-color: #fff;
+  padding: 40px 20px;
+  border-bottom: 4px solid #28a745;
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+}
 
+.success-box-1 {
+  background-color: #fff;
+  padding: 40px 20px;
+  border-bottom: 4px solid #e91313;
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+}
+.icon-circle {
+  font-size: 50px;
+  color: #28a745;
+}
 
+.success-title {
+  font-weight: 600;
+  font-size: 1.8rem;
+  color: #212529;
+}
 
+.success-message {
+  font-size: 1rem;
+  color: #495057;
+  font-weight: 500;
+}
 
+/* Responsive font sizing (optional tweak for small screens) */
+@media (max-width: 576px) {
+  .success-title {
+    font-size: 1.5rem;
+  }
+
+  .icon-circle {
+    font-size: 40px;
+  }
+}

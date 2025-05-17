@@ -1,7 +1,7 @@
 .promo-banner {
   width: 100%;
   height: auto;
-  margin: 20px 0px 20px 0px;
+  margin: -30px 0px 20px 0px;
   overflow: hidden;
 
   &__model-img {
@@ -26,8 +26,29 @@
     }
 
     &--middle {
+      position: relative;
       height: 533px;
-      background-color: #f7e8e8;
+      background-image: url("../../../public/assets/img/bg/middlebg.png");
+      background-repeat: no-repeat;
+      background-size: cover;
+      overflow: hidden;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #f7e8e8;
+        opacity: 0.7; /* Adjust this for stronger or lighter tint */
+        z-index: 1;
+      }
+
+      > * {
+        position: relative;
+        z-index: 2; /* Ensure content stays above overlay */
+      }
     }
 
     &--bottom {
@@ -274,12 +295,18 @@
     .promo-banner__title {
       font-size: 35px;
     }
+    .promo-banner__model-img {
+      height: 700px;
+      top: 73px;
+      width: 356px;
+    }
   }
 
   @media (max-width: 426px) {
     .promo-banner__model-img {
       width: 286px;
       height: 560px;
+      top: 22px;
     }
     .promo-banner__section {
       padding-left: 240px;
@@ -304,19 +331,18 @@
       font-size: 2.5rem 12.5px;
     }
     .promo-banner__shop-btn {
-        font-size: 2.25rem;
+      font-size: 2.25rem;
     }
   }
 
-  
   @media (max-width: 375px) {
     .promo-banner__model-img {
-      width: 220px;
-      height: 430px;
-      top: 91px;
+      width: 230px;
+      height: 451px;
+      top: 54px;
     }
     .promo-banner__section {
-      padding-left: 180px;
+      padding-left: 185px;
     }
     .promo-banner__title {
       font-size: 22px;
@@ -326,20 +352,71 @@
     }
 
     .promo-banner__section--middle {
-      height: 257px;
+      height: 200px;
     }
     .promo-banner__discount-phrase {
-      font-size: 3.5rem;
+      font-size: 2.5rem;
     }
     .promo-banner__brand {
-      font-size: 4.5rem ;
+      font-size: 4.5rem;
     }
     .promo-banner__text {
       font-size: 15px;
     }
     .promo-banner__shop-btn {
-        font-size: 2.25rem;
+      font-size: 2.25rem;
     }
+    .promo-banner {
+      width: 100%;
+      height: auto;
+      margin: -64px 0px 20px 0px;
+    }
+    .promo-banner__section--bottom {
+      padding-left: 155px;
+    }
+    .promo-banner__feature-title {
+      font-size: 13px;
+    }
+    .promo-banner__feature-desc {
+      font-size: 10px;
+    }
+    .promo-banner__icon {
+      width: 35px; /* Set the desired width */
+      height: auto; /* Maintain aspect ratio */
+    }
+  }
+
+  @media (max-width: 320px) {
+    .promo-banner__title {
+      font-size: 18px;
+    }
+    .promo-banner__discount-phrase {
+      font-size: 2.5rem;
+    }
+    .promo-banner__model-img {
+      width: 220px;
+      height: 441px;
+      top: 54px;
+    }
+    .promo-banner__section--middle {
+      height: 175px;
+    }
+    .promo-banner__section {
+      padding-left: 182px;
+    }
+    .promo-banner__icon {
+      width: 30px; /* Set the desired width */
+      height: auto; /* Maintain aspect ratio */
+    }
+    .promo-banner__section--bottom {
+      padding-left: 155px;
+    }
+    .promo-banner__feature-title {
+      font-size: 13px;
+    }
+    .promo-banner__feature-desc {
+      font-size: 8px;
+       }
   }
   /* Tablet Landscape / Small Desktop (768px - 991.98px) */
   @media (min-width: 768px) and (max-width: 991.98px) {
