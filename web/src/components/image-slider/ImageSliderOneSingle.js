@@ -10,7 +10,7 @@ const ImageSliderOneSingle = ({ data }) => {
     ? fileName
     : `${BASE_IMAGE_URL}${fileName.startsWith("/") ? "" : "/"}${fileName}`;
 
-  const isImage = /\.(jpeg|jpg|png|gif|webp|svg)$/i.test(fileName);
+  const isImage = /\.(jpeg|jpg|png|gif|webp|svg)$/i.test(fileName); 
   const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(fileName);
 
   const videoRef = useRef(null);
