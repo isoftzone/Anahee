@@ -7,20 +7,33 @@ import ImageSliderOneSingle from "../../components/image-slider/ImageSliderOneSi
 const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3000";
 
 const settings = {
-  loop: false,
+  loop: true,
+  speed: 1000,
+  navigation: true,
+  autoHeight: false,
+  slidesPerView: 4,
+  spaceBetween: 20, // Add gap between slides
+  autoplay: {
+    delay: 5000,
+    disableOnInteraction: false,
+  },
   grabCursor: true,
   breakpoints: {
     320: {
-      slidesPerView: 2,
+      slidesPerView: 1,
+      spaceBetween: 10,
     },
     640: {
-      slidesPerView: 3,
+      slidesPerView: 2,
+      spaceBetween: 15,
     },
     768: {
-      slidesPerView: 4,
+      slidesPerView: 3,
+      spaceBetween: 20,
     },
     1024: {
-      slidesPerView: 5,
+      slidesPerView: 4,
+      spaceBetween: 20,
     },
   },
 };
@@ -28,32 +41,52 @@ const settings = {
 const ImageSliderOne = ({ spaceTopClass, spaceBottomClass }) => {
   const [images, setImages] = useState([]);
 
+  // useEffect(() => {
+  //   axios
+  //     .get(`${BASE_URL}/videos/productsvideo.mp4`)
+  //     .then((response) => {
+  //       console.log("✅ API Response:", response.data);
+  //       setImages(response.data.images);
+  //     })
+  //     .catch((error) => {
+  //       console.error("❌ Error fetching image slider:", error);
+  //     });
+  // }, []);
+
   useEffect(() => {
-    axios
-      .get(`${BASE_URL}/images`)
-      .then((response) => {
-        console.log("✅ API Response:", response.data);
-        setImages(response.data.images);
-      })
-      .catch((error) => {
-        console.error("❌ Error fetching image slider:", error);
-      });
-  }, []);
+  const files = ["video1.mp4", "video2.webm", "clip.ogg"]; // hardcoded
+
+  const videoFiles = files.filter((file) =>
+    /\.(mp4|webm|ogg|mov)$/i.test(file)
+  );
+
+  const videoURLs = videoFiles.map((filename) => ({
+    images: `${BASE_URL}/videos/productsvideo.mp4`,
+    link: "/",
+    alt: filename,
+  }));
+
+  setImages(videoURLs);
+}, []);
+
 
   return (
     <div className={`image-slider-area ${spaceTopClass} ${spaceBottomClass}`}>
-      <div className="image-slider-active">
-        {images.length >= 5 ? (
-          <Swiper options={settings}>
-            {images.slice(31, 36).map((single, key) => (
-              <SwiperSlide key={key}>
-                <ImageSliderOneSingle data={single} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        ) : (
-          <p>No images available</p>
-        )}
+      <div className="image-slider-active mx-sm-5 px-sm-5">
+        <div className="text-center single-image-text flex mx-5 px-5">
+          <h1 className="">Social Media Pressence</h1>
+          {images.length  ? (
+            <Swiper options={settings}>
+              {images.map((single, key) => (
+                <SwiperSlide key={key}>
+                  <ImageSliderOneSingle data={single} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          ) : (
+            <p>No images available</p>
+          )}
+        </div>
       </div>
     </div>
   );

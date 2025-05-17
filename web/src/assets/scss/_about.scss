@@ -20,7 +20,7 @@
     line-height: 1;
     &:before {
       position: absolute;
-      background-color: #070508;
+      background-color: #D988BA;
       height: 3px;
       width: 70px;
       content: "";
@@ -46,6 +46,11 @@
       width: 100%;
       font-size: 15px;
     }
+  }
+  .brand_name{
+    color:#D988BA;
+    font-size: 40px;
+    margin-top: 20px;
   }
 }
 

@@ -18,7 +18,7 @@ const LanguageCurrencyChanger = ({ currency }) => {
 
   return (
     <div className="language-currency-wrap">
-      <div className="same-language-currency language-style">
+      {/* <div className="same-language-currency language-style">
         <span>
           {i18n.resolvedLanguage === "en"
             ? "English"
@@ -75,7 +75,7 @@ const LanguageCurrencyChanger = ({ currency }) => {
       </div>
       <div className="same-language-currency">
         <p>Call Us 3965410</p>
-      </div>
+      </div> */}
     </div>
   );
 };

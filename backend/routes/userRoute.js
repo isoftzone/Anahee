@@ -22,6 +22,7 @@ const master = require('../controllers/master');
 const salesmaster = require('../controllers/salesmaster');
 const salesdetail = require('../controllers/salesdetail');
 const rfmaster = require('../controllers/rfmaster');
+const upload = require("../middlewares/imageupload");
 
 router.post("/addProducts",addProductData.addProducts);
 router.get('/getCodeTypeData', addProductData.getCodeTypeData);
@@ -36,8 +37,11 @@ router.get('/getNextSequence', addProductData.getNextSequence);
 
 // router.post("/add_Images",imageupdate.addImages);
 
+router.get("/all_items",itemmaster.items);
+router.get("/getItemsById/:id",itemmaster.getItemsById);
+router.put("/updateItemById/:id",upload.any(),itemmaster.updateItemById);
+router.post("/addItem", upload.any(), itemmaster.addItem);
 
-router.post("/addItem",itemmaster.addItem);
 router.get("/items/:id",itemmaster.getItems);
 router.get("/getallitems",itemmaster.getallitems);
 router.put("/update/:id",itemmaster.updateItem);

@@ -1,53 +1,99 @@
 import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { EffectFade } from "swiper";
-import Swiper, { SwiperSlide } from "../../components/swiper";
-import HeroSliderTenSingle from "../../components/hero-slider/HeroSliderTenSingle";
+import { useEffect, useRef, useState } from "react";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3000";
 
-const params = {
-  effect: "fade",
-  fadeEffect: {
-    crossFade: true,
-  },
-  modules: [EffectFade],
-  loop: true,
-  speed: 1000,
-  navigation: true,
-  autoHeight: false,
-  autoplay: false,
-};
-
 const HeroSliderTen = ({ spaceTopClass, spaceBottomClass }) => {
-  const [sliders, setSliders] = useState([]);
+  const [videoUrl, setVideoUrl] = useState("");
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [videoDimensions, setVideoDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
+  const videoRef = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    axios
-      .get(`${BASE_URL}/images`)
-      .then((response) => {
-        console.log("✅ API Response:", response.data);
-        setSliders(response.data.images);
-      })
-      .catch((error) => {
-        console.error("❌ Error fetching sliders:", error);
-      });
+    setVideoUrl(`${BASE_URL}/videos/productsvideo.mp4`);
   }, []);
+
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      const { videoWidth, videoHeight } = videoRef.current;
+      setVideoDimensions({ width: videoWidth, height: videoHeight });
+    }
+  };
+
+  const togglePlayPause = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+    } else {
+      videoRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  // Calculate padding-top percentage based on aspect ratio
+  const aspectRatio = (videoDimensions.height / videoDimensions.width) * 100;
+  const videoContainerStyle = {
+    position: "relative",
+    width: "100%",
+    paddingTop: `${aspectRatio}%`,
+    overflow: "hidden",
+  };
 
   return (
     <div className={`slider-area ${spaceTopClass} ${spaceBottomClass}`}>
-      <div className="slider-active nav-style-1">
-        {sliders.length >= 3 ? (
-          <Swiper options={params}>
-            {sliders.slice(29, 31).map((single, key) => (
-              <SwiperSlide key={key}>
-                <HeroSliderTenSingle data={single} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
+      <div
+        ref={containerRef}
+        className="video-container"
+        style={videoContainerStyle}
+      >
+        {videoUrl ? (
+          <>
+            <video
+              ref={videoRef}
+              className="position-absolute top-0 left-0 w-full h-full object-cover"
+              muted
+              loop
+              onClick={togglePlayPause}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              onLoadedMetadata={handleLoadedMetadata}
+            >
+              <source src={videoUrl} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+
+            {/* Centered Play/Pause Button */}
+            <button
+              onClick={togglePlayPause}
+              className="position-absolute top-50 start-50 translate-middle
+                        rounded-circle border-0 cursor-pointer
+                        d-flex justify-content-center align-items-center
+                        bg-white z-3 shadow-sm"
+              style={{
+                width: "80px",
+                height: "80px",
+              }}
+              aria-label={isPlaying ? "Pause" : "Play"}
+            >
+              {isPlaying ? (
+                <svg width="35" height="35" fill="#dc3545" viewBox="0 0 24 24">
+                  <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                </svg>
+              ) : (
+                <svg width="35" height="35" fill="#dc3545" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              )}
+            </button>
+          </>
         ) : (
-          <p>No sliders available</p>
+          <p className="text-white position-absolute top-50 start-50 translate-middle">
+            Loading video...
+          </p>
         )}
       </div>
     </div>

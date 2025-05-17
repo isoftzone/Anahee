@@ -280,7 +280,7 @@ const ProductGridListSingle = ({
                       <i className="pe-7s-like" />
                     </button>
                   </div>
-                  <div className="shop-list-compare ml-10">
+                  {/* <div className="shop-list-compare ml-10">
                     <button
                       className={compareItem !== undefined ? "active" : ""}
                       disabled={compareItem !== undefined}
@@ -293,7 +293,7 @@ const ProductGridListSingle = ({
                     >
                       <i className="pe-7s-shuffle" />
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
