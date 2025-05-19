@@ -7,18 +7,18 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
     >
       <div className="container text-center">
         <div className="collection-section mx-auto">
-          <h2 className="collection-title">Shop by Collection</h2>
+          <h2 className="collection-title py-3">Shop by Collection</h2>
           <div className="underline mx-auto my-2"></div>
           <div className="links mt-3">
-            <a href="#western" className="mx-2">
+            <a href="/" className="mx-2">
               Western Wear
             </a>
             <span className="divider">|</span>
-            <a href="#suit" className="mx-2">
+            <a href="/" className="mx-2">
               Suit Sets
             </a>
             <span className="divider">|</span>
-            <a href="#cord" className="mx-2">
+            <a href="/" className="mx-2">
               Cord Sets
             </a>
           </div>

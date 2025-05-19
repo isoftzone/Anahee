@@ -395,25 +395,36 @@ const NavMenu = ({ menuWhiteClass, sidebarMenu }) => {
               </li>
             </ul>
           </li> */}
+           <li>
+            <Link to={process.env.PUBLIC_URL + "/about"}>
+              {t("About")}
+            </Link>
+          </li>
           <li>
             <Link to={process.env.PUBLIC_URL + "/"}>
               {t("Everday Elegance")}
-              {sidebarMenu ? (
+              {/* {sidebarMenu ? (
                 <span>
                   <i className="fa fa-angle-right"></i>
                 </span>
               ) : (
                 <i className="fa fa-angle-down" />
-              )}
+              )} */}
             </Link>
-            <ul className="submenu">
+            {/* <ul className="submenu">
               <li>
                 <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
                   {t("Kurta Sets")}
                 </Link>
               </li>
-            </ul>
+            </ul> */}
           </li>
+          <li>
+             <Link to={process.env.PUBLIC_URL + "/"}>
+              {t("Western Wear")}
+            </Link>
+          </li>
+          
           {/* <li>
             <Link to={process.env.PUBLIC_URL + "/"}>
               {t("Western Wear")}

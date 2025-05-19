@@ -14,7 +14,7 @@ const NewsletterTwo = ({
           <div className="col-xl-5 col-lg-7 col-md-10 ms-auto me-auto">
             <div className="subscribe-style-3 text-center">
               <div className="subscribe-content">
-              <h1>Sign up now & get 10% off </h1>
+              <h1> </h1>
               <p>Be the first to know about our new arrivals and exclusive offers.</p>
               </div>
               {/* subscription form */}

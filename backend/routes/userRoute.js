@@ -64,7 +64,7 @@ router.post("/save-page-info",pagemaster.addPolicy);
 // router.get("/getSalesMaster",salesmaster.getSalesMaster);
 router.get("/getSalesMaster/:saleId?", salesmaster.getSalesMaster);
 router.post("/addSalesMaster",salesmaster.addSalesMaster);
-
+router.put("/updateSalesMaster",salesmaster.updateSalesMaster);
 
 router.get("/getSalesDetail/:saleId?",salesdetail.getSalesDetail);
 router.post("/addSalesDetail",salesdetail.addSalesDetail);
