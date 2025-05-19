@@ -127,6 +127,14 @@
     }
   }
 
+  @media (max-width:1024px){
+       .collection-title {
+      font-size: 4.5rem;
+    }
+    .links {
+      font-size: 16px ;
+    }
+  }
   @media (max-width: 768px) {
     .lookbook-main-container {
       background-color: #fff;
@@ -161,20 +169,29 @@
           font-size: 4rem;
           font-weight: 700;
         }
-
         .lookbook-link {
           margin-top: 2rem;
           font-size: 2rem;
         }
       }
     }
-
+    .lookbook1,
+    .lookbook2 {
+      height: 301px;
+    }
     .lookbook1,
     .lookbook2 {
       img {
         object-fit: contain;
       }
     }
+   .collection-title {
+      font-size: 4.5rem;
+    }
+    .links {
+      font-size: 2.25rem ;
+    }
+ 
   }
 
   @media (max-width: 480px) {
@@ -196,6 +213,40 @@
       img {
         object-fit: contain;
       }
+    }
+    .lookbook1,
+    .lookbook2 {
+      height: 301px;
+    }
+  }
+
+  @media (max-width: 425px) {
+    .lookbook-text-content {
+      left: 60% !important;
+    }
+    .lookbook1,
+    .lookbook2 {
+      height: 301px;
+    }
+  }
+
+  @media (max-width: 376px) {
+    .lookbook-text-content {
+      left: 54% !important;
+    }
+    .lookbook1,
+    .lookbook2 {
+      height: 301px;
+    }
+  }
+
+  @media (max-width: 321px) {
+    .lookbook-text-content {
+      left: 47% !important;
+    }
+    .lookbook1,
+    .lookbook2 {
+      height: 301px;
     }
   }
 }
