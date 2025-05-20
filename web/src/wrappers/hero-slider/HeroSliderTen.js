@@ -57,7 +57,7 @@ const HeroSliderTen = ({ spaceTopClass, spaceBottomClass }) => {
           <>
             <video
               ref={videoRef}
-              className="position-absolute top-0 start-0 w-100 h-100"
+              className="position-absolute top-0  start-0 w-100 h-100"
               style={{ objectFit: "contain" }}
               muted
               loop

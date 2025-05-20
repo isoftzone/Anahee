@@ -7,13 +7,19 @@ import ProductDescriptionInfo from "../../components/product/ProductDescriptionI
 import ProductImageGallerySideThumb from "../../components/product/ProductImageGallerySideThumb";
 import ProductImageFixed from "../../components/product/ProductImageFixed";
 
-const ProductImageDescription = ({ spaceTopClass, spaceBottomClass, galleryType, product }) => { console.log('product',product);
+const ProductImageDescription = ({
+  spaceTopClass,
+  spaceBottomClass,
+  galleryType,
+  product,
+}) => {
+  console.log("product", product);
   const currency = useSelector((state) => state.currency);
   const { cartItems } = useSelector((state) => state.cart);
   const { wishlistItems } = useSelector((state) => state.wishlist);
   const { compareItems } = useSelector((state) => state.compare);
-  const wishlistItem = wishlistItems.find(item => item.id === product.id);
-  const compareItem = compareItems.find(item => item.id === product.id);
+  const wishlistItem = wishlistItems.find((item) => item.id === product.id);
+  const compareItem = compareItems.find((item) => item.id === product.id);
 
   const discountedPrice = getDiscountPrice(product.price, product.discount);
   const finalProductPrice = +(product.price * currency.currencyRate).toFixed(2);
@@ -23,9 +29,15 @@ const ProductImageDescription = ({ spaceTopClass, spaceBottomClass, galleryType,
 
   return (
     <div className={clsx("shop-area", spaceTopClass, spaceBottomClass)}>
-      <div className="container">
-        <div className="row">
-          <div className="col-lg-6 col-md-6">
+      <div className="container-fluid">
+        <div
+          className="row gx-2 gap-5 gy-4 justify-content-center"
+          style={{ minHeight: "100%" }}
+        >
+          <div
+            className="d-flex flex-column col-md-6 col-custom-29"
+            style={{ minHeight: "500px" }}
+          >
             {/* product image gallery */}
             {galleryType === "leftThumb" ? (
               <ProductImageGallerySideThumb
@@ -40,7 +52,11 @@ const ProductImageDescription = ({ spaceTopClass, spaceBottomClass, galleryType,
               <ProductImageGallery product={product} />
             )}
           </div>
-          <div className="col-lg-6 col-md-6">
+
+          <div
+            className="d-flex flex-column col-md-6"
+            style={{ minHeight: "500px" }}
+          >
             {/* product description info */}
             <ProductDescriptionInfo
               product={product}

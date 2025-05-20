@@ -947,7 +947,6 @@ const Sidebar = () => {
     </AnimateHeight>
 </li> */}
 
-                         
                             {/* <li className="menu nav-item">
                                 <NavLink to="" className="group">
                                     <div className="flex items-center">
@@ -997,8 +996,6 @@ const Sidebar = () => {
                                 </NavLink>
                             </li> */}
 
-
-
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'web' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('web')}>
                                     <div className="flex items-center">
@@ -1015,7 +1012,7 @@ const Sidebar = () => {
                                         {/* <li>
                                             <NavLink to="/pages/knowledge-base">{t('knowledge_base')}</NavLink>
                                         </li> */}
-                                          <li>
+                                        <li>
                                             <NavLink to="/Components/layoutsetting">Home Page Layout</NavLink>
                                         </li>
                                         <li>
@@ -1052,11 +1049,9 @@ const Sidebar = () => {
                                         <li>
                                             <NavLink to="/Components/socialmediasettingspage">Social Media</NavLink>
                                         </li>
-                                      
                                     </ul>
                                 </AnimateHeight>
                             </li>
-
 
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'datalabel' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('datalabel')}>
@@ -1108,7 +1103,7 @@ const Sidebar = () => {
                                                     <li>
                                                         <NavLink to="/datatables/lable">Lable</NavLink>
                                                     </li> */}
-                                                    
+
                                                     <li>
                                                         {/* <button type="button" className={`${bestInSubMenuOpen ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('best_in')}>
                                                             <div className="flex items-center">
@@ -1132,7 +1127,8 @@ const Sidebar = () => {
                                                                 </li>
                                                                 <li>
                                                                     <NavLink to="/datatables/frmCodeType?category=control">Control</NavLink>
-                                                                </li><li>
+                                                                </li>
+                                                                <li>
                                                                     <NavLink to="/datatables/frmCodeType?category=c_name">C_Name</NavLink>
                                                                 </li>
                                                                 <li>
@@ -1192,16 +1188,13 @@ const Sidebar = () => {
                                                                 <li>
                                                                     <NavLink to="/datatables/frmCodeType?category=tag">Tag</NavLink>
                                                                 </li>
-                                                
                                                             </ul>
                                                         </AnimateHeight>
                                                     </li>
                                                 </ul>
                                             </AnimateHeight>
                                         </li>
-                                       
-                                        
-                                       
+
                                         {/* <li>
                         <button type="button" className={`${salesSubMenuOpen ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('sales')}>
                             <div className="flex items-center">
@@ -1224,9 +1217,7 @@ const Sidebar = () => {
                             </ul>
                         </AnimateHeight>
                     </li> */}
-                                       
-                                      
-                                     
+
                                         {/* <li>
                 <NavLink to="/datatables/advanced">{t('advanced')}</NavLink>
             </li>
@@ -1257,53 +1248,43 @@ const Sidebar = () => {
             <li>
                 <NavLink to="/datatables/column-chooser">{t('column_chooser')}</NavLink>
             </li> */}
-            <li className="menu nav-item">
-                                <NavLink to="/Components/item-master" className="group">
-                                    <div className="flex items-center">
-                                        <IconMenuTables className="group-hover:!text-primary shrink-0" />
-                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Item Master')}</span>
-                                    </div>
-                                </NavLink>
-                                <NavLink to="/Components/items" className="group">
-                                    <div className="flex items-center">
-                                        <IconMenuTables className="group-hover:!text-primary shrink-0" />
-                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('All Item')}</span>
-                                    </div>
-                                </NavLink>
-                            </li>
+                                        <li className="menu nav-item">
+                                            <NavLink to="/Components/item-master" className="group">
+                                                <div className="flex items-center">
+                                                    <IconMenuTables className="group-hover:!text-primary shrink-0" />
+                                                    <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Item Master')}</span>
+                                                </div>
+                                            </NavLink>
+                                            <NavLink to="/Components/items" className="group">
+                                                <div className="flex items-center">
+                                                    <IconMenuTables className="group-hover:!text-primary shrink-0" />
+                                                    <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('All Item')}</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
 
-                            <li className="menu nav-item">
-                                <NavLink to="/Components/Customerl" className="group">
-                                    <div className="flex items-center">
-                                        <IconMenuTables className="group-hover:!text-primary shrink-0" />
-                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Customer Master')}</span>
-                                    </div>
-                                </NavLink>
-                            </li>
+                                        <li className="menu nav-item">
+                                            <NavLink to="/Components/Customerl" className="group">
+                                                <div className="flex items-center">
+                                                    <IconMenuTables className="group-hover:!text-primary shrink-0" />
+                                                    <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Customer Master')}</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
 
+                                        <li className="menu nav-item">
+                                            <NavLink to="/Components/users" className="group">
+                                                <div className="flex items-center">
+                                                    <IconMenuTables className="group-hover:!text-primary shrink-0" />
+                                                    <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('User Master')}</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
 
-                            <li className="menu nav-item">
-                                <NavLink to="/Components/users" className="group">
-                                    <div className="flex items-center">
-                                        <IconMenuTables className="group-hover:!text-primary shrink-0" />
-                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('User Master')}</span>
-                                    </div>
-                                </NavLink>
-                            </li>
-
-
-
-                            {/* /Components/users */}
-
+                                        {/* /Components/users */}
                                     </ul>
                                 </AnimateHeight>
-                                
                             </li>
-
-
-
-
-
 
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'or' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('or')}>
@@ -1324,7 +1305,7 @@ const Sidebar = () => {
                                         <li>
                                             <NavLink to="/Components/orderlist">List</NavLink>
                                         </li>
-                                        <li>
+                                        {/* <li>
                                             <NavLink to="/Components/orderpreview">Preview</NavLink>
                                         </li>
                                         <li>
@@ -1332,15 +1313,10 @@ const Sidebar = () => {
                                         </li>
                                         <li>
                                             <NavLink to="/Components/orderedit">Edit</NavLink>
-                                        </li>
+                                        </li> */}
                                     </ul>
                                 </AnimateHeight>
                             </li>
-
-
-
-
-
 
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'datalab' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('datalab')}>
@@ -1392,7 +1368,7 @@ const Sidebar = () => {
                                                     <li>
                                                         <NavLink to="/datatables/lable">Lable</NavLink>
                                                     </li> */}
-                                                    
+
                                                     <li>
                                                         {/* <button type="button" className={`${bestInSubMenuOpen ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('best_in')}>
                                                             <div className="flex items-center">
@@ -1416,7 +1392,8 @@ const Sidebar = () => {
                                                                 </li>
                                                                 <li>
                                                                     <NavLink to="/datatables/frmCodeType?category=control">Control</NavLink>
-                                                                </li><li>
+                                                                </li>
+                                                                <li>
                                                                     <NavLink to="/datatables/frmCodeType?category=c_name">C_Name</NavLink>
                                                                 </li>
                                                                 <li>
@@ -1476,7 +1453,6 @@ const Sidebar = () => {
                                                                 <li>
                                                                     <NavLink to="/datatables/frmCodeType?category=tag">Tag</NavLink>
                                                                 </li>
-                                                
                                                             </ul>
                                                         </AnimateHeight>
                                                     </li>
@@ -1812,31 +1788,16 @@ const Sidebar = () => {
                                                             </ul>
                                                         </AnimateHeight>
                                                     </li>
-                                                    
+
                                                     <li>
                                                         <NavLink to="/salesTables/delChallan">Delivery Challan</NavLink>
                                                     </li>
-
-                                                 
                                                 </ul>
                                             </AnimateHeight>
                                         </li>
-                                  
-                                       
-                                       
-                                        
-           
                                     </ul>
                                 </AnimateHeight>
-                                
                             </li>
-
-
-
-
-
-
-
 
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'Man' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Man')}>
@@ -1869,18 +1830,13 @@ const Sidebar = () => {
                                         <li>
                                             <NavLink to="/Components/appversion">App Version</NavLink>
                                         </li>
-                                        
+
                                         <li>
                                             <NavLink to="/Components/paymentsetting">Payment Setting</NavLink>
                                         </li>
-                                      
-
-
                                     </ul>
                                 </AnimateHeight>
                             </li>
-
-
 
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'Pro' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Pro')}>
@@ -1910,7 +1866,6 @@ const Sidebar = () => {
                                     </ul>
                                 </AnimateHeight>
                             </li>
-                                
 
                             {/* <li className="menu nav-item">
                                 <NavLink to="/Components/layoutsetting" className="group">
@@ -1920,7 +1875,6 @@ const Sidebar = () => {
                                     </div>
                                 </NavLink>
                             </li> */}
-
 
                             <li className="menu nav-item">
                                 <NavLink to="/Components/image-update" className="group">
@@ -1962,7 +1916,6 @@ const Sidebar = () => {
                                     </div>
                                 </NavLink>
                             </li>
-
 
                             <li className="menu nav-item">
                                 <NavLink to="/components/notification" className="group">
@@ -2039,8 +1992,7 @@ const Sidebar = () => {
                                 </NavLink>
                             </li> */}
 
-
-        <li className="menu nav-item">
+                            <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'master' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('master')}>
                                     <div className="flex items-center">
                                         <IconMenuPages className="group-hover:!text-primary shrink-0" />
@@ -2065,12 +2017,9 @@ const Sidebar = () => {
                                         <li>
                                             <NavLink to="/Components/Customerl">Customer</NavLink>
                                         </li> */}
-
-
                                     </ul>
                                 </AnimateHeight>
                             </li>
-
 
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'dash' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('dash')}>
@@ -2088,7 +2037,7 @@ const Sidebar = () => {
                                         {/* <li>
                                             <NavLink to="/pages/knowledge-base">{t('knowledge_base')}</NavLink>
                                         </li> */}
-                                      
+
                                         <li>
                                             <NavLink to="/Components/discountcouponlist">Discount Coupon</NavLink>
                                         </li>
@@ -2099,9 +2048,6 @@ const Sidebar = () => {
                                         <li>
                                             <NavLink to="/components/refferalcoupan">Refferal Coupon</NavLink>
                                         </li>
-
-
-
 
                                         {/* <li className="menu nav-item">
                                             
@@ -2129,17 +2075,6 @@ const Sidebar = () => {
                                     </ul>
                                 </AnimateHeight>
                             </li>
-
-                           
-
-                            
-
-                        
-
-
-                           
-
-
 
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'app' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('app')}>
@@ -2178,13 +2113,9 @@ const Sidebar = () => {
                                         <li>
                                             <NavLink to="/Components/captionmaster">Caption Master</NavLink>
                                         </li>
-
-
                                     </ul>
                                 </AnimateHeight>
                             </li>
-
-
 
                             <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
                                 <IconMinus className="w-4 h-5 flex-none hidden" />
@@ -2351,4 +2282,4 @@ const Sidebar = () => {
     );
 };
 
-export default Sidebar;
+export default Sidebar;  

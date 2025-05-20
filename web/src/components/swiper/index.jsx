@@ -44,7 +44,7 @@ const SwiperSlider = forwardRef(
 
         {sliderOptions?.navigation && (
           <div className="swiper-navigation-container">
-            <button
+            {/* <button
               type="button"
               className={`bg-black d-flex justify-center items-center opacity-50 swiper-button-prev ht-swiper-button-nav ${prevClass}  text-white-800 font-bold pyb-1 rounded focus:outline-none focus:shadow-outline`}
             >
@@ -55,7 +55,7 @@ const SwiperSlider = forwardRef(
               className={`bg-black d-flex justify-center items-center opacity-50 swiper-button-next ht-swiper-button-nav ${nextClass}   text-white-800 font-bold pyb-1 rounded focus:outline-none focus:shadow-outline`}
             >
               {nextIcon}
-            </button>
+            </button> */}
           </div>
         )}
 

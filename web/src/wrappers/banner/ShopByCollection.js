@@ -3,9 +3,9 @@ import clsx from "clsx";
 const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
   return (
     <div
-      className={clsx("shop-by-collection", spaceTopClass, spaceBottomClass)}
-    >
-      <div className="container text-center">
+      className={clsx("shop-by-collection my-3", spaceTopClass, spaceBottomClass)}
+    > 
+      <div className="container-fluid text-center">
         <div className="collection-section mx-auto">
           <h2 className="collection-title py-3">Shop by Collection</h2>
           <div className="underline mx-auto my-2"></div>

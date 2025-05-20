@@ -62,11 +62,11 @@ const ProductImageGalleryLeftThumb = ({ product, thumbPosition }) => {
 
   return (
     <Fragment>
-      <div className="row row-5 test">
+      <div className="row row-5 test " >
         <div
           className={clsx(thumbPosition && thumbPosition === "left"
               ? "col-xl-10 order-1 order-xl-2"
-              : "col-xl-10")}
+              : "col-xl-10")} 
         >
           <div className="product-large-image-wrapper">
             {product.discount || product.new ? (

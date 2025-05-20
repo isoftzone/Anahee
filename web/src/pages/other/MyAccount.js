@@ -1,10 +1,9 @@
 import { Fragment, useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import SEO from "../../components/seo";
 import LayoutOne from "../../layouts/LayoutOne";
-import axios from 'axios';
+import axios from "axios";
 import { BASE_URL } from "../../config";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const MyAccount = () => {
   const [customer, setCustomer] = useState({
@@ -19,29 +18,31 @@ const MyAccount = () => {
     CDISTRICT: "",
     CPINCODE: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
-  const customerinfo = JSON.parse(localStorage.getItem('customerinfo'));
+  const customerinfo = JSON.parse(localStorage.getItem("customerinfo"));
   const customerId = customerinfo?.id;
   if (!customerId) {
     navigate("/login-register");
   }
-  
+
   useEffect(() => {
     const fetchCustomerData = async () => {
       try {
-
-        const response = await axios.get(`${BASE_URL}/getcustomerbyid/${customerId}`, {
-          headers: {
-            "Content-Type": "application/json"
+        const response = await axios.get(
+          `${BASE_URL}/getcustomerbyid/${customerId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
           }
-        });
-        
+        );
+
         const data = response.data;
-        
+
         setCustomer({
           FNAME: data.FNAME || "",
           LNAME: data.LNAME || "",
@@ -52,26 +53,25 @@ const MyAccount = () => {
           CSTATE: data.CSTATE || "",
           CCOUNTRY: data.CCOUNTRY || "",
           CDISTRICT: data.CDISTRICT || "",
-          CPINCODE: data.CPINCODE || ""
+          CPINCODE: data.CPINCODE || "",
         });
       } catch (error) {
-        console.error('Failed to fetch customer data:', error);
+        console.error("Failed to fetch customer data:", error);
         if (error.response) {
-          console.error('Response data:', error.response.data);
-          console.error('Response status:', error.response.status);
+          console.error("Response data:", error.response.data);
+          console.error("Response status:", error.response.status);
         }
       }
     };
-  
+
     fetchCustomerData();
   }, []);
-  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCustomer(prev => ({
+    setCustomer((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -79,14 +79,13 @@ const MyAccount = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
-  
+
     if (customer.password && customer.password !== customer.confirmPassword) {
       setError("Passwords don't match");
       return;
     }
-  
+
     try {
-  
       const updateData = {
         FNAME: customer.FNAME,
         LNAME: customer.LNAME,
@@ -100,39 +99,42 @@ const MyAccount = () => {
         CPINCODE: customer.CPINCODE,
         customerId,
       };
-  
+
       if (customer.password) {
         updateData.password = customer.password;
       }
-  
-      const response = await axios.put(`${BASE_URL}/updateCustomerInfo`, updateData, {
-        headers: {
-          'Content-Type': 'application/json',
+
+      const response = await axios.put(
+        `${BASE_URL}/updateCustomerInfo`,
+        updateData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      });
-      console.log('response 11',response);
+      );
+      console.log("response 11", response);
       const data = await response.data;
       if (response.status === 200) {
-        setCustomer(prev => ({ ...prev, password: "", confirmPassword: "" }));
+        setCustomer((prev) => ({ ...prev, password: "", confirmPassword: "" }));
         setSuccess(data.message);
-      }else{
+      } else {
         setError(data.message);
       }
-  
     } catch (error) {
-      console.error(error.response?.data?.message || 'Update failed');
+      console.error(error.response?.data?.message || "Update failed");
       setError(error.response?.data?.message);
     }
   };
-  
+
   return (
     <Fragment>
-      <SEO
-        titleTemplate="My Account"
-        description="My Account page"
-      />
+      <SEO titleTemplate="My Account" description="My Account page" />
       <LayoutOne headerTop="visible">
-        <div className="myaccount-area" style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 0' }}>
+        <div
+          className="myaccount-area"
+          style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem 0" }}
+        >
           <div className="container">
             <div className="row">
               <div className="col-12">
@@ -140,8 +142,13 @@ const MyAccount = () => {
                   {error && <p style={{ color: "red" }}>{error}</p>}
                   {success && <p style={{ color: "green" }}>{success}</p>}
                   <form onSubmit={handleSubmit}>
-                    <h4 className="mb-4" style={{ fontWeight: '500' }}>Account Information</h4>
-                    
+                    <div className="mb-4 d-flex justify-content-between">
+                      <h4 style={{ fontWeight: "500" }}>
+                        Account Information
+                      </h4>
+                      <h4 onClick={() => navigate('/orders')} >View Orders</h4>
+                    </div>
+
                     <div className="row">
                       <div className="col-lg-6 col-md-6 mb-4">
                         <label className="d-block mb-2">First Name</label>
@@ -151,10 +158,10 @@ const MyAccount = () => {
                           value={customer.FNAME}
                           onChange={handleInputChange}
                           className="w-100 p-2"
-                          style={{ 
-                            background: 'transparent',
-                            borderBottom: '1px solid #eee',
-                            outline: 'none'
+                          style={{
+                            background: "transparent",
+                            borderBottom: "1px solid #eee",
+                            outline: "none",
                           }}
                         />
                       </div>
@@ -166,10 +173,10 @@ const MyAccount = () => {
                           value={customer.LNAME}
                           onChange={handleInputChange}
                           className="w-100 p-2"
-                          style={{ 
-                            background: 'transparent',
-                            borderBottom: '1px solid #eee',
-                            outline: 'none'
+                          style={{
+                            background: "transparent",
+                            borderBottom: "1px solid #eee",
+                            outline: "none",
                           }}
                         />
                       </div>
@@ -182,11 +189,11 @@ const MyAccount = () => {
                           onChange={handleInputChange}
                           disabled
                           className="w-100 p-2"
-                          style={{ 
-                            background: 'transparent',
-                            borderBottom: '1px solid #eee',
-                            outline: 'none',
-                            color: '#777'
+                          style={{
+                            background: "transparent",
+                            borderBottom: "1px solid #eee",
+                            outline: "none",
+                            color: "#777",
                           }}
                         />
                       </div>
@@ -198,10 +205,10 @@ const MyAccount = () => {
                           value={customer.MOBILE}
                           onChange={handleInputChange}
                           className="w-100 p-2"
-                          style={{ 
-                            background: 'transparent',
-                            borderBottom: '1px solid #eee',
-                            outline: 'none'
+                          style={{
+                            background: "transparent",
+                            borderBottom: "1px solid #eee",
+                            outline: "none",
                           }}
                         />
                       </div>
@@ -213,10 +220,10 @@ const MyAccount = () => {
                           value={customer.CADDRESSLINE1}
                           onChange={handleInputChange}
                           className="w-100 p-2"
-                          style={{ 
-                            background: 'transparent',
-                            borderBottom: '1px solid #eee',
-                            outline: 'none'
+                          style={{
+                            background: "transparent",
+                            borderBottom: "1px solid #eee",
+                            outline: "none",
                           }}
                         />
                       </div>
@@ -228,10 +235,10 @@ const MyAccount = () => {
                           value={customer.CCITY}
                           onChange={handleInputChange}
                           className="w-100 p-2"
-                          style={{ 
-                            background: 'transparent',
-                            borderBottom: '1px solid #eee',
-                            outline: 'none'
+                          style={{
+                            background: "transparent",
+                            borderBottom: "1px solid #eee",
+                            outline: "none",
                           }}
                         />
                       </div>
@@ -243,10 +250,10 @@ const MyAccount = () => {
                           value={customer.CSTATE}
                           onChange={handleInputChange}
                           className="w-100 p-2"
-                          style={{ 
-                            background: 'transparent',
-                            borderBottom: '1px solid #eee',
-                            outline: 'none'
+                          style={{
+                            background: "transparent",
+                            borderBottom: "1px solid #eee",
+                            outline: "none",
                           }}
                         />
                       </div>
@@ -258,10 +265,10 @@ const MyAccount = () => {
                           value={customer.CCOUNTRY}
                           onChange={handleInputChange}
                           className="w-100 p-2"
-                          style={{ 
-                            background: 'transparent',
-                            borderBottom: '1px solid #eee',
-                            outline: 'none'
+                          style={{
+                            background: "transparent",
+                            borderBottom: "1px solid #eee",
+                            outline: "none",
                           }}
                         />
                       </div>
@@ -273,10 +280,10 @@ const MyAccount = () => {
                           value={customer.CPINCODE}
                           onChange={handleInputChange}
                           className="w-100 p-2"
-                          style={{ 
-                            background: 'transparent',
-                            borderBottom: '1px solid #eee',
-                            outline: 'none'
+                          style={{
+                            background: "transparent",
+                            borderBottom: "1px solid #eee",
+                            outline: "none",
                           }}
                         />
                       </div>
@@ -288,10 +295,10 @@ const MyAccount = () => {
                           value={customer.password}
                           onChange={handleInputChange}
                           className="w-100 p-2"
-                          style={{ 
-                            background: 'transparent',
-                            borderBottom: '1px solid #eee',
-                            outline: 'none'
+                          style={{
+                            background: "transparent",
+                            borderBottom: "1px solid #eee",
+                            outline: "none",
                           }}
                         />
                       </div>
@@ -303,25 +310,25 @@ const MyAccount = () => {
                           value={customer.confirmPassword}
                           onChange={handleInputChange}
                           className="w-100 p-2"
-                          style={{ 
-                            background: 'transparent',
-                            borderBottom: '1px solid #eee',
-                            outline: 'none'
+                          style={{
+                            background: "transparent",
+                            borderBottom: "1px solid #eee",
+                            outline: "none",
                           }}
                         />
                       </div>
                     </div>
 
                     <div className="mt-4">
-                      <button 
-                        type="submit" 
+                      <button
+                        type="submit"
                         className="w-100 py-2"
-                        style={{ 
-                          backgroundColor: '#3f51b5', 
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer'
+                        style={{
+                          backgroundColor: "#3f51b5",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer",
                         }}
                       >
                         Update Profile
