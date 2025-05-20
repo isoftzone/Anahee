@@ -27,7 +27,7 @@
     line-height: 1;
     &:before {
       position: absolute;
-      background-color: #D988BA;
+      background-color: #d988ba;
       height: 3px;
       width: 70px;
       content: "";
@@ -36,5 +36,29 @@
       bottom: 0;
       margin: 0 auto;
     }
+  }
+  @media (max-width: 321px) {
+  
+      h1 {
+        font-size: 21px !important;
+      }
+    
+  }
+
+    @media (max-width: 375px) {
+  
+      h1 {
+        font-size: 21px !important;
+      }
+    
+  }
+
+    @media (max-width: 425px) {
+  
+      h1 {
+        font-size: 22px !important;
+            margin: 1px 0 18px !important;
+      }
+    
   }
 }

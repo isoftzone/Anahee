@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
-
 const FooterCopyright = ({ footerLogo, spaceBottomClass, colorClass }) => {
   return (
     <div className={clsx("copyright", spaceBottomClass, colorClass)}>
@@ -10,7 +9,7 @@ const FooterCopyright = ({ footerLogo, spaceBottomClass, colorClass }) => {
           <img alt="" src={process.env.PUBLIC_URL + footerLogo} />
         </Link>
       </div>
-      <p>
+      {/* <p>
         &copy; {new Date().getFullYear()}{" "}
         <a
           href="https://hasthemes.com"
@@ -19,16 +18,14 @@ const FooterCopyright = ({ footerLogo, spaceBottomClass, colorClass }) => {
         >
           Anahee <br /> (Anand Fashion)
         </a>
-        .<br /> All Rights Reserved 
-      </p>
+        .<br /> All Rights Reserved
+      </p> */}
     </div>
   );
 };
-
 FooterCopyright.propTypes = {
   footerLogo: PropTypes.string,
   spaceBottomClass: PropTypes.string,
   colorClass: PropTypes.string
 };
-
 export default FooterCopyright;

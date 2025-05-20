@@ -73,8 +73,8 @@ const ImageSliderOne = ({ spaceTopClass, spaceBottomClass }) => {
   return (
     <div className={`image-slider-area ${spaceTopClass} ${spaceBottomClass}`}>
       <div className="image-slider-active mx-sm-5 px-sm-5">
-        <div className="text-center single-image-text flex mx-5 px-5">
-          <h1 className="">Social Media Pressence</h1>
+        <div className="text-center single-image-text flex">
+          <h1 className="social-media">Social Media Pressence</h1>
           {images.length  ? (
             <Swiper options={settings}>
               {images.map((single, key) => (

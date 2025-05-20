@@ -3,7 +3,7 @@ import React, { Fragment } from "react";
 import { useSelector } from "react-redux";
 import ProductGridListSingle from "../../components/product/ProductGridListSingle";
 
-const  ProductGridList = ({
+const ProductGridList = ({
   products,
   spaceBottomClass
 }) => {
@@ -11,33 +11,43 @@ const  ProductGridList = ({
   const { cartItems } = useSelector((state) => state.cart);
   const { wishlistItems } = useSelector((state) => state.wishlist);
   const { compareItems } = useSelector((state) => state.compare);
-  
+
   return (
     <Fragment>
-      {products?.map(product => {
-        return (
-          <div className="col-xl-4 col-sm-6" key={product.id}>
-            <ProductGridListSingle
-              spaceBottomClass={spaceBottomClass}
-              product={product}
-              currency={currency}
-              cartItem={
-                cartItems.find(cartItem => cartItem.id === product.id)
-              }
-              wishlistItem={
-                wishlistItems.find(
-                  wishlistItem => wishlistItem.id === product.id
-                )
-              }
-              compareItem={
-                compareItems.find(
-                  compareItem => compareItem.id === product.id
-                )
-              }
-            />
+      {products && products.length > 0 ? (
+        products.map((product) => {
+          return (
+            <div className="col-xl-4 col-sm-6" key={product.id}>
+              <ProductGridListSingle
+                spaceBottomClass={spaceBottomClass}
+                product={product}
+                currency={currency}
+                cartItem={
+                  cartItems.find(cartItem => cartItem.id === product.id)
+                }
+                wishlistItem={
+                  wishlistItems.find(
+                    wishlistItem => wishlistItem.id === product.id
+                  )
+                }
+                compareItem={
+                  compareItems.find(
+                    compareItem => compareItem.id === product.id
+                  )
+                }
+              />
+            </div>
+          );
+        })
+      ) : (
+        <div className="col-12 d-flex justify-content-center align-items-center py-5">
+          <p className="text-lg font-medium text-gray-600 mb-0">
+            No Products Found
+          </p>
+        
           </div>
-        );
-      })}
+
+      )}
     </Fragment>
   );
 };

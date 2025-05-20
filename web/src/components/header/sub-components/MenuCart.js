@@ -30,7 +30,6 @@ const MenuCart = () => {
               discountedPrice != null
                 ? (cartTotalPrice += finalDiscountedPrice * item.quantity)
                 : (cartTotalPrice += finalProductPrice * item.quantity);
-
               return (
                 <li className="single-shopping-cart" key={item.cartItemId}>
                   <div className="shopping-cart-img">
