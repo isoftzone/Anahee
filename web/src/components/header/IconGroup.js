@@ -1,3 +1,110 @@
+// import PropTypes from "prop-types";
+// import { Link } from "react-router-dom";
+// import { useSelector } from "react-redux";
+// import clsx from "clsx";
+// import MenuCart from "./sub-components/MenuCart";
+// const IconGroup = ({ iconWhiteClass }) => {
+//   const handleClick = e => {
+//     e.currentTarget.nextSibling.classList.toggle("active");
+//   };
+//   const triggerMobileMenu = () => {
+//     const offcanvasMobileMenu = document.querySelector(
+//       "#offcanvas-mobile-menu"
+//     );
+//     offcanvasMobileMenu.classList.add("active");
+//   };
+//   const { compareItems } = useSelector((state) => state.compare);
+//   const { wishlistItems } = useSelector((state) => state.wishlist);
+//   const { cartItems } = useSelector((state) => state.cart);
+//   return (
+//     <div className={clsx("header-right-wrap", iconWhiteClass)} >
+//       <div className="same-style header-search d-none d-lg-block">
+//         <button className="search-active" onClick={e => handleClick(e)}>
+//           <i className="pe-7s-search" />
+//         </button>
+//         <div className="search-content">
+//           <form action="#">
+//             <input type="text" placeholder="Search" />
+//             <button className="button-search">
+//               <i className="pe-7s-search" />
+//             </button>
+//           </form>
+//         </div>
+//       </div>
+//       <div className="same-style account-setting d-none d-lg-block">
+//         <button
+//           className="account-setting-active"
+//           onClick={e => handleClick(e)}
+//         >
+//           <i className="pe-7s-user-female" />
+//         </button>
+//         <div className="account-dropdown">
+//           <ul>
+//             <li>
+//               <Link to={process.env.PUBLIC_URL + "/login-register"}>Login</Link>
+//             </li>
+//             <li>
+//               <Link to={process.env.PUBLIC_URL + "/register"}>
+//                 Register
+//               </Link>
+//             </li>
+//             <li>
+//               <Link to={process.env.PUBLIC_URL + "/my-account"}>
+//                 my account
+//               </Link>
+//             </li>
+//           </ul>
+//         </div>
+//       </div>
+//       <div className="same-style header-compare">
+//         <Link to={process.env.PUBLIC_URL + "/compare"}>
+//           <i className="pe-7s-shuffle" />
+//           <span className="count-style">
+//             {compareItems && compareItems.length ? compareItems.length : 0}
+//           </span>
+//         </Link>
+//       </div>
+//       <div className="same-style header-wishlist">
+//         <Link to={process.env.PUBLIC_URL + "/wishlist"}>
+//           <i className="pe-7s-like" />
+//           <span className="count-style">
+//             {wishlistItems && wishlistItems.length ? wishlistItems.length : 0}
+//           </span>
+//         </Link>
+//       </div>
+//       <div className="same-style cart-wrap d-none d-lg-block">
+//         <button className="icon-cart" onClick={e => handleClick(e)}>
+//           <i className="pe-7s-shopbag" />
+//           <span className="count-style">
+//             {cartItems && cartItems.length ? cartItems.length : 0}
+//           </span>
+//         </button>
+//         {/* menu cart */}
+//         <MenuCart />
+//       </div>
+//       <div className="same-style cart-wrap d-block d-lg-none">
+//         <Link className="icon-cart" to={process.env.PUBLIC_URL + "/cart"}>
+//           <i className="pe-7s-shopbag" />
+//           <span className="count-style">
+//             {cartItems && cartItems.length ? cartItems.length : 0}
+//           </span>
+//         </Link>
+//       </div>
+//       <div className="same-style mobile-off-canvas d-block d-lg-none">
+//         <button
+//           className="mobile-aside-button"
+//           onClick={() => triggerMobileMenu()}
+//         >
+//           <i className="pe-7s-menu" />
+//         </button>
+//       </div>
+//     </div>
+//   );
+// };
+// IconGroup.propTypes = {
+//   iconWhiteClass: PropTypes.string,
+// };
+// export default IconGroup;
 import PropTypes from "prop-types";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -6,39 +113,55 @@ import MenuCart from "./sub-components/MenuCart";
 import { useEffect, useState } from "react";
 const IconGroup = ({ iconWhiteClass }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [name, setName] = useState("");
   const navigate = useNavigate();
-
-  const [searchQuery, setSearchQuery] = useState('');
-//  search functionality
-  const handleSearch = (e) => {
-    e.preventDefault();
-    console.log("search query", searchQuery);
-     if (searchQuery.trim()) {
-      navigate('/shop-grid-standard', {
-        state: { name: searchQuery }
-      });
-     }
-  };
-  // ✅ Check localStorage for login status
+  // const myItems=localStorage.getItem("customerinfo")
+  // :white_check_mark: Check localStorage for login status
+  //  const [user, setUser] = useState(null);
+  // useEffect(() => {
+  //   const storedUser = localStorage.getItem('userinfo');
+  //   if (storedUser) {
+  //     setUser(JSON.parse(storedUser));
+  //   }
+  // }, []);
   useEffect(() => {
     const checkLogin = () => {
-      const customer = JSON.parse(localStorage.getItem("customerinfo"));
-      setIsLoggedIn(!!customer);
+      const customerStr = localStorage.getItem("customerinfo");
+      if (customerStr) {
+        const customer = JSON.parse(customerStr);
+        setIsLoggedIn(true);
+        setName(customer.name); // assuming `customerinfo` has a `name` field
+        console.log("setName",name)
+      } else {
+        setIsLoggedIn(false);
+        setName("");
+      }
     };
     checkLogin();
-    // ✅ Listen for login/logout in other tabs
+    // :white_check_mark: Listen for login/logout in other tabs
     window.addEventListener("storage", checkLogin);
     return () => window.removeEventListener("storage", checkLogin);
   }, []);
   const handleClick = (e) => {
     e.currentTarget.nextSibling.classList.toggle("active");
   };
+  // const handleLogout = () => {
+  //   localStorage.removeItem("customerinfo");
+  //   // alert("Logout Successfully");
+  //   // confirm();
+  //   setIsLoggedIn(false);
+  //   // navigate("/");
+  // };
   const handleLogout = () => {
+  const confirmLogout = window.confirm("Are you sure you want to logout?");
+  if (confirmLogout) {
     localStorage.removeItem("customerinfo");
-    alert("Logout Successfully");
     setIsLoggedIn(false);
-    // navigate("/");
-  };
+    // navigate("/"); // Uncomment this if you want to redirect after logout
+  } else {
+    // User clicked "No", do nothing
+  }
+};
   const triggerMobileMenu = () => {
     const offcanvasMobileMenu = document.querySelector(
       "#offcanvas-mobile-menu"
@@ -50,30 +173,13 @@ const IconGroup = ({ iconWhiteClass }) => {
   const { compareItems } = useSelector((state) => state.compare);
   const { wishlistItems } = useSelector((state) => state.wishlist);
   const { cartItems } = useSelector((state) => state.cart);
+  // console.log("cartItems",cartItems);
+  console.log("myItems",name);
   return (
     <div className={clsx("header-right-wrap", iconWhiteClass)}>
       {/* Search */}
       <div className="same-style header-search d-none d-lg-block">
-         <button className="search-active" onClick={e => handleClick(e)}>
-          <i className="pe-7s-search" />
-        </button>
-        <div className="search-content">
-          <form onSubmit={handleSearch}>
-             <input
-            type="text"
-            placeholder="Search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <button className="button-search"  onClick={handleSearch}>
-            <i className="pe-7s-search" />
-          </button>
-         
-          </form>
-        </div>
-      
-        
-        {/* <button className="search-active" onClick={handleClick}>
+        <button className="search-active" onClick={handleClick}>
           <i className="pe-7s-search" />
         </button>
         <div className="search-content">
@@ -83,12 +189,31 @@ const IconGroup = ({ iconWhiteClass }) => {
               <i className="pe-7s-search" />
             </button>
           </form>
-        </div> */}
+        </div>
       </div>
       {/* Account Dropdown */}
       <div className="same-style account-setting d-none d-lg-block">
-        <button className="account-setting-active" onClick={handleClick}>
+        <button
+          className="account-setting-active d-flex align-items-center gap-2"
+          onClick={handleClick}
+        >
           <i className="pe-7s-user-female" />
+          {isLoggedIn && (
+            <h4
+              className="mb-0 text-truncate text-capitalize"
+              style={{
+                maxWidth: "80px",
+                overflow: "hidden",
+                marginLeft: "5px",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                fontSize: "15px",
+                marginBottom: "3px",
+              }}
+            >
+              {name}
+            </h4>
+          )}
         </button>
         <div className="account-dropdown">
           <ul>
@@ -98,7 +223,9 @@ const IconGroup = ({ iconWhiteClass }) => {
                   <Link to="/my-account">My Account</Link>
                 </li>
                 <li>
-                   <Link to='/' onClick={handleLogout}>Log Out</Link>
+                  <Link to="/" onClick={handleLogout}>
+                    Log Out
+                  </Link>
                 </li>
               </>
             ) : (
@@ -156,23 +283,3 @@ IconGroup.propTypes = {
   iconWhiteClass: PropTypes.string,
 };
 export default IconGroup;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
