@@ -1,19 +1,14 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import Tab from "react-bootstrap/Tab";
 import Nav from "react-bootstrap/Nav";
 import SEO from "../../components/seo";
 import LayoutOne from "../../layouts/LayoutOne";
-import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { BASE_URL } from "../../config";
-import { useNavigate } from 'react-router-dom';
-
-
-// const BASE_URL = process.env.REACT_APP_BASE_URL;
-
+import { useNavigate } from "react-router-dom";
 const Register = () => {
   const [formData, setFormData] = useState({
-    name: "",
+    fname: "",
+    lname: "",
     email: "",
     mobile: "",
     password: "",
@@ -22,56 +17,85 @@ const Register = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
-
+  useEffect(() => {
+    // Clear form on first load
+    setFormData({
+      fname: "",
+      lname: "",
+      email: "",
+      mobile: "",
+      password: "",
+      confirmPassword: "",
+    });
+    setError("");
+    setSuccess("");
+  }, []);
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
-  
+  const validateForm = () => {
+    const { fname, lname, email, mobile, password, confirmPassword } = formData;
+    if (!fname.trim() || fname.length < 2)
+      return "First name must be at least 2 characters.";
+    if (!lname.trim() || lname.length < 2)
+      return "Last name must be at least 2 characters.";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return "Enter a valid email address.";
+    const mobileRegex = /^[0-9]{10}$/;
+    if (!mobileRegex.test(mobile)) return "Mobile number must be 10 digits.";
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return "Password must be 8+ chars, with letter, number & symbol.";
+    }
+    if (password !== confirmPassword) return "Passwords do not match.";
+    return null;
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
-  
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match!");
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
       return;
     }
-  
     try {
       const response = await fetch(`${BASE_URL}/add_customer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-  
       const data = await response.json();
-  
       if (response.ok) {
         setSuccess("Registration successful!");
         setFormData({
-          name: "",
+          fname: "",
+          lname: "",
           email: "",
           mobile: "",
           password: "",
-          confirmPassword: ""
+          confirmPassword: "",
         });
-        navigate("/login-register");
+        setTimeout(() => navigate("/login-register"), 1000);
       } else {
-        // Show backend error message if available
-        const errorMsg = data?.msg || "Registration failed";
-        setError(errorMsg);
+        setError(data?.msg || "Registration failed.");
       }
     } catch (err) {
       console.error("Network error:", err);
-      setError("Something went wrong. Please check your connection and try again.");
+      setError("Something went wrong. Try again later.");
     }
-  };  
-
+  };
   return (
     <>
-      <SEO titleTemplate="Register" description="Register page of the eCommerce app." />
+      <SEO
+        titleTemplate="Register"
+        description="Register page of the eCommerce app."
+      />
       <LayoutOne headerTop="visible">
-        {/* <Breadcrumb pages={[{ label: "Home", path: "/" }, { label: "Register", path: "/register" }]} /> */}
         <div className="login-register-area pt-100 pb-100">
           <div className="container">
             <div className="row">
@@ -90,13 +114,64 @@ const Register = () => {
                         <div className="login-form-container">
                           <div className="login-register-form">
                             {error && <p style={{ color: "red" }}>{error}</p>}
-                            {success && <p style={{ color: "green" }}>{success}</p>}
-                            <form onSubmit={handleSubmit}>
-                              <input type="text" name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
-                              <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
-                              <input type="tel" name="mobile" placeholder="Mobile" value={formData.mobile} onChange={handleChange} required />
-                              <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
-                              <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} required />
+                            {success && (
+                              <p style={{ color: "green" }}>{success}</p>
+                            )}
+                            <form onSubmit={handleSubmit} autoComplete="off">
+                              <input
+                                type="text"
+                                name="fname"
+                                placeholder="First Name"
+                                value={formData.fname}
+                                onChange={handleChange}
+                                autoComplete="off"
+                                required
+                              />
+                              <input
+                                type="text"
+                                name="lname"
+                                placeholder="Last Name"
+                                value={formData.lname}
+                                onChange={handleChange}
+                                autoComplete="off"
+                                required
+                              />
+                              <input
+                                type="email"
+                                name="email"
+                                placeholder="Email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                autoComplete="off"
+                                required
+                              />
+                              <input
+                                type="tel"
+                                name="mobile"
+                                placeholder="Mobile"
+                                value={formData.mobile}
+                                onChange={handleChange}
+                                autoComplete="off"
+                                required
+                              />
+                              <input
+                                type="password"
+                                name="password"
+                                placeholder="Password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                autoComplete="new-password"
+                                required
+                              />
+                              <input
+                                type="password"
+                                name="confirmPassword"
+                                placeholder="Confirm Password"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                autoComplete="new-password"
+                                required
+                              />
                               <div className="button-box">
                                 <button type="submit">
                                   <span>Register</span>
@@ -117,5 +192,4 @@ const Register = () => {
     </>
   );
 };
-
 export default Register;
