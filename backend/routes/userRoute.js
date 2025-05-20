@@ -65,6 +65,7 @@ router.delete("/deleteUsers/:id", users.deleteUser);
 router.put("/editUser/:id", users.editUser);
 router.post("/add_customer", customer.addcustomer);
 router.post("/login_customer", customer.logincustomer);
+router.get("/getallorders/:customerId", salesmaster.getAllOrders);
 router.get("/getcustomerbyid/:customerId", customer.getcustomerbyid);
 router.put("/updateCustomerInfo", customer.updateCustomerInfo);
 router.get("/getAllcustomer", customer.getAll);
