@@ -98,9 +98,9 @@ const con = require('../config')
   
 
  exports.addcustomer = (req, res) => {
-    const { name, mobile, email, password } = req.body;
+    const { fname,lname, mobile, email, password } = req.body;
   
-    if (!name || !mobile || !email || !password) {
+    if (!fname||!lname || !mobile || !email || !password) {
       return res.status(400).json({ 
         success: false,
         msg: "All fields are required"
@@ -126,7 +126,7 @@ const con = require('../config')
         });
       }
   
-      const newCustomer = { name, mobile, email, password };
+      const newCustomer = {fname,lname, mobile, email, password };
       const insertQuery = 'INSERT INTO customermaster SET ?';
   
       con.query(insertQuery, newCustomer, (insertErr, insertResults) => {
@@ -169,9 +169,9 @@ exports.deletecustomer = async (req, res) => {
 };
 
 exports.logincustomer = (req, res) => {
-    const { email, password } = req.body;
+    const {email, password } = req.body;
   
-    console.log("Received login request:", { email, password });
+    console.log("Received login request:", {email, password });
   
     if (!email || !password) {
       return res.status(400).json({ msg: "Email and password are required" });
@@ -199,7 +199,7 @@ exports.logincustomer = (req, res) => {
         msg: "Login successful",
         customer: {
           id: customer.CUSTOMERID, 
-          name: customer.NAME,
+          name: customer.FNAME,
           email: customer.email,
         },
       });
