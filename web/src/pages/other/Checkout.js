@@ -1,5 +1,5 @@
 import { Fragment, useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getDiscountPrice } from "../../helpers/product";
 import SEO from "../../components/seo";
@@ -30,15 +30,16 @@ const Checkout = () => {
     email: "",
     paymentMethod: "cod",
   });
+  const  navigate=  useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [orderId, setOrderId] = useState("");
+   const [customerId, setCustomerId] = useState(null);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [paymentError, setPaymentError] = useState("");
   const [orderPlaced, setOrderPlaced] = useState(false);
 
   const [isPaymentOpen, setIsPaymentOpen] = useState(true);
-
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
@@ -52,6 +53,11 @@ const Checkout = () => {
 
 // Fetch countries on mount
   useEffect(() => {
+    const customerData = JSON.parse(localStorage.getItem("customerinfo"));
+    setCustomerId(customerData.id)
+    if(!customerData.id){
+       navigate("/login-register");
+    }
     const fetchCountries = async () => {
       try {
         const res = await axios.get(
@@ -356,6 +362,7 @@ const Checkout = () => {
 
     const orderData = {
       ...formData,
+      customerId,
       amount: cartTotalPrice,
       items: cartItems.map((item) => ({
         productId: item.id,
@@ -387,22 +394,22 @@ const Checkout = () => {
           // window.location.href = "/success";
         }
 
-        // setFormData({
-        //   firstName: "",
-        //   lastName: "",
-        //   companyName: "",
-        //   country: "",
-        //   address: "",
-        //   apartment: "",
-        //   city: "",
-        //   state: "",
-        //   postcode: "",
-        //   phone: "",
-        //   email: "",
-        //   message: "",
-        //   paymentMethod: "cod",
-        // });
-        // dispatch(deleteAllFromCart());
+        setFormData({
+          firstName: "",
+          lastName: "",
+          companyName: "",
+          country: "",
+          address: "",
+          apartment: "",
+          city: "",
+          state: "",
+          postcode: "",
+          phone: "",
+          email: "",
+          message: "",
+          paymentMethod: "cod",
+        });
+        dispatch(deleteAllFromCart());
       }
     } catch (error) {
       console.error("Error placing order:", error);
