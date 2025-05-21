@@ -1,9 +1,12 @@
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
-import { Container, Badge } from "react-bootstrap";
+import {  Badge } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../../config";
+import HeaderOne from "../../wrappers/header/HeaderOne";
+import FooterOne from "../../wrappers/footer/FooterOne";
+import LayoutOne from "../../layouts/LayoutOne";
 const Orders = () => {
   const [activeTab, setActiveTab] = useState("all_orders");
   const [orders, setOrders] = useState([]);
@@ -111,7 +114,9 @@ const renderOrderCard = (order) => {
   );
 };
   return (
-    <Container className="orders-container">
+   <>
+      <LayoutOne headerTop="visible">
+    <div className="container-fluid orders-container">
       <div className="page-header">
         <h1 className="page-title">My Orders</h1>
         <p className="page-subtitle">View and manage your order history</p>
@@ -194,7 +199,9 @@ const renderOrderCard = (order) => {
           </Tab>
         </Tabs>
       </div>
-    </Container>
+    </div>
+     </LayoutOne>
+   </>
   );
 };
 export default Orders;

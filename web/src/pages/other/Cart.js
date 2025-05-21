@@ -67,7 +67,7 @@ const Cart = () => {
           ]} 
         /> */}
         <div className="cart-main-area pt-10 pb-30">
-          <div className="container">
+          <div className="container-fluid">
             {cartItems && cartItems.length >= 1 ? (
               <Fragment>
                 <h3 className="cart-page-title">Your cart items</h3>

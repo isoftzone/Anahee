@@ -109,7 +109,7 @@ const Register = () => {
                         </Nav.Link>
                       </Nav.Item>
                     </Nav>
-                    <Tab.Content>
+                    <Tab.Content style={{height:"694px"}}>
                       <Tab.Pane eventKey="register">
                         <div className="login-form-container">
                           <div className="login-register-form">

@@ -43,7 +43,7 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
                   <br />
                   <span>Video</span>
                 </h2>
-                <a href="#" className="lookbook-link">
+                <a href="/shop-grid-standard" className="lookbook-link">
                   SHOP NOW
                 </a>
               </div>
