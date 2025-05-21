@@ -215,10 +215,19 @@
 
 // export default Success;
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 const Success = () => {
   // Change this to true or false to switch views
   const [isSuccess] = useState(true); // or false
+    const navigate = useNavigate();
+
+  useEffect(() => {
+      const timer = setTimeout(() => {
+        navigate("/orders"); 
+      }, 3000); 
+      return () => clearTimeout(timer); 
+  }, [navigate]);
   return (
   <div>
     

@@ -1,7 +1,9 @@
+
 import PropTypes from "prop-types";
 import clsx from "clsx";
+import { useState } from "react";
 import MailchimpSubscribe from "react-mailchimp-subscribe";
-
+// CustomForm component with mobile number validation
 const CustomForm = ({
   status,
   message,
@@ -9,29 +11,43 @@ const CustomForm = ({
   spaceTopClass,
   subscribeBtnClass
 }) => {
-  let mobile;
-  const submit = () => {
-    mobile &&
-      mobile.value.length > 9 &&
-      onValidated({
-        mobile: mobile.value
-      });
-
-    mobile.value = "";
+  const [mobile, setMobile] = useState("");
+  const [error, setError] = useState("");
+  const handleChange = (e) => {
+    const value = e.target.value;
+    // Allow only digits
+    if (/^\d*$/.test(value)) {
+      setMobile(value);
+      setError("");
+    } else {
+      setError("Please enter only numbers.");
+    }
   };
-
+  const submit = () => {
+    if (mobile.length === 10) {
+      onValidated({ mobile });
+      setMobile("");
+    } else {
+      setError("Please enter a valid 10-digit mobile number.");
+    }
+  };
   return (
     <div className={clsx("subscribe-form-3", spaceTopClass)}>
       <div className="mc-form">
         <div>
           <input
             className="mobile"
-            ref={node => (mobile = node)}
+            value={mobile}
+            onChange={handleChange}
             type="text"
             placeholder="Enter Your Mobile Number"
             required
+            maxLength={10}
+            inputMode="numeric"
+            pattern="\d*"
           />
         </div>
+        {error && <div style={{ color: "#e74c3c", fontSize: "12px" }}>{error}</div>}
         {status === "sending" && (
           <div style={{ color: "#3498db", fontSize: "12px" }}>sending...</div>
         )}
@@ -47,9 +63,7 @@ const CustomForm = ({
             dangerouslySetInnerHTML={{ __html: message }}
           />
         )}
-        <div
-          className={`clear-3 ${subscribeBtnClass ? subscribeBtnClass : ""}`}
-        >
+        <div className={`clear-3 ${subscribeBtnClass ? subscribeBtnClass : ""}`}>
           <button className="send_btn" onClick={submit}>
             Send
           </button>
@@ -58,7 +72,7 @@ const CustomForm = ({
     </div>
   );
 };
-
+// Main subscription wrapper
 const SubscribeEmailTwo = ({
   mailchimpUrl,
   spaceTopClass,
@@ -72,7 +86,7 @@ const SubscribeEmailTwo = ({
           <CustomForm
             status={status}
             message={message}
-            onValidated={formData => subscribe(formData)}
+            onValidated={(formData) => subscribe(formData)}
             spaceTopClass={spaceTopClass}
             subscribeBtnClass={subscribeBtnClass}
           />
@@ -81,10 +95,9 @@ const SubscribeEmailTwo = ({
     </div>
   );
 };
-
 SubscribeEmailTwo.propTypes = {
-  mailchimpUrl: PropTypes.string,
-  spaceTopClass: PropTypes.string
+  mailchimpUrl: PropTypes.string.isRequired,
+  spaceTopClass: PropTypes.string,
+  subscribeBtnClass: PropTypes.string
 };
-
 export default SubscribeEmailTwo;

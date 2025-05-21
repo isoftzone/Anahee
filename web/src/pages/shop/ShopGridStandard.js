@@ -79,18 +79,25 @@ const ShopGridStandard = () => {
                 />
               </div>
               <div className="col-lg-9 order-2 order-lg-2">
-               <div className="shop-select border" style={{ width: "25%", position: "relative" }}>
+            <div
+  className="shop-select border mb-4 mt-4 sm:mt-4"
+  style={{
+    width: "100%",             // Full responsive width
+    maxWidth: "300px",         // Max width for larger screens
+    position: "relative",
+  }}
+>
   <select
     onChange={(e) => getFilterSortParams("filterSort", e.target.value)}
-    className="py-3 px-4 pl-3 pr-8 appearance-none w-full"
+    className="w-full py-3 px-4 pr-12 text-sm appearance-none rounded border border-gray-300"
     style={{
       WebkitAppearance: "none",
       MozAppearance: "none",
       appearance: "none",
-      backgroundImage: `url("data:image/svg+xml,%3Csvg fill='black' viewBox='0 0 24 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`,
+      backgroundImage: `url("data:image/svg+xml,%3Csvg fill='black' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`,
       backgroundRepeat: "no-repeat",
-      backgroundPosition: "calc(100% - 2rem) center",
-      backgroundSize: "20px", // <-- Increased from 10px to 20px
+      backgroundPosition: "right 0.75rem center",
+      backgroundSize: "2.75rem", // Increased arrow icon size
     }}
   >
     <option value="default">Default</option>

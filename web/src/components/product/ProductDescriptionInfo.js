@@ -122,7 +122,7 @@ setQuantityCount(1);
           </div>
         </div>
       ) : (
-        <div className="pro-details-quality flex flex-wrap gap-4">
+        <div className="pro-details-quality flex flex-wrap gap-3">
           <div className="cart-plus-minus flex items-center">
             <button
               onClick={() =>
@@ -190,20 +190,6 @@ setQuantityCount(1);
               onClick={() => dispatch(addToWishlist(product))}
             >
               <i className="pe-7s-like" />
-            </button>
-          </div>
-          <div className="pro-details-compare">
-            <button
-              className={compareItem !== undefined ? "active" : ""}
-              disabled={compareItem !== undefined}
-              title={
-                compareItem !== undefined
-                  ? "Added to compare"
-                  : "Add to compare"
-              }
-              onClick={() => dispatch(addToCompare(product))}
-            >
-              <i className="pe-7s-shuffle" />
             </button>
           </div>
         </div>
