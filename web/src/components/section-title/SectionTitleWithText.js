@@ -4,7 +4,7 @@ import clsx from "clsx";
 const SectionTitleWithText = ({ spaceTopClass, spaceBottomClass }) => {
   return (
     <div className={clsx("welcome-area", spaceTopClass, spaceBottomClass)}>
-      <div className="container">
+      <div className="container-fluid pt-50">
         <div className="welcome-content text-center">
           <h5>Who Are We</h5>
           <h1>Welcome To Anahee</h1>
@@ -24,7 +24,7 @@ const SectionTitleWithText = ({ spaceTopClass, spaceBottomClass }) => {
       </div>
       <div className="container">
         <div className="welcome-content text-center">
-          <h1>Our Vision</h1>
+          <h1 className="pt-5">Our Vision</h1>
           <p>
             At Anahee, our vision is to empower modern women with affordable
             luxury that seamlessly blends cultural heritage and contemporary

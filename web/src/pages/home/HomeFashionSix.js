@@ -32,7 +32,7 @@ import BannerThirtyThree from "../../wrappers/banner/BannerThirtyThree";
 import PromoBannerText from "../../wrappers/banner/PromoBannerText.js";
 import ShopByCollection from "../../wrappers/banner/ShopByCollection.js";
 // import Banner from "../../wrappers/banner/Banner";
-
+import Success from "../other/Success.js";
 const HomeFashionSix = () => {
   const [hometableData, setHometableData] = useState([]);
   const flag = 1;
@@ -56,14 +56,6 @@ const HomeFashionSix = () => {
     switch (name.toLowerCase()) {
       case "banner":
         return <HeroSliderFourteen />;
-      // case "Bannertwo":
-      //   return <HeroSliderTen />;
-      // case "Gridview":
-      //   return (
-      //     <BannerTwentyEight spaceTopClass="pt-100" spaceBottomClass="pb-70" />
-      //   );
-      // case "gridview":
-      //   return <BannerTwentyEight spaceTopClass="pt-100" spaceBottomClass="pb-70" />;
       case "gridtwo":
         return (
           <BannerTwentyEight spaceTopClass="pt-100" spaceBottomClass="pb-70" />
@@ -146,20 +138,12 @@ const HomeFashionSix = () => {
         return (
           <SectionTitleHome spaceTopClass="pt-0" spaceBottomClass="pb-90" />
         );
+      case "success":
+        return <Success spaceTopClass="pt-0" spaceBottomClass="pb-90" />;
       default:
         return null; // No matching component
     }
   };
-
-  // return (
-  //   <Fragment>
-  //     {hometableData.map((item, index) => (
-  //       <Fragment key={index}>
-  //         {item.flag === 1 && getComponent(item.value)}
-  //       </Fragment>
-  //     ))}
-  //   </Fragment>
-  // );
 
   return (
     <Fragment>
@@ -173,65 +157,7 @@ const HomeFashionSix = () => {
             {item.flag === 1 && getComponent(item.name)}
           </Fragment>
         ))}
-        {/* {homeTableData.some((item) => item.value === "collection" && item.flag === 1) && <HeroSliderTen />} */}
-        {/* section title */}
-        {/* <SectionTitleWithText spaceTopClass="pt-95" spaceBottomClass="pb-90" /> */}
-        {/* <HeroSliderTen /> */}
-        {/* tab product */}
-        {/* <BannerTwentyEight spaceTopClass="pt-100" spaceBottomClass="pb-70" /> */}
-        {/* <CategoryTwoSlider spaceTopClass="pt-100" spaceBottomClass="pb-95" /> */}
-
-        {/* <TabProductEight
-          spaceBottomClass="pb-70"
-          category="fashion"
-          sectionTitle={false}
-        /> */}
-        {/* feature icon */}
-        {/* <FeatureIconFour
-          bgImg="/assets/img/bg/shape.png"
-          containerClass="container-fluid"
-          gutterClass="padding-10-row-col"
-          spaceTopClass="pt-50"
-          spaceBottomClass="pb-40"
-        /> */}
-
-        {/* <TabProductTwelve
-          category="kids"
-          spaceTopClass="pt-95"
-          sectionTitle="Best Products"
-        /> */}
-        {/* <ProductSliderThree category="fashion" /> */}
-        {/* <BannerTwo spaceTopClass="pt-80" spaceBottomClass="pb-60" /> */}
-
-        {/* <BannerTwentySix spaceBottomClass="pb-70" /> */}
-
-        {/* <BannerSix spaceTopClass="pt-100" spaceBottomClass="pb-80" /> */}
-
-        {/* <BannerNine spaceBottomClass="pb-70" /> */}
-        {/* <BannerEleven /> */}
-        {/* <TabProductFive
-          spaceTopClass="pt-95"
-          spaceBottomClass="pb-70"
-          category="cosmetics"
-        /> */}
-        {/* <BannerFifteen spaceTopClass="pt-10" spaceBottomClass="pb-85" /> */}
-        {/* <BannerSeven spaceTopClass="pt-95" spaceBottomClass="pb-70" /> */}
-        {/* <NewProductGrid category="accessories" limit={10} /> */}
-
-        {/* newsletter */}
-        {/* <NewsletterTwo spaceBottomClass="pb-100" /> */}
-        {/* <ProductGridFiveContainer
-          spaceTopClass="pt-100"
-          spaceBottomClass="pb-100"
-          category="accessories"
-        /> */}
-        {/* <BannerSixteen spaceTopClass="pt-95" /> */}
-        {/* <BannerThirtyThree spaceBottomClass="pb-70" bgColorClass="bg-black-2" /> */}
-
-        {/* image slider */}
-        {/* <ImageSliderOne /> */}
       </LayoutOne>
-      {/* <Banner /> */}
     </Fragment>
   );
 };

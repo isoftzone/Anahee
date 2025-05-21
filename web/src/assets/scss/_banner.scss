@@ -1569,4 +1569,21 @@
       font-size: 3rem;
     }
   }
+
+  @media (max-width: 425px) {
+  .slider-content-overlay {
+    top: 50%;
+    left: 50%;
+    width: 94%;
+    transform: translate(-50%, -50%);
+    padding: 3rem;
+  }}
+   @media (max-width: 768px) {
+  .slider-content-overlay {
+    top: 50%;
+    left: 50%;
+    width: 94%;
+    transform: translate(-50%, -50%);
+    padding: 3rem;
+  }}
 }

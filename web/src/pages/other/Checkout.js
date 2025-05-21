@@ -1,18 +1,22 @@
 import { Fragment, useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { getDiscountPrice } from "../../helpers/product";
 import SEO from "../../components/seo";
 import LayoutOne from "../../layouts/LayoutOne";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import axios from "axios";
 import { BASE_URL } from "./../../config";
-
+import { deleteAllFromCart } from "../../store/slices/cart-slice";
 const Checkout = () => {
   let cartTotalPrice = 0;
+  const dispatch = useDispatch();
   let { pathname } = useLocation();
   const currency = useSelector((state) => state.currency);
   const { cartItems } = useSelector((state) => state.cart);
+    const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -26,13 +30,16 @@ const Checkout = () => {
     email: "",
     paymentMethod: "cod",
   });
+  const  navigate=  useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [orderId, setOrderId] = useState("");
+   const [customerId, setCustomerId] = useState(null);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+  const [paymentError, setPaymentError] = useState("");
+  const [orderPlaced, setOrderPlaced] = useState(false);
 
   const [isPaymentOpen, setIsPaymentOpen] = useState(true);
-
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
@@ -43,6 +50,70 @@ const Checkout = () => {
       document.body.removeChild(script);
     };
   }, []);
+
+// Fetch countries on mount
+  useEffect(() => {
+    const customerData = JSON.parse(localStorage.getItem("customerinfo"));
+    setCustomerId(customerData.id)
+    if(!customerData.id){
+       navigate("/login-register");
+    }
+    const fetchCountries = async () => {
+      try {
+        const res = await axios.get(
+          "https://countriesnow.space/api/v0.1/countries/positions"
+        );
+        if (res.data && res.data.data) {
+          setCountries(res.data.data.map((c) => c.name));
+        }
+      } catch (err) {
+        console.error("Failed to fetch countries:", err);
+      }
+    };
+    fetchCountries();
+  }, []);
+
+  // Fetch states on country change
+  useEffect(() => {
+    if (formData.country) {
+      const fetchStates = async () => {
+        try {
+          const res = await axios.post(
+            "https://countriesnow.space/api/v0.1/countries/states",
+            { country: formData.country }
+          );
+          setStates(res.data.data.states || []);
+          setFormData((prev) => ({ ...prev, state: "", city: "" }));
+          setCities([]);
+        } catch (err) {
+          console.error("Failed to fetch states:", err);
+        }
+      };
+      fetchStates();
+    }
+  }, [formData.country]);
+
+  // Fetch cities on state change
+  useEffect(() => {
+    if (formData.country && formData.state) {
+      const fetchCities = async () => {
+        try {
+          const res = await axios.post(
+            "https://countriesnow.space/api/v0.1/countries/state/cities",
+            {
+              country: formData.country,
+              state: formData.state,
+            }
+          );
+          setCities(res.data.data || []);
+          setFormData((prev) => ({ ...prev, city: "" }));
+        } catch (err) {
+          console.error("Failed to fetch cities:", err);
+        }
+      };
+      fetchCities();
+    }
+  }, [formData.state]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -144,13 +215,26 @@ const Checkout = () => {
       ...prevData,
       paymentMethod: method,
     }));
+    // Clear payment error when user changes payment method
+    setPaymentError("");
   };
 
   const phonePeCallback = (response) => {
+    setIsLoading(false);
+
     if (response === "USER_CANCEL") {
-      alert("Payment was cancelled by user");
+      setPaymentError(
+        "Payment was cancelled. Please choose a payment method to continue."
+      );
+      // Reset order state so user can try again
+      setOrderPlaced(false);
     } else if (response === "CONCLUDED") {
       verifyPaymentStatus(orderId);
+    } else {
+      setPaymentError(
+        "Payment failed. Please try again or choose a different payment method."
+      );
+      setOrderPlaced(false);
     }
   };
 
@@ -161,6 +245,8 @@ const Checkout = () => {
       );
       if (response.data.success) {
         console.log("verifyPaymentStatus res", response.data);
+        resetForm();
+      dispatch(deleteAllFromCart());
         window.location.href = "/success";
 
         // const updateData = {
@@ -179,11 +265,15 @@ const Checkout = () => {
         //   },
         // });
       } else {
-        alert("Payment verification failed. Please contact support.");
+        setPaymentError("Payment verification failed. Please contact support.");
+        setOrderPlaced(false);
       }
     } catch (error) {
       console.error("Error verifying payment:", error);
-      alert("There was an error verifying your payment.");
+      setPaymentError(
+        "There was an error verifying your payment. Please contact support."
+      );
+      setOrderPlaced(false);
     }
   };
 
@@ -211,21 +301,54 @@ const Checkout = () => {
             type: "IFRAME",
           });
         } else {
-          alert("PhonePe checkout is not ready. Please try again.");
+          setPaymentError("PhonePe checkout is not ready. Please try again.");
+          setIsLoading(false);
+          setOrderPlaced(false);
         }
       } else {
-        console.log("Failed to initiate PhonePe payment.");
+        setPaymentError(
+          "Failed to initiate PhonePe payment. Please try again."
+        );
+        setIsLoading(false);
+        setOrderPlaced(false);
       }
     } catch (error) {
       console.error("Error initiating PhonePe payment:", error);
-      alert("There was an error initiating PhonePe payment.");
-    } finally {
+      setPaymentError(
+        "There was an error initiating PhonePe payment. Please try again."
+      );
       setIsLoading(false);
+      setOrderPlaced(false);
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      firstName: "",
+      lastName: "",
+      companyName: "",
+      country: "",
+      address: "",
+      apartment: "",
+      message: "",
+      city: "",
+      state: "",
+      postcode: "",
+      phone: "",
+      email: "",
+      paymentMethod: "cod",
+    });
+    setErrors({});
+    setTouched({});
+    setOrderId("");
+    // dispatch(clearCart()); // Clear cart items
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Clear previous payment errors
+    setPaymentError("");
 
     const allFieldsTouched = {};
     Object.keys(formData).forEach((key) => {
@@ -239,6 +362,7 @@ const Checkout = () => {
 
     const orderData = {
       ...formData,
+      customerId,
       amount: cartTotalPrice,
       items: cartItems.map((item) => ({
         productId: item.id,
@@ -257,18 +381,48 @@ const Checkout = () => {
       if (response.data.success) {
         const saleId = String(response.data.saleId);
         setOrderId(saleId);
+        setOrderPlaced(true);
 
         if (formData.paymentMethod === "phonepe") {
           await initiatePhonePePayment(saleId);
         } else {
+          // For COD, complete the order
+          setIsLoading(false);
           alert("Order placed successfully!");
+
+          // Optionally redirect to success page
+          // window.location.href = "/success";
         }
+
+        setFormData({
+          firstName: "",
+          lastName: "",
+          companyName: "",
+          country: "",
+          address: "",
+          apartment: "",
+          city: "",
+          state: "",
+          postcode: "",
+          phone: "",
+          email: "",
+          message: "",
+          paymentMethod: "cod",
+        });
+        dispatch(deleteAllFromCart());
       }
     } catch (error) {
       console.error("Error placing order:", error);
       alert("There was an error placing your order.");
-    } finally {
       setIsLoading(false);
+      setOrderPlaced(false);
+    }
+  };
+
+  const retryPayment = () => {
+    if (orderId && formData.paymentMethod === "phonepe") {
+      setPaymentError("");
+      initiatePhonePePayment(orderId);
     }
   };
 
@@ -346,27 +500,23 @@ const Checkout = () => {
                             )}
                           </div>
                         </div>
+
+
                         <div className="col-lg-12">
                           <div className="billing-select mb-20">
                             <label>Country *</label>
-                            <select
-                              name="country"
-                              value={formData.country}
-                              onChange={handleInputChange}
-                              onBlur={handleBlur}
-                              className={`form-select ${
-                                errors.country && touched.country
-                                  ? "is-invalid"
-                                  : ""
-                              }`}
-                            >
-                              <option value="">Select a country</option>
-                              <option value="India">India</option>
-                              <option value="America">America</option>
-                              <option value="Singapore">Singapore</option>
-                              <option value="Bangladesh">Bangladesh</option>
-                              <option value="Barbados">Barbados</option>
-                            </select>
+                          <select
+                            name="country"
+                            value={formData.country}
+                            onChange={handleInputChange}
+                          >
+                            <option value="">Select a country</option>
+                            {countries.map((country, i) => (
+                              <option key={i} value={country}>
+                                {country}
+                              </option>
+                            ))}
+                          </select>
                             {errors.country && touched.country && (
                               <div className="invalid-feedback">
                                 {errors.country}
@@ -374,6 +524,8 @@ const Checkout = () => {
                             )}
                           </div>
                         </div>
+
+
                         <div className="col-lg-12">
                           <div className="billing-info mb-20">
                             <label>Street Address *</label>
@@ -399,51 +551,65 @@ const Checkout = () => {
                               className="form-control mt-2"
                               placeholder="Apartment, suite, unit etc."
                               type="text"
+                              name="apartment"
+                              value={formData.apartment}
+                              onChange={handleInputChange}
                             />
                           </div>
                         </div>
-                        <div className="col-lg-12">
-                          <div className="billing-info mb-20">
-                            <label>Town / City *</label>
-                            <input
-                              type="text"
-                              name="city"
-                              value={formData.city}
-                              onChange={handleInputChange}
-                              onBlur={handleBlur}
-                              className={`form-control ${
-                                errors.city && touched.city ? "is-invalid" : ""
-                              }`}
-                            />
-                            {errors.city && touched.city && (
+
+
+
+                          <div className="col-lg-12">
+                          <div className="billing-select mb-20">
+                        <label>State</label>
+                          <select
+                            name="state"
+                            value={formData.state}
+                            onChange={handleInputChange}
+                            disabled={!states.length}
+                          >
+                            <option value="">Select a state</option>
+                            {states.map((s, i) => (
+                              <option key={i} value={s.name}>
+                                {s.name}
+                              </option>
+                            ))}
+                          </select>
+                            {errors.country && touched.country && (
                               <div className="invalid-feedback">
-                                {errors.city}
+                                {errors.country}
                               </div>
                             )}
                           </div>
                         </div>
-                        <div className="col-lg-6 col-md-6">
-                          <div className="billing-info mb-20">
-                            <label>State / County *</label>
-                            <input
-                              type="text"
-                              name="state"
-                              value={formData.state}
-                              onChange={handleInputChange}
-                              onBlur={handleBlur}
-                              className={`form-control ${
-                                errors.state && touched.state
-                                  ? "is-invalid"
-                                  : ""
-                              }`}
-                            />
-                            {errors.state && touched.state && (
+
+
+                      <div className="col-lg-12">
+                          <div className="billing-select mb-20">
+                          <label>City</label>
+                          <select
+                            name="city"
+                            value={formData.city}
+                            onChange={handleInputChange}
+                            disabled={!cities.length}
+                          >
+                            <option value="">Select a city</option>
+                            {cities.map((city, i) => (
+                              <option key={i} value={city}>
+                                {city}
+                              </option>
+                            ))}
+                          </select>
+                            {errors.country && touched.country && (
                               <div className="invalid-feedback">
-                                {errors.state}
+                                {errors.country}
                               </div>
                             )}
                           </div>
                         </div>
+
+
                         <div className="col-lg-6 col-md-6">
                           <div className="billing-info mb-20">
                             <label>Postcode / ZIP *</label>
@@ -520,7 +686,8 @@ const Checkout = () => {
                             className="form-control"
                             placeholder="Notes about your order, e.g. special notes for delivery."
                             name="message"
-                            defaultValue={""}
+                            value={formData.message}
+                            onChange={handleInputChange}
                           />
                         </div>
                       </div>
@@ -591,6 +758,45 @@ const Checkout = () => {
                             </ul>
                           </div>
                         </div>
+
+                        {/* Payment Error Display */}
+                        {paymentError && (
+                          <div
+                            style={{
+                              backgroundColor: "#f8d7da",
+                              color: "#721c24",
+                              padding: "12px",
+                              marginBottom: "15px",
+                              borderRadius: "4px",
+                              border: "1px solid #f5c6cb",
+                            }}
+                          >
+                            <strong>Payment Error:</strong> {paymentError}
+                            {orderPlaced &&
+                              formData.paymentMethod === "phonepe" && (
+                                <div style={{ marginTop: "10px" }}>
+                                  <button
+                                    type="button"
+                                    onClick={retryPayment}
+                                    disabled={isLoading}
+                                    style={{
+                                      backgroundColor: "#007bff",
+                                      color: "white",
+                                      border: "none",
+                                      padding: "8px 16px",
+                                      borderRadius: "4px",
+                                      cursor: "pointer",
+                                      marginRight: "10px",
+                                    }}
+                                  >
+                                    {isLoading
+                                      ? "Processing..."
+                                      : "Retry Payment"}
+                                  </button>
+                                </div>
+                              )}
+                          </div>
+                        )}
 
                         <div className="payment-method">
                           <div className="accordion-item">
@@ -779,6 +985,8 @@ const Checkout = () => {
                               ></span>
                               Processing...
                             </>
+                          ) : orderPlaced && paymentError ? (
+                            "Retry Order"
                           ) : (
                             "Place Order"
                           )}

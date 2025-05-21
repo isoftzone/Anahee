@@ -2,9 +2,6 @@ import PropTypes from "prop-types";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
 import FooterCopyright from "../../components/footer/FooterCopyright";
-import FooterNewsletter from "../../components/footer/FooterNewsletter";
-
-
 const FooterOne = ({
   backgroundColorClass,
   spaceTopClass,
@@ -13,174 +10,152 @@ const FooterOne = ({
   spaceRightClass,
   containerClass,
   extraFooterClass,
-  sideMenu
+  sideMenu,
 }) => {
   return (
-    <footer className={clsx("footer-area", backgroundColorClass, spaceTopClass, spaceBottomClass, extraFooterClass, spaceLeftClass, spaceRightClass )}>
-      <div className={`${containerClass ? containerClass : "container"}`}>
-        <div className="row">
-          <div
-            className={`${
-              sideMenu ? "col-xl-2 col-sm-4" : "col-lg-2 col-sm-4"
-            }`}
-          >
-            {/* footer copyright */}
+    <footer
+      className={clsx(
+        "footer-area py-3",
+        backgroundColorClass,
+        spaceTopClass,
+        spaceBottomClass,
+        extraFooterClass,
+        spaceLeftClass,
+        spaceRightClass
+      )}
+    >
+      <div className={`${containerClass || "container-fluid"}`}>
+        <div className="row justify-content-center ">
+          {/* Logo */}
+          <div className="col-12 col-sm-6 col-md-3 col-lg-2">
             <FooterCopyright
+            className ="footer-title text-start text-md-center"
               footerLogo="/assets/img/logo/logo.png"
               spaceBottomClass="mb-30"
             />
+            {/* Follow Us */}
+            <div className="list-unstyled d-flex flex-column align-items-center align-items-md-center">
+              <p>
+Anahee blends cultural elegance with modern, affordable luxury.        </p>
+            </div>
           </div>
-          <div
-            className={`${
-              sideMenu ? "col-xl-2 col-sm-4" : "col-lg-2 col-sm-4"
-            }`}
-          >
-            <div className="footer-widget mb-30 ml-30">
-              <div className="footer-title">
-                <h3>ABOUT US</h3>
+          {/* HOME Links */}
+          <div className="col-12 col-sm-6 col-md-3 col-lg-2  my-4">
+            <div className="footer-widget pt-4">
+              <div className="footer-title text-center text-md-center">
+                <h3>QUICK LINKS</h3>
               </div>
               <div className="footer-list">
-                <ul>
+                <ul className="list-unstyled d-flex flex-column align-items-center align-items-md-center">
                   <li>
-                    <Link to={process.env.PUBLIC_URL + "/about"}>About us</Link>
+                    <Link to="/home">Home</Link>
                   </li>
                   <li>
-                    <Link to={process.env.PUBLIC_URL + "/contact"}>
-                      Contact
-                    </Link>
+                    <Link to="/about">About us</Link>
                   </li>
                   <li>
-                    <Link to={process.env.PUBLIC_URL + "/exchange-policy"}>
-                    Exchange Policy
-                    </Link>
+                    <Link to="/contact">Contact</Link>
                   </li>
-                  <li>
-                    <Link to={process.env.PUBLIC_URL + "/terms-conditions"}>
-                    Terms and Conditions
-                    </Link>
+                   <li>
+                    <Link to="/terms-conditions">Terms & Condition</Link>
                   </li>
-                  <li>
-                    <Link to={process.env.PUBLIC_URL + "/privacy-policy"}>
-                    Privacy Policy
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={process.env.PUBLIC_URL + "/exchange-process"}>Exchange Process</Link>
-                  </li>
+                  
                 </ul>
               </div>
             </div>
           </div>
-          <div
-            className={`${
-              sideMenu ? "col-xl-2 col-sm-4" : "col-lg-2 col-sm-4"
-            }`}
-          >
-            <div
-              className={`${
-                sideMenu
-                  ? "footer-widget mb-30 ml-95"
-                  : "footer-widget mb-30 ml-50"
-              }`}
-            >
-              <div className="footer-title">
+          {/* Useful Links */}
+          <div className="col-12 col-sm-6 col-md-3 col-lg-2 my-4">
+            <div className="footer-widget pt-4 text-center ">
+              <div className="footer-title text-center text-md-center">
                 <h3>USEFUL LINKS</h3>
               </div>
               <div className="footer-list">
-                <ul>
+                <ul className="list-unstyled d-flex flex-column align-items-center align-items-md-center">
+                  {/* <li><Link to="/cancellation-policy">Cancellation Policy</Link></li> */}
+                  {/* <li><Link to="/refund-policy">Refund Policy</Link></li> */}
                   <li>
-                    <Link to={process.env.PUBLIC_URL + "/cancellation-policy"}>
-                    Cancellation Policy
-                    </Link>
+                    <Link to="/shipping-locations">Shipping Locations</Link>
                   </li>
                   <li>
-                    <Link to={process.env.PUBLIC_URL + "/refund-policy"}>Refund Policy</Link>
+                    <Link to="/terms-of-service">Terms of Service</Link>
                   </li>
                   <li>
-                    <Link to={process.env.PUBLIC_URL + "/shipping-locations"}>Shipping Locations</Link>
+                    <Link to="/exchange-process">Exchange Process</Link>
                   </li>
-                  <li>
-                    <Link to={process.env.PUBLIC_URL + "/terms-of-service"}>TERMS OF SERVICE</Link>
-                  </li>
+                     <div className="footer-list d-flex justify-content-center justify-content-md-start gap-3 mt-2">
+                <a
+                  href="//www.facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i className="fa fa-facebook"></i>
+                </a>
+                <a
+                  href="https://www.instagram.com/anahee_india?igsh=cjRvZWVwcDk2ODNh"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i className="fa fa-instagram"></i>
+                </a>
+                <a
+                  href="//www.youtube.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i className="fa fa-youtube"></i>
+                </a>
+              </div>
                 </ul>
               </div>
             </div>
           </div>
-          <div
-            className={`${
-              sideMenu ? "col-xl-3 col-sm-4" : "col-lg-2 col-sm-6"
-            }`}
-          >
-            <div
-              className={`${
-                sideMenu
-                  ? "footer-widget mb-30 ml-145"
-                  : "footer-widget mb-30 ml-75"
-              }`}
-            >
-              <div className="footer-title">
-                <h3>FOLLOW US</h3>
+
+          <div className="col-12 col-sm-6 col-md-3 col-lg-2 my-4">
+            <div className="footer-widget pt-4 text-center ">
+              <div className="footer-title text-center text-md-center">
+                <h3>POLICY LINKS</h3>
               </div>
               <div className="footer-list">
-                <ul>
+                <ul className="list-unstyled d-flex flex-column align-items-center align-items-md-center">
                   <li>
-                    <a
-                      href="//www.facebook.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Facebook
-                    </a>
+                    <Link to="/cancellation-policy">Cancellation Policy</Link>
                   </li>
                   <li>
-                    <a
-                      href="//www.twitter.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Twitter
-                    </a>
+                    <Link to="/refund-policy">Refund Policy</Link>
                   </li>
                   <li>
-                    <a
-                      href="//www.instagram.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Instagram
-                    </a>
+                    <Link to="/privacy-policy">Privacy Policy</Link>
                   </li>
                   <li>
-                    <a
-                      href="//www.youtube.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Youtube
-                    </a>
+                    <Link to="/exchange-policy">Exchange Policy</Link>
                   </li>
                 </ul>
               </div>
             </div>
-          </div>
-          <div
-            className={`${
-              sideMenu ? "col-xl-3 col-sm-8" : "col-lg-4 col-sm-6"
-            }`}
-          >
-            {/* footer newsletter */}
-            <FooterNewsletter
-              spaceBottomClass="mb-30"
-              spaceLeftClass="ml-70"
-              sideMenu={sideMenu}
-            />
           </div>
         </div>
       </div>
+
+     <hr className="my-5" style={{ width: "50%", height: "2px", backgroundColor: "black", border: "none", margin:"auto" }} />
+
+
+      {/* Copyright */}
+      <section className="text-center mb-3 ">
+        <div className="Right-Reserved tracking-wider">
+          &copy; {new Date().getFullYear()}{" "}
+          <a
+            href="https://hasthemes.com"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Anahee (Anand Fashion) All Rights Reserved
+          </a>
+        </div>
+      </section>
     </footer>
   );
 };
-
 FooterOne.propTypes = {
   backgroundColorClass: PropTypes.string,
   containerClass: PropTypes.string,
@@ -189,7 +164,6 @@ FooterOne.propTypes = {
   spaceBottomClass: PropTypes.string,
   spaceTopClass: PropTypes.string,
   spaceLeftClass: PropTypes.string,
-  spaceRightClass: PropTypes.string
+  spaceRightClass: PropTypes.string,
 };
-
 export default FooterOne;

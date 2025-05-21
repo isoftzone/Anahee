@@ -57,7 +57,7 @@ const PromoBannerText = ({ spaceTopClass, spaceBottomClass }) => {
 const styles = {
   banner: {
     width: "100%",
-    height: "86px",
+    height: "56px",
     backgroundColor: "#5CAE86",
     overflow: "hidden",
     display: "flex",
@@ -75,7 +75,7 @@ const styles = {
   },
   text: {
     color: "white",
-    fontSize: "20px", // larger for better readability
+    fontSize: "15px", // larger for better readability
     fontWeight: 600, // semi-bold
     letterSpacing: "0.3px", // subtle spacing like the image
     marginRight: "60px", // extra gap between text chunks

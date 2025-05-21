@@ -47,14 +47,18 @@ const HeroSliderTen = ({ spaceTopClass, spaceBottomClass }) => {
     <div className={`slider-area ${spaceTopClass} ${spaceBottomClass}`}>
       <div
         ref={containerRef}
-        className="video-container"
-        style={videoContainerStyle}
+        className="position-relative overflow-hidden w-100"
+        style={{
+          paddingTop: "56.25%", // 16:9 aspect ratio
+          backgroundColor: "#000", // fallback background
+        }}
       >
         {videoUrl ? (
           <>
             <video
               ref={videoRef}
-              className="position-absolute top-0 left-0 w-full h-full object-cover"
+              className="position-absolute top-0  start-0 w-100 h-100"
+              style={{ objectFit: "contain" }}
               muted
               loop
               onClick={togglePlayPause}
@@ -70,21 +74,22 @@ const HeroSliderTen = ({ spaceTopClass, spaceBottomClass }) => {
             <button
               onClick={togglePlayPause}
               className="position-absolute top-50 start-50 translate-middle
-                        rounded-circle border-0 cursor-pointer
-                        d-flex justify-content-center align-items-center
-                        bg-white z-3 shadow-sm"
+                    rounded-circle border-0
+                    d-flex justify-content-center align-items-center
+                    bg-white shadow-sm"
               style={{
-                width: "80px",
-                height: "80px",
+                width: "40px",
+                height: "40px",
+                zIndex: 1,
               }}
               aria-label={isPlaying ? "Pause" : "Play"}
             >
               {isPlaying ? (
-                <svg width="35" height="35" fill="#dc3545" viewBox="0 0 24 24">
+                <svg width="30" height="30" fill="#dc3545" viewBox="0 0 24 24">
                   <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
                 </svg>
               ) : (
-                <svg width="35" height="35" fill="#dc3545" viewBox="0 0 24 24">
+                <svg width="30" height="30" fill="#dc3545" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
               )}

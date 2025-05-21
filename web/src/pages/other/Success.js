@@ -220,7 +220,9 @@ const Success = () => {
   // Change this to true or false to switch views
   const [isSuccess] = useState(true); // or false
   return (
-    <div
+  <div>
+    
+      <div
       className="container py-5"
       style={{
         height: "100vh",
@@ -260,6 +262,7 @@ const Success = () => {
         </div>
       )}
     </div>
+  </div>
   );
 };
 export default Success;
