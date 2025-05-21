@@ -3,12 +3,10 @@
 // import { useSelector } from "react-redux";
 // import clsx from "clsx";
 // import MenuCart from "./sub-components/MenuCart";
-
 // const IconGroup = ({ iconWhiteClass }) => {
 //   const handleClick = e => {
 //     e.currentTarget.nextSibling.classList.toggle("active");
 //   };
-
 //   const triggerMobileMenu = () => {
 //     const offcanvasMobileMenu = document.querySelector(
 //       "#offcanvas-mobile-menu"
@@ -18,7 +16,6 @@
 //   const { compareItems } = useSelector((state) => state.compare);
 //   const { wishlistItems } = useSelector((state) => state.wishlist);
 //   const { cartItems } = useSelector((state) => state.cart);
-
 //   return (
 //     <div className={clsx("header-right-wrap", iconWhiteClass)} >
 //       <div className="same-style header-search d-none d-lg-block">
@@ -104,45 +101,23 @@
 //     </div>
 //   );
 // };
-
 // IconGroup.propTypes = {
 //   iconWhiteClass: PropTypes.string,
 // };
-
 // export default IconGroup;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import PropTypes from "prop-types";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import clsx from "clsx";
 import MenuCart from "./sub-components/MenuCart";
 import { useEffect, useState } from "react";
-
 const IconGroup = ({ iconWhiteClass }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [name,setName] = useState("");
-
+  const [name, setName] = useState("");
   const navigate = useNavigate();
-// const myItems=localStorage.getItem("customerinfo")
-  // ✅ Check localStorage for login status
+  // const myItems=localStorage.getItem("customerinfo")
+  // :white_check_mark: Check localStorage for login status
   //  const [user, setUser] = useState(null);
-
   // useEffect(() => {
   //   const storedUser = localStorage.getItem('userinfo');
   //   if (storedUser) {
@@ -156,30 +131,37 @@ const IconGroup = ({ iconWhiteClass }) => {
         const customer = JSON.parse(customerStr);
         setIsLoggedIn(true);
         setName(customer.name); // assuming `customerinfo` has a `name` field
+        console.log("setName",name)
       } else {
         setIsLoggedIn(false);
         setName("");
       }
     };
-
     checkLogin();
-
-    // ✅ Listen for login/logout in other tabs
+    // :white_check_mark: Listen for login/logout in other tabs
     window.addEventListener("storage", checkLogin);
     return () => window.removeEventListener("storage", checkLogin);
   }, []);
-
   const handleClick = (e) => {
     e.currentTarget.nextSibling.classList.toggle("active");
   };
-
+  // const handleLogout = () => {
+  //   localStorage.removeItem("customerinfo");
+  //   // alert("Logout Successfully");
+  //   // confirm();
+  //   setIsLoggedIn(false);
+  //   // navigate("/");
+  // };
   const handleLogout = () => {
+  const confirmLogout = window.confirm("Are you sure you want to logout?");
+  if (confirmLogout) {
     localStorage.removeItem("customerinfo");
-    alert("Logout Successfully");
     setIsLoggedIn(false);
-    // navigate("/");
-  };
-
+    // navigate("/"); // Uncomment this if you want to redirect after logout
+  } else {
+    // User clicked "No", do nothing
+  }
+};
   const triggerMobileMenu = () => {
     const offcanvasMobileMenu = document.querySelector(
       "#offcanvas-mobile-menu"
@@ -192,8 +174,8 @@ const IconGroup = ({ iconWhiteClass }) => {
   const { compareItems } = useSelector((state) => state.compare);
   const { wishlistItems } = useSelector((state) => state.wishlist);
   const { cartItems } = useSelector((state) => state.cart);
-// console.log("cartItems",cartItems);
-// console.log("myItems",myItems);
+  // console.log("cartItems",cartItems);
+  console.log("myItems",name);
   return (
     <div className={clsx("header-right-wrap", iconWhiteClass)}>
       {/* Search */}
@@ -210,60 +192,56 @@ const IconGroup = ({ iconWhiteClass }) => {
           </form>
         </div>
       </div>
-
       {/* Account Dropdown */}
-          <div className="same-style account-setting d-none d-lg-block">
-     <button
-  className="account-setting-active d-flex align-items-center gap-2"
-  onClick={handleClick}
->
-  <i className="pe-7s-user-female" />
-  {isLoggedIn && (
-    <h4
-      className="mb-0 text-truncate text-capitalize"
-      style={{
-        maxWidth: "80px",
-        overflow: "hidden",
-        marginLeft: "5px",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap",
-        fontSize: "15px",
-        marginBottom: "3px",
-      }}
-    >
-      {name}
-    </h4>
-  )}
-</button>
-
-      <div className="account-dropdown">
-        <ul>
-          {isLoggedIn ? (
-            <>
-              <li>
-                <Link to="/my-account">My Account</Link>
-              </li>
-              <li>
-                <Link to="/" onClick={handleLogout}>
-                  Log Out
-                </Link>
-              </li>
-            </>
-          ) : (
-            <>
-              <li>
-                <Link to="/login-register">Login</Link>
-              </li>
-              <li>
-                <Link to="/register">Register</Link>
-              </li>
-            </>
+      <div className="same-style account-setting d-none d-lg-block">
+        <button
+          className="account-setting-active d-flex align-items-center gap-2"
+          onClick={handleClick}
+        >
+          <i className="pe-7s-user-female" />
+          {isLoggedIn && (
+            <h4
+              className="mb-0 text-truncate text-capitalize"
+              style={{
+                maxWidth: "80px",
+                overflow: "hidden",
+                marginLeft: "5px",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                fontSize: "15px",
+                marginBottom: "3px",
+              }}
+            >
+              {name}
+            </h4>
           )}
-        </ul>
+        </button>
+        <div className="account-dropdown">
+          <ul>
+            {isLoggedIn ? (
+              <>
+                <li>
+                  <Link to="/my-account">My Account</Link>
+                </li>
+                <li>
+                  <Link to="/" onClick={handleLogout}>
+                    Log Out
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <>
+                <li>
+                  <Link to="/login-register">Login</Link>
+                </li>
+                <li>
+                  <Link to="/register">Register</Link>
+                </li>
+              </>
+            )}
+          </ul>
+        </div>
       </div>
-    </div>
-
-
       {/* Compare */}
       {/* <div className="same-style header-compare">
         <Link to="/compare">
@@ -271,7 +249,6 @@ const IconGroup = ({ iconWhiteClass }) => {
           <span className="count-style">{compareItems?.length || 0}</span>
         </Link>
       </div> */}
-
       {/* Wishlist */}
       <div className="same-style header-wishlist">
         <Link to="/wishlist">
@@ -279,7 +256,6 @@ const IconGroup = ({ iconWhiteClass }) => {
           <span className="count-style">{wishlistItems?.length || 0}</span>
         </Link>
       </div>
-
       {/* Cart (Desktop) */}
       <div className="same-style cart-wrap d-none d-lg-block">
         <button className="icon-cart" onClick={handleClick}>
@@ -288,7 +264,6 @@ const IconGroup = ({ iconWhiteClass }) => {
         </button>
         <MenuCart />
       </div>
-
       {/* Cart (Mobile) */}
       <div className="same-style cart-wrap d-block d-lg-none">
         <Link className="icon-cart" to="/cart">
@@ -296,7 +271,6 @@ const IconGroup = ({ iconWhiteClass }) => {
           <span className="count-style">{cartItems?.length || 0}</span>
         </Link>
       </div>
-
       {/* Mobile Menu Toggle */}
       <div className="same-style mobile-off-canvas d-block d-lg-none">
         <button className="mobile-aside-button" onClick={triggerMobileMenu}>
@@ -306,9 +280,7 @@ const IconGroup = ({ iconWhiteClass }) => {
     </div>
   );
 };
-
 IconGroup.propTypes = {
   iconWhiteClass: PropTypes.string,
 };
-
 export default IconGroup;

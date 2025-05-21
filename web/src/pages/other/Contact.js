@@ -1,13 +1,11 @@
-import { Fragment } from "react"; 
+import { Fragment } from "react";
 import { useLocation } from "react-router-dom";
 import SEO from "../../components/seo";
 import LayoutOne from "../../layouts/LayoutOne";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import GoogleMap from "../../components/google-map"
-
+import GoogleMap from "../../components/google-map";
 const Contact = () => {
   let { pathname } = useLocation();
-
   return (
     <Fragment>
       <SEO
@@ -16,16 +14,16 @@ const Contact = () => {
       />
       <LayoutOne headerTop="visible">
         {/* breadcrumb */}
-        {/* <Breadcrumb 
+        {/* <Breadcrumb
           pages={[
             {label: "Home", path: process.env.PUBLIC_URL + "/" },
             {label: "Contact", path: process.env.PUBLIC_URL + pathname }
-          ]} 
+          ]}
         /> */}
-        <div className="contact-area pt-100 pb-100">
-          <div className="container">
+        <div className="contact-area pt-100 pb-3">
+          <div className="container-fluid">
             <div className="contact-map mb-10">
-              <GoogleMap lat={47.444} lng={-122.176} />
+              <GoogleMap lat={26.9356} lng={75.793} />
             </div>
             <div className="custom-row-2">
               <div className="col-12 col-lg-4 col-md-5">
@@ -44,14 +42,10 @@ const Contact = () => {
                     </div>
                     <div className="contact-info-dec">
                       <p>
-                        <a href="mailto:sahiba@anahee.in">
-                          sahiba@anahee.in
-                        </a>
+                        <a href="mailto:sahiba@anahee.in">sahiba@anahee.in</a>
                       </p>
                       <p>
-                        <a href="http://anahee.in/">
-                          anahee.in
-                        </a>
+                        <a href="http://anahee.in/">anahee.in</a>
                       </p>
                     </div>
                   </div>
@@ -83,24 +77,14 @@ const Contact = () => {
                       </li>
                       <li>
                         <a href="//pinterest.com">
-                          <i className="fa fa-pinterest-p" />
+                          <i className="fa fa-instagram" />
                         </a>
                       </li>
                       <li>
                         <a href="//thumblr.com">
-                          <i className="fa fa-tumblr" />
+                        <i class="fa fa-youtube"></i>
                         </a>
-                      </li>
-                      <li>
-                        <a href="//vimeo.com">
-                          <i className="fa fa-vimeo" />
-                        </a>
-                      </li>
-                      <li>
-                        <a href="//twitter.com">
-                          <i className="fa fa-twitter" />
-                        </a>
-                      </li>
+                      </li>                     
                     </ul>
                   </div>
                 </div>
@@ -147,5 +131,4 @@ const Contact = () => {
     </Fragment>
   );
 };
-
 export default Contact;

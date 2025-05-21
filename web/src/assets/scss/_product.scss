@@ -458,17 +458,18 @@
     max-width: 100%;
     padding: 35px 0;
   }
-  .modal-header {
-    .close {
-      cursor: pointer;
-
-      opacity: 1;
-      color: #333;
-      &:hover {
-        color: $theme-color;
-      }
-    }
-  }
+.custom-close-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+.custom-close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #333;
+  padding: 0 15px;
+}
   .modal-body {
     padding: 35px 15px;
   }

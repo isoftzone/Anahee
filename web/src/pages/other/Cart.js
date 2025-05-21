@@ -42,7 +42,7 @@ const Cart = () => {
         orderData
       );
       if (response.data.success) {
-        alert("Proceeding to checkout...");
+        // alert("Proceeding to checkout...");
         navigate(process.env.PUBLIC_URL + "/checkout");
       }
     } catch (error) {

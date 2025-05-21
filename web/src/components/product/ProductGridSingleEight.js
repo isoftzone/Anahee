@@ -132,7 +132,7 @@ const ProductGridSingleEight = ({
                 </button>
               )}
             </div>
-            <div className="pro-same-action pro-compare">
+            {/* <div className="pro-same-action pro-compare">
               <button
                 className={compareItem !== undefined ? "active" : ""}
                 disabled={compareItem !== undefined}
@@ -145,7 +145,7 @@ const ProductGridSingleEight = ({
               >
                 <i className="pe-7s-shuffle" />
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // import React, { useState } from "react";
 // import { Link } from "react-router-dom";
 // import Tab from "react-bootstrap/Tab";
@@ -1289,6 +1290,8 @@
 
 
 
+=======
+>>>>>>> main
 import React, { useState, useEffect } from "react";
 import Tab from "react-bootstrap/Tab";
 import Nav from "react-bootstrap/Nav";
@@ -1296,7 +1299,10 @@ import SEO from "../../components/seo";
 import LayoutOne from "../../layouts/LayoutOne";
 import { BASE_URL } from "../../config";
 import { useNavigate } from "react-router-dom";
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
 const Register = () => {
   const [formData, setFormData] = useState({
     fname: "",
@@ -1310,7 +1316,10 @@ const Register = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
   useEffect(() => {
     // Clear form on first load
     setFormData({
@@ -1324,13 +1333,17 @@ const Register = () => {
     setError("");
     setSuccess("");
   }, []);
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+<<<<<<< HEAD
   };
 
   const validateForm = () => {
@@ -1355,26 +1368,56 @@ const Register = () => {
     return null;
   };
 
+=======
+  };
+  const validateForm = () => {
+    const { fname, lname, email, mobile, password, confirmPassword } = formData;
+    if (!fname.trim() || fname.length < 2)
+      return "First name must be at least 2 characters.";
+    if (!lname.trim() || lname.length < 2)
+      return "Last name must be at least 2 characters.";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return "Enter a valid email address.";
+    const mobileRegex = /^[0-9]{10}$/;
+    if (!mobileRegex.test(mobile)) return "Mobile number must be 10 digits.";
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return "Password must be 8+ chars, with letter, number & symbol.";
+    }
+    if (password !== confirmPassword) return "Passwords do not match.";
+    return null;
+  };
+>>>>>>> main
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
     const validationError = validateForm();
     if (validationError) {
       setError(validationError);
       return;
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
     try {
       const response = await fetch(`${BASE_URL}/add_customer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+<<<<<<< HEAD
 
       const data = await response.json();
 
+=======
+      const data = await response.json();
+>>>>>>> main
       if (response.ok) {
         setSuccess("Registration successful!");
         setFormData({
@@ -1394,10 +1437,16 @@ const Register = () => {
       setError("Something went wrong. Try again later.");
     }
   };
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
   return (
     <>
-      <SEO titleTemplate="Register" description="Register page of the eCommerce app." />
+      <SEO
+        titleTemplate="Register"
+        description="Register page of the eCommerce app."
+      />
       <LayoutOne headerTop="visible">
         <div className="login-register-area pt-100 pb-100">
           <div className="container">
@@ -1417,7 +1466,13 @@ const Register = () => {
                         <div className="login-form-container">
                           <div className="login-register-form">
                             {error && <p style={{ color: "red" }}>{error}</p>}
+<<<<<<< HEAD
                             {success && <p style={{ color: "green" }}>{success}</p>}
+=======
+                            {success && (
+                              <p style={{ color: "green" }}>{success}</p>
+                            )}
+>>>>>>> main
                             <form onSubmit={handleSubmit} autoComplete="off">
                               <input
                                 type="text"
@@ -1493,7 +1548,11 @@ const Register = () => {
     </>
   );
 };
+<<<<<<< HEAD
 
 export default Register;
 
 
+=======
+export default Register;
+>>>>>>> main
