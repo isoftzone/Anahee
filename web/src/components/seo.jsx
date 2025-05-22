@@ -24,7 +24,7 @@ SEO.propTypes = {
 SEO.defaultProps = {
     title: "Anahee",
     titleTemplate: "Product Page",
-    description: "Product page of Anahee react minimalist eCommerce template.",
+    description: "Product page of Anahee .",
 };
 
 export default SEO;

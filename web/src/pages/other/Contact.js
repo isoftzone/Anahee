@@ -10,7 +10,7 @@ const Contact = () => {
     <Fragment>
       <SEO
         titleTemplate="Contact"
-        description="Contact page of Anahee react minimalist eCommerce template."
+        description="Contact page of Anahee Anahee."
       />
       <LayoutOne headerTop="visible">
         {/* breadcrumb */}
@@ -23,7 +23,16 @@ const Contact = () => {
         <div className="contact-area pt-100 pb-3">
           <div className="container-fluid">
             <div className="contact-map mb-10">
-              <GoogleMap lat={26.9356} lng={75.793} />
+              <iframe
+                title="Anahee Location"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10985.797589222544!2d75.77160155541992!3d26.936704!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396db37fbb01310f%3A0x4916f277d8d96683!2sIndira%20colony%20near%20bani%20park!5e1!3m2!1sen!2sin!4v1747910028780!5m2!1sen!2sin"
+                width="100%"
+                height="450"
+                style={{ border: 0 }}
+                allowFullScreen={true}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>{" "}
             </div>
             <div className="custom-row-2">
               <div className="col-12 col-lg-4 col-md-5">
@@ -82,9 +91,9 @@ const Contact = () => {
                       </li>
                       <li>
                         <a href="//thumblr.com">
-                        <i class="fa fa-youtube"></i>
+                          <i class="fa fa-youtube"></i>
                         </a>
-                      </li>                     
+                      </li>
                     </ul>
                   </div>
                 </div>

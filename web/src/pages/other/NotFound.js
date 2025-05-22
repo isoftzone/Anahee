@@ -11,7 +11,7 @@ const NotFound = () => {
     <Fragment>
       <SEO
         titleTemplate="Not Found"
-        description="404 of Anahee react minimalist eCommerce template."
+        description="404 of Anahee Anahee."
       />
       <LayoutOne headerTop="visible">
         {/* breadcrumb */}

@@ -14,7 +14,7 @@ const BlogRightSidebar = () => {
     <Fragment>
       <SEO
         titleTemplate="Blog"
-        description="Blog of Anahee react minimalist eCommerce template."
+        description="Blog of Anahee ."
       />
       <LayoutOne headerTop="visible">
         {/* breadcrumb */}

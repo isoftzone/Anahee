@@ -22,7 +22,7 @@ const Wishlist = () => {
     <Fragment>
       <SEO
         titleTemplate="Wishlist"
-        description="Wishlist page of Anahee react minimalist eCommerce template."
+        description="Wishlist page of Anahee Anahee."
       />
       <LayoutOne headerTop="visible">
         <div className="cart-main-area pt-10 pb-30">

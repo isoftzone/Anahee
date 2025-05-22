@@ -14,7 +14,7 @@ const HomePetFood = () => {
     <Fragment>
       <SEO
         titleTemplate="Pet Food Home"
-        description="Pet food home of Anahee react minimalist eCommerce template."
+        description="Pet food home of Anahee Anahee."
       />
       <LayoutOne headerTop="visible">
         {/* hero slider */}

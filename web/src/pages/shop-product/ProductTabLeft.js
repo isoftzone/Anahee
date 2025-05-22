@@ -18,7 +18,7 @@ const ProductTabLeft = () => {
     <Fragment>
       <SEO
         titleTemplate="Product Page"
-        description="Product page of Anahee react minimalist eCommerce template."
+        description="Product page of Anahee Anahee."
       />
 
       <LayoutOne headerTop="visible">

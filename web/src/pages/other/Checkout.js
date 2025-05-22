@@ -430,7 +430,7 @@ const Checkout = () => {
     <Fragment>
       <SEO
         titleTemplate="Checkout"
-        description="Checkout page of Anahee react minimalist eCommerce template."
+        description="Checkout page of Anahee Anahee."
       />
       <LayoutOne headerTop="visible">
         <div className="checkout-area pt-10 pb-30">

@@ -149,7 +149,7 @@ const HomeFashionSix = () => {
     <Fragment>
       <SEO
         titleTemplate="Fashion Home"
-        description="Fashion home of flone react minimalist eCommerce template."
+        description="Fashion home of Anhaee."
       />
       <LayoutOne>
         {hometableData.map((item, index) => (

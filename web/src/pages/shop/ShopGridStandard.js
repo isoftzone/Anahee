@@ -9,6 +9,7 @@ import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import ShopSidebar from "../../wrappers/product/ShopSidebar";
 import ShopTopbar from "../../wrappers/product/ShopTopbar";
 import ShopProducts from "../../wrappers/product/ShopProducts";
+import PropTypes from "prop-types";
 
 const ShopGridStandard = () => {
   const [layout, setLayout] = useState("grid three-column");
@@ -55,7 +56,7 @@ const ShopGridStandard = () => {
     <Fragment>
       <SEO
         titleTemplate="Shop Page"
-        description="Shop page of Anahee react minimalist eCommerce template."
+        description="Shop page of Anahee Anahee."
       />
 
       <LayoutOne headerTop="visible">
@@ -79,25 +80,22 @@ const ShopGridStandard = () => {
                 />
               </div>
               <div className="col-lg-9 order-2 order-lg-2">
-            <div
-  className="shop-select border mb-4 mt-4 sm:mt-4"
-  style={{
-    width: "100%",             // Full responsive width
-    maxWidth: "300px",         // Max width for larger screens
-    position: "relative",
-  }}
->
+                <div className="row">
+                  <div className=" sm:flex-row items-center d-flex justify-content-between gap-4">
+                    {/* ShopTopbar */}
+
+                    {/* Sort Dropdown */}
+                  <div className="w-100 w-sm-auto" style={{ maxWidth: "250px" }}>
   <select
-    onChange={(e) => getFilterSortParams("filterSort", e.target.value)}
-    className="w-full py-3 px-4 pr-12 text-sm appearance-none rounded border border-gray-300"
+    onChange={(e) =>
+      getFilterSortParams("filterSort", e.target.value)
+    }
+    className="form-select form-select-lg py-3 pe-5"
     style={{
-      WebkitAppearance: "none",
-      MozAppearance: "none",
-      appearance: "none",
-      backgroundImage: `url("data:image/svg+xml,%3Csvg fill='black' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`,
+      backgroundImage: `url("data:image/svg+xml,%3Csvg fill='black' width='32' height='32' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`,
       backgroundRepeat: "no-repeat",
-      backgroundPosition: "right 0.75rem center",
-      backgroundSize: "2.75rem", // Increased arrow icon size
+      backgroundPosition: "right 1rem center",
+      backgroundSize: "2.5rem",
     }}
   >
     <option value="default">Default</option>
@@ -107,18 +105,30 @@ const ShopGridStandard = () => {
 </div>
 
 
+                    <div className="w-full sm:w-auto">
+                      <ShopTopbar
+                        getLayout={getLayout}
+                        getFilterSortParams={getFilterSortParams}
+                        productCount={products.length}
+                        sortedProductCount={currentData.length}
+                      />
+                    </div>
+                  </div>
+                </div>
+                {/* shop topbar default */}
+
                 {/* shop page content default */}
                 <ShopProducts layout={layout} products={currentData} />
-                {/* shop topbar default */}
-                <ShopTopbar
-                  getLayout={getLayout}
-                  getFilterSortParams={getFilterSortParams}
-                  productCount={products.length}
-                  sortedProductCount={currentData.length}
-                />
 
                 {/* shop product pagination */}
-                <div className="pro-pagination-style text-center mt-10">
+
+                <div
+                  className=" pro-pagination-style justify-content-between align-items-center text-center mt-10"
+                  style={{ display: "flex" }}
+                >
+                  <p className="pt-5">
+                    Showing{currentData.length} of {products.length} result
+                  </p>
                   <Paginator
                     totalRecords={sortedProducts.length}
                     pageLimit={pageLimit}
@@ -139,5 +149,4 @@ const ShopGridStandard = () => {
     </Fragment>
   );
 };
-
 export default ShopGridStandard;

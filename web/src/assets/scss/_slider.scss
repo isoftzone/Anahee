@@ -441,14 +441,13 @@
       position: relative;
 
       display: inline-block;
-
       width: 14px;
       height: 14px;
       margin: 0 8px;
 
       opacity: 1;
       border-radius: 100%;
-      background: #fff none repeat scroll 0 0;
+      background: #ffffff none repeat scroll 0 0;
       &:before {
         position: absolute;
         top: -3px;
@@ -8169,12 +8168,14 @@ textarea,
   text-align: center;
   z-index: 9;
   background-color: rgba(255, 255, 255, 0.788);
-}
+} 
 @media (max-width: 47.94em) {
   .instagram-feed-heading {
     width: 240px;
   }
 }
+
+
 .instagram-feed-heading * {
   z-index: 2;
 }
@@ -25863,8 +25864,8 @@ a,
 }
 .delivery-check {
   width: 100%;
-  margin-top: 54px;
-  margin-bottom: 54px;
+  margin-top: 44px;
+  margin-bottom: 18px;
 }
 
 .delivery-check h3 {
@@ -26147,4 +26148,12 @@ th {
   background-size: cover;
   transform: scale(2); /* Zoom effect */
 }
+
+@media (max-width: 768px){
+.delivery-check {
+  width: 100%;
+  margin-top: -5px;
+  margin-bottom: 18px;
+}
+} 
 
