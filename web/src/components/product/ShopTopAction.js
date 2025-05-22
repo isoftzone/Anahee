@@ -5,21 +5,15 @@ import { setActiveLayout } from "../../helpers/product";
 const ShopTopAction = ({
   getLayout,
   getFilterSortParams,
-  productCount,
-  sortedProductCount
+ 
 }) => {
   return (
     <div className="shop-top-bar mb-35">
-      <div className="select-shoing-wrap">
-        
-        <p>
-          Showing {sortedProductCount} of {productCount} result
-        </p>
-      </div>
+   
 
       <div className="shop-tab">
         <button
-          onClick={e => {
+          onClick={(e) => {
             getLayout("grid two-column");
             setActiveLayout(e);
           }}
@@ -27,7 +21,7 @@ const ShopTopAction = ({
           <i className="fa fa-th-large" />
         </button>
         <button
-          onClick={e => {
+          onClick={(e) => {
             getLayout("grid three-column");
             setActiveLayout(e);
           }}
@@ -35,7 +29,7 @@ const ShopTopAction = ({
           <i className="fa fa-th" />
         </button>
         <button
-          onClick={e => {
+          onClick={(e) => {
             getLayout("list");
             setActiveLayout(e);
           }}
@@ -51,7 +45,7 @@ ShopTopAction.propTypes = {
   getFilterSortParams: PropTypes.func,
   getLayout: PropTypes.func,
   productCount: PropTypes.number,
-  sortedProductCount: PropTypes.number
+  sortedProductCount: PropTypes.number,
 };
 
 export default ShopTopAction;

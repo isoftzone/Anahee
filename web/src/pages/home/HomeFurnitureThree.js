@@ -14,7 +14,7 @@ const HomeFurnitureThree = () => {
     <Fragment>
       <SEO
         titleTemplate="Furniture Home"
-        description="Furniture home of flone react minimalist eCommerce template."
+        description="Furniture home of Anhaee."
       />
       <LayoutOne
         headerContainerClass="container-fluid"
