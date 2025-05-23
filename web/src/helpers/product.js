@@ -5,11 +5,20 @@ export const getProducts = (products, category, type, limit) => {
         product => product.category.filter(single => single === category)[0]
       )
     : products;
+console.log("products",products);
+console.log("type",type);
+console.log("category",category);
+console.log("limit",limit);
+
+
+
+
 
   if (type && type === "new") {
     const newProducts = finalProducts.filter(single => single.new);
     return newProducts.slice(0, limit ? limit : newProducts.length);
   }
+  
   if (type && type === "bestSeller") {
     return finalProducts
       .sort((a, b) => {
@@ -33,29 +42,29 @@ export const getDiscountPrice = (price, discount) => {
 
 // get product cart quantity
 export const getProductCartQuantity = (cartItems, product, color, size) => {
-  // let productInCart = cartItems.find(
-  //   single =>
-  //     single.id === product.id &&
-  //     (single.selectedProductColor
-  //       ? single.selectedProductColor === color
-  //       : true) &&
-  //     (single.selectedProductSize ? single.selectedProductSize === size : true)
-  // );
-  // if (cartItems.length >= 1 && productInCart) {
-  //   if (product.variation) {
-  //     return cartItems.find(
-  //       single =>
-  //         single.id === product.id &&
-  //         single.selectedProductColor === color &&
-  //         single.selectedProductSize === size
-  //     ).quantity;
-  //   } else {
-  //     return cartItems.find(single => product.id === single.id).quantity;
-  //   }
-  // } else {
-  //   return 0;
-  // }
-  return 0;
+  let productInCart = cartItems.find(
+    single =>
+      single.id === product.id &&
+      (single.selectedProductColor
+        ? single.selectedProductColor === color
+        : true) &&
+      (single.selectedProductSize ? single.selectedProductSize === size : true)
+  );
+  if (cartItems.length >= 1 && productInCart) {
+    if (product.variation) {
+      return cartItems.find(
+        single =>
+          single.id === product.id &&
+          single.selectedProductColor === color &&
+          single.selectedProductSize === size
+      ).quantity;
+    } else {
+      return cartItems.find(single => product.id === single.id).quantity;
+    }
+  } else {
+    return 0;
+  }
+  //return 0;
 };
 
 export const cartItemStock = (item, color, size) => {

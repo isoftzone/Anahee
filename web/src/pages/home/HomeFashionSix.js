@@ -78,7 +78,7 @@ const HomeFashionSix = () => {
         return (
           <TabProductEight
             spaceBottomClass="pb-10"
-            category="fashion"
+            category="Kurta"
             sectionTitle={false}
           />
         );
