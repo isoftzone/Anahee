@@ -509,7 +509,7 @@ const routes = [
         element: <OrderAdd />
     },
     {
-        path: '/Components/orderedit',
+        path: '/Components/orderedit/:saleId',
         element: <OrderEdit />
     },
     {

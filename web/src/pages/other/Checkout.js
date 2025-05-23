@@ -28,7 +28,7 @@ const Checkout = () => {
     postcode: "",
     phone: "",
     email: "",
-    paymentMethod: "cod",
+    paymentMethod: "Cod",
   });
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -38,8 +38,10 @@ const Checkout = () => {
   const [touched, setTouched] = useState({});
   const [paymentError, setPaymentError] = useState("");
   const [orderPlaced, setOrderPlaced] = useState(false);
-
   const [isPaymentOpen, setIsPaymentOpen] = useState(true);
+  const [discount, setDiscount] = useState(0);
+
+  // let discountedTotal = cartTotalPrice - discount;
   useEffect(() => {
     // Validate all fields when component mounts or when formData changes
     validateForm();
@@ -55,6 +57,27 @@ const Checkout = () => {
     };
   }, []);
 
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  const couponCode = params.get("couponCode");
+  useEffect(() => {
+    if (couponCode) {
+      const applyCoupon = async () => {
+        try {
+          const response = await axios.post(`${BASE_URL}/applycoupon`, {
+            coupon_code: couponCode,
+            cart_total: cartTotalPrice.toFixed(2),
+          });
+          if (response.data.success) {
+            setDiscount(response.data.discount);
+          }
+        } catch (err) {
+          console.error("Coupon re-validation failed", err);
+        }
+      };
+      applyCoupon();
+    }
+  }, [couponCode, cartTotalPrice]);
   // Fetch countries on mount
   useEffect(() => {
     const customerData = JSON.parse(localStorage.getItem("customerinfo"));
@@ -220,7 +243,7 @@ const Checkout = () => {
     setPaymentError("");
   };
 
-  const phonePeCallback = (response,orderId) => {
+  const phonePeCallback = (response, orderId) => {
     setIsLoading(false);
 
     if (response === "USER_CANCEL") {
@@ -245,14 +268,13 @@ const Checkout = () => {
         `${BASE_URL}/api/order-status/${orderId}`
       );
       if (response.data.success) {
-
         const paymentDetail = response.data.data.paymentDetails[0];
 
         const splitInstrument = paymentDetail?.splitInstruments[0];
 
         const updateData = {
           merchant_order_id: response?.data?.data?.orderId,
-          payment_mode: paymentDetail?.paymentMode,
+         // payment_mode: paymentDetail?.paymentMode,
           provider_reference_id: splitInstrument?.rail?.utr,
           phonepe_status: response?.data?.data?.state,
           payment_status: paymentDetail?.state,
@@ -286,7 +308,7 @@ const Checkout = () => {
       setIsLoading(true);
       const response = await axios.post(`${BASE_URL}/api/create-order`, {
         orderId: orderId,
-        amountInPaisa: cartTotalPrice * 100,
+        amountInPaisa: (cartTotalPrice - discount) * 100,
         customerPhone: formData.phone || "0000000000",
         redirectUrl: window.location.origin + "/success",
         expireAfter: 1200,
@@ -300,7 +322,7 @@ const Checkout = () => {
         if (window.PhonePeCheckout && window.PhonePeCheckout.transact) {
           window.PhonePeCheckout.transact({
             tokenUrl: response.data.data.redirectUrl,
-               callback: (resp) => phonePeCallback(resp, orderId),
+            callback: (resp) => phonePeCallback(resp, orderId),
             type: "IFRAME",
           });
         } else {
@@ -339,7 +361,7 @@ const Checkout = () => {
       postcode: "",
       phone: "",
       email: "",
-      paymentMethod: "cod",
+      paymentMethod: "Cod",
     });
     setErrors({});
     setTouched({});
@@ -366,7 +388,7 @@ const Checkout = () => {
     const orderData = {
       ...formData,
       customerId,
-      amount: cartTotalPrice,
+      amount: (cartTotalPrice - discount),
       items: cartItems.map((item) => ({
         productId: item.id,
         quantity: item.quantity,
@@ -386,7 +408,7 @@ const Checkout = () => {
         setOrderId(saleId);
         setOrderPlaced(true);
 
-        if (formData.paymentMethod === "online") {
+        if (formData.paymentMethod === "Paid") {
           await initiatePhonePePayment(saleId);
         } else {
           // For COD, complete the order
@@ -394,7 +416,7 @@ const Checkout = () => {
           alert("Order placed successfully!");
           resetForm();
           // Optionally redirect to success page
-          // window.location.href = "/success";
+          window.location.href = "/success";
         }
       }
     } catch (error) {
@@ -406,7 +428,7 @@ const Checkout = () => {
   };
 
   const retryPayment = () => {
-    if (orderId && formData.paymentMethod === "online") {
+    if (orderId && formData.paymentMethod === "Paid") {
       setPaymentError("");
       initiatePhonePePayment(orderId);
     }
@@ -430,7 +452,7 @@ const Checkout = () => {
     <Fragment>
       <SEO
         titleTemplate="Checkout"
-        description="Checkout page of Anahee Anahee."
+        description="Checkout page of Anahee react minimalist eCommerce template."
       />
       <LayoutOne headerTop="visible">
         <div className="checkout-area pt-10 pb-30">
@@ -488,35 +510,6 @@ const Checkout = () => {
                         </div>
 
                         <div className="col-lg-12">
-                          <div className="billing-select mb-20">
-                            <label>Country *</label>
-                            <select
-                              name="country"
-                              value={formData.country}
-                              onChange={handleInputChange}
-                              onBlur={handleBlur}
-                              className={`form-control ${
-                                errors.country && touched.country
-                                  ? "is-invalid"
-                                  : ""
-                              }`}
-                            >
-                              <option value="">Select a country</option>
-                              {countries.map((country, i) => (
-                                <option key={i} value={country}>
-                                  {country}
-                                </option>
-                              ))}
-                            </select>
-                            {errors.country && touched.country && (
-                              <div className="invalid-feedback">
-                                {errors.country}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="col-lg-12">
                           <div className="billing-info mb-20">
                             <label>Street Address *</label>
                             <input
@@ -545,6 +538,35 @@ const Checkout = () => {
                               value={formData.apartment}
                               onChange={handleInputChange}
                             />
+                          </div>
+                        </div>
+
+                        <div className="col-lg-12">
+                          <div className="billing-select mb-20">
+                            <label>Country *</label>
+                            <select
+                              name="country"
+                              value={formData.country}
+                              onChange={handleInputChange}
+                              onBlur={handleBlur}
+                              className={`form-control ${
+                                errors.country && touched.country
+                                  ? "is-invalid"
+                                  : ""
+                              }`}
+                            >
+                              <option value="">Select a country</option>
+                              {countries.map((country, i) => (
+                                <option key={i} value={country}>
+                                  {country}
+                                </option>
+                              ))}
+                            </select>
+                            {errors.country && touched.country && (
+                              <div className="invalid-feedback">
+                                {errors.country}
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -744,12 +766,17 @@ const Checkout = () => {
                               <li>Free shipping</li>
                             </ul>
                           </div>
+                          <div className="your-order-bottom">
+                            <ul>
+                              <li className="your-order-shipping">Discount</li>
+                              <li>{  "-"+currency.currencySymbol + discount }</li>
+                            </ul>
+                          </div>
                           <div className="your-order-total">
                             <ul>
                               <li className="order-total">Total</li>
                               <li>
-                                {currency.currencySymbol +
-                                  cartTotalPrice.toFixed(2)}
+                                  {currency.currencySymbol + (cartTotalPrice - discount).toFixed(2)}
                               </li>
                             </ul>
                           </div>
@@ -769,7 +796,7 @@ const Checkout = () => {
                           >
                             <strong>Payment Error:</strong> {paymentError}
                             {orderPlaced &&
-                              formData.paymentMethod === "online" && (
+                              formData.paymentMethod === "Paid" && (
                                 <div style={{ marginTop: "10px" }}>
                                   <button
                                     type="button"
@@ -843,12 +870,12 @@ const Checkout = () => {
                                       type="radio"
                                       id="phonepe"
                                       name="paymentMethod"
-                                      value="online"
+                                      value="Paid"
                                       checked={
-                                        formData.paymentMethod === "online"
+                                        formData.paymentMethod === "Paid"
                                       }
                                       onChange={() =>
-                                        handlePaymentMethodChange("online")
+                                        handlePaymentMethodChange("Paid")
                                       }
                                       style={{
                                         margin: "0",
@@ -890,10 +917,10 @@ const Checkout = () => {
                                       type="radio"
                                       id="cod"
                                       name="paymentMethod"
-                                      value="cod"
-                                      checked={formData.paymentMethod === "cod"}
+                                      value="Cod"
+                                      checked={formData.paymentMethod === "Cod"}
                                       onChange={() =>
-                                        handlePaymentMethodChange("cod")
+                                        handlePaymentMethodChange("Cod")
                                       }
                                       style={{
                                         margin: "0",

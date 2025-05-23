@@ -19,6 +19,7 @@ const addProductData = require("../controllers/addProductData");
 // const imageupdate = require("../controllers/imageupdate");
 const master = require("../controllers/master");
 const salesmaster = require("../controllers/salesmaster");
+const discountController = require("../controllers/discountController")
 const salesdetail = require("../controllers/salesdetail");
 const rfmaster = require("../controllers/rfmaster");
 const upload = require("../middlewares/imageupload");
@@ -99,4 +100,10 @@ router.get("/getCustomer", customer.getCustomer);
 router.get("/getLable", lablemaster.getLable);
 router.get("/getrfmaster", rfmaster.getrfmaster);
 router.get("/getMasterSet", rfmaster.getMasterSet);
+// Coupon Discount
+router.post("/addcoupons", discountController.addDiscountCoupon);
+router.get("/getcoupons", discountController.getAllDiscountCoupons);
+router.get("/getcouponsbyid/:id", discountController.getCouponById);
+router.put('/updatecoupons/:id', discountController.updateDiscountCoupon);
+router.post("/applycoupon", discountController.applyCoupon);
 module.exports = router;
