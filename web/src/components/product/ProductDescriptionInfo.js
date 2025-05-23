@@ -1,12 +1,16 @@
 import PropTypes from "prop-types";
 import React, { Fragment, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { getProductCartQuantity } from "../../helpers/product";
 import Rating from "./sub-components/ProductRating";
 import { addToCart } from "../../store/slices/cart-slice";
-import { addToWishlist } from "../../store/slices/wishlist-slice";
+import { addToWishlist,deleteFromWishlist } from "../../store/slices/wishlist-slice";
 import { addToCompare } from "../../store/slices/compare-slice";
+import { BASE_URL } from "../../config"
+import axios from 'axios'; 
+import Modal from 'react-bootstrap/Modal';
+import SizeChartModal from "./SizeChart";
 
 const ProductDescriptionInfo = ({
   product,
@@ -36,10 +40,32 @@ const ProductDescriptionInfo = ({
     selectedProductSize
   );
   const [openDropdown, setOpenDropdown] = useState(null);
-  const toggleDropdown = (dropdown) => {
-    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
+    const [item, setItem] = useState([]);
+  // const toggleDropdown = (dropdown) => {
+  //   setOpenDropdown(openDropdown === dropdown ? null : dropdown);
+  // };
+const toggleDropdown = (dropdown) => {
+    setOpenDropdown(openDropdown === dropdown ? null : dropdown); // If the same dropdown is clicked again, close it.
   };
-
+  const { id } = useParams();
+  const [show, setShow] = useState(false);
+   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/items/${id}`,{
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+        console.log("Combined API response:", response.data);
+        setItem(response.data.data);
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+    };
+    fetchData();
+  }, [id]);
+  console.log('item data',item);
   useEffect(()=>{
 setQuantityCount(1);
   },[product.id]);
@@ -74,39 +100,84 @@ setQuantityCount(1);
       </div>
 
       {product.variation && (
-        <div className="pro-details-size-color">
-          <div className="pro-details-size">
-            <span>Size</span>
+<div className="pro-details-size">
+            <div class="sizeheading  d-flex mb-2">
+                   Size
+                  
+                  <div className="sizechart d-flex align-items-center ms-2" onClick={() => setShow(true)}>
+                    | Size Chart
+                    <img
+                      src="/assets/img/icon-img/sizecharticon.webp"
+                      alt="Size Chart"
+                      className="ms-1"
+                      style={{ width: "20px", height: "20px" }}
+                    />
+                  </div>
+            </div> 
+            {/* size model */}
+            <Modal
+              show={show}
+              onHide={() => setShow(false)}
+              dialogClassName="modal-90w"
+              aria-labelledby="example-custom-modal-styling-title"
+            >
+              <Modal.Header className="d-flex justify-content-between align-items-center">
+                <div>
+                  <Modal.Title id="example-custom-modal-styling-title">
+                    Size Chart (inches)
+                  </Modal.Title>
+                </div>
+                <button
+                  onClick={() => setShow(false)}
+                  style={{
+                    border: "none",
+                    fontSize: "3.2rem",
+                    lineHeight: "1",
+                    padding: "0.25rem 0.5rem",
+                  }}
+                >
+                  &times;
+                </button>
+              </Modal.Header>
+
+              <Modal.Body>
+                <SizeChartModal />
+              </Modal.Body>
+            </Modal>
+
+            {/* <span>Size</span> */}
             <div className="pro-details-size-content">
-              {product.variation.map((single) =>
-                single.color === selectedProductColor
-                  ? single.size.map((singleSize, key) => (
-                      <label
-                        className="pro-details-size-content--single"
-                        key={key}
-                      >
-                        <input
-                          type="radio"
-                          value={singleSize.name}
-                          checked={
-                            singleSize.name === selectedProductSize
-                              ? "checked"
-                              : ""
-                          }
-                          onChange={() => {
-                            setSelectedProductSize(singleSize.name);
-                            setProductStock(singleSize.stock);
-                            setQuantityCount(1);
-                          }}
-                        />
-                        <span className="size-name">{singleSize.name}</span>
-                      </label>
-                    ))
-                  : ""
-              )}
+              {product.variation &&
+                product.variation.map(single => {
+                  return single.color === selectedProductColor
+                    ? single.size.map((singleSize, key) => {
+                        return (
+                          <label
+                            className={`pro-details-size-content--single`}
+                            key={key}
+                          >
+                            <input
+                              type="radio"
+                              value={singleSize.name}
+                              checked={
+                                singleSize.name === selectedProductSize
+                                  ? "checked"
+                                  : ""
+                              }
+                              onChange={() => {
+                                setSelectedProductSize(singleSize.name);
+                                setProductStock(singleSize.stock);
+                                setQuantityCount(1);
+                              }}
+                            />
+                            <span className="size-name">{singleSize.name}</span>
+                          </label>
+                        );
+                      })
+                    : "";
+                })}
             </div>
           </div>
-        </div>
       )}
 
       {product.affiliateLink ? (
@@ -122,7 +193,7 @@ setQuantityCount(1);
           </div>
         </div>
       ) : (
-        <div className="pro-details-quality flex flex-wrap gap-3">
+        <div className="pro-details-quality mt-5 pt-3 flex flex-wrap gap-3">
           <div className="cart-plus-minus flex items-center">
             <button
               onClick={() =>
@@ -178,7 +249,7 @@ setQuantityCount(1);
               <button disabled>Out of Stock</button>
             )}
           </div>
-          <div className="pro-details-wishlist">
+          {/* <div className="pro-details-wishlist">
             <button
               className={wishlistItem !== undefined ? "active" : ""}
               disabled={wishlistItem !== undefined}
@@ -190,6 +261,25 @@ setQuantityCount(1);
               onClick={() => dispatch(addToWishlist(product))}
             >
               <i className="pe-7s-like" />
+            </button>
+          </div> */}
+          <div className="pro-details-wishlist">
+            <button
+              className={`transition-all duration-300 text-2xl ${
+                wishlistItem ? "text-danger" : "text-gray-400"
+              }`}
+              title={wishlistItem ? "Remove from wishlist" : "Add to wishlist"}
+              onClick={() =>
+                wishlistItem
+                  ? dispatch(deleteFromWishlist(product))
+                  : dispatch(addToWishlist(product))
+              }
+            >
+              {wishlistItem ? (
+               <i className="fa fa-heart "></i>
+              ) : (
+               <i className="fa fa-heart-o"></i>
+              )}
             </button>
           </div>
         </div>
@@ -227,7 +317,24 @@ setQuantityCount(1);
       </div>
 
       <div>
+              {product.Product_Details ? (
         <div className="product-details-dropdown">
+          <button onClick={() => toggleDropdown("productDetails")}>
+            Product Details
+          </button>
+          {openDropdown === "productDetails" && (
+            <div className="dropdown-content">
+             <div
+                className="prose mt-2"
+                dangerouslySetInnerHTML={{ __html: product.Product_Details || "<p>No details available.</p>" }}
+              />
+            </div>
+          )}
+        </div>
+      ) : (
+        ""
+      )}
+        {/* <div className="product-details-dropdown">
           <button onClick={() => toggleDropdown("productDetails")}>
             Product Details
           </button>
@@ -274,7 +381,7 @@ setQuantityCount(1);
               </ul>
             </div>
           )}
-        </div>
+        </div> */}
 
         <div className="product-details-dropdown">
           <button onClick={() => toggleDropdown("shipping")}>Shipping</button>
@@ -293,19 +400,33 @@ setQuantityCount(1);
             Manufacturer Details
           </button>
           {openDropdown === "manufacturerDetails" && (
-            <div className="dropdown-content">
-              <ul className="list-disc ml-6">
-                <li>
-                  <strong>Name of Commodity:</strong> Shirt
-                </li>
-                <li>
-                  <strong>Country of Origin:</strong> India
-                </li>
-                <li>
-                  <strong>Net Qty:</strong> 1 N
-                </li>
-              </ul>
-            </div>
+            // <div className="dropdown-content">
+            //   <ul className="list-disc ml-6">
+            //     <li>
+            //       <strong>Name of Commodity:</strong> Shirt
+            //     </li>
+            //     <li>
+            //       <strong>Country of Origin:</strong> India
+            //     </li>
+            //     <li>
+            //       <strong>Net Qty:</strong> 1 N
+            //     </li>
+            //   </ul>
+            // </div>
+            <div className="product-details-dropdown">
+        <button onClick={() => toggleDropdown("manufacturerDetails")}>
+          Manufacturer Details
+        </button>
+        {openDropdown === "manufacturerDetails" && (
+          <div className="dropdown-content">
+            <ul>
+              <li><strong>Name of Commodity:</strong> Shirt</li>
+              <li><strong>Country of Origin:</strong> India</li>
+              <li><strong>Net Qty:</strong> 1 N</li>
+            </ul>
+          </div>
+        )}
+      </div>
           )}
         </div>
       </div>

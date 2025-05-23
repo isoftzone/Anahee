@@ -22,7 +22,8 @@
   z-index: 999;
   top: 0;
   left: 0;
-
+// padding-bottom: 10px;
+// padding-top: 10px;
   width: 100%;
 
   transition: all 0.3s ease 0s;
@@ -2263,7 +2264,7 @@
 }
 
 .offcanvas-navigation {
-  margin-bottom: 50px;
+  // margin-bottom: 50px;
   & > ul {
     li {
       &.menu-item-has-children {

@@ -20,6 +20,18 @@ const MobileWidgets = () => {
         {/* <a href="//twitter.com" title="Twitter">
           <i className="fa fa-twitter"></i>
         </a> */}
+         <a
+          href="https://www.facebook.com/people/Anahee-India/61574025151970"
+          rel="noopener noreferrer"
+          title="Facebook"
+        >
+          <img
+            src="https://cdn.simpleicons.org/facebook/000000"
+            alt="Facebook Logo"
+            width="20"
+            height="20"
+          />
+        </a>
         <a
           href="https://www.instagram.com/anahee_india?igsh=cjRvZWVwcDk2ODNh"
           title="Instagram"
@@ -31,14 +43,8 @@ const MobileWidgets = () => {
             height="24rem"
           />{" "}
         </a>
-        <a href="//facebook.com" title="Facebook">
-          <img
-            src="https://cdn.simpleicons.org/facebook/000000"
-            alt="Facebook Logo"
-            width="20"
-            height="20"
-          />{" "}
-        </a>
+       
+
         <a href="//youtube.com" title="Youtube">
           <img
             src="https://cdn.simpleicons.org/youtube/000000"

@@ -22,10 +22,12 @@ const ShopGridStandard = () => {
   const [currentData, setCurrentData] = useState([]);
   const [sortedProducts, setSortedProducts] = useState([]);
   const { products } = useSelector((state) => state.product);
-
   const pageLimit = 15;
   let { pathname } = useLocation();
 
+  // const location = useLocation();
+
+  // const searchState = location.state;
   const getLayout = (layout) => {
     setLayout(layout);
   };
@@ -39,9 +41,27 @@ const ShopGridStandard = () => {
     setFilterSortType(sortType);
     setFilterSortValue(sortValue);
   };
-
   useEffect(() => {
-    let sortedProducts = getSortedProducts(products, sortType, sortValue);
+    // let filtered = [...products];
+
+    // if (searchState?.name) {
+    //   console.log("this is clickable image", searchState.name);
+    //   const query = searchState.name.toLowerCase().trim();
+    //   filtered = products.filter(
+    //     (product) =>
+    //       Array.isArray(product.category) &&
+    //       product.category.some((cat) =>
+    //         cat.toLowerCase().trim().includes(query)
+    //       )
+    //   );
+    //   console.log("this is dats", filtered);
+    // }
+    let sortedProducts = getSortedProducts(
+      // filtered,
+      products,
+      sortType,
+      sortValue
+    );
     const filterSortedProducts = getSortedProducts(
       sortedProducts,
       filterSortType,
@@ -50,7 +70,15 @@ const ShopGridStandard = () => {
     sortedProducts = filterSortedProducts;
     setSortedProducts(sortedProducts);
     setCurrentData(sortedProducts.slice(offset, offset + pageLimit));
-  }, [offset, products, sortType, sortValue, filterSortType, filterSortValue]);
+  }, [
+    offset,
+    products,
+    sortType,
+    sortValue,
+    filterSortType,
+    filterSortValue,
+    // searchState,
+  ]);
 
   return (
     <Fragment>
@@ -85,25 +113,31 @@ const ShopGridStandard = () => {
                     {/* ShopTopbar */}
 
                     {/* Sort Dropdown */}
-                  <div className="w-100 w-sm-auto" style={{ maxWidth: "250px" }}>
-  <select
-    onChange={(e) =>
-      getFilterSortParams("filterSort", e.target.value)
-    }
-    className="form-select form-select-lg py-3 pe-5"
-    style={{
-      backgroundImage: `url("data:image/svg+xml,%3Csvg fill='black' width='32' height='32' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`,
-      backgroundRepeat: "no-repeat",
-      backgroundPosition: "right 1rem center",
-      backgroundSize: "2.5rem",
-    }}
-  >
-    <option value="default">Default</option>
-    <option value="priceHighToLow">Price - High to Low</option>
-    <option value="priceLowToHigh">Price - Low to High</option>
-  </select>
-</div>
-
+                    <div
+                      className="w-100 w-sm-auto"
+                      style={{ maxWidth: "250px" }}
+                    >
+                      <select
+                        onChange={(e) =>
+                          getFilterSortParams("filterSort", e.target.value)
+                        }
+                        className="form-select form-select-lg py-3 pe-5"
+                        style={{
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg fill='black' width='32' height='32' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`,
+                          backgroundRepeat: "no-repeat",
+                          backgroundPosition: "right 1rem center",
+                          backgroundSize: "2.5rem",
+                        }}
+                      >
+                        <option value="default">Default</option>
+                        <option value="priceHighToLow">
+                          Price - High to Low
+                        </option>
+                        <option value="priceLowToHigh">
+                          Price - Low to High
+                        </option>
+                      </select>
+                    </div>
 
                     <div className="w-full sm:w-auto">
                       <ShopTopbar
