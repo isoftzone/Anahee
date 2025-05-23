@@ -8,7 +8,7 @@ const HeroSliderFourteenSingle = ({ data }) => {
       style={{ backgroundImage: `url(${data.images})` }}
     >
       {/* Dark overlay */}
-      <div className="slider-content-overlay">
+      <div className="slider-content-overlay  responsive-box">
         <div className="z-2">
           <div className="justify-content-center text-center">
             <div className="">

@@ -7603,7 +7603,7 @@ textarea,
 }
 
 .order-details {
-  padding: 40px 45px;
+  padding: 0px 20px;
   border: 2px solid #eeeeee;
 }
 @media (max-width: 47.94em) {
@@ -25979,9 +25979,13 @@ a,
   pointer-events: none;
   z-index: 10;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-  transform: translate(-50%, -50%); /* Center lens on cursor */
-  background-size: 400% 400%; /* Increase zoom factor */
-  display: none;
+  transform: translate(-50%, -50%);
+  /*Centerlensoncursor*/background-size: 400% 400%;
+  /*Increasezoomfactor*/display: none;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
 }
 
 .single-image:hover .magnifying-lens {

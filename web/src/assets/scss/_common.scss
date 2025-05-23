@@ -1872,6 +1872,8 @@ a.default-btn {
 
   &__text {
     font-size: 20px;
+    margin-bottom: 25px;
+
     a {
       font-size: 14px;
       font-weight: 500;
@@ -1960,7 +1962,7 @@ button:disabled {
 
 // suceess css
 .success-box {
-  background-color: #F6F6F8;
+  background-color: #f6f6f8;
   padding: 40px 20px;
   border-bottom: 7px solid #28a745;
   // box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
@@ -1997,7 +1999,6 @@ button:disabled {
   }
 }
 
-
 // productimagegallary
 @media (min-width: 1440px) {
   .col-custom-29 {
@@ -2005,9 +2006,3 @@ button:disabled {
     max-width: 29% !important;
   }
 }
-
-
-
-
-
-

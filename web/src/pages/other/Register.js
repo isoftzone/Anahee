@@ -51,7 +51,7 @@ const Register = () => {
     if (!passwordRegex.test(password)) {
       return "Password must be 8+ chars, with letter, number & symbol.";
     }
-    if (password !== confirmPassword) return "Passwords do not match.";
+    if (password !== confirmPassword) return "Password does not match.";
     return null;
   };
   const handleSubmit = async (e) => {

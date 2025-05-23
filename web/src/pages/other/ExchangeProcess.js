@@ -32,11 +32,11 @@ const ExchangeProcess = () => {
           { label: "Exchange Process", path: pathname }
         ]}
       /> */}
-     <div className="container mt-4">
+     <div className="container-fluid mb-5">
         {policies.length > 0 ? (
           policies.map((policy, index) => (
             <div key={index} className="mb-4">
-              <h3>{policy.sectionname}</h3>
+              <h3 className="fw-bold">{policy.sectionname}</h3>
                 <div dangerouslySetInnerHTML={{ __html: policy.content }} />  
             </div>
           ))

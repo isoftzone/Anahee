@@ -123,16 +123,12 @@ const Wishlist = () => {
                                       </a>
                                     ) : wishlistItem.variation &&
                                       wishlistItem.variation.length >= 1 ? (
-                                      <Link
+                                      <button
                                         to={`${process.env.PUBLIC_URL}/product/${wishlistItem.id}`}
-                                        className="btn btn-sm btn-outline-primary"
-                                        style={{
-                                          minWidth: "60px",
-                                          textAlign: "center",
-                                        }}
+                                       className="px-4 py-3 text-sm sm:px-5 sm:py-5 sm:text-base"
                                       >
                                         Select option
-                                      </Link>
+                                      </button>
                                     ) : wishlistItem.stock &&
                                       wishlistItem.stock > 0 ? (
                                       <button
@@ -190,7 +186,7 @@ const Wishlist = () => {
 
                 <div className="row">
                   <div className="col-lg-12">
-                    <div className="cart-shiping-update-wrapper">
+                    <div className="cart-shiping-update-wrapper d-flex flex-column flex-sm-row justify-content-center justify-content-sm-between align-items-center gap-3 text-center">
                       <div className="cart-shiping-update">
                         <Link
                           to={process.env.PUBLIC_URL + "/shop-grid-standard"}

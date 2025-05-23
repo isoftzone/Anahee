@@ -1,6 +1,8 @@
 import clsx from "clsx";
-
+import { useNavigate } from "react-router-dom";
 const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
+ const navigate = useNavigate();
+
   return (
     <div
       className={clsx("shop-by-collection my-3", spaceTopClass, spaceBottomClass)}
@@ -29,11 +31,15 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
           <div className="col-lg-6 col-12 mb-4">
             <div className="lookbook-main-container d-flex position-relative">
               <div className="lookbook-image">
+
+     <a href="#" className="lookbook-link">
+                   {/* <a href="http://localhost:3000/videos/productsvideo.mp4" className="lookbook-link"> */}
                 <img
                   src="assets/img/banner/Maskgroup__11.png"
                   alt="Lookbook 2025"
                   className="img-fluid"
                 />
+                </a>
               </div>
               <div className="lookbook-text"></div>
               <div className="lookbook-text-content d-flex flex-column justify-content-center align-items-start">
@@ -52,7 +58,7 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
 
           {/* Right Top and Bottom Images */}
           <div className="col-lg-3 col-sm-6 col-12 mb-4">
-            <div className="lookbook1">
+             <div className="lookbook1  cursor-pointer" onClick={() => navigate("/shop-grid-standard", { state: { name: "fashion" } })}>
               <img
                 src="assets/img/banner/Maskgroup__22.png"
                 alt="Blue Dress"
@@ -61,7 +67,7 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
             </div>
           </div>
           <div className="col-lg-3 col-sm-6 col-12 mb-4">
-            <div className="lookbook2">
+               <div className="lookbook2  cursor-pointer" onClick={() => navigate("/shop-grid-standard", { state: { name: "westernwear" } })}>
               <img
                 src="assets/img/banner/Maskgroup__33.png"
                 alt="Yellow Dress"

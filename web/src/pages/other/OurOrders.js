@@ -1,6 +1,6 @@
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
-import { Badge } from "react-bootstrap";
+import { Container, Badge } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../../config";
@@ -61,7 +61,7 @@ const Orders = () => {
     return (
       <div key={order.SALEID} className="order-card mb-4">
         <div className="order-header">
-          <h3 className="order-number">Order #{order.SALEID}</h3>
+          <h3 className="order-number">Order {order.SALEID}</h3>
           <div className="order-meta">
             <span className="order-date">
               <i className="bi bi-calendar"></i>{" "}
@@ -84,8 +84,9 @@ const Orders = () => {
           <div className="table-responsive">
             <table className="table order-items-table">
               <thead>
-                <tr>
-                  <th className="product-col">Product</th>
+                <tr >
+                  <th className="product-col">Image</th>
+                  <th className="product-col text-center">Product</th>
                   <th className="quantity-col text-center">Qty</th>
                   <th className="amount-col text-end">Amount</th>
                 </tr>
@@ -97,31 +98,78 @@ const Orders = () => {
                     const amount = parseFloat(item.AMOUNT || 0);
                     const lineTotal = amount * quantity;
                     totalAmount += lineTotal;
+                    const imageArray = item.PHOTO.split(",");
+
+                    const firstImage = imageArray[0];
                     return (
-                      <tr key={index}>
-                        <td className="product-cell">
+                      <tr className="align-items-center" key={index}>
+                        {/* Product Image Cell */}
+                        <td className="product-cell ">
+                          {item.PHOTO && (
+                            <img
+                              src={
+                                process.env.REACT_APP_PUBLIC_URL + firstImage
+                              }
+                              alt={item.ITEMNAME}
+                              className="product-image img img-fluid me-3"
+                              style={{
+                                width: "90px",
+                                height: "120px",
+                                objectFit: "cover",
+                                borderRadius: "8px",
+                              }}
+                            />
+                          )}
+                        </td>
+
+                        {/* Product Info Cell */}
+                        <td className="product-info-cell">
+                          {" "}
+                          {/* Changed to text-start for left alignment */}
                           <div className="product-info">
-                            <div className="product-name">
+                            <div
+                              className="product-name"
+                              style={{ fontSize: "1.9rem" }}
+                            >
+                              {" "}
+                              {/* Reduced font size for product name */}
                               {item.ITEMNAME || "Product Name Not Available"}
                             </div>
                             {item.DESCRIPTION && (
-                              <div className="product-desc text-muted">
+                              <div
+                                className="product-desc text-muted"
+                                style={{ fontSize: "13px" }}
+                              >
+                                {" "}
+                                {/* Increased font size for description */}
                                 {item.DESCRIPTION}
                               </div>
                             )}
                           </div>
                         </td>
-                        <td className="quantity-cell text-center">
+
+                        {/* Quantity Cell */}
+                        <td
+                          className="quantity-cell text-center"
+                          style={{ fontSize: "13px" }}
+                        >
+                          {" "}
+                          {/* Kept as text-center for quantity */}
                           {quantity}
                         </td>
+
+                        {/* Amount Cell */}
                         <td className="amount-cell text-end">
-                          ${amount.toFixed(2)}
+                          {" "}
+                          {/* Kept as text-end for amount */}$
+                          {amount.toFixed(2)}
                         </td>
                       </tr>
+                      
                     );
                   })}
                 <tr className="order-total-row">
-                  <td colSpan="2" className="text-end total-label">
+                  <td colSpan="3" className="text-end total-label">
                     <strong>Total:</strong>
                   </td>
                   <td className="text-end total-amount">
@@ -138,7 +186,7 @@ const Orders = () => {
   return (
     <>
       <LayoutOne headerTop="visible">
-        <div className="container-fluid orders-container" style={{maxWidth:"0px"}}>
+        <div className="container-fluid orders-container">
           <div className="page-header">
             <h1 className="page-title">My Orders</h1>
             <p className="page-subtitle">View and manage your order history</p>
