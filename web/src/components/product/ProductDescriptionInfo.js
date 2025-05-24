@@ -1,17 +1,18 @@
 import PropTypes from "prop-types";
 import React, { Fragment, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { getProductCartQuantity } from "../../helpers/product";
 import Rating from "./sub-components/ProductRating";
 import { addToCart } from "../../store/slices/cart-slice";
-import { addToWishlist,deleteFromWishlist } from "../../store/slices/wishlist-slice";
-import { addToCompare } from "../../store/slices/compare-slice";
-import { BASE_URL } from "../../config"
-import axios from 'axios'; 
+// import { addToWishlist } from "../../store/slices/wishlist-slice";
 import Modal from 'react-bootstrap/Modal';
 import SizeChartModal from "./SizeChart";
-
+import {
+  addToWishlist,
+  deleteFromWishlist,
+} from "../../store/slices/wishlist-slice";
+import { addToCompare } from "../../store/slices/compare-slice";
 const ProductDescriptionInfo = ({
   product,
   discountedPrice,
@@ -40,37 +41,13 @@ const ProductDescriptionInfo = ({
     selectedProductSize
   );
   const [openDropdown, setOpenDropdown] = useState(null);
-    const [item, setItem] = useState([]);
-  // const toggleDropdown = (dropdown) => {
-  //   setOpenDropdown(openDropdown === dropdown ? null : dropdown);
-  // };
-const toggleDropdown = (dropdown) => {
-    setOpenDropdown(openDropdown === dropdown ? null : dropdown); // If the same dropdown is clicked again, close it.
+    const [show, setShow] = useState(false);
+  const toggleDropdown = (dropdown) => {
+    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
   };
-  const { id } = useParams();
-  const [show, setShow] = useState(false);
-   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/items/${id}`,{
-          headers: {
-            "Content-Type": "application/json"
-          }
-        });
-        console.log("Combined API response:", response.data);
-        setItem(response.data.data);
-      } catch (error) {
-        console.error("Error fetching data", error);
-      }
-    };
-    fetchData();
-  }, [id]);
-  console.log('item data',item);
-  useEffect(()=>{
-setQuantityCount(1);
-  },[product.id]);
-
-
+  useEffect(() => {
+    setQuantityCount(1);
+  }, [product.id]);
   return (
     <div className="product-details-content ml-0 md:ml-10 p-4 md:p-6 space-y-6">
       <div>
@@ -98,12 +75,41 @@ setQuantityCount(1);
           <p>{product.shortDescription}</p>
         </div>
       </div>
-
       {product.variation && (
-<div className="pro-details-size">
+        <div className="pro-details-size-color">
+          <div className="pro-details-size">
+            <span>Size</span>
+            <div className="pro-details-size-content">
+              {product.variation.map((single) =>
+                single.color === selectedProductColor
+                  ? single.size.map((singleSize, key) => (
+                      <label
+                        className="pro-details-size-content--single"
+                        key={key}
+                      >
+                        <input
+                          type="radio"
+                          value={singleSize.name}
+                          checked={
+                            singleSize.name === selectedProductSize
+                              ? "checked"
+                              : ""
+                          }
+                          onChange={() => {
+                            setSelectedProductSize(singleSize.name);
+                            setProductStock(singleSize.stock);
+                            setQuantityCount(1);
+                          }}
+                        />
+                        <span className="size-name">{singleSize.name}</span>
+                      </label>
+                    ))
+                  : ""
+              )}
+            </div>
+          </div>
+          <div className="pro-details-size">
             <div class="sizeheading  d-flex mb-2">
-                   Size
-                  
                   <div className="sizechart d-flex align-items-center ms-2" onClick={() => setShow(true)}>
                     | Size Chart
                     <img
@@ -146,7 +152,7 @@ setQuantityCount(1);
             </Modal>
 
             {/* <span>Size</span> */}
-            <div className="pro-details-size-content">
+            {/* <div className="pro-details-size-content">
               {product.variation &&
                 product.variation.map(single => {
                   return single.color === selectedProductColor
@@ -176,10 +182,11 @@ setQuantityCount(1);
                       })
                     : "";
                 })}
-            </div>
+            </div> */}
           </div>
+        </div>
+        
       )}
-
       {product.affiliateLink ? (
         <div className="pro-details-quality">
           <div className="pro-details-cart btn-hover ml-0">
@@ -193,7 +200,7 @@ setQuantityCount(1);
           </div>
         </div>
       ) : (
-        <div className="pro-details-quality mt-5 pt-3 flex flex-wrap gap-3">
+        <div className="pro-details-quality flex flex-wrap gap-4">
           <div className="cart-plus-minus flex items-center">
             <button
               onClick={() =>
@@ -263,6 +270,7 @@ setQuantityCount(1);
               <i className="pe-7s-like" />
             </button>
           </div> */}
+
           <div className="pro-details-wishlist">
             <button
               className={`transition-all duration-300 text-2xl ${
@@ -276,15 +284,28 @@ setQuantityCount(1);
               }
             >
               {wishlistItem ? (
-               <i className="fa fa-heart "></i>
+                <i className="fa fa-heart "></i>
               ) : (
-               <i className="fa fa-heart-o"></i>
+                <i className="fa fa-heart-o"></i>
               )}
             </button>
           </div>
+          {/* <div className="pro-details-compare">
+            <button
+              className={compareItem !== undefined ? "active" : ""}
+              disabled={compareItem !== undefined}
+              title={
+                compareItem !== undefined
+                  ? "Added to compare"
+                  : "Add to compare"
+              }
+              onClick={() => dispatch(addToCompare(product))}
+            >
+              <i className="pe-7s-shuffle" />
+            </button>
+          </div> */}
         </div>
       )}
-
       <div className="delivery-check">
         <h3>Check Delivery Pincode</h3>
         <div className="pincode-form flex gap-2">
@@ -315,9 +336,8 @@ setQuantityCount(1);
           </div>
         </div>
       </div>
-
       <div>
-              {product.Product_Details ? (
+           {product.Product_Details ? (
         <div className="product-details-dropdown">
           <button onClick={() => toggleDropdown("productDetails")}>
             Product Details
@@ -361,16 +381,19 @@ setQuantityCount(1);
                   <strong>Closure Type:</strong> Kurta- Button, Pants- Side Zip
                 </li>
                 <li>
-                  <strong>Model Height:</strong> 5'7"/172 cms and is wearing size S.
+                  <strong>Model Height:</strong> 5'7"/172 cms and is wearing
+                  size S.
                 </li>
                 <li>
                   <strong>Product Care:</strong> Professional Dry Clean only
                 </li>
                 <li>
-                  <strong>Top Length:</strong> S- 46 in/ 1 mtr, M- 46 in/ 1 mtr, L- 46 in/ 1 mtr, XL- 46 in/ 1 mtr
+                  <strong>Top Length:</strong> S- 46 in/ 1 mtr, M- 46 in/ 1 mtr,
+                  L- 46 in/ 1 mtr, XL- 46 in/ 1 mtr
                 </li>
                 <li>
-                  <strong>Bottom Length:</strong> S- 40 in/ 1 mtr, M- 40 in/ 1 mtr, L- 40 in/ 1 mtr, XL- 40 in/ 1 mtr
+                  <strong>Bottom Length:</strong> S- 40 in/ 1 mtr, M- 40 in/ 1
+                  mtr, L- 40 in/ 1 mtr, XL- 40 in/ 1 mtr
                 </li>
                 <li>
                   <strong>Style Code:</strong> 2ASSDF0100Q734B694-BLACK RUST
@@ -382,38 +405,22 @@ setQuantityCount(1);
             </div>
           )}
         </div> */}
-
-        <div className="product-details-dropdown">
-          <button onClick={() => toggleDropdown("shipping")}>Shipping</button>
-          {openDropdown === "shipping" && (
-            <div className="dropdown-content">
-              <ul className="list-disc ml-6">
-                <li>Fast & Reliable shipping.</li>
-                <li>Free shipping on orders above INR 1,500 in India.</li>
-              </ul>
-            </div>
-          )}
-        </div>
-
-        <div className="product-details-dropdown">
-          <button onClick={() => toggleDropdown("manufacturerDetails")}>
-            Manufacturer Details
-          </button>
-          {openDropdown === "manufacturerDetails" && (
-            // <div className="dropdown-content">
-            //   <ul className="list-disc ml-6">
-            //     <li>
-            //       <strong>Name of Commodity:</strong> Shirt
-            //     </li>
-            //     <li>
-            //       <strong>Country of Origin:</strong> India
-            //     </li>
-            //     <li>
-            //       <strong>Net Qty:</strong> 1 N
-            //     </li>
-            //   </ul>
-            // </div>
-            <div className="product-details-dropdown">
+       <div className="product-details-dropdown">
+        <button onClick={() => toggleDropdown("shipping")}>
+          Shipping
+        </button>
+        {openDropdown === "shipping" && (
+          <div className="dropdown-content">
+            <ul>
+              <li>Fast & Reliable shipping.</li>
+              <li>Free shipping on orders above INR 1,500 in India.</li>
+              <li>Free shipping on orders above INR 1,500 in India.</li>
+              <li>Free shipping on orders above INR 1,500 in India.</li>
+            </ul>
+          </div>
+        )}
+      </div>
+       <div className="product-details-dropdown">
         <button onClick={() => toggleDropdown("manufacturerDetails")}>
           Manufacturer Details
         </button>
@@ -427,13 +434,10 @@ setQuantityCount(1);
           </div>
         )}
       </div>
-          )}
-        </div>
       </div>
     </div>
   );
 };
-
 ProductDescriptionInfo.propTypes = {
   cartItems: PropTypes.array,
   compareItem: PropTypes.shape({}),
@@ -444,5 +448,4 @@ ProductDescriptionInfo.propTypes = {
   product: PropTypes.shape({}),
   wishlistItem: PropTypes.shape({}),
 };
-
 export default ProductDescriptionInfo;
