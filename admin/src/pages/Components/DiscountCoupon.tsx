@@ -163,7 +163,7 @@ const DiscountCoupan: React.FC = () => {
                     </div>
 
                     <div className="flex flex-col">
-                        <label className="font-semibold">Max Amount To Redeem%</label>
+                        <label className="font-semibold">Max Amount To Redeem</label>
                         <input
                             type="number"
                             name="max_discount_amount"
