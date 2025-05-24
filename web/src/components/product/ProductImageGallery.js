@@ -107,8 +107,9 @@ const ProductImageGallery = ({ product }) => {
                       ref={imgRef}
                       src={process.env.REACT_APP_PUBLIC_URL + single}
                       className="img-fluid"
-                      alt=""
+                      alt="Zoomable"
                     />
+
                     {isHovering && (
                       <div
                         className="magnifying-lens"
@@ -126,22 +127,6 @@ const ProductImageGallery = ({ product }) => {
                       />
                     )}
                   </div>
-                  {isHovering && (
-                    <div className="zoomed-preview">
-                      <div
-                        className="zoomed-image"
-                        style={{
-                          backgroundImage: `url(${
-                            process.env.REACT_APP_PUBLIC_URL + single
-                          })`,
-                          backgroundPosition: backgroundPosition,
-                          backgroundSize: `${imgRef.current?.width * 2}px ${
-                            imgRef.current?.height * 2
-                          }px`,
-                        }}
-                      />
-                    </div>
-                  )}
                 </div>
               </SwiperSlide>
             ))}

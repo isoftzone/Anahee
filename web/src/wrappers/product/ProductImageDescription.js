@@ -31,7 +31,7 @@ const ProductImageDescription = ({
     <div className={clsx("shop-area", spaceTopClass, spaceBottomClass)}>
       <div className="container-fluid">
         <div
-          className="row gx-2 gap-5 gy-4 justify-content-center"
+          className="row gx-2 gap-4 gy-4 justify-content-center"
           style={{ minHeight: "100%" }}
         >
           <div

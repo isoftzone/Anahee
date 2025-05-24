@@ -5,9 +5,14 @@ import SEO from "../../components/seo";
 import { getDiscountPrice } from "../../helpers/product";
 import LayoutOne from "../../layouts/LayoutOne";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import { addToCart, decreaseQuantity, deleteFromCart, deleteAllFromCart } from "../../store/slices/cart-slice";
+import {
+  addToCart,
+  decreaseQuantity,
+  deleteFromCart,
+  deleteAllFromCart,
+} from "../../store/slices/cart-slice";
 import { cartItemStock } from "../../helpers/product";
-import axios from 'axios';
+import axios from "axios";
 import { BASE_URL } from "../../config";
 
 const Cart = () => {
@@ -18,20 +23,57 @@ const Cart = () => {
   let { pathname } = useLocation();
   const currency = useSelector((state) => state.currency);
   const { cartItems } = useSelector((state) => state.cart);
-  const navigate = useNavigate();  // Initialize the useNavigate hook
+  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const [cartTotal, setCartTotal] = useState(0);
+
+  const [discount, setDiscount] = useState(0);
+  const [finalTotal, setFinalTotal] = useState(0);
+  const [couponMessage, setCouponMessage] = useState("");
+  const [couponSuccess, setCouponSuccess] = useState(null);
 
   const handleCouponChange = (e) => {
     setCouponCode(e.target.value);
   };
+  const handleApplyCoupon = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(`${BASE_URL}/applycoupon`, {
+        coupon_code: couponCode,
+        cart_total: cartTotalPrice.toFixed(2),
+      });
+
+      if (response.data.success) {
+        setDiscount(response.data.discount);
+        setCouponMessage(response.data.msg);
+        setCouponSuccess(true);
+      } else {
+        setCouponMessage(response.data.msg);
+        setCouponSuccess(false);
+        setDiscount(0);
+
+      }
+    } catch (err) {
+      setCouponMessage(err.response?.data?.msg || "Something went wrong");
+      setCouponSuccess(false);
+      setDiscount(0);
+    }
+  };
 
   const handleProceedToCheckout = async () => {
+    const queryParams = new URLSearchParams({
+      couponCode: couponCode,
+    }).toString();
+
     const orderData = {
       couponCode: couponCode,
-      items: cartItems.map(item => ({
-        ITEMDESC: item.name,  // Item name as ITEMID
-        QTY: item.quantity,  // Quantity as QTY
-        AMOUNT: (getDiscountPrice(item.price, item.discount) || item.price) * item.quantity // Subtotal for the item
-      }))
+      items: cartItems.map((item) => ({
+        ITEMDESC: item.name, // Item name as ITEMID
+        QTY: item.quantity, // Quantity as QTY
+        AMOUNT:
+          (getDiscountPrice(item.price, item.discount) || item.price) *
+          item.quantity, // Subtotal for the item
+      })),
     };
 
     try {
@@ -43,7 +85,7 @@ const Cart = () => {
       );
       if (response.data.success) {
         // alert("Proceeding to checkout...");
-        navigate(process.env.PUBLIC_URL + "/checkout");
+        navigate(`/checkout?${queryParams}`);
       }
     } catch (error) {
       console.error("Error proceeding to checkout:", error);
@@ -188,10 +230,12 @@ const Cart = () => {
                                     <button
                                       className="inc qtybutton"
                                       onClick={() =>
-                                        dispatch(addToCart({
-                                          ...cartItem,
-                                          quantity: quantityCount
-                                        }))
+                                        dispatch(
+                                          addToCart({
+                                            ...cartItem,
+                                            quantity: quantityCount,
+                                          })
+                                        )
                                       }
                                       disabled={
                                         cartItem !== undefined &&
@@ -223,7 +267,9 @@ const Cart = () => {
                                 <td className="product-remove">
                                   <button
                                     onClick={() =>
-                                      dispatch(deleteFromCart(cartItem.cartItemId))
+                                      dispatch(
+                                        deleteFromCart(cartItem.cartItemId)
+                                      )
                                     }
                                   >
                                     <i className="fa fa-times"></i>
@@ -300,7 +346,6 @@ const Cart = () => {
                       </div>
                     </div>
                   </div>
-
                   <div className="col-lg-4 col-md-6">
                     <div className="discount-code-wrapper">
                       <div className="title-wrap">
@@ -310,8 +355,8 @@ const Cart = () => {
                       </div>
                       <div className="discount-code">
                         <p>Enter your coupon code if you have one.</p>
-                        <form>
-                        <input
+                        <form onSubmit={handleApplyCoupon}>
+                          <input
                             type="text"
                             required
                             name="couponCode"
@@ -322,6 +367,15 @@ const Cart = () => {
                             Apply Coupon
                           </button>
                         </form>
+                        {couponMessage && (
+                          <div
+                            className={`mt-2 ${
+                              couponSuccess ? "text-success" : "text-danger"
+                            }`}
+                          >
+                            {couponMessage}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -334,19 +388,30 @@ const Cart = () => {
                         </h4>
                       </div>
                       <h5>
-                        Total products{" "}
+                        Total Amount
                         <span>
                           {currency.currencySymbol + cartTotalPrice.toFixed(2)}
                         </span>
                       </h5>
 
-                      <h4 className="grand-totall-title">
-                        Grand Total{" "}
+                      <h5>
+                        Discount
                         <span>
-                          {currency.currencySymbol + cartTotalPrice.toFixed(2)}
+                           { "-"+currency.currencySymbol + discount}
+                        </span>
+                      </h5>
+
+                      <h4 className="grand-totall-title">
+                        Grand Total
+                        <span>
+                          {currency.currencySymbol + (cartTotalPrice - discount).toFixed(2)}
                         </span>
                       </h4>
-                      <Link to={process.env.PUBLIC_URL + "/checkout"} onClick={handleProceedToCheckout}>
+
+                      <Link
+                        to={process.env.PUBLIC_URL + "/checkout"}
+                        onClick={handleProceedToCheckout}
+                      >
                         Proceed to Checkout
                         {/* <button onClick={handleProceedToCheckout} >
                           </button> */}

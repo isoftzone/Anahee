@@ -498,10 +498,12 @@ exports.getAllOrders = (req, res) => {
   sd.QTY,
   sd.AMOUNT,
   im.ITEMNAME,
-  im.DESCRIPTION
+  im.DESCRIPTION,
+  ii.PHOTO
 FROM madhuban.salesmaster sm
 LEFT JOIN madhuban.salesdetail sd ON sm.SALEID = sd.SALEID
 LEFT JOIN madhuban.itemmaster im ON sd.ITEMID = im.ITEMID
+LEFT JOIN madhuban.itemimage ii ON im.ITEMID = ii.ITEMID
 WHERE sm.CUSTOMERID = ?
 ORDER BY sm.SALEID DESC, sd.ITEMID
   `;
@@ -541,6 +543,7 @@ ORDER BY sm.SALEID DESC, sd.ITEMID
         DESCRIPTION: row.DESCRIPTION,
         QUANTITY: row.QTY,
         AMOUNT: row.AMOUNT,
+        PHOTO:row.PHOTO
       });
     });
 

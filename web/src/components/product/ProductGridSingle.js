@@ -8,7 +8,6 @@ import { getDiscountPrice } from "../../helpers/product";
 import ProductModal from "./ProductModal";
 // import { addToCart } from "../../store/slices/cart-slice";
 import { addToWishlist } from "../../store/slices/wishlist-slice";
-
 const ProductGridSingle = ({
   product,
   currency,
@@ -24,7 +23,6 @@ const ProductGridSingle = ({
     discountedPrice * currency.currencyRate
   ).toFixed(2);
   const dispatch = useDispatch();
-
   return (
     <Fragment>
       <div className={clsx("product-wrap", spaceBottomClass)}>
@@ -57,7 +55,6 @@ const ProductGridSingle = ({
           ) : (
             ""
           )}
-
           <div className="product-action">
             <div className="pro-same-action pro-wishlist">
               <button
@@ -130,7 +127,7 @@ const ProductGridSingle = ({
           </h3>
           {product.rating && product.rating > 0 ? (
             <div className="product-rating">
-              <Rating ratingValue={product.rating} />
+              <Rating ratingValue={product.rating} editable={true}/>
             </div>
           ) : (
             ""
@@ -164,7 +161,6 @@ const ProductGridSingle = ({
     </Fragment>
   );
 };
-
 ProductGridSingle.propTypes = {
   cartItem: PropTypes.shape({}),
   compareItem: PropTypes.shape({}),
@@ -174,5 +170,4 @@ ProductGridSingle.propTypes = {
   sliderClassName: PropTypes.string,
   spaceBottomClass: PropTypes.string,
 };
-
 export default ProductGridSingle;

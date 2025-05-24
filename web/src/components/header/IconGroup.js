@@ -173,12 +173,24 @@ const IconGroup = ({ iconWhiteClass }) => {
   const { compareItems } = useSelector((state) => state.compare);
   const { wishlistItems } = useSelector((state) => state.wishlist);
   const { cartItems } = useSelector((state) => state.cart);
+  const [searchQuery, setSearchQuery] = useState('');
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const trimmedQuery = searchQuery.trim();
+    if (trimmedQuery) {
+      navigate('/shop-grid-standard', {
+        state: { name: trimmedQuery }
+      });
+    } else {
+      alert("Please enter a valid search term.");
+    }
+  };
   // console.log("cartItems",cartItems);
   console.log("myItems",name);
   return (
     <div className={clsx("header-right-wrap", iconWhiteClass)}>
       {/* Search */}
-      <div className="same-style header-search d-none d-lg-block">
+      {/* <div className="same-style header-search d-none d-lg-block">
         <button className="search-active" onClick={handleClick}>
           <i className="pe-7s-search" />
         </button>
@@ -190,7 +202,31 @@ const IconGroup = ({ iconWhiteClass }) => {
             </button>
           </form>
         </div>
+      </div> */}
+      <div className="same-style header-search d-none d-lg-block">
+      <button
+        className="search-active"
+        onClick={(e) => {
+          e.preventDefault();
+          document.querySelector(".search-content")?.classList.toggle("active");
+        }}
+      >
+        <i className="pe-7s-search" />
+      </button>
+      <div className="search-content">
+        <form onSubmit={handleSearch}>
+          <input
+            type="text"
+            placeholder="Search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <button type="submit" className="button-search">
+            <i className="pe-7s-search" />
+          </button>
+        </form>
       </div>
+    </div>
       {/* Account Dropdown */}
       <div className="same-style account-setting d-none d-lg-block">
         <button
@@ -221,6 +257,11 @@ const IconGroup = ({ iconWhiteClass }) => {
               <>
                 <li>
                   <Link to="/my-account">My Account</Link>
+                </li>
+                <li>
+                  <Link to="/orders">
+                    Orders
+                  </Link>
                 </li>
                 <li>
                   <Link to="/" onClick={handleLogout}>

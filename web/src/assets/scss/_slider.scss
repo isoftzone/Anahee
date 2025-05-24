@@ -441,14 +441,13 @@
       position: relative;
 
       display: inline-block;
-
       width: 14px;
       height: 14px;
       margin: 0 8px;
 
       opacity: 1;
       border-radius: 100%;
-      background: #fff none repeat scroll 0 0;
+      background: #ffffff none repeat scroll 0 0;
       &:before {
         position: absolute;
         top: -3px;
@@ -7128,6 +7127,7 @@ textarea,
 .tab-content {
   width: 100%;
 }
+
 .tab-content .tab-pane {
   display: none;
   height: 0;
@@ -7603,7 +7603,7 @@ textarea,
 }
 
 .order-details {
-  padding: 40px 45px;
+  padding: 0px 20px;
   border: 2px solid #eeeeee;
 }
 @media (max-width: 47.94em) {
@@ -8168,12 +8168,14 @@ textarea,
   text-align: center;
   z-index: 9;
   background-color: rgba(255, 255, 255, 0.788);
-}
+} 
 @media (max-width: 47.94em) {
   .instagram-feed-heading {
     width: 240px;
   }
 }
+
+
 .instagram-feed-heading * {
   z-index: 2;
 }
@@ -25862,8 +25864,8 @@ a,
 }
 .delivery-check {
   width: 100%;
-  margin-top: 54px;
-  margin-bottom: 54px;
+  margin-top: 44px;
+  margin-bottom: 18px;
 }
 
 .delivery-check h3 {
@@ -25977,9 +25979,13 @@ a,
   pointer-events: none;
   z-index: 10;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-  transform: translate(-50%, -50%); /* Center lens on cursor */
-  background-size: 400% 400%; /* Increase zoom factor */
-  display: none;
+  transform: translate(-50%, -50%);
+  /*Centerlensoncursor*/background-size: 400% 400%;
+  /*Increasezoomfactor*/display: none;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
 }
 
 .single-image:hover .magnifying-lens {
@@ -26102,6 +26108,7 @@ th {
   //width: 200px;
   //height: 200px;
   border: 2px solid #ddd;
+  top: 100%;
   background-repeat: no-repeat;
   pointer-events: none;
   border-radius: 50%;
@@ -26146,3 +26153,19 @@ th {
   background-size: cover;
   transform: scale(2); /* Zoom effect */
 }
+
+@media (max-width: 768px){
+.delivery-check {
+  width: 100%;
+  margin-top: -5px;
+  margin-bottom: 18px;
+}
+} 
+
+@media (max-width:1024px) {
+  .delivery-check{
+        margin-bottom: 55px;
+
+  }
+}
+

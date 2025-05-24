@@ -15,7 +15,7 @@ const HomeFurnitureSix = () => {
     <Fragment>
       <SEO
         titleTemplate="Furniture Shop Home"
-        description="Furniture shop home of flone react minimalist eCommerce template."
+        description="Furniture shop home of Anhaee."
       />
       <LayoutEight
         headerTop="visible"

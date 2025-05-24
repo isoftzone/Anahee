@@ -12,6 +12,7 @@
   }
   .select-shoing-wrap {
     display: flex;
+    
     @media #{$xs-layout} {
       display: block;
     }

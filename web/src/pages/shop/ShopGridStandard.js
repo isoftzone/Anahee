@@ -9,6 +9,7 @@ import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import ShopSidebar from "../../wrappers/product/ShopSidebar";
 import ShopTopbar from "../../wrappers/product/ShopTopbar";
 import ShopProducts from "../../wrappers/product/ShopProducts";
+import PropTypes from "prop-types";
 
 const ShopGridStandard = () => {
   const [layout, setLayout] = useState("grid three-column");
@@ -21,10 +22,12 @@ const ShopGridStandard = () => {
   const [currentData, setCurrentData] = useState([]);
   const [sortedProducts, setSortedProducts] = useState([]);
   const { products } = useSelector((state) => state.product);
-
   const pageLimit = 15;
   let { pathname } = useLocation();
 
+  // const location = useLocation();
+
+  // const searchState = location.state;
   const getLayout = (layout) => {
     setLayout(layout);
   };
@@ -38,9 +41,27 @@ const ShopGridStandard = () => {
     setFilterSortType(sortType);
     setFilterSortValue(sortValue);
   };
-
   useEffect(() => {
-    let sortedProducts = getSortedProducts(products, sortType, sortValue);
+    // let filtered = [...products];
+
+    // if (searchState?.name) {
+    //   console.log("this is clickable image", searchState.name);
+    //   const query = searchState.name.toLowerCase().trim();
+    //   filtered = products.filter(
+    //     (product) =>
+    //       Array.isArray(product.category) &&
+    //       product.category.some((cat) =>
+    //         cat.toLowerCase().trim().includes(query)
+    //       )
+    //   );
+    //   console.log("this is dats", filtered);
+    // }
+    let sortedProducts = getSortedProducts(
+      // filtered,
+      products,
+      sortType,
+      sortValue
+    );
     const filterSortedProducts = getSortedProducts(
       sortedProducts,
       filterSortType,
@@ -49,13 +70,21 @@ const ShopGridStandard = () => {
     sortedProducts = filterSortedProducts;
     setSortedProducts(sortedProducts);
     setCurrentData(sortedProducts.slice(offset, offset + pageLimit));
-  }, [offset, products, sortType, sortValue, filterSortType, filterSortValue]);
+  }, [
+    offset,
+    products,
+    sortType,
+    sortValue,
+    filterSortType,
+    filterSortValue,
+    // searchState,
+  ]);
 
   return (
     <Fragment>
       <SEO
         titleTemplate="Shop Page"
-        description="Shop page of Anahee react minimalist eCommerce template."
+        description="Shop page of Anahee Anahee."
       />
 
       <LayoutOne headerTop="visible">
@@ -79,39 +108,61 @@ const ShopGridStandard = () => {
                 />
               </div>
               <div className="col-lg-9 order-2 order-lg-2">
-               <div className="shop-select border" style={{ width: "25%", position: "relative" }}>
-  <select
-    onChange={(e) => getFilterSortParams("filterSort", e.target.value)}
-    className="py-3 px-4 pl-3 pr-8 appearance-none w-full"
-    style={{
-      WebkitAppearance: "none",
-      MozAppearance: "none",
-      appearance: "none",
-      backgroundImage: `url("data:image/svg+xml,%3Csvg fill='black' viewBox='0 0 24 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`,
-      backgroundRepeat: "no-repeat",
-      backgroundPosition: "calc(100% - 2rem) center",
-      backgroundSize: "20px", // <-- Increased from 10px to 20px
-    }}
-  >
-    <option value="default">Default</option>
-    <option value="priceHighToLow">Price - High to Low</option>
-    <option value="priceLowToHigh">Price - Low to High</option>
-  </select>
-</div>
+                <div className="row">
+                  <div className=" sm:flex-row items-center d-flex justify-content-between gap-4">
+                    {/* ShopTopbar */}
 
+                    {/* Sort Dropdown */}
+                    <div
+                      className="w-100 w-sm-auto"
+                      style={{ maxWidth: "250px" }}
+                    >
+                      <select
+                        onChange={(e) =>
+                          getFilterSortParams("filterSort", e.target.value)
+                        }
+                        className="form-select form-select-lg py-3 pe-5"
+                        style={{
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg fill='black' width='32' height='32' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`,
+                          backgroundRepeat: "no-repeat",
+                          backgroundPosition: "right 1rem center",
+                          backgroundSize: "2.5rem",
+                        }}
+                      >
+                        <option value="default">Default</option>
+                        <option value="priceHighToLow">
+                          Price - High to Low
+                        </option>
+                        <option value="priceLowToHigh">
+                          Price - Low to High
+                        </option>
+                      </select>
+                    </div>
+
+                    <div className="w-full sm:w-auto">
+                      <ShopTopbar
+                        getLayout={getLayout}
+                        getFilterSortParams={getFilterSortParams}
+                        productCount={products.length}
+                        sortedProductCount={currentData.length}
+                      />
+                    </div>
+                  </div>
+                </div>
+                {/* shop topbar default */}
 
                 {/* shop page content default */}
                 <ShopProducts layout={layout} products={currentData} />
-                {/* shop topbar default */}
-                <ShopTopbar
-                  getLayout={getLayout}
-                  getFilterSortParams={getFilterSortParams}
-                  productCount={products.length}
-                  sortedProductCount={currentData.length}
-                />
 
                 {/* shop product pagination */}
-                <div className="pro-pagination-style text-center mt-10">
+
+                <div
+                  className=" pro-pagination-style justify-content-between align-items-center text-center mt-10"
+                  style={{ display: "flex" }}
+                >
+                  <p className="pt-5">
+                    Showing{currentData.length} of {products.length} result
+                  </p>
                   <Paginator
                     totalRecords={sortedProducts.length}
                     pageLimit={pageLimit}
@@ -132,5 +183,4 @@ const ShopGridStandard = () => {
     </Fragment>
   );
 };
-
 export default ShopGridStandard;

@@ -7,21 +7,16 @@ import { Link } from "react-router-dom";
 import SectionTitleWithText from "../../components/section-title/SectionTitleWithText";
 import SectionTitleHome from "../../components/section-title/SectionTitleHome.js";
 import axios from "axios";
-
 const params = {
   effect: "fade",
   fadeEffect: {
-    crossFade: true,
+    crossFade: true
   },
-  modules: [EffectFade,Autoplay],
+  modules: [EffectFade],
   loop: true,
   speed: 1000,
-  navigation: true,
-  autoHeight: false,
-  autoplay: {
-    delay: 5000, // Auto transition every 5 seconds
-    disableOnInteraction: false, // Allow autoplay to continue after user interaction
-  },
+  pagination: true,
+  autoHeight: false
 };
 
 const HeroSliderFourteen = () => {

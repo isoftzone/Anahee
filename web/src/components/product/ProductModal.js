@@ -9,6 +9,7 @@ import { getProductCartQuantity } from "../../helpers/product";
 import { addToCart } from "../../store/slices/cart-slice";
 import { addToWishlist } from "../../store/slices/wishlist-slice";
 import { addToCompare } from "../../store/slices/compare-slice";
+
 function ProductModal({
   product,
   currency,
@@ -76,13 +77,13 @@ function ProductModal({
       onHide={onCloseModal}
       className="product-quickview-modal-wrapper"
     >
-      <Modal.Header>
+      {/* <Modal.Header>
         <div className="custom-close-wrapper">
           <button className="custom-close-btn" onClick={onCloseModal}>
             <i className="pe-7s-close-circle" />
           </button>
         </div>
-      </Modal.Header>
+      </Modal.Header> */}
       <div className="modal-body">
         <div className="row">
           <div className="col-md-5 col-sm-12 col-xs-12">

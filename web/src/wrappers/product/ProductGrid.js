@@ -17,7 +17,8 @@ const ProductGrid = ({ spaceBottomClass, category, type, limit }) => {
   const { wishlistItems } = useSelector((state) => state.wishlist);
 
   const filteredProducts = getProducts(products, category, type, limit);
-
+console.log("new products" ,products);
+console.log("new products filteredProducts" ,filteredProducts);
   const swiperParams = {
     loop: true,
     spaceBetween: 30,

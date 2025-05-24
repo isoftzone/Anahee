@@ -14,7 +14,7 @@ const Checkout = () => {
   let { pathname } = useLocation();
   const currency = useSelector((state) => state.currency);
   const { cartItems } = useSelector((state) => state.cart);
-    const [countries, setCountries] = useState([]);
+  const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const [formData, setFormData] = useState({
@@ -28,18 +28,24 @@ const Checkout = () => {
     postcode: "",
     phone: "",
     email: "",
-    paymentMethod: "cod",
+    paymentMethod: "Cod",
   });
-  const  navigate=  useNavigate();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [orderId, setOrderId] = useState("");
-   const [customerId, setCustomerId] = useState(null);
+  const [customerId, setCustomerId] = useState(null);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [paymentError, setPaymentError] = useState("");
   const [orderPlaced, setOrderPlaced] = useState(false);
-
   const [isPaymentOpen, setIsPaymentOpen] = useState(true);
+  const [discount, setDiscount] = useState(0);
+
+  // let discountedTotal = cartTotalPrice - discount;
+  useEffect(() => {
+    // Validate all fields when component mounts or when formData changes
+    validateForm();
+  }, [formData]);
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
@@ -51,12 +57,35 @@ const Checkout = () => {
     };
   }, []);
 
-// Fetch countries on mount
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  const couponCode = params.get("couponCode");
+  useEffect(() => {
+    if (couponCode) {
+      const applyCoupon = async () => {
+        try {
+          const response = await axios.post(`${BASE_URL}/applycoupon`, {
+            coupon_code: couponCode,
+            cart_total: cartTotalPrice.toFixed(2),
+          });
+          if (response.data.success) {
+            setDiscount(response.data.discount);
+          }
+        } catch (err) {
+          console.error("Coupon re-validation failed", err);
+        }
+      };
+      applyCoupon();
+    }
+  }, [couponCode, cartTotalPrice]);
+  // Fetch countries on mount
   useEffect(() => {
     const customerData = JSON.parse(localStorage.getItem("customerinfo"));
-    setCustomerId(customerData.id)
-    if(!customerData.id){
-       navigate("/login-register");
+
+    if (!customerData || !customerData.id) {
+      navigate("/login-register");
+    } else {
+      setCustomerId(customerData.id);
     }
     const fetchCountries = async () => {
       try {
@@ -122,13 +151,8 @@ const Checkout = () => {
       [name]: value,
     }));
 
-    if (!touched[name]) {
-      setTouched((prev) => ({ ...prev, [name]: true }));
-    }
-
-    if (touched[name]) {
-      validateField(name, value);
-    }
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    validateField(name, value);
   };
 
   const handleBlur = (e) => {
@@ -162,10 +186,10 @@ const Checkout = () => {
         if (!value.trim()) error = "City is required";
         break;
       case "country":
-        if (!value) error = "Country is required";
+        if (!value.trim()) error = "Country is required";
         break;
       case "state":
-        if (!value) error = "State is required";
+        if (!value.trim()) error = "State is required";
         break;
       case "postcode":
         if (!value.trim()) error = "Postal code is required";
@@ -219,7 +243,7 @@ const Checkout = () => {
     setPaymentError("");
   };
 
-  const phonePeCallback = (response) => {
+  const phonePeCallback = (response, orderId) => {
     setIsLoading(false);
 
     if (response === "USER_CANCEL") {
@@ -241,29 +265,31 @@ const Checkout = () => {
   const verifyPaymentStatus = async (orderId) => {
     try {
       const response = await axios.get(
-        `${BASE_URL}/api/order-status/${Number(orderId)}`
+        `${BASE_URL}/api/order-status/${orderId}`
       );
       if (response.data.success) {
-        console.log("verifyPaymentStatus res", response.data);
-        resetForm();
-      dispatch(deleteAllFromCart());
-        window.location.href = "/success";
+        const paymentDetail = response.data.data.paymentDetails[0];
 
-        // const updateData = {
-        //   merchant_order_id: response.data.orderId,
-        //   payment_mode: response.data.paymentDetails.paymentMode,
-        //   provider_reference_id: response.data.providerReferenceId,
-        //   phonepe_status: response.data.status,
-        //   payment_status: response.data.paymentDetails.state,
-        //   transaction_id: response.data.paymentDetails.transactionId,
-        //   saleId: orderId, // Assuming you have orderId in state
-        // };
-        // console.log("updateData,updateData", updateData);
-        // await axios.put(`${BASE_URL}/updateSalesMaster`, updateData, {
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        // });
+        const splitInstrument = paymentDetail?.splitInstruments[0];
+
+        const updateData = {
+          merchant_order_id: response?.data?.data?.orderId,
+         // payment_mode: paymentDetail?.paymentMode,
+          provider_reference_id: splitInstrument?.rail?.utr,
+          phonepe_status: response?.data?.data?.state,
+          payment_status: paymentDetail?.state,
+          transaction_id: paymentDetail?.transactionId,
+          saleId: orderId, // Assuming you have orderId in state
+        };
+        console.log("updateData,updateData", updateData);
+        await axios.put(`${BASE_URL}/updateSalesMaster`, updateData, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        resetForm();
+        window.location.href = "/success";
       } else {
         setPaymentError("Payment verification failed. Please contact support.");
         setOrderPlaced(false);
@@ -282,7 +308,7 @@ const Checkout = () => {
       setIsLoading(true);
       const response = await axios.post(`${BASE_URL}/api/create-order`, {
         orderId: orderId,
-        amountInPaisa: cartTotalPrice * 100,
+        amountInPaisa: (cartTotalPrice - discount) * 100,
         customerPhone: formData.phone || "0000000000",
         redirectUrl: window.location.origin + "/success",
         expireAfter: 1200,
@@ -293,11 +319,10 @@ const Checkout = () => {
       });
 
       if (response.data.success && response.data.data.redirectUrl) {
-        console.log(response.data.data.redirectUrl);
         if (window.PhonePeCheckout && window.PhonePeCheckout.transact) {
           window.PhonePeCheckout.transact({
             tokenUrl: response.data.data.redirectUrl,
-            callback: phonePeCallback,
+            callback: (resp) => phonePeCallback(resp, orderId),
             type: "IFRAME",
           });
         } else {
@@ -336,12 +361,12 @@ const Checkout = () => {
       postcode: "",
       phone: "",
       email: "",
-      paymentMethod: "cod",
+      paymentMethod: "Cod",
     });
     setErrors({});
     setTouched({});
     setOrderId("");
-    // dispatch(clearCart()); // Clear cart items
+    dispatch(deleteAllFromCart()); // Clear cart items
   };
 
   const handleSubmit = async (e) => {
@@ -363,7 +388,7 @@ const Checkout = () => {
     const orderData = {
       ...formData,
       customerId,
-      amount: cartTotalPrice,
+      amount: (cartTotalPrice - discount),
       items: cartItems.map((item) => ({
         productId: item.id,
         quantity: item.quantity,
@@ -383,33 +408,16 @@ const Checkout = () => {
         setOrderId(saleId);
         setOrderPlaced(true);
 
-        if (formData.paymentMethod === "phonepe") {
+        if (formData.paymentMethod === "Paid") {
           await initiatePhonePePayment(saleId);
         } else {
           // For COD, complete the order
           setIsLoading(false);
           alert("Order placed successfully!");
-
+          resetForm();
           // Optionally redirect to success page
-          // window.location.href = "/success";
+          window.location.href = "/success";
         }
-
-        setFormData({
-          firstName: "",
-          lastName: "",
-          companyName: "",
-          country: "",
-          address: "",
-          apartment: "",
-          city: "",
-          state: "",
-          postcode: "",
-          phone: "",
-          email: "",
-          message: "",
-          paymentMethod: "cod",
-        });
-        dispatch(deleteAllFromCart());
       }
     } catch (error) {
       console.error("Error placing order:", error);
@@ -420,7 +428,7 @@ const Checkout = () => {
   };
 
   const retryPayment = () => {
-    if (orderId && formData.paymentMethod === "phonepe") {
+    if (orderId && formData.paymentMethod === "Paid") {
       setPaymentError("");
       initiatePhonePePayment(orderId);
     }
@@ -501,31 +509,6 @@ const Checkout = () => {
                           </div>
                         </div>
 
-
-                        <div className="col-lg-12">
-                          <div className="billing-select mb-20">
-                            <label>Country *</label>
-                          <select
-                            name="country"
-                            value={formData.country}
-                            onChange={handleInputChange}
-                          >
-                            <option value="">Select a country</option>
-                            {countries.map((country, i) => (
-                              <option key={i} value={country}>
-                                {country}
-                              </option>
-                            ))}
-                          </select>
-                            {errors.country && touched.country && (
-                              <div className="invalid-feedback">
-                                {errors.country}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-
                         <div className="col-lg-12">
                           <div className="billing-info mb-20">
                             <label>Street Address *</label>
@@ -558,24 +541,27 @@ const Checkout = () => {
                           </div>
                         </div>
 
-
-
-                          <div className="col-lg-12">
+                        <div className="col-lg-12">
                           <div className="billing-select mb-20">
-                        <label>State</label>
-                          <select
-                            name="state"
-                            value={formData.state}
-                            onChange={handleInputChange}
-                            disabled={!states.length}
-                          >
-                            <option value="">Select a state</option>
-                            {states.map((s, i) => (
-                              <option key={i} value={s.name}>
-                                {s.name}
-                              </option>
-                            ))}
-                          </select>
+                            <label>Country *</label>
+                            <select
+                              name="country"
+                              value={formData.country}
+                              onChange={handleInputChange}
+                              onBlur={handleBlur}
+                              className={`form-control ${
+                                errors.country && touched.country
+                                  ? "is-invalid"
+                                  : ""
+                              }`}
+                            >
+                              <option value="">Select a country</option>
+                              {countries.map((country, i) => (
+                                <option key={i} value={country}>
+                                  {country}
+                                </option>
+                              ))}
+                            </select>
                             {errors.country && touched.country && (
                               <div className="invalid-feedback">
                                 {errors.country}
@@ -584,31 +570,63 @@ const Checkout = () => {
                           </div>
                         </div>
 
-
-                      <div className="col-lg-12">
+                        <div className="col-lg-12">
                           <div className="billing-select mb-20">
-                          <label>City</label>
-                          <select
-                            name="city"
-                            value={formData.city}
-                            onChange={handleInputChange}
-                            disabled={!cities.length}
-                          >
-                            <option value="">Select a city</option>
-                            {cities.map((city, i) => (
-                              <option key={i} value={city}>
-                                {city}
-                              </option>
-                            ))}
-                          </select>
-                            {errors.country && touched.country && (
+                            <label>State *</label>
+                            <select
+                              name="state"
+                              value={formData.state}
+                              onChange={handleInputChange}
+                              onBlur={handleBlur}
+                              disabled={!states.length}
+                              className={`form-control ${
+                                errors.state && touched.state
+                                  ? "is-invalid"
+                                  : ""
+                              }`}
+                            >
+                              <option value="">Select a state</option>
+                              {states.map((s, i) => (
+                                <option key={i} value={s.name}>
+                                  {s.name}
+                                </option>
+                              ))}
+                            </select>
+                            {errors.state && touched.state && (
                               <div className="invalid-feedback">
-                                {errors.country}
+                                {errors.state}
                               </div>
                             )}
                           </div>
                         </div>
 
+                        <div className="col-lg-12">
+                          <div className="billing-select mb-20">
+                            <label>City *</label>
+                            <select
+                              name="city"
+                              value={formData.city}
+                              onChange={handleInputChange}
+                              onBlur={handleBlur}
+                              disabled={!cities.length}
+                              className={`form-control ${
+                                errors.city && touched.city ? "is-invalid" : ""
+                              }`}
+                            >
+                              <option value="">Select a city</option>
+                              {cities.map((city, i) => (
+                                <option key={i} value={city}>
+                                  {city}
+                                </option>
+                              ))}
+                            </select>
+                            {errors.city && touched.city && (
+                              <div className="invalid-feedback">
+                                {errors.city}
+                              </div>
+                            )}
+                          </div>
+                        </div>
 
                         <div className="col-lg-6 col-md-6">
                           <div className="billing-info mb-20">
@@ -748,12 +766,17 @@ const Checkout = () => {
                               <li>Free shipping</li>
                             </ul>
                           </div>
+                          <div className="your-order-bottom">
+                            <ul>
+                              <li className="your-order-shipping">Discount</li>
+                              <li>{  "-"+currency.currencySymbol + discount }</li>
+                            </ul>
+                          </div>
                           <div className="your-order-total">
                             <ul>
                               <li className="order-total">Total</li>
                               <li>
-                                {currency.currencySymbol +
-                                  cartTotalPrice.toFixed(2)}
+                                  {currency.currencySymbol + (cartTotalPrice - discount).toFixed(2)}
                               </li>
                             </ul>
                           </div>
@@ -773,7 +796,7 @@ const Checkout = () => {
                           >
                             <strong>Payment Error:</strong> {paymentError}
                             {orderPlaced &&
-                              formData.paymentMethod === "phonepe" && (
+                              formData.paymentMethod === "Paid" && (
                                 <div style={{ marginTop: "10px" }}>
                                   <button
                                     type="button"
@@ -847,12 +870,12 @@ const Checkout = () => {
                                       type="radio"
                                       id="phonepe"
                                       name="paymentMethod"
-                                      value="phonepe"
+                                      value="Paid"
                                       checked={
-                                        formData.paymentMethod === "phonepe"
+                                        formData.paymentMethod === "Paid"
                                       }
                                       onChange={() =>
-                                        handlePaymentMethodChange("phonepe")
+                                        handlePaymentMethodChange("Paid")
                                       }
                                       style={{
                                         margin: "0",
@@ -870,36 +893,9 @@ const Checkout = () => {
                                         fontWeight: "500",
                                       }}
                                     >
-                                      PhonePe
+                                      Pay Now
                                     </label>
                                   </div>
-
-                                  {formData.paymentMethod === "phonepe" && (
-                                    <div
-                                      style={{
-                                        padding: "10px 15px",
-                                        backgroundColor: "#f8f9fa",
-                                        marginLeft: "28px",
-                                        marginTop: "5px",
-                                        borderRadius: "4px",
-                                        fontSize: "13px",
-                                        color: "#666",
-                                      }}
-                                    >
-                                      <p>
-                                        Pay securely using PhonePe. Your payment
-                                        details are protected.
-                                      </p>
-                                      <img
-                                        src="/assets/img/phonepe-logo.png"
-                                        alt="PhonePe"
-                                        style={{
-                                          height: "30px",
-                                          marginTop: "10px",
-                                        }}
-                                      />
-                                    </div>
-                                  )}
                                 </div>
 
                                 <div
@@ -921,10 +917,10 @@ const Checkout = () => {
                                       type="radio"
                                       id="cod"
                                       name="paymentMethod"
-                                      value="cod"
-                                      checked={formData.paymentMethod === "cod"}
+                                      value="Cod"
+                                      checked={formData.paymentMethod === "Cod"}
                                       onChange={() =>
-                                        handlePaymentMethodChange("cod")
+                                        handlePaymentMethodChange("Cod")
                                       }
                                       style={{
                                         margin: "0",
@@ -945,25 +941,6 @@ const Checkout = () => {
                                       Cash on Delivery
                                     </label>
                                   </div>
-
-                                  {formData.paymentMethod === "cod" && (
-                                    <div
-                                      style={{
-                                        padding: "10px 15px",
-                                        backgroundColor: "#f8f9fa",
-                                        marginLeft: "28px",
-                                        marginTop: "5px",
-                                        borderRadius: "4px",
-                                        fontSize: "13px",
-                                        color: "#666",
-                                      }}
-                                    >
-                                      <p>
-                                        Pay with cash upon delivery. Please
-                                        ensure you have the exact amount ready.
-                                      </p>
-                                    </div>
-                                  )}
                                 </div>
                               </div>
                             )}
