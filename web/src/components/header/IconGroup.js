@@ -203,7 +203,7 @@ const IconGroup = ({ iconWhiteClass }) => {
           </form>
         </div>
       </div> */}
-      <div className="same-style header-search d-none d-lg-block">
+      <div className="same-style header-search d-lg-block">
       <button
         className="search-active"
         onClick={(e) => {
@@ -228,7 +228,7 @@ const IconGroup = ({ iconWhiteClass }) => {
       </div>
     </div>
       {/* Account Dropdown */}
-      <div className="same-style account-setting d-none d-lg-block">
+      <div className="same-style account-setting d-lg-block">
         <button
           className="account-setting-active d-flex align-items-center gap-2"
           onClick={handleClick}

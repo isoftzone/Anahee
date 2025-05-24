@@ -161,7 +161,7 @@ const Orders = () => {
                         {/* Amount Cell */}
                         <td className="amount-cell text-end">
                           {" "}
-                          {/* Kept as text-end for amount */}$
+                          {/* Kept as text-end for amount */}₹
                           {amount.toFixed(2)}
                         </td>
                       </tr>
@@ -173,7 +173,7 @@ const Orders = () => {
                     <strong>Total:</strong>
                   </td>
                   <td className="text-end total-amount">
-                    <strong>${totalAmount.toFixed(2)}</strong>
+                    <strong>₹{totalAmount.toFixed(2)}</strong>
                   </td>
                 </tr>
               </tbody>

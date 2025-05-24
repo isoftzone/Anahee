@@ -22,8 +22,8 @@
   z-index: 999;
   top: 0;
   left: 0;
-// padding-bottom: 10px;
-// padding-top: 10px;
+  // padding-bottom: 10px;
+  // padding-top: 10px;
   width: 100%;
 
   transition: all 0.3s ease 0s;
@@ -366,10 +366,10 @@
 
             margin-left: 1px;
           }
-          @media #{$lg-layout}{
+          @media #{$lg-layout} {
             font-size: 12px;
           }
-          @media #{$xl-layout}{
+          @media #{$xl-layout} {
             font-size: 13px;
           }
         }
@@ -442,10 +442,6 @@
     margin-top: 14px;
   }
 }
-
-
-
-
 
 .header-right-wrap {
   display: flex;
@@ -946,7 +942,6 @@
   }
 }
 
-
 /* header 3 */
 
 .header-padding-2 .container-fluid {
@@ -1276,8 +1271,6 @@
   }
 }
 
-
-
 .sidebar-menu {
   padding: 0 0 0 108px;
   @media #{$xx-layout} {
@@ -1543,7 +1536,6 @@
   }
 }
 
-
 .header-hm4-none {
   display: none;
   @media #{$xs-layout} {
@@ -1553,7 +1545,6 @@
     display: block;
   }
 }
-
 
 /* home 5 */
 
@@ -1592,8 +1583,6 @@
     padding: 0 15px;
   }
 }
-
-
 
 /* home 7 */
 
@@ -1776,8 +1765,6 @@
   }
 }
 
-
-
 .header-hm-7.stick {
   .clickable-menu {
     margin-top: 19px;
@@ -1854,7 +1841,6 @@
   }
 }
 
-
 /* home 8 */
 
 .header-hm8 {
@@ -1927,10 +1913,10 @@
   }
   .logo {
     @media #{$md-layout} {
-      text-align: left!important;
+      text-align: left !important;
     }
     @media #{$xs-layout} {
-      text-align: left!important;
+      text-align: left !important;
     }
   }
 }
@@ -1951,8 +1937,6 @@
 }
 
 /* home 9 */
-
-
 
 .header-hm9 {
   .main-menu {
@@ -2017,7 +2001,6 @@
   }
 }
 
-
 /* header hm10 */
 
 @media #{$sm-layout} {
@@ -2039,7 +2022,6 @@
   }
 }
 
-
 @media #{$xs-layout} {
   .header-hm9 {
     .header-right-wrap {
@@ -2054,13 +2036,9 @@
   }
 }
 
-
 .mobile-aside-button {
   padding: 0;
 }
-
-
-
 
 /* offcanvas mobile menu */
 
@@ -2079,7 +2057,7 @@
 }
 
 .offcanvas-widget-area {
-  margin-top: -32px;
+  margin-top: 7px;
   margin-bottom: 35px;
 
   @media #{$sm-layout} {
@@ -2092,6 +2070,7 @@
 
   .header-contact-info {
     flex-basis: 33.33%;
+    // margin-top: 20px;
     &__list {
       li {
         display: inline-block;
@@ -2131,7 +2110,6 @@
   transition: 0.6s;
   transform: translateX(100%);
 
-
   &.active {
     transform: translateX(0);
   }
@@ -2159,7 +2137,6 @@
   color: #fff;
   border: none;
   background: #343538;
-
 
   // @media #{$sm-layout}{
   //     width: 50px;
@@ -2335,7 +2312,6 @@
         text-transform: uppercase;
       }
 
-
       &.menu-item-has-children {
         position: relative;
 
@@ -2454,7 +2430,6 @@
   }
 }
 
-
 .transparent-bar {
   position: absolute;
   z-index: 999;
@@ -2474,7 +2449,6 @@
   }
 }
 
-
 .mobile-menu-middle {
   margin-bottom: 50px;
   .lang-curr-style {
@@ -2486,7 +2460,6 @@
       border: none;
       background: none;
     }
-
 
     .title {
       font-weight: 500;
@@ -2514,36 +2487,39 @@
   }
 }
 
-.home-sidebar-left .header-right-wrap .same-style.cart-wrap .shopping-cart-content ul{
+.home-sidebar-left
+  .header-right-wrap
+  .same-style.cart-wrap
+  .shopping-cart-content
+  ul {
   &::-webkit-scrollbar {
     display: none;
   }
-  -ms-overflow-style: none; 
+  -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
+.header-area {
+  transition: all 0.3s ease-in-out; /* Smooth transition for the header */
+}
 
-.header-area {  
-  transition: all 0.3s ease-in-out; /* Smooth transition for the header */  
-}  
+.logo img {
+  transition: opacity 0.3s ease-in-out; /* Smooth transition for the logo */
+  display: block; /* Ensure block display for smooth opacity */
+}
 
-.logo img {  
-  transition: opacity 0.3s ease-in-out; /* Smooth transition for the logo */  
-  display: block; /* Ensure block display for smooth opacity */  
-}  
+.sticky-block img {
+  opacity: 1; /* Fully visible when in navbar */
+}
 
-.sticky-block img {  
-  opacity: 1; /* Fully visible when in navbar */  
-}  
+.sticky-none img {
+  opacity: 0; /* Invisible when not scrolled */
+}
 
-.sticky-none img {  
-  opacity: 0; /* Invisible when not scrolled */  
-}  
-
-/* Optional: Adjust sticky-navbar styles */  
-.stick {  
-  position: fixed;  
-  top: 0;  
-  width: 100%;  
-  z-index: 999; /* High z-index for navbar */  
+/* Optional: Adjust sticky-navbar styles */
+.stick {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 999; /* High z-index for navbar */
 }
