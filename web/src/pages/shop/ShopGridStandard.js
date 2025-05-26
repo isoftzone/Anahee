@@ -114,7 +114,7 @@ const ShopGridStandard = () => {
 
                     {/* Sort Dropdown */}
                     <div
-                      className="w-100 w-sm-auto"
+                      className="w-100 col-12 w-sm-auto"
                       style={{ maxWidth: "250px" }}
                     >
                       <select
@@ -139,7 +139,7 @@ const ShopGridStandard = () => {
                       </select>
                     </div>
 
-                    <div className="w-full sm:w-auto">
+                    <div className="col-12 w-full sm:w-auto">
                       <ShopTopbar
                         getLayout={getLayout}
                         getFilterSortParams={getFilterSortParams}

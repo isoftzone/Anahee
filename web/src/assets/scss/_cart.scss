@@ -217,7 +217,7 @@ h3.cart-page-title {
 
     display: inline-block;
 
-    padding: 18px 63px 17px;
+    padding: 10px 15px;
 
     text-transform: uppercase;
 
@@ -256,7 +256,7 @@ h3.cart-page-title {
 
 .cart-tax,
 .discount-code-wrapper {
-  padding: 45px 30px 50px;
+  padding: 18px;
 
   border: 1px solid #ebebeb;
   border-radius: 5px;
@@ -346,7 +346,7 @@ h3.cart-page-title {
         font-size: 14px;
         font-weight: 500;
 
-        padding: 13px 42px 12px;
+        // padding: 13px 42px 12px;
 
         cursor: pointer;
         transition: all 0.3s ease 0s;
@@ -370,7 +370,7 @@ h3.cart-page-title {
     form {
       input {
         height: 40px;
-        margin-bottom: 30px;
+        margin-bottom: 24px;
         padding-left: 10px;
 
         border: 1px solid #ebebeb;
@@ -380,7 +380,7 @@ h3.cart-page-title {
         font-size: 14px;
         font-weight: 500;
 
-        padding: 13px 42px 12px;
+        padding: 5px 12px 5px;
 
         cursor: pointer;
         transition: all 0.3s ease 0s;
@@ -399,8 +399,7 @@ h3.cart-page-title {
 }
 
 .grand-totall {
-  padding: 45px 30px 50px;
-
+padding:18px;
   border: 1px solid #ebebeb;
   border-radius: 5px;
   background-color: #f9f9f9;
@@ -445,7 +444,7 @@ h3.cart-page-title {
   h5 {
     font-size: 14px;
 
-    margin: 36px 0 27px;
+    margin: 16px 0 24px;
     span {
       font-size: 18px;
       font-weight: 500;
@@ -511,11 +510,11 @@ h3.cart-page-title {
   a {
     font-size: 14px;
     font-weight: 500;
-    line-height: 1;
+    line-height: 0;
 
-    display: block;
+    // display: block;
 
-    padding: 18px 10px 17px;
+    padding: 9px 12px 9px;
 
     text-align: center;
     text-transform: uppercase;

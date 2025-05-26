@@ -12,15 +12,15 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
           <h2 className="collection-title py-3">Shop by Collection</h2>
           <div className="underline mx-auto my-2"></div>
           <div className="links mt-3">
-            <a href="/" className="mx-2">
+            <a href="/shop-grid-standard" className="mx-2">
               Western Wear
             </a>
             <span className="divider">|</span>
-            <a href="/" className="mx-2">
+            <a href="/shop-grid-standard" className="mx-2">
               Suit Sets
             </a>
             <span className="divider">|</span>
-            <a href="/" className="mx-2">
+            <a href="/shop-grid-standard" className="mx-2">
               Cord Sets
             </a>
           </div>
@@ -58,7 +58,7 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
 
           {/* Right Top and Bottom Images */}
           <div className="col-lg-3 col-sm-6 col-12 mb-4">
-             <div className="lookbook1  cursor-pointer" onClick={() => navigate("/shop-grid-standard", { state: { name: "Kurta" } })}>
+             <div className="lookbook1  cursor-pointer" onClick={() => navigate("/shop-grid-standard", { state: { name: "westernwear" } })}>
               <img
                 src="assets/img/banner/Maskgroup__22.png"
                 alt="Blue Dress"
@@ -67,7 +67,7 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
             </div>
           </div>
           <div className="col-lg-3 col-sm-6 col-12 mb-4">
-               <div className="lookbook2  cursor-pointer" onClick={() => navigate("/shop-grid-standard", { state: { name: "Kurta" } })}>
+               <div className="lookbook2  cursor-pointer" onClick={() => navigate("/shop-grid-standard", { state: { name: "westernwear" } })}>
               <img
                 src="assets/img/banner/Maskgroup__33.png"
                 alt="Yellow Dress"
