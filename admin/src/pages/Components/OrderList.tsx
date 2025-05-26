@@ -54,7 +54,7 @@ const OrderList: React.FC = () => {
         setSales((prev) => prev.map((order) => (order.SALEID === saleId ? { ...order, ORDER_STATUS: status } : order)));
     };
     return (
-        <div className="p-6">
+        <div>
             <div className="flex justify-center mb-4">
                 <h2 className="text-2xl font-semibold mb-4">Order List</h2>
             </div>
@@ -62,7 +62,7 @@ const OrderList: React.FC = () => {
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-gray-200">
-                            <th className="p-3">Select</th>
+                            {/* <th className="p-3">Select</th> */}
                             <th className="p-3">Sale Id</th>
                             <th className="p-3">Name</th>
                             <th className="p-3">Email</th>
@@ -89,9 +89,9 @@ const OrderList: React.FC = () => {
                         ) : (
                             sales.map((sale, index) => (
                                 <tr key={index} className="border-b hover:bg-gray-100">
-                                    <td className="p-3">
+                                    {/* <td className="p-3">
                                         <input type="checkbox" />
-                                    </td>
+                                    </td> */}
                                     <td className="p-3 text-blue-600">{sale.SALEID}</td>
                                     <td className="p-3">{sale.NAME}</td>
                                     <td className="p-3">{sale.EMAIL}</td>
