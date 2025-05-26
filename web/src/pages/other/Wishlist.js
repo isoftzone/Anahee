@@ -167,7 +167,7 @@ const Wishlist = () => {
                                     <button
                                       onClick={() =>
                                         dispatch(
-                                          deleteFromWishlist(wishlistItem.id)
+                                          deleteFromWishlist(wishlistItem)
                                         )
                                       }
                                     >

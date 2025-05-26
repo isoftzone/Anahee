@@ -109,12 +109,12 @@ const ShopGridStandard = () => {
               </div>
               <div className="col-lg-9 order-2 order-lg-2">
                 <div className="row">
-                  <div className=" sm:flex-row items-center d-flex justify-content-between gap-4">
+                  <div className="flex-col flex-row  items-center d-flex justify-content-between gap-4">
                     {/* ShopTopbar */}
 
                     {/* Sort Dropdown */}
                     <div
-                      className="w-100 col-12 w-sm-auto"
+                      className="w-100 col-md-8 w-sm-auto"
                       style={{ maxWidth: "250px" }}
                     >
                       <select
@@ -138,8 +138,7 @@ const ShopGridStandard = () => {
                         </option>
                       </select>
                     </div>
-
-                    <div className="col-12 w-full sm:w-auto">
+                    <div className="w-full col-md-4 sm:w-auto">
                       <ShopTopbar
                         getLayout={getLayout}
                         getFilterSortParams={getFilterSortParams}

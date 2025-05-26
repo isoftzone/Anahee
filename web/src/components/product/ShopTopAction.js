@@ -9,8 +9,6 @@ const ShopTopAction = ({
 }) => {
   return (
     <div className="shop-top-bar mb-35">
-   
-
       <div className="shop-tab">
         <button
           onClick={(e) => {

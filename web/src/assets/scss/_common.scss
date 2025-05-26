@@ -2006,3 +2006,13 @@ button:disabled {
     max-width: 29% !important;
   }
 }
+
+
+@media (max-width:375px){
+  *,
+*::after,
+*::before {
+  box-sizing: border-box;
+  font-size:11px;
+}
+}

@@ -273,14 +273,14 @@ const ProductDescriptionInfo = ({
           </div> */}
 
           <div className="pro-details-wishlist">
-            <button
+           <button
               className={`transition-all duration-300 text-2xl ${
                 wishlistItem ? "text-danger" : "text-gray-400"
               }`}
               title={wishlistItem ? "Remove from wishlist" : "Add to wishlist"}
               onClick={() =>
                 wishlistItem
-                  ? dispatch(removeFromWishlist(product))
+                  ? dispatch(deleteFromWishlist(product))
                   : dispatch(addToWishlist(product))
               }
             >

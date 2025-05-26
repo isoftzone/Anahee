@@ -72,8 +72,8 @@ export const cartItemStock = (item, color, size) => {
     return item.stock;
   } else {
     return item.variation
-      .filter(single => single.color === color)[0]
-      .size.filter(single => single.name === size)[0].stock;
+      // .filter(single => single.color === color)[0]
+      // .size.filter(single => single.name === size)[0].stock;
   }
 };
 
