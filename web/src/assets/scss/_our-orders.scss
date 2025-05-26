@@ -143,8 +143,7 @@
 
             tbody {
               td {
-                padding: 15px 25px;
-                font-size: 10px;
+                font-size: 13px;
               }
             }
 
@@ -176,7 +175,7 @@
     }
   }
   .status-badge {
-    font-size: 0.85rem;
+    font-size: 11px;
     padding: 0.4em 0.6em;
     margin-top: 5px;
   }
@@ -192,7 +191,7 @@
           align-items: flex-start;
         }
       }
-
+ 
       .order-details {
         .payment-info {
           flex-direction: column;
@@ -229,9 +228,30 @@
         font-size: 1.95rem !important
         ;
       }
+      
     }
   }
+
 }
+
+.order-card {
+  transition: box-shadow 0.2s ease;
+}
+.order-card:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+}
+@media (max-width: 576px) {
+  .page-title {
+    font-size: 1.5rem;
+  }
+  .page-subtitle {
+    font-size: 0.9rem;
+  }
+  .order-number {
+    font-size: 1rem;
+  }
+}
+
 
 @media (max-width: 480px) {
   .orders-container {

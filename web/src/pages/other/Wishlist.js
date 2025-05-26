@@ -123,12 +123,12 @@ const Wishlist = () => {
                                       </a>
                                     ) : wishlistItem.variation &&
                                       wishlistItem.variation.length >= 1 ? (
-                                      <button
+                                      <Link
                                         to={`${process.env.PUBLIC_URL}/product/${wishlistItem.id}`}
                                        className="px-4 py-3 text-sm sm:px-5 sm:py-5 sm:text-base"
                                       >
                                         Select option
-                                      </button>
+                                      </Link>
                                     ) : wishlistItem.stock &&
                                       wishlistItem.stock > 0 ? (
                                       <button

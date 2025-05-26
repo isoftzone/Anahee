@@ -565,3 +565,21 @@ exports.getAllOrders = (req, res) => {
   });
 };
 
+exports.cancelOrder = (req, res) => {
+  const { saleId } = req.params;
+
+  const query = `
+    UPDATE anahee.salesmaster
+    SET ORDER_STATUS = 'Cancel'
+    WHERE SALEID = ?
+  `;
+
+  con.query(query, [saleId], (err, result) => {
+    if (err) {
+      console.error("❌ Error cancelling order:", err);
+      return res.status(500).json({ error: "Failed to cancel order" });
+    }
+    res.status(200).json({ message: "Order cancelled successfully" });
+  });
+};
+

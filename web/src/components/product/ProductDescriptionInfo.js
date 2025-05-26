@@ -11,6 +11,7 @@ import SizeChartModal from "./SizeChart";
 import {
   addToWishlist,
   deleteFromWishlist,
+  removeFromWishlist,
 } from "../../store/slices/wishlist-slice";
 import { addToCompare } from "../../store/slices/compare-slice";
 const ProductDescriptionInfo = ({
@@ -279,7 +280,7 @@ const ProductDescriptionInfo = ({
               title={wishlistItem ? "Remove from wishlist" : "Add to wishlist"}
               onClick={() =>
                 wishlistItem
-                  ? dispatch(deleteFromWishlist(product))
+                  ? dispatch(removeFromWishlist(product))
                   : dispatch(addToWishlist(product))
               }
             >
