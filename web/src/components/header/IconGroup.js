@@ -107,14 +107,18 @@
 // export default IconGroup;
 import PropTypes from "prop-types";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import clsx from "clsx";
 import MenuCart from "./sub-components/MenuCart";
+import { deleteAllFromWishlist } from "../../store/slices/wishlist-slice";
+import { deleteAllFromCart } from "../../store/slices/cart-slice";
 import { useEffect, useState } from "react";
 const IconGroup = ({ iconWhiteClass }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [name, setName] = useState("");
   const navigate = useNavigate();
+  // const dispatch = useDispatch();
+
   // const myItems=localStorage.getItem("customerinfo")
   // :white_check_mark: Check localStorage for login status
   //  const [user, setUser] = useState(null);
@@ -157,6 +161,8 @@ const IconGroup = ({ iconWhiteClass }) => {
     if (confirmLogout) {
       localStorage.removeItem("customerinfo");
       setIsLoggedIn(false);
+    //   dispatch(deleteAllFromWishlist());
+    // dispatch(deleteAllFromCart())
       // navigate("/"); // Uncomment this if you want to redirect after logout
     } else {
       // User clicked "No", do nothing
