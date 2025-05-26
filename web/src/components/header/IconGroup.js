@@ -239,7 +239,7 @@ const IconGroup = ({ iconWhiteClass }) => {
           <i className="pe-7s-user-female" />
           {isLoggedIn && (
             <h4
-              className="mb-0 text-truncate text-capitalize d-none d-lg-block"
+              className="mb-0 text-truncate text-capitalize d-block"
               style={{
                 maxWidth: "80px",
                 overflow: "hidden",
