@@ -443,6 +443,10 @@
   }
 }
 
+.pe-7s-menu {
+  margin-left: 40px;
+  margin-right: 10px;
+}
 .header-right-wrap {
   display: flex;
   justify-content: flex-end;
@@ -465,7 +469,7 @@
       margin-left: 15px;
     }
     @media #{$xs-layout} {
-      margin-left: 20px;
+      margin-left: 0px;
     }
     > a,
     button {
