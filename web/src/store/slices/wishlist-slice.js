@@ -47,7 +47,7 @@ const wishlistSlice = createSlice({
             }
         },
         deleteFromWishlist(state, action){
-            state.wishlistItems = state.wishlistItems.filter(item => item.id !== action.payload);
+            state.wishlistItems = state.wishlistItems.filter(item => item.id !== action.payload.id);
             cogoToast.error("Remove From Wishlist", {
               position: "bottom-left",
             });
