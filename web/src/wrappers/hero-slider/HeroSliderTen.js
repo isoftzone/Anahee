@@ -6,23 +6,11 @@ const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3000";
 const HeroSliderTen = ({ spaceTopClass, spaceBottomClass }) => {
   const [videoUrl, setVideoUrl] = useState("");
   const [isPlaying, setIsPlaying] = useState(false);
-  const [videoDimensions, setVideoDimensions] = useState({
-    width: 0,
-    height: 0,
-  });
   const videoRef = useRef(null);
-  const containerRef = useRef(null);
 
   useEffect(() => {
     setVideoUrl(`${BASE_URL}/videos/productsvideo.mp4`);
   }, []);
-
-  const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      const { videoWidth, videoHeight } = videoRef.current;
-      setVideoDimensions({ width: videoWidth, height: videoHeight });
-    }
-  };
 
   const togglePlayPause = () => {
     if (!videoRef.current) return;
@@ -34,43 +22,29 @@ const HeroSliderTen = ({ spaceTopClass, spaceBottomClass }) => {
     setIsPlaying(!isPlaying);
   };
 
-  // Calculate padding-top percentage based on aspect ratio
-  const aspectRatio = (videoDimensions.height / videoDimensions.width) * 100;
-  const videoContainerStyle = {
-    position: "relative",
-    width: "100%",
-    paddingTop: `${aspectRatio}%`,
-    overflow: "hidden",
-  };
-
   return (
-    <div className={`slider-area ${spaceTopClass} ${spaceBottomClass}`}>
-      <div
-        ref={containerRef}
-        className="position-relative overflow-hidden w-100"
-        style={{
-          paddingTop: "56.25%", // 16:9 aspect ratio
-          backgroundColor: "#000", // fallback background
-        }}
-      >
+     <div className={`slider-area ${spaceTopClass} ${spaceBottomClass}`}>
+      {/* Video Container - Responsive Height */}
+      <div className="video-container position-relative overflow-hidden w-100">
         {videoUrl ? (
           <>
             <video
               ref={videoRef}
-              className="position-absolute top-0  start-0 w-100 h-100"
-              style={{ objectFit: "contain" }}
+              className="position-absolute top-0 start-0 w-100 h-100"
+              style={{ 
+                objectFit: "cover" // Ensures video fills container
+              }}
               muted
               loop
               onClick={togglePlayPause}
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
-              onLoadedMetadata={handleLoadedMetadata}
             >
               <source src={videoUrl} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
 
-            {/* Centered Play/Pause Button */}
+            {/* Play/Pause Button */}
             <button
               onClick={togglePlayPause}
               className="position-absolute top-50 start-50 translate-middle
@@ -101,6 +75,26 @@ const HeroSliderTen = ({ spaceTopClass, spaceBottomClass }) => {
           </p>
         )}
       </div>
+
+      {/* Add this CSS (either in your CSS file or via CSS-in-JS) */}
+      <style jsx>{`
+        .video-container {
+          height: 700px;
+          background-color: #000;
+        }
+        
+        @media (max-width: 1024px) {
+          .video-container {
+            height: 500px;
+          }
+        }
+        
+        @media (max-width: 767px) {
+          .video-container {
+            height: 300px;
+          }
+        }
+      `}</style>
     </div>
   );
 };

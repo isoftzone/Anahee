@@ -34,10 +34,10 @@ const PrivacyPolicy = () => {
           { label: "Privacy Policy", path: pathname }
         ]}
       /> */}
-      <div className="container-fluid mb-4">
+      <div className="container-fluid ">
         {policies.length > 0 ? (
           policies.map((policy, index) => (
-            <div key={index} className="mb-4">
+            <div key={index} className="">
               <h3 className="fw-bold">{policy.sectionname}</h3>
               <div dangerouslySetInnerHTML={{ __html: policy.content }} />
             </div>

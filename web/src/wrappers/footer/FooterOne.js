@@ -91,18 +91,18 @@ const FooterOne = ({
               <div className="footer-title ">
                 <h3 className="fw-bold">SITE MAP</h3>
               </div>
-              <ul className="list-unstyled d-flex flex-column align-items-center">
+              <ul className="list-unstyled d-flex pt-2 flex-column align-items-center">
                 <li>
-                  <Link to="/">Home</Link>
+                  <Link  style={{fontSize:"15px"}} to="/">Home</Link>
                 </li>
                 <li>
-                  <Link to="/about">About us</Link>
+                  <Link  style={{fontSize:"15px"}} to="/about">About us</Link>
                 </li>
                 <li>
-                  <Link to="/contact">Contact</Link>
+                  <Link  style={{fontSize:"15px"}} to="/contact">Contact</Link>
                 </li>
                 <li>
-                  <Link to="/terms-conditions">Terms & Condition</Link>
+                  <Link  style={{fontSize:"15px"}} to="/terms-conditions">Terms & Condition</Link>
                 </li>
               </ul>
             </div>
@@ -114,15 +114,15 @@ const FooterOne = ({
               {/* <div className="footer-title">
                 <h3>USEFUL LINKS</h3>
               </div> */}
-              <ul className="list-unstyled d-flex flex-column align-items-center">
+              <ul className="list-unstyled d-flex  pt-4 flex-column align-items-center">
                 <li>
-                  <Link to="/shipping-locations">Shipping Locations</Link>
+                  <Link  style={{fontSize:"15px"}} to="/shipping-locations">Shipping Locations</Link>
                 </li>
                 <li>
-                  <Link to="/terms-of-service">Terms of Service</Link>
+                  <Link  style={{fontSize:"15px"}} to="/terms-of-service">Terms of Service</Link>
                 </li>
                 <li>
-                  <Link to="/exchange-process">Exchange Process</Link>
+                  <Link  style={{fontSize:"15px"}} to="/exchange-process">Exchange Process</Link>
                 </li>
                 <li></li>
               </ul>
@@ -131,22 +131,22 @@ const FooterOne = ({
 
           {/* POLICY LINKS */}
           <div className="col-12 col-sm-6 col-md-6 col-lg-2">
-            <div className="footer-widget pt-4 mt-5 text-center text-md-center">
+            <div className="footer-widget mt-5 pt-5 text-center text-md-center">
               {/* <div className="footer-title">
                 <h3>POLICY LINKS</h3>
               </div> */}
               <ul className="list-unstyled d-flex flex-column align-items-center">
                 <li>
-                  <Link to="/cancellation-policy">Cancellation Policy</Link>
+                  <Link  style={{fontSize:"15px"}} to="/cancellation-policy">Cancellation Policy</Link>
                 </li>
                 <li>
-                  <Link to="/refund-policy">Refund Policy</Link>
+                  <Link  style={{fontSize:"15px"}} to="/refund-policy">Refund Policy</Link>
                 </li>
                 <li>
-                  <Link to="/privacy-policy">Privacy Policy</Link>
+                  <Link  style={{fontSize:"15px"}} to="/privacy-policy">Privacy Policy</Link>
                 </li>
                 <li>
-                  <Link to="/exchange-policy">Exchange Policy</Link>
+                  <Link  style={{fontSize:"15px"}} to="/exchange-policy">Exchange Policy</Link>
                 </li>
               </ul>
             </div>
