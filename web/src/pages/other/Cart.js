@@ -66,6 +66,7 @@ const Cart = () => {
 
     const orderData = {
       couponCode: couponCode,
+      discount:discount,
       items: cartItems.map((item) => ({
         ITEMDESC: item.name, // Item name as ITEMID
         QTY: item.quantity, // Quantity as QTY

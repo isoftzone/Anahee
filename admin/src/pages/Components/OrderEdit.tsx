@@ -53,8 +53,14 @@ const OrderEdit: React.FC = () => {
                     country: sale.COUNTRY,
                     paymentStatus: sale.PAYMENTSTATUS,
                 });
+                  // Calculate discount percentage based on the stored discount amount
+      const subtotal = sale.ITEMS?.reduce((sum: number, item: any) => sum + item.QUANTITY * item.AMOUNT, 0) || 0;
+      const discountAmount = sale.DISCOUNT || 0;
+      const discountPercentage = subtotal > 0 ? (discountAmount / subtotal) * 100 : 0;
+      
+      setDiscount(discountPercentage); // Set the discount percentage
                 setItems(
-                    sale.ITEMS?.map((item :any) => ({
+                    sale.ITEMS?.map((item: any) => ({
                         id: item.ITEMID,
                         name: item.ITEMNAME,
                         description: item.DESCRIPTION,
@@ -70,9 +76,13 @@ const OrderEdit: React.FC = () => {
             setLoading(false);
         }
     };
+    // const calculateSubtotal = () => items.reduce((sum, item) => sum + item.quantity * item.price, 0);
+    // const subtotal = calculateSubtotal();
+    // const grandTotal = subtotal + (subtotal * tax) / 100 - (subtotal * discount) / 100 + shipping;
     const calculateSubtotal = () => items.reduce((sum, item) => sum + item.quantity * item.price, 0);
-    const subtotal = calculateSubtotal();
-    const grandTotal = subtotal + (subtotal * tax) / 100 - (subtotal * discount) / 100 + shipping;
+const subtotal = calculateSubtotal();
+const discountAmount = (subtotal * discount) / 100; // Calculate discount amount from percentage
+const grandTotal = subtotal + (subtotal * tax) / 100 - discountAmount + shipping;
     const addItem = () => {
         setItems([...items, { name: '', description: null, quantity: 1, price: 0 }]);
     };
@@ -222,23 +232,27 @@ const OrderEdit: React.FC = () => {
                 <div className="mt-6 p-4 bg-gray-50 rounded-md">
                     <div className="flex justify-between mb-2">
                         <span>Subtotal:</span>
-                        <span className="font-medium">${subtotal.toFixed(2)}</span>
+                        <span className="font-medium">{subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between mb-2">
                         <span>Tax ({tax}%):</span>
                         <span>${((subtotal * tax) / 100).toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between mb-2">
+                    {/* <div className="flex justify-between mb-2">
                         <span>Discount ({discount}%):</span>
                         <span>-${((subtotal * discount) / 100).toFixed(2)}</span>
-                    </div>
+                    </div> */}
+                    <div className="flex justify-between mb-2">
+  <span>Discount ({discount}%):</span>
+  <span>-${discountAmount.toFixed(2)}</span>
+</div>
                     <div className="flex justify-between mb-2">
                         <span>Shipping:</span>
                         <span>${shipping.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between pt-2 border-t border-gray-200">
                         <span className="font-bold">Grand Total:</span>
-                        <span className="text-xl font-bold">${grandTotal.toFixed(2)}</span>
+                        <span className="text-xl font-bold">{grandTotal.toFixed(2)}</span>
                     </div>
                 </div>
             </div>
