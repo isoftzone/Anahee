@@ -583,3 +583,86 @@ exports.cancelOrder = (req, res) => {
   });
 };
 
+exports.updateSales = async (req, res) => {
+    const { id } = req.params;
+    console.log(":memo: Updating SALEID:", id);
+    if (!id) return res.status(400).json({ error: "Missing SALEID" });
+    const saleId = Number(id);
+    if (isNaN(saleId)) return res.status(400).json({ error: "Invalid SALEID" });
+    const { items, tax, discount, shipping, customerDetails } = req.body;
+    if (!customerDetails || typeof customerDetails !== 'object') {
+        return res.status(400).json({ error: "Missing or invalid customerDetails" });
+    }
+    const {
+        COMPANYID, FINYEAR, SERIES, SALEDATE, TMODE,
+        CUSTOMERID, TOTALAMOUNT, DISCAMOUNT, NETAMOUNT,
+        AMOUNTPAID, BALANCE
+    } = customerDetails;
+    const ITEMQTY = items.reduce((sum, item) => sum + (item.QUANTITY || 0), 0);
+    const updatedSalesMaster = {
+        COMPANYID,
+        FINYEAR,
+        SERIES,
+        SALEDATE,
+        TMODE,
+        CUSTOMERID,
+        ITEMQTY,
+        TOTALAMOUNT,
+        DISCOUNT: discount,
+        DISCAMOUNT,
+        NETAMOUNT,
+        AMOUNTPAID,
+        BALANCE
+    };
+    try {
+        // 1. Update salesmaster table
+        await new Promise((resolve, reject) => {
+            con.query("UPDATE salesmaster SET ? WHERE SALEID = ?", [updatedSalesMaster, saleId], (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+            });
+        });
+        // 2. Update each item in itemmaster (ITEMNAME, DESCRIPTION, AMOUNT)
+        for (const item of items) {
+            const { ITEMID, ITEMNAME, DESCRIPTION } = item;
+            await new Promise((resolve, reject) => {
+                con.query(
+                    "UPDATE itemmaster SET ITEMNAME = ?, DESCRIPTION = ? WHERE ITEMID = ?",
+                    [ITEMNAME, DESCRIPTION, ITEMID],
+                    (err, result) => {
+                        if (err) return reject(err);
+                        resolve(result);
+                    }
+                );
+            });
+        }
+        // 3. Delete existing salesdetail entries for this SALEID
+        await new Promise((resolve, reject) => {
+            con.query("DELETE FROM salesdetail WHERE SALEID = ?", [saleId], (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+            });
+        });
+        // 4. Insert new salesdetail rows with QTY
+        const salesDetailValues = items.map(item => [
+            saleId,
+            item.ITEMID,
+            item.QUANTITY,
+            item.AMOUNT
+        ]);
+        await new Promise((resolve, reject) => {
+            con.query(
+                "INSERT INTO salesdetail (SALEID, ITEMID, QTY, AMOUNT) VALUES ?",
+                [salesDetailValues],
+                (err, result) => {
+                    if (err) return reject(err);
+                    resolve(result);
+                }
+            );
+        });
+        res.json({ success: true, message: "Sales, items, and quantities updated successfully!" });
+    } catch (error) {
+        console.error(":x: Error updating sale:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};

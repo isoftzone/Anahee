@@ -289,7 +289,7 @@ const MyAccount = ({ showOrdersView = false }) => {
                       <div className="row">
                         {/* Form fields remain the same as in your original code */}
                         {/* ... */}
-                       {/* First Name */}
+                        {/* First Name */}
                         <div className="col-lg-6 mb-4">
                           <label className="d-block mb-2">First Name</label>
                           <input
@@ -419,15 +419,12 @@ const MyAccount = ({ showOrdersView = false }) => {
                           />
                         </div>
 
-                        {/* Password */}
-                        {/* <div className="col-lg-6 mb-4">
-                          <label className="d-block mb-2">New Password</label>
-                          <input type="password" name="newPassword" value={customer.newPassword} onChange={handleInputChange} className="w-100 p-2" style={inputStyle} />
-                        </div> */}
-
                         <div
+                          className="col-lg-6 mb-4"
                           style={{ position: "relative", marginBottom: "15px" }}
                         >
+                          <label className="d-block mb-2">New Password</label>
+
                           <input
                             type={showPassword ? "text" : "password"}
                             name="newPassword"
@@ -439,7 +436,7 @@ const MyAccount = ({ showOrdersView = false }) => {
                             autoComplete="off"
                           />
                           <i
-                            className={`bi ${
+                            className={`bi pt-5 ${
                               showPassword ? "bi-eye-slash" : "bi-eye"
                             }`}
                             onClick={() => setShowPassword(!showPassword)}
@@ -462,8 +459,13 @@ const MyAccount = ({ showOrdersView = false }) => {
                         </div> */}
 
                         <div
+                          className="col-lg-6 mb-4"
                           style={{ position: "relative", marginBottom: "15px" }}
                         >
+                          <label className="d-block mb-2">
+                            Confirm Password
+                          </label>
+
                           <input
                             type={showConfirmPassword ? "text" : "password"}
                             name="confirmPassword"
@@ -479,7 +481,7 @@ const MyAccount = ({ showOrdersView = false }) => {
                       <div className="mt-4">
                         <button
                           type="submit"
-                          className="w-100 py-2"
+                          className="px-3 py-2"
                           style={buttonStyle}
                         >
                           Update Profile
@@ -487,7 +489,13 @@ const MyAccount = ({ showOrdersView = false }) => {
                       </div>
                     </form>
                   ) : (
-                    <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "2rem" }}>
+                    <div
+                      style={{
+                        maxWidth: "1000px",
+                        margin: "0 auto",
+                        padding: "2rem",
+                      }}
+                    >
                       <Container className="orders-container">
                         <div className="page-header">
                           <h1 className="page-title">My Orders</h1>
@@ -528,7 +536,9 @@ const MyAccount = ({ showOrdersView = false }) => {
                   <ul style={{ listStyle: "none", padding: 0 }}>
                     <li>
                       <button
-                        onClick={() => navigate(showOrdersView ? '/my-account' : '/orders')}
+                        onClick={() =>
+                          navigate(showOrdersView ? "/my-account" : "/orders")
+                        }
                         style={sidebarStyle}
                       >
                         {showOrdersView ? "Back to Profile" : "View Orders"}
@@ -563,7 +573,7 @@ const sidebarStyle = {
   backgroundColor: "#ffeaf1",
   border: "none",
   borderRadius: "5px",
-  padding: "5px 10px"
+  padding: "5px 10px",
 };
 
 export default MyAccount;

@@ -869,7 +869,7 @@
       form {
         position: relative;
         input {
-          width: 100%;
+          width: 89%;
           padding: 5px 72px 5px 15px;
 
           transition: all 0.4s ease 0s;
@@ -2526,4 +2526,15 @@
   top: 0;
   width: 100%;
   z-index: 999; /* High z-index for navbar */
+}
+
+@media (max-width:321px){
+.same-style.header-search, .search-content, form, input{
+  width: 100%;
+    margin-left: 10px;
+}
+.header-right-wrap, .same-style.header-search .search-content{
+          right: -120px !important;
+
+}
 }

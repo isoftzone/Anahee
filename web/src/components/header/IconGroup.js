@@ -225,7 +225,6 @@ const IconGroup = ({ iconWhiteClass }) => {
           <form onSubmit={handleSearch}>
             <input
               type="text"
-              className="ms-5"
               placeholder="Search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
