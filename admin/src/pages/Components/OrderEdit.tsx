@@ -231,7 +231,7 @@ const OrderEdit: React.FC = () => {
             <body>
                 <div class="header">
                     <h1>INVOICE</h1>
-                    <h2>Invoice #${invoiceNumber}</h2>
+                    <h2>Invoice ${invoiceNumber}</h2>
                     <p>Date: ${currentDate}</p>
                 </div>
                 
@@ -265,8 +265,8 @@ const OrderEdit: React.FC = () => {
                                 <td>${item.name}</td>
                                 <td>${item.description || ''}</td>
                                 <td>${item.quantity}</td>
-                                <td>$${item.price.toFixed(2)}</td>
-                                <td>$${(item.quantity * item.price).toFixed(2)}</td>
+                                <td>${item.price.toFixed(2)}</td>
+                                <td>${(item.quantity * item.price).toFixed(2)}</td>
                             </tr>
                         `
                             )
@@ -275,11 +275,11 @@ const OrderEdit: React.FC = () => {
                 </table>
                 
                 <div class="totals">
-                    <div><span>Subtotal:</span><span>$${subtotal.toFixed(2)}</span></div>
-                    <div><span>Tax (${tax}%):</span><span>$${((subtotal * tax) / 100).toFixed(2)}</span></div>
-                    <div><span>Discount (${discount}%):</span><span>-$${((subtotal * discount) / 100).toFixed(2)}</span></div>
-                    <div><span>Shipping:</span><span>$${shipping.toFixed(2)}</span></div>
-                    <div class="grand-total"><span>Grand Total:</span><span>$${grandTotal.toFixed(2)}</span></div>
+                    <div><span>Subtotal:</span><span>${subtotal.toFixed(2)}</span></div>
+                    <div><span>Tax (${tax}%):</span><span>${((subtotal * tax) / 100).toFixed(2)}</span></div>
+                    <div><span>Discount (${discount}%):</span><span>-${((subtotal * discount) / 100).toFixed(2)}</span></div>
+                    <div><span>Shipping:</span><span>${shipping.toFixed(2)}</span></div>
+                    <div class="grand-total"><span>Grand Total:</span><span>${grandTotal.toFixed(2)}</span></div>
                 </div>
             </body>
             </html>
@@ -312,8 +312,8 @@ const OrderEdit: React.FC = () => {
 
             // Open email client after a short delay
             setTimeout(() => {
-                const subject = `Invoice #${invoiceNumber} from Your Company`;
-                const body = `Please find attached invoice #${invoiceNumber}.`;
+                const subject = `Invoice ${invoiceNumber} from Your Company`;
+                const body = `Please find attached invoice ${invoiceNumber}.`;
                 const mailtoLink = `mailto:${customerDetails.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
                 window.location.href = mailtoLink;
             }, 1000);
@@ -460,7 +460,7 @@ const OrderEdit: React.FC = () => {
                             <label className="block text-sm font-medium">Payment Mode:</label>
                             <input
                                 className="border rounded w-full p-2"
-                                value={customerDetails.payment_mode || 'N/A' }
+                                value={customerDetails.payment_mode || 'N/A'}
                                 onChange={(e) => setCustomerDetails({ ...customerDetails, payment_mode: e.target.value })}
                             />
                         </div>
@@ -468,7 +468,7 @@ const OrderEdit: React.FC = () => {
                             <label className="block text-sm font-medium">Payment Status:</label>
                             <input
                                 className="border rounded w-full p-2"
-                                value={customerDetails.paymentStatus || 'N/A' }
+                                value={customerDetails.paymentStatus || 'N/A'}
                                 onChange={(e) => setCustomerDetails({ ...customerDetails, paymentStatus: e.target.value })}
                             />
                         </div>

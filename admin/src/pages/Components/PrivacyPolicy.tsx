@@ -53,7 +53,7 @@ const PrivacyPolicy: React.FC = () => {
 
   return (
     <div className="privacy-policy-editor">
-      <h1 className="" style={{ fontWeight: "700" }}>Exchange Policy</h1>
+      <h1 className="" style={{ fontWeight: "700" }}>Privacy Policy</h1>
        {/* Section Name Input */}
        <Form.Group className="">
         <Form.Label>Section Name</Form.Label>

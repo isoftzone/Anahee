@@ -66,7 +66,7 @@ const Cart = () => {
 
     const orderData = {
       couponCode: couponCode,
-      discount:discount,
+      discount: discount,
       items: cartItems.map((item) => ({
         ITEMDESC: item.name, // Item name as ITEMID
         QTY: item.quantity, // Quantity as QTY
@@ -288,7 +288,7 @@ const Cart = () => {
                         </div>
                         <div className="row">
                           <div className="col-lg-12">
-                            <div className="cart-shiping-update-wrapper">
+                            <div className="cart-shiping-update-wrapper   d-flex flex-column flex-sm-row justify-content-center justify-content-sm-between align-items-center gap-3 text-center">
                               <div className="cart-shiping-update">
                                 <Link
                                   to={
@@ -420,22 +420,21 @@ const Cart = () => {
                                 (cartTotalPrice - discount).toFixed(2)}
                             </span>
                           </h4>
-<div>
-  <Link
-                            to={process.env.PUBLIC_URL + "/checkout"}
-                            onClick={handleProceedToCheckout}
-                          >
-                            Proceed to Checkout
-                            {/* <button onClick={handleProceedToCheckout} >
+                          <div>
+                            <Link
+                              to={process.env.PUBLIC_URL + "/checkout"}
+                              onClick={handleProceedToCheckout}
+                            >
+                              Proceed to Checkout
+                              {/* <button onClick={handleProceedToCheckout} >
                           </button> */}
-                          </Link>
-</div>
-                          
+                            </Link>
+                          </div>
+
                           {/* <button className="cart-btn-2" type="button" onClick={handleProceedToCheckout} >
                             Apply Coupon & Proceed to Checkout
                           </button> */}
                         </div>
-                        
                       </div>
                     </div>
                   </div>
