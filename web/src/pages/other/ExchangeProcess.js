@@ -32,7 +32,7 @@ const ExchangeProcess = () => {
           { label: "Exchange Process", path: pathname }
         ]}
       /> */}
-     <div className="container-fluid">
+     <div className="container-fluid mb-5">
         {policies.length > 0 ? (
           policies.map((policy, index) => (
             <div key={index} className="">

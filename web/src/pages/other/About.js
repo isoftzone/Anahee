@@ -19,7 +19,7 @@ const About = () => {
         titleTemplate="About us"
         description="About page of Anahee Anahee."
       /> 
-      <LayoutOne headerTop="visible">
+      <LayoutOne headerTop="visible" >
         {/* breadcrumb */}
         {/* <Breadcrumb 
           pages={[

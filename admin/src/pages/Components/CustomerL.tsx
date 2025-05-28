@@ -56,17 +56,17 @@ const CustomersL: React.FC = () => {
         navigate(`/components/EditCustomer/${customerId}`);
     };
     const handleDelete = async (customerId: string | number) => {
-  const confirmDelete = window.confirm("Are you sure you want to delete this customer?");
-  if (!confirmDelete) return;
-  try {
-    await axios.delete(`${BASE_URL}/deletecustomer/${customerId}`);
-    setCustomers(prev => prev.filter(cust => cust.CUSTOMERID !== customerId));
-    alert('Customer deleted successfully');
-  } catch (error: any) {
-    console.error('Error deleting customer:', error);
-    alert('Failed to delete customer');
-  }
-};
+        const confirmDelete = window.confirm('Are you sure you want to delete this customer?');
+        if (!confirmDelete) return;
+        try {
+            await axios.delete(`${BASE_URL}/deletecustomer/${customerId}`);
+            setCustomers((prev) => prev.filter((cust) => cust.CUSTOMERID !== customerId));
+            alert('Customer deleted successfully');
+        } catch (error: any) {
+            console.error('Error deleting customer:', error);
+            alert('Failed to delete customer');
+        }
+    };
     return (
         <div className="customer-list-container">
             <h1>Customer List</h1>
@@ -111,7 +111,7 @@ const CustomersL: React.FC = () => {
                                 <td>{customer.CADDRESSLINE1}</td>
                                 {/* <td>{customer.NAME}</td> */}
                                 <td>{customer.email}</td>
-                                <td className='flex gap-2'>
+                                <td className="flex gap-2">
                                     <button className="btn btn-sm btn-warning" onClick={() => handleEdit(customer.CUSTOMERID)}>
                                         Edit
                                     </button>
