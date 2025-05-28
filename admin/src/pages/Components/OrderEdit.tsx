@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
+
 interface Item {
     id?: number;
     name: string;
@@ -9,6 +10,7 @@ interface Item {
     quantity: number;
     price: number;
 }
+
 interface CustomerDetails {
     name: string;
     email: string;
@@ -16,7 +18,23 @@ interface CustomerDetails {
     phone: string;
     country: string;
     paymentStatus: string;
+    payment_mode: string;
 }
+
+interface SalesMasterData {
+    COMPANYID: number;
+    FINYEAR: number;
+    SERIES: string;
+    SALEDATE: string;
+    TMODE: string;
+    CUSTOMERID: number;
+    TOTALAMOUNT: number;
+    DISCAMOUNT: number;
+    NETAMOUNT: number;
+    AMOUNTPAID: number;
+    BALANCE: number;
+}
+
 const OrderEdit: React.FC = () => {
     const { saleId } = useParams<{ saleId: string }>();
     const [items, setItems] = useState<Item[]>([]);
@@ -24,6 +42,9 @@ const OrderEdit: React.FC = () => {
     const [discount, setDiscount] = useState(0);
     const [shipping, setShipping] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [showPreview, setShowPreview] = useState(false);
+    const printRef = useRef<HTMLDivElement>(null);
+
     const [customerDetails, setCustomerDetails] = useState<CustomerDetails>({
         name: '',
         email: '',
@@ -31,20 +52,42 @@ const OrderEdit: React.FC = () => {
         phone: '',
         country: '',
         paymentStatus: '',
+        payment_mode: '',
     });
-    const [invoiceNumber, setInvoiceNumber] = useState('#0001');
+
+    // Add the salesMasterData state
+    const [salesMasterData, setSalesMasterData] = useState<SalesMasterData>({
+        COMPANYID: 1,
+        FINYEAR: new Date().getFullYear(),
+        SERIES: 'INV',
+        SALEDATE: new Date().toISOString().split('T')[0],
+        TMODE: 'CASH',
+        CUSTOMERID: 1,
+        TOTALAMOUNT: 0,
+        DISCAMOUNT: 0,
+        NETAMOUNT: 0,
+        AMOUNTPAID: 0,
+        BALANCE: 0,
+    });
+
+    const [invoiceNumber, setInvoiceNumber] = useState(saleId);
+
     console.log('wewe id', saleId);
+
     useEffect(() => {
         if (saleId) {
             fetchSalesData();
         }
     }, [saleId]);
+
     const fetchSalesData = async () => {
         try {
             setLoading(true);
             const response = await axios.get(`${BASE_URL}/getSalesMaster/${saleId}`);
             if (response.data?.sales?.[0]) {
                 const sale = response.data.sales[0];
+
+                // Set customer details
                 setCustomerDetails({
                     name: sale.NAME,
                     email: sale.EMAIL,
@@ -52,13 +95,10 @@ const OrderEdit: React.FC = () => {
                     phone: sale.NUMBER,
                     country: sale.COUNTRY,
                     paymentStatus: sale.PAYMENTSTATUS,
+                    payment_mode: sale.PAYMENTMETHOD,
                 });
-                  // Calculate discount percentage based on the stored discount amount
-      const subtotal = sale.ITEMS?.reduce((sum: number, item: any) => sum + item.QUANTITY * item.AMOUNT, 0) || 0;
-      const discountAmount = sale.DISCOUNT || 0;
-      const discountPercentage = subtotal > 0 ? (discountAmount / subtotal) * 100 : 0;
-      
-      setDiscount(discountPercentage); // Set the discount percentage
+
+                // Set items
                 setItems(
                     sale.ITEMS?.map((item: any) => ({
                         id: item.ITEMID,
@@ -68,6 +108,26 @@ const OrderEdit: React.FC = () => {
                         price: item.AMOUNT,
                     })) || []
                 );
+
+                // Set sales master data
+                setSalesMasterData({
+                    COMPANYID: sale.COMPANYID || 1,
+                    FINYEAR: sale.FINYEAR || new Date().getFullYear(),
+                    SERIES: sale.SERIES || 'INV',
+                    SALEDATE: sale.SALEDATE || new Date().toISOString().split('T')[0],
+                    TMODE: sale.TMODE || 'CASH',
+                    CUSTOMERID: sale.CUSTOMERID || 1,
+                    TOTALAMOUNT: sale.TOTALAMOUNT || 0,
+                    DISCAMOUNT: sale.DISCAMOUNT || 0,
+                    NETAMOUNT: sale.NETAMOUNT || 0,
+                    AMOUNTPAID: sale.AMOUNTPAID || 0,
+                    BALANCE: sale.BALANCE || 0,
+                });
+
+                // Set existing tax, discount, shipping if available
+                setTax(sale.TAX || 0);
+                setDiscount(sale.DISCOUNT || 0);
+                setShipping(sale.SHIPPING || 0);
             }
         } catch (error) {
             console.error('Error fetching sales data:', error);
@@ -76,19 +136,19 @@ const OrderEdit: React.FC = () => {
             setLoading(false);
         }
     };
-    // const calculateSubtotal = () => items.reduce((sum, item) => sum + item.quantity * item.price, 0);
-    // const subtotal = calculateSubtotal();
-    // const grandTotal = subtotal + (subtotal * tax) / 100 - (subtotal * discount) / 100 + shipping;
+
     const calculateSubtotal = () => items.reduce((sum, item) => sum + item.quantity * item.price, 0);
-const subtotal = calculateSubtotal();
-const discountAmount = (subtotal * discount) / 100; // Calculate discount amount from percentage
-const grandTotal = subtotal + (subtotal * tax) / 100 - discountAmount + shipping;
+    const subtotal = calculateSubtotal();
+    const grandTotal = subtotal + (subtotal * tax) / 100 - (subtotal * discount) / 100 + shipping;
+
     const addItem = () => {
         setItems([...items, { name: '', description: null, quantity: 1, price: 0 }]);
     };
+
     const removeItem = (index: number) => {
         setItems(items.filter((_, i) => i !== index));
     };
+
     const handleItemChange = (index: number, field: keyof Item, value: string | number | null) => {
         const updatedItems = [...items];
         updatedItems[index] = {
@@ -97,23 +157,43 @@ const grandTotal = subtotal + (subtotal * tax) / 100 - discountAmount + shipping
         };
         setItems(updatedItems);
     };
+
     const handleSaveOrder = async () => {
         try {
             setLoading(true);
-            await axios.put(`${BASE_URL}/updateSales/${saleId}`, {
+
+            // Calculate totals
+            const subtotal = calculateSubtotal();
+            const taxAmount = (subtotal * tax) / 100;
+            const discountAmount = (subtotal * discount) / 100;
+            const totalAmount = subtotal + taxAmount;
+            const netAmount = totalAmount - discountAmount + shipping;
+
+            // Prepare the data structure expected by your controller
+            const updateData = {
                 items: items.map((item) => ({
-                    ITEMID: item.id,
+                    ITEMID: item.id || null,
                     ITEMNAME: item.name,
                     DESCRIPTION: item.description,
                     QUANTITY: item.quantity,
                     AMOUNT: item.price,
                 })),
-                tax,
-                discount,
-                shipping,
-                customerDetails,
-            });
-            alert('Order saved successfully!');
+                tax: tax,
+                discount: discount,
+                shipping: shipping,
+                customerDetails: {
+                    ...salesMasterData, // Use the stored sales master data
+                    ITEMQTY: items.reduce((sum, item) => sum + item.quantity, 0),
+                    TOTALAMOUNT: totalAmount,
+                    DISCAMOUNT: discountAmount,
+                    NETAMOUNT: netAmount,
+                    AMOUNTPAID: customerDetails.paymentStatus === 'PAID' ? netAmount : 0,
+                    BALANCE: customerDetails.paymentStatus === 'PAID' ? 0 : netAmount,
+                },
+            };
+
+            await axios.put(`${BASE_URL}/updateSales/${saleId}`, updateData);
+            alert('Order updated successfully!');
         } catch (error) {
             console.error('Error saving order:', error);
             alert('Failed to save order');
@@ -121,6 +201,166 @@ const grandTotal = subtotal + (subtotal * tax) / 100 - discountAmount + shipping
             setLoading(false);
         }
     };
+
+    // Generate PDF content as HTML string
+    const generateInvoiceHTML = () => {
+        const currentDate = new Date().toLocaleDateString();
+
+        return `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <title>Invoice ${invoiceNumber}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    .header { text-align: center; margin-bottom: 30px; }
+                    .invoice-details { display: flex; justify-content: space-between; margin-bottom: 30px; }
+                    .customer-details, .payment-details { width: 45%; }
+                    .items-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                    .items-table th, .items-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    .items-table th { background-color: #f5f5f5; }
+                    .totals { float: right; width: 300px; }
+                    .totals div { display: flex; justify-content: space-between; margin-bottom: 5px; }
+                    .grand-total { border-top: 2px solid #333; padding-top: 10px; font-weight: bold; font-size: 18px; }
+                    .status-badge { padding: 4px 8px; border-radius: 4px; }
+                    .status-pending { background-color: #fef3c7; color: #92400e; }
+                    .status-paid { background-color: #d1fae5; color: #065f46; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>INVOICE</h1>
+                    <h2>Invoice #${invoiceNumber}</h2>
+                    <p>Date: ${currentDate}</p>
+                </div>
+                
+                <div class="invoice-details">
+                    <div class="customer-details">
+                        <h3>Bill To:</h3>
+                        <p><strong>${customerDetails.name}</strong></p>
+                        <p>${customerDetails.email}</p>
+                        <p>${customerDetails.address}</p>
+                        <p>${customerDetails.phone}</p>
+                        <p>${customerDetails.country}</p>
+                        <p>Payment Status: <span class="status-badge ${customerDetails.paymentStatus === 'PAID' ? 'status-paid' : 'status-pending'}">${customerDetails.paymentStatus}</span></p>
+                    </div>
+                </div>
+                
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Description</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${items
+                            .map(
+                                (item) => `
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>${item.description || ''}</td>
+                                <td>${item.quantity}</td>
+                                <td>$${item.price.toFixed(2)}</td>
+                                <td>$${(item.quantity * item.price).toFixed(2)}</td>
+                            </tr>
+                        `
+                            )
+                            .join('')}
+                    </tbody>
+                </table>
+                
+                <div class="totals">
+                    <div><span>Subtotal:</span><span>$${subtotal.toFixed(2)}</span></div>
+                    <div><span>Tax (${tax}%):</span><span>$${((subtotal * tax) / 100).toFixed(2)}</span></div>
+                    <div><span>Discount (${discount}%):</span><span>-$${((subtotal * discount) / 100).toFixed(2)}</span></div>
+                    <div><span>Shipping:</span><span>$${shipping.toFixed(2)}</span></div>
+                    <div class="grand-total"><span>Grand Total:</span><span>$${grandTotal.toFixed(2)}</span></div>
+                </div>
+            </body>
+            </html>
+        `;
+    };
+
+    // Send Invoice via Email
+    const handleSendInvoice = async () => {
+        try {
+            setLoading(true);
+
+            // First save the current state
+            await handleSaveOrder();
+
+            // Generate invoice content
+            const invoiceHTML = generateInvoiceHTML();
+
+            // Create a blob with the HTML content
+            const blob = new Blob([invoiceHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+
+            // Create a download link
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `invoice_${invoiceNumber}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            // Open email client after a short delay
+            setTimeout(() => {
+                const subject = `Invoice #${invoiceNumber} from Your Company`;
+                const body = `Please find attached invoice #${invoiceNumber}.`;
+                const mailtoLink = `mailto:${customerDetails.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.location.href = mailtoLink;
+            }, 1000);
+
+            alert('The invoice has been downloaded. Please attach it to your email.');
+        } catch (error) {
+            console.error('Error preparing invoice email:', error);
+            alert('Failed to prepare invoice email');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Preview Invoice
+    const handlePreview = () => {
+        setShowPreview(true);
+    };
+
+    // Download Invoice as PDF
+    const handleDownload = () => {
+        const invoiceHTML = generateInvoiceHTML();
+        const newWindow = window.open('', '_blank');
+        if (newWindow) {
+            newWindow.document.write(invoiceHTML);
+            newWindow.document.close();
+
+            // Trigger print dialog for PDF save
+            setTimeout(() => {
+                newWindow.print();
+            }, 1000);
+        }
+    };
+
+    // Alternative download method using blob
+    const handleDownloadAlternative = () => {
+        const invoiceHTML = generateInvoiceHTML();
+        const blob = new Blob([invoiceHTML], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `invoice-${invoiceNumber}.html`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-screen">
@@ -128,20 +368,51 @@ const grandTotal = subtotal + (subtotal * tax) / 100 - discountAmount + shipping
             </div>
         );
     }
+
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Edit Order #{saleId}</h1>
+                <h1 className="text-2xl font-bold">Edit Order {saleId}</h1>
                 <div className="flex space-x-4">
                     <button onClick={handleSaveOrder} className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors" disabled={loading}>
                         {loading ? 'Saving...' : 'Save'}
                     </button>
-                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors">Send Invoice</button>
-                    <button className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-md transition-colors">Preview</button>
-                    <button className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-md transition-colors">Download</button>
+                    <button onClick={handleSendInvoice} className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors" disabled={loading}>
+                        Send Invoice
+                    </button>
+                    <button onClick={handlePreview} className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-md transition-colors">
+                        Preview
+                    </button>
+                    <button onClick={handleDownload} className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-md transition-colors">
+                        Download
+                    </button>
                 </div>
             </div>
+
+            {/* Preview Modal */}
+            {showPreview && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-lg max-w-4xl max-h-[90vh] overflow-auto">
+                        <div className="flex justify-between items-center p-4 border-b">
+                            <h2 className="text-xl font-bold">Invoice Preview</h2>
+                            <button onClick={() => setShowPreview(false)} className="text-gray-500 hover:text-gray-700 text-2xl">
+                                ×
+                            </button>
+                        </div>
+                        <div className="p-6" dangerouslySetInnerHTML={{ __html: generateInvoiceHTML() }} />
+                        <div className="flex justify-end space-x-4 p-4 border-t">
+                            <button onClick={() => setShowPreview(false)} className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                                Close
+                            </button>
+                            <button onClick={handleDownload} className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">
+                                Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Invoice Form */}
             <div className="bg-white p-6 shadow-md rounded-md">
                 {/* Company Details */}
@@ -151,6 +422,7 @@ const grandTotal = subtotal + (subtotal * tax) / 100 - discountAmount + shipping
                         <input className="border rounded w-full p-2 mt-1" value={invoiceNumber} onChange={(e) => setInvoiceNumber(e.target.value)} />
                     </div>
                 </div>
+
                 {/* Billing & Payment Details */}
                 <div className="grid grid-cols-2 gap-6 mb-6">
                     {/* Bill To */}
@@ -179,15 +451,30 @@ const grandTotal = subtotal + (subtotal * tax) / 100 - discountAmount + shipping
                             </span>
                         </div>
                     </div>
+
+                    {/* Payment Details */}
                     {/* Payment Details */}
                     <div>
                         <h3 className="font-semibold mb-2">Payment Details:</h3>
-                        <input className="border rounded w-full p-2 mb-2" placeholder="Account Number" />
-                        <input className="border rounded w-full p-2 mb-2" placeholder="Bank Name" />
-                        <input className="border rounded w-full p-2 mb-2" placeholder="SWIFT Code" />
-                        <input className="border rounded w-full p-2 mb-2" placeholder="IBAN" />
+                        <div className="mb-2">
+                            <label className="block text-sm font-medium">Payment Mode:</label>
+                            <input
+                                className="border rounded w-full p-2"
+                                value={customerDetails.payment_mode || 'N/A' }
+                                onChange={(e) => setCustomerDetails({ ...customerDetails, payment_mode: e.target.value })}
+                            />
+                        </div>
+                        <div className="mb-2">
+                            <label className="block text-sm font-medium">Payment Status:</label>
+                            <input
+                                className="border rounded w-full p-2"
+                                value={customerDetails.paymentStatus || 'N/A' }
+                                onChange={(e) => setCustomerDetails({ ...customerDetails, paymentStatus: e.target.value })}
+                            />
+                        </div>
                     </div>
                 </div>
+
                 {/* Invoice Items */}
                 <div className="mt-6">
                     <h3 className="font-semibold mb-2">Item Details</h3>
@@ -213,21 +500,23 @@ const grandTotal = subtotal + (subtotal * tax) / 100 - discountAmount + shipping
                         Add Item
                     </button>
                 </div>
+
                 {/* Pricing Details */}
                 <div className="mt-6 grid grid-cols-3 gap-4">
                     <div>
-                        <label className="block text-sm font-medium">Tax (%)</label>
+                        <label className="block text-sm font-medium">Tax</label>
                         <input className="border rounded w-full p-2 mt-1" type="number" min="0" value={tax} onChange={(e) => setTax(Number(e.target.value))} />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium">Discount (%)</label>
+                        <label className="block text-sm font-medium">Discount</label>
                         <input className="border rounded w-full p-2 mt-1" type="number" min="0" value={discount} onChange={(e) => setDiscount(Number(e.target.value))} />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium">Shipping ($)</label>
+                        <label className="block text-sm font-medium">Shipping</label>
                         <input className="border rounded w-full p-2 mt-1" type="number" min="0" step="0.01" value={shipping} onChange={(e) => setShipping(Number(e.target.value))} />
                     </div>
                 </div>
+
                 {/* Total Section */}
                 <div className="mt-6 p-4 bg-gray-50 rounded-md">
                     <div className="flex justify-between mb-2">
@@ -236,19 +525,15 @@ const grandTotal = subtotal + (subtotal * tax) / 100 - discountAmount + shipping
                     </div>
                     <div className="flex justify-between mb-2">
                         <span>Tax ({tax}%):</span>
-                        <span>${((subtotal * tax) / 100).toFixed(2)}</span>
+                        <span>{((subtotal * tax) / 100).toFixed(2)}</span>
                     </div>
-                    {/* <div className="flex justify-between mb-2">
-                        <span>Discount ({discount}%):</span>
-                        <span>-${((subtotal * discount) / 100).toFixed(2)}</span>
-                    </div> */}
                     <div className="flex justify-between mb-2">
-  <span>Discount ({discount}%):</span>
-  <span>-${discountAmount.toFixed(2)}</span>
-</div>
+                        <span>Discount ({discount}%):</span>
+                        <span>-{((subtotal * discount) / 100).toFixed(2)}</span>
+                    </div>
                     <div className="flex justify-between mb-2">
                         <span>Shipping:</span>
-                        <span>${shipping.toFixed(2)}</span>
+                        <span>{shipping.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between pt-2 border-t border-gray-200">
                         <span className="font-bold">Grand Total:</span>
@@ -259,4 +544,5 @@ const grandTotal = subtotal + (subtotal * tax) / 100 - discountAmount + shipping
         </div>
     );
 };
+
 export default OrderEdit;

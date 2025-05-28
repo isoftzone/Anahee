@@ -29,7 +29,7 @@ const About = () => {
         /> */}
 
         {/* section title with text */}
-        <SectionTitleWithText spaceTopClass="pt-100" spaceBottomClass="pb-95" />
+        <SectionTitleWithText />
 
         {/* banner */}
         {/* <BannerOne spaceBottomClass="pb-70" /> */}

@@ -68,6 +68,7 @@ router.put("/editUser/:id", users.editUser);
 router.post("/add_customer", customer.addcustomer);
 router.post("/login_customer", customer.logincustomer);
 router.get("/getallorders/:customerId", salesmaster.getAllOrders);
+router.put("/updateSales/:id",salesmaster.updateSales);
 router.get("/getcustomerbyid/:customerId", customer.getcustomerbyid);
 router.put("/updateCustomerInfo/:id", customer.updateCustomerInfo);
 router.get("/getAllcustomer", customer.getAll);

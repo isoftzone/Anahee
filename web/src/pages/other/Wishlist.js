@@ -125,7 +125,7 @@ const Wishlist = () => {
                                       wishlistItem.variation.length >= 1 ? (
                                       <Link
                                         to={`${process.env.PUBLIC_URL}/product/${wishlistItem.id}`}
-                                       className="px-4 py-3 text-sm sm:px-5 sm:py-5 sm:text-base"
+                                        className="px-4 py-3 text-sm sm:px-5 sm:py-5 sm:text-base"
                                       >
                                         Select option
                                       </Link>
@@ -214,9 +214,7 @@ const Wishlist = () => {
                     </div>
                     <div className="item-empty-area__text">
                       No items found in wishlist <br />
-                      <Link
-                        to={process.env.PUBLIC_URL + "/shop-grid-standard"}
-                      >
+                      <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
                         Add Items
                       </Link>
                     </div>

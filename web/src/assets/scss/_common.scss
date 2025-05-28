@@ -2013,6 +2013,9 @@ button:disabled {
 *::after,
 *::before {
   box-sizing: border-box;
-        font-size: 20px;
+        font-size:15px;
+}
+.pe-7s-close:before{
+  font-size: 36px;
 }
 }
