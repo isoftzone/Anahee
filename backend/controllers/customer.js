@@ -8,6 +8,72 @@ exports.getCustomer = async (req, res) => {
     res.json(result);
   });
 };
+// exports.updateCustomerInfo = (req, res) => {
+//   const {
+//     FNAME,
+//     LNAME,
+//     email,
+//     customerId,
+//     MOBILE,
+//     CADDRESSLINE1,
+//     CCITY,
+//     CSTATE,
+//     CCOUNTRY,
+//     CDISTRICT,
+//     CPINCODE,
+//     password,
+//   } = req.body;
+//   if (!customerId) {
+//     return res.status(400).json({ error: "Customer ID is missing" });
+//   }
+//   // Build query
+//   const fields = [
+//     "FNAME = ?",
+//     "LNAME = ?",
+//     "email = ?",
+//     "MOBILE = ?",
+//     "CADDRESSLINE1 = ?",
+//     "CCITY = ?",
+//     "CSTATE = ?",
+//     "CCOUNTRY = ?",
+//     "CDISTRICT = ?",
+//     "CPINCODE = ?",
+//   ];
+//   const values = [
+//     FNAME,
+//     LNAME,
+//     email,
+//     MOBILE,
+//     CADDRESSLINE1,
+//     CCITY,
+//     CSTATE,
+//     CCOUNTRY,
+//     CDISTRICT,
+//     CPINCODE,
+//   ];
+//   if (password) {
+//     fields.push("password = ?");
+//     values.push(password); // plain text password
+//   }
+//   values.push(customerId); // for WHERE condition
+//   const sql = `UPDATE customermaster SET ${fields.join(
+//     ", "
+//   )} WHERE CUSTOMERID = ?`;
+//   con.query(sql, values, (err, result) => {
+//     if (err) {
+//       console.error("Database update error:", err);
+//       return res
+//         .status(500)
+//         .json({ error: "Database update failed", message: err.message });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Customer not found" });
+//     }
+//     return res
+//       .status(200)
+//       .json({ message: "Account Information updated successfully" });
+//   });
+// };
 exports.updateCustomerInfo = (req, res) => {
   const {
     FNAME,
@@ -74,13 +140,17 @@ exports.updateCustomerInfo = (req, res) => {
       .json({ message: "Account Information updated successfully" });
   });
 };
+
+
+
+
 exports.getcustomerbyid = (req, res) => {
   const { customerId } = req.params;
   if (!customerId) {
     return res.status(400).json({ error: "Customer ID is required" });
   }
   con.query(
-    "SELECT FNAME, LNAME, email, MOBILE, CADDRESSLINE1, CCITY, CSTATE, CCOUNTRY, CDISTRICT, CPINCODE FROM customermaster WHERE CUSTOMERID = ?",
+    "SELECT FNAME, LNAME, email, MOBILE, CADDRESSLINE1, CCITY, CSTATE, CCOUNTRY, CDISTRICT, password, CPINCODE FROM customermaster WHERE CUSTOMERID = ?",
     [customerId],
     (err, result) => {
       if (err) {
@@ -97,6 +167,31 @@ exports.getcustomerbyid = (req, res) => {
     }
   );
 };
+
+exports.deletecustomer = (req, res) => {
+  const customerId = req.params.id;
+  con.query(
+    // use the actual primary key column name here:
+    "DELETE FROM customermaster WHERE CUSTOMERID = ?",
+    [customerId],
+    (err, result) => {
+      if (err) {
+        console.error("Error deleting customer:", err);
+        return res.status(500).json({ error: "Failed to delete customer" });
+      }
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "Customer not found" });
+      }
+      res.status(200).json({ message: "Customer deleted successfully" });
+    }
+  );
+};
+
+
+
+
+
+
 exports.addcustomer = (req, res) => {
   const { FNAME, LNAME, MOBILE, email, CADDRESSLINE1 } = req.body;
   console.log("addcustomer", req.body);
@@ -149,19 +244,33 @@ exports.getAll = async (req, res) => {
     res.json(result);
   });
 };
-exports.deletecustomer = async (req, res) => {
+
+
+exports.deletecustomer = (req, res) => {
   const customerId = req.params.id;
-  await con.query(
-    "DELETE FROM customermaster WHERE id = ?",
-    customerId,
+  con.query(
+    // use the actual primary key column name here:
+    "DELETE FROM customermaster WHERE CUSTOMERID = ?",
+    [customerId],
     (err, result) => {
       if (err) {
-        throw err;
+        console.error("Error deleting customer:", err);
+        return res.status(500).json({ error: "Failed to delete customer" });
       }
-      res.send("customer deleted successfully");
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "Customer not found" });
+      }
+      res.status(200).json({ message: "Customer deleted successfully" });
     }
   );
 };
+
+
+
+
+
+
+
 exports.logincustomer = (req, res) => {
   const { email, password } = req.body;
   console.log("Received login request:", { email, password });

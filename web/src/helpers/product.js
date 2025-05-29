@@ -50,20 +50,35 @@ export const getProductCartQuantity = (cartItems, product, color, size) => {
         : true) &&
       (single.selectedProductSize ? single.selectedProductSize === size : true)
   );
+  // if (cartItems.length >= 1 && productInCart) {
+  //   if (product.variation) {
+  //     return cartItems.find(
+  //       single =>
+  //         single.id === product.id &&
+  //         single.selectedProductColor === color &&
+  //         single.selectedProductSize === size
+  //     ).quantity;
+  //   } else {
+  //     return cartItems.find(single => product.id === single.id).quantity;
+  //   }
+  // } else {
+  //   return 0;
+  // }
   if (cartItems.length >= 1 && productInCart) {
-    if (product.variation) {
-      return cartItems.find(
-        single =>
-          single.id === product.id &&
-          single.selectedProductColor === color &&
-          single.selectedProductSize === size
-      ).quantity;
-    } else {
-      return cartItems.find(single => product.id === single.id).quantity;
-    }
+  if (product.variation) {
+    const matchedItem = cartItems.find(
+      single =>
+        single.id === product.id &&
+        single.selectedProductColor === color &&
+        single.selectedProductSize === size
+    );
+    return matchedItem ? matchedItem.quantity : 0;
   } else {
-    return 0;
+    const matchedItem = cartItems.find(single => product.id === single.id);
+    return matchedItem ? matchedItem.quantity : 0;
   }
+}
+
   //return 0;
 };
 
@@ -216,16 +231,33 @@ export const getIndividualSizes = product => {
   return individualSizes;
 };
 
-export const setActiveSort = e => {
+// export const setActiveSort = e => {
+//   const filterButtons = document.querySelectorAll(
+//     ".sidebar-widget-list-left button, .sidebar-widget-tag button, .product-filter button"
+//   );
+//   filterButtons.forEach(item => {
+//     item.classList.remove("active");
+//   });
+//   e.currentTarget.classList.add("active");
+// };
+
+
+export const setActiveSort = (e) => {
   const filterButtons = document.querySelectorAll(
     ".sidebar-widget-list-left button, .sidebar-widget-tag button, .product-filter button"
   );
-  filterButtons.forEach(item => {
+  const clickedButton = e.currentTarget;
+  // If clicked button is already active, remove 'active' and exit
+  if (clickedButton.classList.contains("active")) {
+    clickedButton.classList.remove("active");
+    return;
+  }
+  // Otherwise, remove 'active' from all buttons and add to clicked one
+  filterButtons.forEach((item) => {
     item.classList.remove("active");
   });
-  e.currentTarget.classList.add("active");
+  clickedButton.classList.add("active");
 };
-
 export const setActiveLayout = e => {
   const gridSwitchBtn = document.querySelectorAll(".shop-tab button");
   gridSwitchBtn.forEach(item => {

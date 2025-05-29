@@ -65,7 +65,9 @@ function ProductModal({
       clickable: true,
       type: "bullets",
     },
-    modules: [Pagination], // Add Pagination module
+    modules: [Pagination], 
+    // Add Pagination module
+    
   };
   const onCloseModal = () => {
     setThumbsSwiper(null);
@@ -84,6 +86,13 @@ function ProductModal({
           </button>
         </div>
       </Modal.Header> */}
+      <Modal.Header>
+        <div className="custom-close-wrapper">
+          <button className="custom-close-btn" onClick={onCloseModal}>
+            <i className="pe-7s-close-circle" />
+          </button>
+        </div>
+      </Modal.Header>
       <div className="modal-body">
         <div className="row">
           <div className="col-md-5 col-sm-12 col-xs-12">

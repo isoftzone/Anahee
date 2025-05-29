@@ -385,6 +385,10 @@ const routes = [
         path: '/Components/discountcoupon',
         element: <DiscountCoupan />
     },
+     {
+        path: '/Components/discountcoupon/:id',
+        element: <DiscountCoupan />
+    },
     {
         path: '/Components/storemaster',
         element: <StoreMaster />

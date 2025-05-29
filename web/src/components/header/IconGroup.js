@@ -115,9 +115,15 @@ import { deleteAllFromCart } from "../../store/slices/cart-slice";
 import { useEffect, useState } from "react";
 const IconGroup = ({ iconWhiteClass }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const cartCount = useSelector((state) => state.cart.cartItems.length) || 0 ;
+  const wishlistCount = useSelector((state)=> state.wishlist.wishlistItems?.length) || 0;
   const [name, setName] = useState("");
   const navigate = useNavigate();
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
+
+  console.log("this is cartCount", cartCount)
+  
+  console.log("this is cartCount", wishlistCount)
 
   // const myItems=localStorage.getItem("customerinfo")
   // :white_check_mark: Check localStorage for login status
@@ -161,6 +167,8 @@ const IconGroup = ({ iconWhiteClass }) => {
     if (confirmLogout) {
       localStorage.removeItem("customerinfo");
       setIsLoggedIn(false);
+      dispatch(deleteAllFromCart());
+    dispatch(deleteAllFromWishlist());
     //   dispatch(deleteAllFromWishlist());
     // dispatch(deleteAllFromCart())
       // navigate("/"); // Uncomment this if you want to redirect after logout

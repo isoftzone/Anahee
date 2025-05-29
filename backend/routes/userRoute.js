@@ -72,6 +72,11 @@ router.put("/updateSales/:id", salesmaster.updateSales);
 router.get("/getcustomerbyid/:customerId", customer.getcustomerbyid);
 router.put("/updateCustomerInfo/:id", customer.updateCustomerInfo);
 router.get("/getAllcustomer", customer.getAll);
+router.delete("/deletecustomer/:id",customer.deletecustomer);
+
+const { addtocartWishlistproduct, getCartWishlistProduct, deletefromcartWishlist, clearALlcartwishlist, addtocartwishlistAction, getAllWishlistItems, getAllCartItems } = require("../controllers/addtocartWishlistController");
+
+
 // router.delete("/deletecustomer/:id",customer.deletecustomer);
 // router.put("/editcustomer/:id",customer.editcustomer);
 //homepage
@@ -108,4 +113,14 @@ router.get("/getcoupons", discountController.getAllDiscountCoupons);
 router.get("/getcouponsbyid/:id", discountController.getCouponById);
 router.put("/updatecoupons/:id", discountController.updateDiscountCoupon);
 router.post("/applycoupon", discountController.applyCoupon);
+
+
+router.post("/addtocartWishlist",addtocartWishlistproduct)
+router.post("/addtocartAction",addtocartwishlistAction)
+router.get('/getaddtocartdata/:CUSTOMERID', getCartWishlistProduct)
+router.get('/getwishlist/:customerId', getAllWishlistItems)
+router.get('/getalladdtocart/:customerId', getAllCartItems)
+router.delete("/deletecartWishlist", deletefromcartWishlist)
+router.delete("/clearAllcartWishlist", clearALlcartwishlist)
+
 module.exports = router;

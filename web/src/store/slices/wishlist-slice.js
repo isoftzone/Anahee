@@ -14,7 +14,7 @@
 //                 state.wishlistItems.push(action.payload);
 //                 cogoToast.success("Added To wishlist", {position: "bottom-left"});
 //             }
-            
+
 //         },
 //         deleteFromWishlist(state, action){
 //             state.wishlistItems = state.wishlistItems.filter(item => item.id !== action.payload);
@@ -28,46 +28,67 @@
 // export const { addToWishlist, removeFromWishlist, deleteFromWishlist, deleteAllFromWishlist } = wishlistSlice.actions;
 // export default wishlistSlice.reducer;
 
-
-import cogoToast from 'cogo-toast';
-const { createSlice } = require('@reduxjs/toolkit');
+import cogoToast from "cogo-toast";
+const { createSlice } = require("@reduxjs/toolkit");
 const wishlistSlice = createSlice({
-    name: "wishlist",
-    initialState: {
-        wishlistItems: []
+  name: "wishlist",
+  initialState: {
+    wishlistItems: [],
+  },
+  reducers: {
+    addToWishlist(state, action) {
+      const isInWishlist = state.wishlistItems.findIndex(
+        (item) => item.id === action.payload.id
+      );
+      if (isInWishlist > -1) {
+        cogoToast.info("Product already in wishlist", {
+          position: "bottom-left",
+        });
+      } else {
+        state.wishlistItems.push(action.payload);
+        cogoToast.success("Added To wishlist", { position: "bottom-left" });
+      }
     },
-    reducers: {
-        addToWishlist(state, action) {
-            const isInWishlist = state.wishlistItems.findIndex(item => item.id === action.payload.id);
-            if(isInWishlist > -1){
-                cogoToast.info("Product already in wishlist", {position: "bottom-left"});
-            } else {
-                state.wishlistItems.push(action.payload);
-                cogoToast.success("Added To wishlist", {position: "bottom-left"});
-            }
-        },
-        deleteFromWishlist(state, action){
-            state.wishlistItems = state.wishlistItems.filter(item => item.id !== action.payload.id);
-            cogoToast.error("Remove From Wishlist", {
-              position: "bottom-left",
-            });
-        },
-        // deleteAllFromWishlist(state, action){
-        //     state.wishlistItems = state.wishlistItems.filter(item => item.id !== action.payload.id);
-        //     cogoToast.error("Removed From Wishlist", {
-        //       position: "bottom-left",
-        //     });
-        // },
-        deleteAllFromWishlist(state){
-            state.wishlistItems = []
-        },
-        removeFromWishlist(state, action){
-            state.wishlistItems = state.wishlistItems.filter(item => item.id !== action.payload.id);
-            cogoToast.error("Removed From Wishlist", {
-              position: "bottom-left",
-            });
-        }
+    setwishlistItems: (state, action) => {
+      state.wishlistItems = action.payload;
     },
+    removeColorFromWishlist(state, action){
+            state.wishlistItems = state.wishlistItems.filter(item => item.id !== action.payload.id);
+            cogoToast.error("Removed From Wishlist", {position: "bottom-left"});
+        },
+    deleteFromWishlist(state, action) {
+      state.wishlistItems = state.wishlistItems.filter(
+        (item) => item.id !== action.payload.id
+      );
+      cogoToast.error("Remove From Wishlist", {
+        position: "bottom-left",
+      });
+    },
+    // deleteAllFromWishlist(state, action){
+    //     state.wishlistItems = state.wishlistItems.filter(item => item.id !== action.payload.id);
+    //     cogoToast.error("Removed From Wishlist", {
+    //       position: "bottom-left",
+    //     });
+    // },
+    deleteAllFromWishlist(state) {
+      state.wishlistItems = [];
+    },
+    removeFromWishlist(state, action) {
+      state.wishlistItems = state.wishlistItems.filter(
+        (item) => item.id !== action.payload.id
+      );
+      cogoToast.error("Removed From Wishlist", {
+        position: "bottom-left",
+      });
+    },
+  },
 });
-export const { addToWishlist, removeFromWishlist, deleteFromWishlist, deleteAllFromWishlist } = wishlistSlice.actions;
+export const {
+  addToWishlist,
+  setwishlistItems,
+  removeColorFromWishlist,
+  removeFromWishlist,
+  deleteFromWishlist,
+  deleteAllFromWishlist,
+} = wishlistSlice.actions;
 export default wishlistSlice.reducer;

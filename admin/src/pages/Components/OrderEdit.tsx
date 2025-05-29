@@ -126,7 +126,7 @@ const OrderEdit: React.FC = () => {
 
                 // Set existing tax, discount, shipping if available
                 setTax(sale.TAX || 0);
-                setDiscount(sale.DISCOUNT || 0);
+                setDiscount(sale.DISCAMOUNT || 0);
                 setShipping(sale.SHIPPING || 0);
             }
         } catch (error) {
@@ -139,7 +139,7 @@ const OrderEdit: React.FC = () => {
 
     const calculateSubtotal = () => items.reduce((sum, item) => sum + item.quantity * item.price, 0);
     const subtotal = calculateSubtotal();
-    const grandTotal = subtotal + (subtotal * tax) / 100 - (subtotal * discount) / 100 + shipping;
+    const grandTotal = subtotal + (subtotal * tax) / 100 -  discount + shipping;
 
     const addItem = () => {
         setItems([...items, { name: '', description: null, quantity: 1, price: 0 }]);
@@ -165,7 +165,7 @@ const OrderEdit: React.FC = () => {
             // Calculate totals
             const subtotal = calculateSubtotal();
             const taxAmount = (subtotal * tax) / 100;
-            const discountAmount = (subtotal * discount) / 100;
+            const discountAmount = discount;
             const totalAmount = subtotal + taxAmount;
             const netAmount = totalAmount - discountAmount + shipping;
 
@@ -231,7 +231,7 @@ const OrderEdit: React.FC = () => {
             <body>
                 <div class="header">
                     <h1>INVOICE</h1>
-                    <h2>Invoice ${invoiceNumber}</h2>
+                    <h2>Invoice #${invoiceNumber}</h2>
                     <p>Date: ${currentDate}</p>
                 </div>
                 
@@ -265,8 +265,8 @@ const OrderEdit: React.FC = () => {
                                 <td>${item.name}</td>
                                 <td>${item.description || ''}</td>
                                 <td>${item.quantity}</td>
-                                <td>${item.price.toFixed(2)}</td>
-                                <td>${(item.quantity * item.price).toFixed(2)}</td>
+                                <td>$${item.price.toFixed(2)}</td>
+                                <td>$${(item.quantity * item.price).toFixed(2)}</td>
                             </tr>
                         `
                             )
@@ -275,11 +275,11 @@ const OrderEdit: React.FC = () => {
                 </table>
                 
                 <div class="totals">
-                    <div><span>Subtotal:</span><span>${subtotal.toFixed(2)}</span></div>
-                    <div><span>Tax (${tax}%):</span><span>${((subtotal * tax) / 100).toFixed(2)}</span></div>
-                    <div><span>Discount (${discount}%):</span><span>-${((subtotal * discount) / 100).toFixed(2)}</span></div>
-                    <div><span>Shipping:</span><span>${shipping.toFixed(2)}</span></div>
-                    <div class="grand-total"><span>Grand Total:</span><span>${grandTotal.toFixed(2)}</span></div>
+                    <div><span>Subtotal:</span><span>$${subtotal.toFixed(2)}</span></div>
+                    <div><span>Tax (${tax}%):</span><span>$${((subtotal * tax) / 100).toFixed(2)}</span></div>
+                    <div><span>Discount (${discount}%):</span><span>-$${(discount).toFixed(2)}</span></div>
+                    <div><span>Shipping:</span><span>$${shipping.toFixed(2)}</span></div>
+                    <div class="grand-total"><span>Grand Total:</span><span>$${grandTotal.toFixed(2)}</span></div>
                 </div>
             </body>
             </html>
@@ -312,8 +312,8 @@ const OrderEdit: React.FC = () => {
 
             // Open email client after a short delay
             setTimeout(() => {
-                const subject = `Invoice ${invoiceNumber} from Your Company`;
-                const body = `Please find attached invoice ${invoiceNumber}.`;
+                const subject = `Invoice #${invoiceNumber} from Your Company`;
+                const body = `Please find attached invoice #${invoiceNumber}.`;
                 const mailtoLink = `mailto:${customerDetails.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
                 window.location.href = mailtoLink;
             }, 1000);
@@ -460,7 +460,7 @@ const OrderEdit: React.FC = () => {
                             <label className="block text-sm font-medium">Payment Mode:</label>
                             <input
                                 className="border rounded w-full p-2"
-                                value={customerDetails.payment_mode || 'N/A'}
+                                value={customerDetails.payment_mode || 'N/A' }
                                 onChange={(e) => setCustomerDetails({ ...customerDetails, payment_mode: e.target.value })}
                             />
                         </div>
@@ -468,7 +468,7 @@ const OrderEdit: React.FC = () => {
                             <label className="block text-sm font-medium">Payment Status:</label>
                             <input
                                 className="border rounded w-full p-2"
-                                value={customerDetails.paymentStatus || 'N/A'}
+                                value={customerDetails.paymentStatus || 'N/A' }
                                 onChange={(e) => setCustomerDetails({ ...customerDetails, paymentStatus: e.target.value })}
                             />
                         </div>
@@ -479,18 +479,20 @@ const OrderEdit: React.FC = () => {
                 <div className="mt-6">
                     <h3 className="font-semibold mb-2">Item Details</h3>
                     <div className="grid grid-cols-12 gap-2 mb-2 font-medium">
-                        <div className="col-span-5">Item Name</div>
+                        <div className="col-span-4">Item Name</div>
                         <div className="col-span-3">Description</div>
-                        <div className="col-span-2">Quantity</div>
+                        <div className="col-span-1">Quantity</div>
                         <div className="col-span-1">Price</div>
-                        <div className="col-span-1"></div>
+                        <div className="col-span-1">Total</div>
+                        <div className="col-span-1">Delete</div>
                     </div>
                     {items.map((item, index) => (
                         <div key={index} className="grid grid-cols-12 gap-2 items-center mb-2">
-                            <input className="col-span-5 border rounded p-2" value={item.name} onChange={(e) => handleItemChange(index, 'name', e.target.value)} />
+                            <input className="col-span-4 border rounded p-2" value={item.name} onChange={(e) => handleItemChange(index, 'name', e.target.value)} />
                             <input className="col-span-3 border rounded p-2" value={item.description || ''} onChange={(e) => handleItemChange(index, 'description', e.target.value)} />
-                            <input className="col-span-2 border rounded p-2" type="number" min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} />
+                            <input className="col-span-1 border rounded p-2" type="number" min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} />
                             <input className="col-span-1 border rounded p-2" type="number" min="0" step="0.01" value={item.price} onChange={(e) => handleItemChange(index, 'price', e.target.value)} />
+                            <input className="col-span-1 border rounded p-2" type="number" min="0" step="0.01" value={item.price * item.quantity} onChange={(e) => handleItemChange(index, 'price', e.target.value)} />
                             <button className="col-span-1 text-red-500 hover:text-red-700" onClick={() => removeItem(index)}>
                                 ❌
                             </button>
@@ -528,8 +530,8 @@ const OrderEdit: React.FC = () => {
                         <span>{((subtotal * tax) / 100).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between mb-2">
-                        <span>Discount ({discount}%):</span>
-                        <span>-{((subtotal * discount) / 100).toFixed(2)}</span>
+                        <span>Discount Amount:</span>
+                        <span>-{(discount).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between mb-2">
                         <span>Shipping:</span>
