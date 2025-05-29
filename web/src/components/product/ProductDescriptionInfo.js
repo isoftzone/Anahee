@@ -10,10 +10,19 @@ import Modal from 'react-bootstrap/Modal';
 import SizeChartModal from "./SizeChart";
 import {
   addToWishlist,
+  removeColorFromWishlist,
   deleteFromWishlist,
   removeFromWishlist,
 } from "../../store/slices/wishlist-slice";
 import { addToCompare } from "../../store/slices/compare-slice";
+import axios from "axios";
+import { BASE_URL } from "../../config";
+// const URL = "http://localhost:3000"; // Adjust as needed
+const customerInfoSting= localStorage.getItem('customerinfo');
+const customerinfo = customerInfoSting ? JSON.parse(customerInfoSting) : null;
+console.log("this is id customer description", customerinfo?.id);
+const CUSTOMERID = customerinfo?.id;
+console.log("this is customer id", CUSTOMERID);
 const ProductDescriptionInfo = ({
   product,
   discountedPrice,
@@ -49,6 +58,91 @@ const ProductDescriptionInfo = ({
   useEffect(() => {
     setQuantityCount(1);
   }, [product.id]);
+  const handleAddtocart = async () => {
+    try {
+      //  dispatch(
+      //   addToCart({
+      //     ...product,
+      //     quantity : quantityCount,
+      //     // selectedProductColor: selectedProductColor
+      //   })
+      //    )
+      dispatch(
+        addToCart({
+          ...product,
+          quantity: quantityCount,
+          selectedProductColor:
+            selectedProductColor ??
+            product.selectedProductColor ??
+            null,
+          selectedProductSize:
+            selectedProductSize ??
+            product.selectedProductSize ??
+            null,
+        })
+      )
+      const payload = {
+        CUSTOMERID,
+        ITEMID: product.id,
+        quantity: quantityCount,
+        type: "cart",
+      }
+      console.log("this is data add to cart", payload);
+      //  addto cart api
+      const response = await axios.post(`${BASE_URL}/addtocartWishlist`, payload)
+      console.log("this is fetch data", response.data);
+    }
+    catch (error) {
+      console.log("this is failed to add item to cart backend", error)
+    }
+  }
+  const handleWishlist = async () => {
+    try {
+      dispatch(addToWishlist(product))
+      // dispatch(
+      //   addToWishlist({
+      //     ...product,
+      //     quantity: quantityCount,
+      //     // selectedProductColor: selectedProductColor
+      //   })
+      // )
+      const payload = {
+        CUSTOMERID,
+        ITEMID: product.id,
+        // quantity: quantityCount,
+        type: "wishlist",
+      }
+      console.log("this is data add to cart", payload);
+      //  addto cart api
+      const response = await axios.post(`${BASE_URL}/addtocartWishlist`, payload)
+      console.log("this is fetch data", response.data);
+    }
+    catch (error) {
+      console.log("this is failed to add item to cart backend", error)
+    }
+  }
+  const handledeleteWishlist = async () => {
+     dispatch(deleteFromWishlist(product))
+    try {
+       const payload = {
+        CUSTOMERID,
+        ITEMID: product.id,
+        type: "wishlist",
+      }
+      console.log("this is data handle delete wishlist", payload);
+       //   delete api
+      const response = await axios.delete(`${BASE_URL}/deletecartWishlist`, { data: payload })
+      console.log("this is delete data wishlist", response );
+    if (response.status === 200 || response.data.success) {
+     dispatch( removeColorFromWishlist(product))
+    // dispatch(deleteFromWishlist(product))
+    }
+    // dispatch(deleteFromWishlist(product))
+    }
+    catch (error) {
+      console.log("this is failed to wishlist data backend", error)
+    }
+  }
   return (
     <div className="product-details-content ml-0 md:ml-10 p-4 md:p-6 space-y-6">
       <div>
@@ -232,23 +326,24 @@ const ProductDescriptionInfo = ({
           </div>
           <div className="pro-details-cart btn-hover">
             {productStock && productStock > 0 ? (
-              <button
-                onClick={() =>
-                  dispatch(
-                    addToCart({
-                      ...product,
-                      quantity: quantityCount,
-                      selectedProductColor:
-                        selectedProductColor ??
-                        product.selectedProductColor ??
-                        null,
-                      selectedProductSize:
-                        selectedProductSize ??
-                        product.selectedProductSize ??
-                        null,
-                    })
-                  )
-                }
+              <button 
+              onClick={handleAddtocart}
+                // onClick={() =>
+                //   dispatch(
+                //     addToCart({
+                //       ...product,
+                //       quantity: quantityCount,
+                //       selectedProductColor:
+                //         selectedProductColor ??
+                //         product.selectedProductColor ??
+                //         null,
+                //       selectedProductSize:
+                //         selectedProductSize ??
+                //         product.selectedProductSize ??
+                //         null,
+                //     })
+                //   )
+                // }
                 disabled={productCartQty >= productStock}
               >
                 Add To Cart
@@ -278,10 +373,16 @@ const ProductDescriptionInfo = ({
                 wishlistItem ? "text-danger" : "text-gray-400"
               }`}
               title={wishlistItem ? "Remove from wishlist" : "Add to wishlist"}
-              onClick={() =>
+            //   onClick={() =>
+            //     wishlistItem
+            //       ? dispatch(deleteFromWishlist(product))
+            //       : dispatch(addToWishlist(product))
+            //   }
+            // >
+                onClick={() =>
                 wishlistItem
-                  ? dispatch(deleteFromWishlist(product))
-                  : dispatch(addToWishlist(product))
+                  ?  handledeleteWishlist()
+                  : handleWishlist()
               }
             >
               {wishlistItem ? (

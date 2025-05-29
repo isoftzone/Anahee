@@ -15,6 +15,10 @@ import { cartItemStock } from "../../helpers/product";
 import axios from "axios";
 import { BASE_URL } from "../../config";
 
+const customerInfoSting = localStorage.getItem('customerinfo');
+const customerinfo = customerInfoSting ? JSON.parse(customerInfoSting) : null;
+const CUSTOMERID = customerinfo?.id;
+console.log("this is customer id cart id data", CUSTOMERID);
 const Cart = () => {
   let cartTotalPrice = 0;
   const [couponCode, setCouponCode] = useState("");
@@ -92,7 +96,85 @@ const Cart = () => {
       alert("There was an error processing your checkout.");
     }
   };
-
+const handledeleteCart = async (item) => {
+  const ITEMID = item?.id;
+  const cartItemId = item?.cartItemId;
+  console.log("🗑️ Attempting to delete cart item ID:", ITEMID);
+  const payload = {
+    CUSTOMERID,
+    ITEMID,
+    type: "cart",
+  };
+  try {
+    const response = await axios.delete(`${URL}/deletecartWishlist`, { data: payload });
+    if (response.status === 200 && response.data?.success) {
+      dispatch(deleteFromCart(cartItemId)); // Use the same key you used in payload
+    } else {
+      console.warn("⚠️ Failed to delete item from cart:", response.data?.message ?? response.data);
+      alert("Failed to delete item from cart.");
+    }
+  } catch (error) {
+    console.error("❌ Error deleting item from cart:", error);
+    alert("An error occurred while deleting the item.");
+  }
+};
+  const handleAllclearAddtocart = async () => {
+    try {
+      dispatch(deleteAllFromCart())
+      const payload = {
+        CUSTOMERID,
+        type: "cart",
+      }
+      console.log("this is payload delete data", payload);
+      //   delete api
+      const response = await axios.delete(`${URL}/clearAllcartWishlist`, { data: payload })
+      console.log("this is delete  cart data", response);
+   if (response.status === 200 && response.data?.success) {
+       dispatch(deleteAllFromCart());
+      }
+      // if (response.status === 200 || response.data.success) {
+      //   dispatch(deleteAllFromWishlist());
+      // }
+    }
+    catch (error) {
+      console.log("this is failed to wishlist data backend", error)
+    }
+  }
+ 
+  const handleQuantityChange = async(item, action) =>{
+     if(action === 'decrement' && item.quantity <= 1){
+        return ;
+      }
+    try{ 
+     
+      const payload = {
+        CUSTOMERID,
+        ITEMID: item.id,
+        type: "cart",
+        action : action
+      }
+     console.log("this is responsive quantity change", payload);
+ 
+     const response = await axios.post(`${URL}/addtocartAction`, payload)
+     console.log("this is response data", response.data);
+     if(response.status === 200)
+     {
+       if(action === 'increment'){
+        dispatch(addToCart({...item, quantity : 1}));
+      }
+      else if(action === 'decrement'){
+        dispatch(decreaseQuantity(item))
+      }
+     }
+     else {
+      alert("failed to update cart item.")
+     }
+    }
+    catch(error){
+      console.error("Error fetching cart item", error);
+      alert("there was an error updating your cart")
+    }
+  }
   return (
     <Fragment>
       <SEO
@@ -216,14 +298,21 @@ const Cart = () => {
 
                                     <td className="product-quantity">
                                       <div className="cart-plus-minus">
-                                        <button
+                                         <button
+                                      className="dec qtybutton"
+                                      onClick={() =>handleQuantityChange(cartItem, 'decrement')}
+                                      disabled={cartItem.quantity <= 1}
+                                  >
+                                      -
+                                    </button>
+                                        {/* <button
                                           className="dec qtybutton"
                                           onClick={() =>
                                             dispatch(decreaseQuantity(cartItem))
                                           }
                                         >
                                           -
-                                        </button>
+                                        </button> */}
                                         <input
                                           className="cart-plus-minus-box"
                                           type="text"
@@ -232,14 +321,16 @@ const Cart = () => {
                                         />
                                         <button
                                           className="inc qtybutton"
-                                          onClick={() =>
-                                            dispatch(
-                                              addToCart({
-                                                ...cartItem,
-                                                quantity: quantityCount,
-                                              })
-                                            )
-                                          }
+                                            onClick={() => handleQuantityChange(cartItem, 'increment')}
+                                    
+                                          // onClick={() =>
+                                          //   dispatch(
+                                          //     addToCart({
+                                          //       ...cartItem,
+                                          //       quantity: quantityCount,
+                                          //     })
+                                          //   )
+                                          // }
                                           disabled={
                                             cartItem !== undefined &&
                                             cartItem.quantity &&
@@ -270,7 +361,10 @@ const Cart = () => {
                                     </td>
 
                                     <td className="product-remove">
-                                      <button
+                                       <button onClick={() => handledeleteCart(cartItem)}>
+                                    <i className="fa fa-times"></i>
+                                  </button>
+                                      {/* <button
                                         onClick={() =>
                                           dispatch(
                                             deleteFromCart(cartItem.cartItemId)
@@ -278,7 +372,7 @@ const Cart = () => {
                                         }
                                       >
                                         <i className="fa fa-times"></i>
-                                      </button>
+                                      </button> */}
                                     </td>
                                   </tr>
                                 );
@@ -300,11 +394,14 @@ const Cart = () => {
                                 </Link>
                               </div>
                               <div className="cart-clear">
-                                <button
+                                    <button onClick={handleAllclearAddtocart}>
+                          Clear Shopping Cart
+                        </button>
+                                {/* <button
                                   onClick={() => dispatch(deleteAllFromCart())}
                                 >
                                   Clear Shopping Cart
-                                </button>
+                                </button> */}
                               </div>
                             </div>
                           </div>

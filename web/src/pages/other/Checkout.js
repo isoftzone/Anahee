@@ -388,6 +388,7 @@ const Checkout = () => {
     const orderData = {
       ...formData,
       customerId,
+      discountAmount:discount,
       amount: (cartTotalPrice - discount),
       items: cartItems.map((item) => ({
         productId: item.id,

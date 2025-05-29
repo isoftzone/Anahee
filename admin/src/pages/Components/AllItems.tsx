@@ -9,6 +9,7 @@ type Item = {
   BARCODE: string;
   BRAND: string;
   RATE: number;
+  SALEPRICE:number;
   MRP: number;
   STATUS: string;
 };
@@ -61,8 +62,8 @@ export default function ItemManager() {
               <th className="border px-2 py-1">Name</th>
               <th className="border px-2 py-1">Barcode</th>
               <th className="border px-2 py-1">Brand</th>
-              <th className="border px-2 py-1">Rate</th>
               <th className="border px-2 py-1">MRP</th>
+              <th className="border px-2 py-1">Rate</th>
               <th className="border px-2 py-1">Status</th>
               <th className="border px-2 py-1">Actions</th>
             </tr>
@@ -74,7 +75,7 @@ export default function ItemManager() {
                 <td className="border px-2 py-1">{item.ITEMNAME}</td>
                 <td className="border px-2 py-1">{item.BARCODE}</td>
                 <td className="border px-2 py-1">{item.BRAND}</td>
-                <td className="border px-2 py-1">{item.RATE}</td>
+                <td className="border px-2 py-1">{item.SALEPRICE}</td>
                 <td className="border px-2 py-1">{item.MRP}</td>
                 <td className="border px-2 py-1">{item.STATUS}</td>
                 <td className="border px-2 py-1 flex space-x-2">

@@ -2019,3 +2019,8 @@ button:disabled {
   font-size: 36px;
 }
 }
+
+.swiper-horizontal>.swiper-pagination-bullets, .swiper-pagination-bullets.swiper-pagination-horizontal{
+  position: relative !important;
+  bottom: 1px !important;
+}

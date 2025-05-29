@@ -6,7 +6,7 @@ const con = require("../config");
 //   console.log(`Looking for Sale ID: ${saleId}`); // Debugging log
 //   try {
 //     await con.query(
-//       "SELECT * FROM anahee.salesmaster WHERE SALEID = ?",
+//       "SELECT * FROM  salesmaster WHERE SALEID = ?",
 //       [saleId],
 //       (err, result) => {
 //         if (err) {
@@ -28,7 +28,7 @@ const con = require("../config");
 // };
 // exports.getSalesMaster = async (req, res) => {
 //   const { saleId } = req.params;
-//   let query = "SELECT * FROM anahee.salesmaster ORDER BY SALEID DESC";
+//   let query = "SELECT * FROM  salesmaster ORDER BY SALEID DESC";
 //   let params = [];
 //   // If saleId is provided, filter by ID
 //   if (saleId) {
@@ -61,14 +61,15 @@ exports.getSalesMaster = (req, res) => {
       sm.CREATEDON, 
       sm.payment_status,
       sm.ORDER_STATUS,
+      sm.DISCAMOUNT,
       sd.ITEMID,
       sd.QTY,
       sd.AMOUNT,
       im.ITEMNAME,
       im.DESCRIPTION
-    FROM anahee.salesmaster sm
-    JOIN anahee.salesdetail sd ON sm.SALEID = sd.SALEID
-    JOIN anahee.itemmaster im ON sd.ITEMID = im.ITEMID
+    FROM salesmaster sm
+    JOIN salesdetail sd ON sm.SALEID = sd.SALEID
+    JOIN itemmaster im ON sd.ITEMID = im.ITEMID
   `;
 
   const params = [];
@@ -108,6 +109,7 @@ exports.getSalesMaster = (req, res) => {
           CREATEDON: row.CREATEDON,
           PAYMENTSTATUS: row.payment_status,
           ORDER_STATUS: row.ORDER_STATUS,
+          DISCAMOUNT:row.DISCAMOUNT,
           ITEMS: [],
         };
       }
@@ -131,7 +133,7 @@ exports.getSalesMaster = (req, res) => {
 
 // exports.getSalesMaster = async (req, res) => {
 //   const { saleId } = req.params; // Assuming you're passing SaleID to fetch specific sales data
-//   con.query("SELECT * FROM anahee.salesmaster WHERE SALEID = ?", [saleId], (err, result) => {
+//   con.query("SELECT * FROM  salesmaster WHERE SALEID = ?", [saleId], (err, result) => {
 //       if (err) {
 //           console.error("❌ Error fetching sales data:", err);
 //           return res.status(500).json({ error: "Database error" });
@@ -157,7 +159,7 @@ exports.getSalesMaster = (req, res) => {
 //   console.log("addSalesMaster",req.body);
 //   try {
 //     await con.query(
-//       'INSERT INTO anahee.salesmaster SET ?', newSale,
+//       'INSERT INTO  salesmaster SET ?', newSale,
 //       (err, result) => {
 //         if (err) {
 //           console.error("❌ Error inserting sale record:", err);
@@ -186,8 +188,9 @@ exports.addSalesMaster = (req, res) => {
     email,
     items,
     // amount,
+    discountAmount,
     paymentMethod,
-    customerId,
+    customerId
   } = req.body;
   const now = new Date();
   const newSale = {
@@ -198,59 +201,64 @@ exports.addSalesMaster = (req, res) => {
     NUMBER: phone,
     EMAIL: email,
     // AMOUNT: amount,
+    DISCAMOUNT:discountAmount,
     payment_mode: paymentMethod,
-    CUSTOMERID: customerId,
+    CUSTOMERID:customerId,
     CREATEDON: now,
     UPDATEDON: now,
   };
   console.log("📥 Incoming sale:", req.body);
   // Step 1: Insert into salesmaster
-  con.query("INSERT INTO anahee.salesmaster SET ?", newSale, (err, result) => {
-    if (err) {
-      console.error("❌ Error inserting into salesmaster:", err);
-      return res
-        .status(500)
-        .json({ error: "Failed to insert into salesmaster" });
-    }
-    const saleId = result.insertId;
-    console.log("✅ SalesMaster Inserted with ID:", saleId);
-    // Step 2: Insert each item into salesdetail
-    let completed = 0;
-    let hasError = false;
-    items.forEach((item, index) => {
-      const detail = {
-        SALEID: saleId,
-        ITEMID: item.productId,
-        QTY: item.quantity,
-        AMOUNT: item.price,
-      };
-      con.query(
-        "INSERT INTO anahee.salesdetail SET ?",
-        detail,
-        (err, result) => {
-          if (err) {
-            if (!hasError) {
-              hasError = true;
-              console.error("❌ Error inserting into salesdetail:", err);
-              return res
-                .status(500)
-                .json({ error: "Failed to insert item into salesdetail" });
+  con.query(
+    "INSERT INTO  salesmaster SET ?",
+    newSale,
+    (err, result) => {
+      if (err) {
+        console.error("❌ Error inserting into salesmaster:", err);
+        return res
+          .status(500)
+          .json({ error: "Failed to insert into salesmaster" });
+      }
+      const saleId = result.insertId;
+      console.log("✅ SalesMaster Inserted with ID:", saleId);
+      // Step 2: Insert each item into salesdetail
+      let completed = 0;
+      let hasError = false;
+      items.forEach((item, index) => {
+        const detail = {
+          SALEID: saleId,
+          ITEMID: item.productId,
+          QTY: item.quantity,
+          AMOUNT: item.price,
+        };
+        con.query(
+          "INSERT INTO  salesdetail SET ?",
+          detail,
+          (err, result) => {
+            if (err) {
+              if (!hasError) {
+                hasError = true;
+                console.error("❌ Error inserting into salesdetail:", err);
+                return res
+                  .status(500)
+                  .json({ error: "Failed to insert item into salesdetail" });
+              }
+            }
+            completed++;
+            // When all inserts are done, send success response
+            if (completed === items.length && !hasError) {
+              console.log("✅ All items inserted into salesdetail");
+              return res.json({
+                success: true,
+                saleId: saleId,
+                message: "Sale and item details added successfully!",
+              });
             }
           }
-          completed++;
-          // When all inserts are done, send success response
-          if (completed === items.length && !hasError) {
-            console.log("✅ All items inserted into salesdetail");
-            return res.json({
-              success: true,
-              saleId: saleId,
-              message: "Sale and item details added successfully!",
-            });
-          }
-        }
-      );
-    });
-  });
+        );
+      });
+    }
+  );
 };
 // exports.addSalesMaster = async (req, res) => {
 //     const { COMPANYID, FINYEAR, SERIES, SALEID, SALEDATE, TMODE, CUSTOMERID, ITEMQTY, TOTALAMOUNT, DISCOUNT, DISCAMOUNT, NETAMOUNT, AMOUNTPAID, BALANCE } = req.body;
@@ -259,7 +267,7 @@ exports.addSalesMaster = (req, res) => {
 //     };
 //     try {
 //         await con.query(
-//             'INSERT INTO anahee.salesmaster SET ?', newSale,
+//             'INSERT INTO  salesmaster SET ?', newSale,
 //             (err, result) => {
 //                 if (err) {
 //                     console.error("❌ Error inserting sale record:", err);
@@ -359,7 +367,7 @@ exports.salesMasterPaginated = (req, res) => {
 //     };
 //     try {
 //       await con.query(
-//         'INSERT INTO anahee.salesmaster SET ?', newSale,
+//         'INSERT INTO  salesmaster SET ?', newSale,
 //         (err, result) => {
 //           if (err) {
 //             console.error("❌ Error inserting sale record:", err);
@@ -375,41 +383,105 @@ exports.salesMasterPaginated = (req, res) => {
 //     }
 //   };
 // Update SalesMaster Item
-// exports.updateSalesMaster = async (req, res) => {
-//     const { id } = req.params;  // Ensure id is coming from URL params
-//     console.log("Received SalesMaster ID for Update:", id);
-//     if (!id) {
-//         return res.status(400).json({ error: "Missing SalesMaster ID" });
-//     }
-//     const editId = Number(id); // Convert id to a number
-//     if (isNaN(editId)) {
-//         return res.status(400).json({ error: "Invalid SalesMaster ID" });
-//     }
-//     upload.single('photo')(req, res, function (err) {
-//         if (err) {
-//             console.error("❌ Error uploading files:", err);
-//             return res.status(500).json({ error: "File upload error" });
-//         }
-//         const { COMPANYID, FINYEAR, SERIES, SALEID, SALEDATE, TMODE, CUSTOMERID, ITEMQTY, TOTALAMOUNT, DISCOUNT, DISCAMOUNT, NETAMOUNT, AMOUNTPAID, BALANCE } = req.body;
-//         let photo = req.file ? req.file.filename : null; // Get the uploaded file if any
-//         const updatedSalesMaster = {
-//             COMPANYID, FINYEAR, SERIES, SALEID, SALEDATE, TMODE, CUSTOMERID, ITEMQTY, TOTALAMOUNT, DISCOUNT, DISCAMOUNT, NETAMOUNT, AMOUNTPAID, BALANCE, PHOTO: photo
-//         };
-//         try {
-//             // Update the salesmaster record
-//             con.query("UPDATE salesmaster SET ? WHERE SALEID = ?", [updatedSalesMaster, editId], (err, result) => {
-//                 if (err) {
-//                     console.error("❌ Error updating salesmaster:", err);
-//                     return res.status(500).json({ error: "Database error" });
-//                 }
-//                 res.json({ success: true, message: "SalesMaster updated successfully!" });
-//             });
-//         } catch (error) {
-//             console.error("❌ Unexpected error:", error);
-//             res.status(500).json({ error: "Server error" });
-//         }
-//     });
-// };
+exports.updateSales = async (req, res) => {
+    const { id } = req.params;
+    console.log("📝 Updating SALEID:", id);
+
+    if (!id) return res.status(400).json({ error: "Missing SALEID" });
+    const saleId = Number(id);
+    if (isNaN(saleId)) return res.status(400).json({ error: "Invalid SALEID" });
+
+    const { items, tax, discount, shipping, customerDetails } = req.body;
+
+    if (!customerDetails || typeof customerDetails !== 'object') {
+        return res.status(400).json({ error: "Missing or invalid customerDetails" });
+    }
+
+    const {
+        COMPANYID, FINYEAR, SERIES, SALEDATE, TMODE,
+        CUSTOMERID, TOTALAMOUNT, DISCAMOUNT, NETAMOUNT,
+        AMOUNTPAID, BALANCE
+    } = customerDetails;
+
+    const ITEMQTY = items.reduce((sum, item) => sum + (item.QUANTITY || 0), 0);
+
+    const updatedSalesMaster = {
+        COMPANYID,
+        FINYEAR,
+        SERIES,
+        SALEDATE,
+        TMODE,
+        CUSTOMERID,
+        ITEMQTY,
+        TOTALAMOUNT,
+        DISCOUNT: discount,
+        DISCAMOUNT,
+        NETAMOUNT,
+        AMOUNTPAID,
+        BALANCE
+    };
+
+    try {
+        // 1. Update salesmaster table
+        await new Promise((resolve, reject) => {
+            con.query("UPDATE salesmaster SET ? WHERE SALEID = ?", [updatedSalesMaster, saleId], (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+            });
+        });
+
+        // 2. Update each item in itemmaster (ITEMNAME, DESCRIPTION, AMOUNT)
+        for (const item of items) {
+            const { ITEMID, ITEMNAME, DESCRIPTION } = item;
+
+            await new Promise((resolve, reject) => {
+                con.query(
+                    "UPDATE itemmaster SET ITEMNAME = ?, DESCRIPTION = ? WHERE ITEMID = ?",
+                    [ITEMNAME, DESCRIPTION, ITEMID],
+                    (err, result) => {
+                        if (err) return reject(err);
+                        resolve(result);
+                    }
+                );
+            });
+        }
+
+        // 3. Delete existing salesdetail entries for this SALEID
+        await new Promise((resolve, reject) => {
+            con.query("DELETE FROM salesdetail WHERE SALEID = ?", [saleId], (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+            });
+        });
+
+        // 4. Insert new salesdetail rows with QTY
+        const salesDetailValues = items.map(item => [
+            saleId,
+            item.ITEMID,
+            item.QUANTITY,
+            item.AMOUNT
+        ]);
+
+        await new Promise((resolve, reject) => {
+            con.query(
+                "INSERT INTO salesdetail (SALEID, ITEMID, QTY, AMOUNT) VALUES ?",
+                [salesDetailValues],
+                (err, result) => {
+                    if (err) return reject(err);
+                    resolve(result);
+                }
+            );
+        });
+
+        res.json({ success: true, message: "Sales, items, and quantities updated successfully!" });
+    } catch (error) {
+        console.error("❌ Error updating sale:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+
+
 exports.updateOrderStatus = async (req, res) => {
   const { SALEID, ORDER_STATUS } = req.body;
   if (!SALEID) {
@@ -462,7 +534,7 @@ exports.updateSalesMaster = async (req, res) => {
   };
   try {
     await con.query(
-      "UPDATE anahee.salesmaster SET ? WHERE SALEID = ?",
+      "UPDATE  salesmaster SET ? WHERE SALEID = ?",
       [updateFields, saleId],
       (err, result) => {
         if (err) {
@@ -507,10 +579,10 @@ exports.getAllOrders = (req, res) => {
       im.ITEMNAME,
       im.DESCRIPTION,
       ii.PHOTO
-    FROM anahee.salesmaster sm
-    LEFT JOIN anahee.salesdetail sd ON sm.SALEID = sd.SALEID
-    LEFT JOIN anahee.itemmaster im ON sd.ITEMID = im.ITEMID
-    LEFT JOIN anahee.itemimage ii ON im.ITEMID = ii.ITEMID
+    FROM  salesmaster sm
+    LEFT JOIN  salesdetail sd ON sm.SALEID = sd.SALEID
+    LEFT JOIN  itemmaster im ON sd.ITEMID = im.ITEMID
+    LEFT JOIN  itemimage ii ON im.ITEMID = ii.ITEMID
     WHERE sm.CUSTOMERID = ?
     ORDER BY sm.SALEID DESC
   `;
@@ -565,7 +637,7 @@ exports.cancelOrder = (req, res) => {
   const { saleId } = req.params;
 
   const query = `
-    UPDATE anahee.salesmaster
+    UPDATE  salesmaster
     SET ORDER_STATUS = 'Cancel'
     WHERE SALEID = ?
   `;
@@ -577,109 +649,4 @@ exports.cancelOrder = (req, res) => {
     }
     res.status(200).json({ message: "Order cancelled successfully" });
   });
-};
-
-exports.updateSales = async (req, res) => {
-  const { id } = req.params;
-  console.log(":memo: Updating SALEID:", id);
-  if (!id) return res.status(400).json({ error: "Missing SALEID" });
-  const saleId = Number(id);
-  if (isNaN(saleId)) return res.status(400).json({ error: "Invalid SALEID" });
-  const { items, tax, discount, shipping, customerDetails } = req.body;
-  if (!customerDetails || typeof customerDetails !== "object") {
-    return res
-      .status(400)
-      .json({ error: "Missing or invalid customerDetails" });
-  }
-  const {
-    COMPANYID,
-    FINYEAR,
-    SERIES,
-    SALEDATE,
-    TMODE,
-    CUSTOMERID,
-    TOTALAMOUNT,
-    DISCAMOUNT,
-    NETAMOUNT,
-    AMOUNTPAID,
-    BALANCE,
-  } = customerDetails;
-  const ITEMQTY = items.reduce((sum, item) => sum + (item.QUANTITY || 0), 0);
-  const updatedSalesMaster = {
-    COMPANYID,
-    FINYEAR,
-    SERIES,
-    SALEDATE,
-    TMODE,
-    CUSTOMERID,
-    ITEMQTY,
-    TOTALAMOUNT,
-    DISCOUNT: discount,
-    DISCAMOUNT,
-    NETAMOUNT,
-    AMOUNTPAID,
-    BALANCE,
-  };
-  try {
-    // 1. Update salesmaster table
-    await new Promise((resolve, reject) => {
-      con.query(
-        "UPDATE salesmaster SET ? WHERE SALEID = ?",
-        [updatedSalesMaster, saleId],
-        (err, result) => {
-          if (err) return reject(err);
-          resolve(result);
-        }
-      );
-    });
-    // 2. Update each item in itemmaster (ITEMNAME, DESCRIPTION, AMOUNT)
-    for (const item of items) {
-      const { ITEMID, ITEMNAME, DESCRIPTION } = item;
-      await new Promise((resolve, reject) => {
-        con.query(
-          "UPDATE itemmaster SET ITEMNAME = ?, DESCRIPTION = ? WHERE ITEMID = ?",
-          [ITEMNAME, DESCRIPTION, ITEMID],
-          (err, result) => {
-            if (err) return reject(err);
-            resolve(result);
-          }
-        );
-      });
-    }
-    // 3. Delete existing salesdetail entries for this SALEID
-    await new Promise((resolve, reject) => {
-      con.query(
-        "DELETE FROM salesdetail WHERE SALEID = ?",
-        [saleId],
-        (err, result) => {
-          if (err) return reject(err);
-          resolve(result);
-        }
-      );
-    });
-    // 4. Insert new salesdetail rows with QTY
-    const salesDetailValues = items.map((item) => [
-      saleId,
-      item.ITEMID,
-      item.QUANTITY,
-      item.AMOUNT,
-    ]);
-    await new Promise((resolve, reject) => {
-      con.query(
-        "INSERT INTO salesdetail (SALEID, ITEMID, QTY, AMOUNT) VALUES ?",
-        [salesDetailValues],
-        (err, result) => {
-          if (err) return reject(err);
-          resolve(result);
-        }
-      );
-    });
-    res.json({
-      success: true,
-      message: "Sales, items, and quantities updated successfully!",
-    });
-  } catch (error) {
-    console.error(":x: Error updating sale:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
 };
