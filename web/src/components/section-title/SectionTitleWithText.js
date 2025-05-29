@@ -22,7 +22,7 @@ const SectionTitleWithText = ({ spaceTopClass, spaceBottomClass }) => {
   }, []);
   return (
     <div className={clsx("welcome-area mb-5", spaceTopClass, spaceBottomClass)}>
-      <div className="container-fluid">
+      <div className="container-fluid" style={{height:"600px"}}>
         {aboutData.length > 0 ? (
           aboutData.map((section, index) => (
             <div className="welcome-content text-center mb-6" key={index}>

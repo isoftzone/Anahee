@@ -120,7 +120,7 @@ const IconGroup = ({ iconWhiteClass }) => {
   const [name, setName] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   console.log("this is cartCount", cartCount)
   
   console.log("this is cartCount", wishlistCount)
@@ -175,6 +175,18 @@ const IconGroup = ({ iconWhiteClass }) => {
     } else {
       // User clicked "No", do nothing
     }
+  };
+  const handleLogoutClick = () => {
+    setShowLogoutPopup(true);
+  };
+  const confirmLogout = () => {
+    localStorage.removeItem("customerinfo");
+    setIsLoggedIn(false);
+    setShowLogoutPopup(false);
+    navigate("/"); // optional: redirect to home
+  };
+  const cancelLogout = () => {
+    setShowLogoutPopup(false);
   };
   const triggerMobileMenu = () => {
     const offcanvasMobileMenu = document.querySelector(
@@ -278,7 +290,7 @@ const IconGroup = ({ iconWhiteClass }) => {
                   <Link to="/orders">Orders</Link>
                 </li>
                 <li>
-                  <Link to="/" onClick={handleLogout}>
+                  <Link to="#" onClick={handleLogoutClick}>
                     Log Out
                   </Link>
                 </li>
@@ -331,6 +343,50 @@ const IconGroup = ({ iconWhiteClass }) => {
           <i className="pe-7s-menu" />
         </button>
       </div>
+      {/* Logout Confirmation Popup (Inline) */}
+      {showLogoutPopup && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            height: "100vh",
+            width: "100vw",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            zIndex: 10000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#fff",
+              padding: "20px 30px",
+              borderRadius: "10px",
+              boxShadow: "0 0 10px rgba(0,0,0,0.25)",
+              textAlign: "center",
+              width: "300px",
+            }}
+          >
+            <p style={{ marginBottom: "20px", fontSize: "16px" }}>
+              Are you sure you want to logout?
+            </p>
+            <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+              <button onClick={confirmLogout} style={{ padding: "6px 12px", background:"#000" , color:"#fff", borderRadius:
+                "10px"
+               }}>
+                Yes
+              </button>
+              <button onClick={cancelLogout} style={{ padding: "6px 12px", background:"#000" , color:"#fff", borderRadius:
+                "10px"
+               }}>
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

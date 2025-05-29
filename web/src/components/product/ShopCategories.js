@@ -84,11 +84,13 @@
 import PropTypes from "prop-types";
 import { setActiveSort } from "../../helpers/product";
 import Accordion from 'react-bootstrap/Accordion';
-const ShopCategories = ({ categories, getSortParams }) => {
+import { useTranslation } from "react-i18next";
+const ShopCategories = ({ categories, getSortParams,selectedCategory }) => {
+  const { t } = useTranslation();
   return (
     <div className="sidebar-widget">
         <Accordion.Item eventKey="0">
-    <Accordion.Header><h4 className="pro-sidebar-title">Categories</h4></Accordion.Header>
+    <Accordion.Header><h4 className="pro-sidebar-title">{t("Categories")}</h4></Accordion.Header>
     <Accordion.Body>
       <div className="sidebar-widget-list mt-30">
         {categories ? (
@@ -100,23 +102,25 @@ const ShopCategories = ({ categories, getSortParams }) => {
                     getSortParams("category", "");
                     setActiveSort(e);
                   }}
+                   className={!selectedCategory ? "active" : ""}
                 >
                   <span className="checkmark" /> All Categories
                 </button>
               </div>
             </li>
-            {categories.map((category, key) => {
+            {categories.map((categoryKey, key) => {
               return (
                 <li key={key}>
                   <div className="sidebar-widget-list-left">
                     <button
                       onClick={(e) => {
-                        getSortParams("category", category);
+                        getSortParams("category", categoryKey);
                         setActiveSort(e);
                       }}
+                      className={selectedCategory === categoryKey ? "active" : ""}
                     >
                       {" "}
-                      <span className="checkmark" /> {category}{" "}
+                    <span className="checkmark" /> {t(categoryKey)}
                     </button>
                   </div>
                 </li>
@@ -133,8 +137,9 @@ const ShopCategories = ({ categories, getSortParams }) => {
   );
 };
 ShopCategories.propTypes = {
-  categories: PropTypes.array,
-  getSortParams: PropTypes.func,
+   categories: PropTypes.array.isRequired,
+  getSortParams: PropTypes.func.isRequired,
+  selectedCategory: PropTypes.string
 };
 export default ShopCategories;
 

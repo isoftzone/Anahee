@@ -106,7 +106,7 @@ const handledeleteCart = async (item) => {
     type: "cart",
   };
   try {
-    const response = await axios.delete(`${URL}/deletecartWishlist`, { data: payload });
+    const response = await axios.delete(`${BASE_URL}/deletecartWishlist`, { data: payload });
     if (response.status === 200 && response.data?.success) {
       dispatch(deleteFromCart(cartItemId)); // Use the same key you used in payload
     } else {
@@ -127,7 +127,7 @@ const handledeleteCart = async (item) => {
       }
       console.log("this is payload delete data", payload);
       //   delete api
-      const response = await axios.delete(`${URL}/clearAllcartWishlist`, { data: payload })
+      const response = await axios.delete(`${BASE_URL}/clearAllcartWishlist`, { data: payload })
       console.log("this is delete  cart data", response);
    if (response.status === 200 && response.data?.success) {
        dispatch(deleteAllFromCart());
@@ -155,7 +155,7 @@ const handledeleteCart = async (item) => {
       }
      console.log("this is responsive quantity change", payload);
  
-     const response = await axios.post(`${URL}/addtocartAction`, payload)
+     const response = await axios.post(`${BASE_URL}/addtocartAction`, payload)
      console.log("this is response data", response.data);
      if(response.status === 200)
      {

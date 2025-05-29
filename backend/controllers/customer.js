@@ -328,3 +328,139 @@ exports.editcustomer = async (req, res) => {
     res.status(500).send({ error: "Internal Server Error" });
   }
 };
+
+
+exports.addCustomerAddress = (req, res) => {
+  console.log("Received request to add address:", req.body);
+  const {
+    customer_id,
+    firstName,
+    lastName,
+    address,
+    city,
+    state,
+    country,
+    postcode,
+    email,
+    phone,
+    description,
+  } = req.body;
+  // Insert Address
+  const sql = `
+    INSERT INTO customer_addresses
+      (customer_id, fname, lname, address, city, state, country, postal_code, email, mobile, description)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+  const values = [
+    customer_id,
+    firstName,
+    lastName,
+    address,
+    city,
+    state,
+    country,
+    postcode,
+    email,
+    phone,
+    description || "", // description is optional
+  ];
+  con.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ msg: "Database error", error: err });
+    }
+    res.json({
+      success: true,
+      message: "Address added successfully",
+      id: result.insertId,
+    });
+  });
+};
+exports.updateCustomerAddress = (req, res) => {
+  const {
+    id,
+    customer_id,
+    fname,
+    lname,
+    address,
+    city,
+    state,
+    country,
+    postal_code,
+    email,
+    mobile,
+    description = '',
+    primary_address = 0
+  } = req.body;
+  // Input validation
+  const requiredFields = { id, customer_id, fname, lname, address, city, state, country, postal_code, email, mobile };
+  for (const [key, value] of Object.entries(requiredFields)) {
+    if (value === undefined || value === '') {
+      return res.status(400).json({ msg: `${key} is required` });
+    }
+  }
+  const handleUpdate = () => {
+    const sql = `
+      UPDATE customer_addresses
+      SET fname = ?, lname = ?, address = ?, city = ?, state = ?, country = ?,
+          description = ?, postal_code = ?, email = ?, mobile = ?, primary_address = ?
+      WHERE id = ? AND customer_id = ?
+    `;
+    const values = [
+      fname, lname, address, city, state, country,
+      description, postal_code, email, mobile,
+      primary_address, id, customer_id
+    ];
+    con.query(sql, values, (err, result) => {
+      if (err) {
+        console.error("Error during update:", err);
+        return res.status(500).json({ msg: "Database error", error: err });
+      }
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ msg: "Address not found or not updated" });
+      }
+      res.json({ message: 'Address updated successfully' });
+    });
+  };
+  // If setting this as primary, reset others
+  if (parseInt(primary_address) === 1) {
+    con.query(
+      'UPDATE customer_addresses SET primary_address = 0 WHERE customer_id = ?',
+      [customer_id],
+      (err) => {
+        if (err) {
+          console.error("Error resetting primary address:", err);
+          return res.status(500).json({ msg: "Failed to reset primary address", error: err });
+        }
+        handleUpdate();
+      }
+    );
+  } else {
+    handleUpdate();
+  }
+};
+exports.getAddressesByUserId = (req, res) => {
+  const { customer_id } = req.params;
+  const { primary_address } = req.query; // use query string: ?primary_address=1
+  console.log("Received request to get addresses for user ID:", customer_id);
+  let sql = 'SELECT * FROM customer_addresses WHERE customer_id = ?';
+  const values = [customer_id];
+  if (primary_address !== undefined) {
+    sql += ' AND primary_address = ?';
+    values.push(primary_address);
+  }
+  // sql += ' ORDER BY primary_address DESC';
+  con.query(sql, values, (err, result) => {
+    if (err) return res.status(500).json({ msg: "DB error", error: err });
+    res.json(result);
+  });
+};
+exports.deleteCustomerAddress = (req, res) => {
+  const { address_id } = req.params;
+  if (!address_id) return res.status(400).json({ msg: "Address ID is required" });
+  const sql = 'DELETE FROM customer_addresses WHERE id = ?';
+  con.query(sql, [address_id], (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json({ message: 'Address deleted successfully' });
+  });
+};

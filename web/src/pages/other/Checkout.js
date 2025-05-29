@@ -30,6 +30,10 @@ const Checkout = () => {
     email: "",
     paymentMethod: "Cod",
   });
+  const [data, setData] = useState([]);
+  const [editIndex, setEditIndex] = useState(null);
+  const [editItem, setEditItem] = useState(null);
+  const [showAddForm, setShowAddForm] = useState(false);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [orderId, setOrderId] = useState("");
@@ -101,6 +105,15 @@ const Checkout = () => {
     };
     fetchCountries();
   }, []);
+  useEffect(() => {
+    const fetchAddresses = (customerId) => {
+      axios
+        .get(`${BASE_URL}/getcustomeraddress/${customerId}`)
+        .then((res) => setData(res.data))
+        .catch((err) => console.error("API Error:", err));
+    };
+    fetchAddresses(customerId);
+  }, [customerId]);
 
   // Fetch states on country change
   useEffect(() => {
@@ -274,7 +287,7 @@ const Checkout = () => {
 
         const updateData = {
           merchant_order_id: response?.data?.data?.orderId,
-         // payment_mode: paymentDetail?.paymentMode,
+          payment_mode: "Paid",
           provider_reference_id: splitInstrument?.rail?.utr,
           phonepe_status: response?.data?.data?.state,
           payment_status: paymentDetail?.state,
@@ -375,21 +388,30 @@ const Checkout = () => {
     // Clear previous payment errors
     setPaymentError("");
 
-    const allFieldsTouched = {};
-    Object.keys(formData).forEach((key) => {
-      allFieldsTouched[key] = true;
-    });
-    setTouched(allFieldsTouched);
+  
+  // 🔍 Find the primary address from address list
+  const primaryAddress = data.find((addr) => addr.primary_address === 1);
 
-    if (!validateForm()) {
-      return;
-    }
+  if (!primaryAddress) {
+    alert("Please set a primary address before placing the order.");
+    return;
+  }
 
     const orderData = {
-      ...formData,
+      firstName: primaryAddress.fname,
+      lastName: primaryAddress.lname,
+      email: primaryAddress.email,
+      phone: primaryAddress.mobile,
+      address: primaryAddress.address,
+      city: primaryAddress.city,
+      state: primaryAddress.state,
+      country: primaryAddress.country,
+      postcode: primaryAddress.postal_code,
+      description: primaryAddress.description,
+      discount,
       customerId,
-      discountAmount:discount,
-      amount: (cartTotalPrice - discount),
+      amount: cartTotalPrice - discount,
+      payment_mode:"Cod",
       items: cartItems.map((item) => ({
         productId: item.id,
         quantity: item.quantity,
@@ -448,7 +470,88 @@ const Checkout = () => {
       ? (cartTotalPrice += finalDiscountedPrice * cartItem.quantity)
       : (cartTotalPrice += finalProductPrice * cartItem.quantity);
   });
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`${BASE_URL}/updatecustomeraddress`, {
+        ...editItem,
+        customer_id: customerId,
+        primary_address: editItem.primary_address || 0,
+      });
+      alert("Address updated successfully");
+      setData(prevData =>
+      prevData.map(item =>
+        item.id === editItem.id ? editItem : item
+      )
+    );
+    } catch (err) {
+      alert("Update failed: " + (err.response?.data?.msg || err.message));
+    }
+  };
+  const handleMakePrimary = async (addressId) => {
+    const itemToUpdate = data.find((item) => item.id === addressId);
+    if (!itemToUpdate) return alert("Address not found");
+    try {
+      await axios.put(`${BASE_URL}/updatecustomeraddress`, {
+        ...itemToUpdate,
+        customer_id: customerId,
+        primary_address: 1,
+      });
+       setData(prevData =>
+      prevData.map(item => ({
+        ...item,
+        primary_address: item.id === addressId ? 1 : 0
+      }))
+    );
+    } catch (err) {
+      alert("Failed to set primary address");
+    }
+  };
+  const handleDelete = async (addressId) => {
+    if (!window.confirm("Are you sure you want to delete this address?"))
+      return;
 
+    try {
+      await axios.delete(`${BASE_URL}/deletecustomeraddress/${addressId}`);
+      alert("Address deleted successfully");
+      setData((prevData) => prevData.filter((address) => address.id !== addressId));
+    } catch (err) {
+      alert("Failed to delete address");
+      console.error(err);
+    }
+  };
+
+  const handleEditClick = (item, index) => {
+    setEditItem({ ...item });
+    setEditIndex(index);
+  };
+  const handleAddSubmit = async (e) => {
+    e.preventDefault();
+  const allFieldsTouched = {};
+    Object.keys(formData).forEach((key) => {
+      allFieldsTouched[key] = true;
+    });
+    setTouched(allFieldsTouched);
+
+    if (!validateForm()) {
+      return;
+    }
+    try {
+      console.log("formData 001", formData);
+      await axios.post(`${BASE_URL}/addcustomeraddress`, {
+        ...formData,
+        customer_id: customerId,
+      });
+      setData((prevData) => [...prevData, formData]);
+      alert("Address added successfully");
+      setShowAddForm(false);
+    } catch (err) {
+      alert(
+        "Failed to add address: " + (err.response?.data?.msg || err.message)
+      );
+    }
+  };
+  console.log("addres data", data);
   return (
     <Fragment>
       <SEO
@@ -463,254 +566,432 @@ const Checkout = () => {
                 <div className="row">
                   <div className="col-lg-7">
                     <div className="billing-info-wrap">
-                      <h3>Billing Details</h3>
-                      <div className="row">
-                        <div className="col-lg-6 col-md-6">
-                          <div className="billing-info mb-20">
-                            <label>First Name *</label>
-                            <input
-                              type="text"
-                              name="firstName"
-                              value={formData.firstName}
-                              onChange={handleInputChange}
-                              onBlur={handleBlur}
-                              className={`form-control ${
-                                errors.firstName && touched.firstName
-                                  ? "is-invalid"
-                                  : ""
-                              }`}
-                            />
-                            {errors.firstName && touched.firstName && (
-                              <div className="invalid-feedback">
-                                {errors.firstName}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="col-lg-6 col-md-6">
-                          <div className="billing-info mb-20">
-                            <label>Last Name *</label>
-                            <input
-                              type="text"
-                              name="lastName"
-                              value={formData.lastName}
-                              onChange={handleInputChange}
-                              onBlur={handleBlur}
-                              className={`form-control ${
-                                errors.lastName && touched.lastName
-                                  ? "is-invalid"
-                                  : ""
-                              }`}
-                            />
-                            {errors.lastName && touched.lastName && (
-                              <div className="invalid-feedback">
-                                {errors.lastName}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="col-lg-12">
-                          <div className="billing-info mb-20">
-                            <label>Street Address *</label>
-                            <input
-                              className={`form-control ${
-                                errors.address && touched.address
-                                  ? "is-invalid"
-                                  : ""
-                              }`}
-                              placeholder="House number and street name"
-                              type="text"
-                              name="address"
-                              value={formData.address}
-                              onChange={handleInputChange}
-                              onBlur={handleBlur}
-                            />
-                            {errors.address && touched.address && (
-                              <div className="invalid-feedback">
-                                {errors.address}
-                              </div>
-                            )}
-                            <input
-                              className="form-control mt-2"
-                              placeholder="Apartment, suite, unit etc."
-                              type="text"
-                              name="apartment"
-                              value={formData.apartment}
-                              onChange={handleInputChange}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="col-lg-12">
-                          <div className="billing-select mb-20">
-                            <label>Country *</label>
-                            <select
-                              name="country"
-                              value={formData.country}
-                              onChange={handleInputChange}
-                              onBlur={handleBlur}
-                              className={`form-control ${
-                                errors.country && touched.country
-                                  ? "is-invalid"
-                                  : ""
-                              }`}
-                            >
-                              <option value="">Select a country</option>
-                              {countries.map((country, i) => (
-                                <option key={i} value={country}>
-                                  {country}
-                                </option>
-                              ))}
-                            </select>
-                            {errors.country && touched.country && (
-                              <div className="invalid-feedback">
-                                {errors.country}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="col-lg-12">
-                          <div className="billing-select mb-20">
-                            <label>State *</label>
-                            <select
-                              name="state"
-                              value={formData.state}
-                              onChange={handleInputChange}
-                              onBlur={handleBlur}
-                              disabled={!states.length}
-                              className={`form-control ${
-                                errors.state && touched.state
-                                  ? "is-invalid"
-                                  : ""
-                              }`}
-                            >
-                              <option value="">Select a state</option>
-                              {states.map((s, i) => (
-                                <option key={i} value={s.name}>
-                                  {s.name}
-                                </option>
-                              ))}
-                            </select>
-                            {errors.state && touched.state && (
-                              <div className="invalid-feedback">
-                                {errors.state}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="col-lg-12">
-                          <div className="billing-select mb-20">
-                            <label>City *</label>
-                            <select
-                              name="city"
-                              value={formData.city}
-                              onChange={handleInputChange}
-                              onBlur={handleBlur}
-                              disabled={!cities.length}
-                              className={`form-control ${
-                                errors.city && touched.city ? "is-invalid" : ""
-                              }`}
-                            >
-                              <option value="">Select a city</option>
-                              {cities.map((city, i) => (
-                                <option key={i} value={city}>
-                                  {city}
-                                </option>
-                              ))}
-                            </select>
-                            {errors.city && touched.city && (
-                              <div className="invalid-feedback">
-                                {errors.city}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="col-lg-6 col-md-6">
-                          <div className="billing-info mb-20">
-                            <label>Postcode / ZIP *</label>
-                            <input
-                              type="text"
-                              name="postcode"
-                              value={formData.postcode}
-                              onChange={handleInputChange}
-                              onBlur={handleBlur}
-                              className={`form-control ${
-                                errors.postcode && touched.postcode
-                                  ? "is-invalid"
-                                  : ""
-                              }`}
-                            />
-                            {errors.postcode && touched.postcode && (
-                              <div className="invalid-feedback">
-                                {errors.postcode}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="col-lg-6 col-md-6">
-                          <div className="billing-info mb-20">
-                            <label>Phone *</label>
-                            <input
-                              type="text"
-                              name="phone"
-                              value={formData.phone}
-                              onChange={handleInputChange}
-                              onBlur={handleBlur}
-                              className={`form-control ${
-                                errors.phone && touched.phone
-                                  ? "is-invalid"
-                                  : ""
-                              }`}
-                            />
-                            {errors.phone && touched.phone && (
-                              <div className="invalid-feedback">
-                                {errors.phone}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="col-lg-6 col-md-6">
-                          <div className="billing-info mb-20">
-                            <label>Email Address *</label>
-                            <input
-                              type="email"
-                              name="email"
-                              value={formData.email}
-                              onChange={handleInputChange}
-                              onBlur={handleBlur}
-                              className={`form-control ${
-                                errors.email && touched.email
-                                  ? "is-invalid"
-                                  : ""
-                              }`}
-                            />
-                            {errors.email && touched.email && (
-                              <div className="invalid-feedback">
-                                {errors.email}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="additional-info-wrap">
-                        <h4>Additional information</h4>
-                        <div className="additional-info">
-                          <label>Order notes</label>
-                          <textarea
-                            className="form-control"
-                            placeholder="Notes about your order, e.g. special notes for delivery."
-                            name="message"
-                            value={formData.message}
-                            onChange={handleInputChange}
-                          />
-                        </div>
+                      <div className="accordion-item">
+                        <h2 className="accordion-header" id="headingBilling">
+                          Billing Details
+                        </h2>
                       </div>
                     </div>
+
+                    <div
+                      className="border rounded p-3 mb-4 mt-4 d-flex align-items-center gap-2"
+                      role="button"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => setShowAddForm(!showAddForm)}
+                    >
+                      <i className="bi bi-plus-lg text-primary"></i>
+                      <span className="text-primary fw-semibold">
+                        {showAddForm
+                          ? "HIDE ADDRESS FORM"
+                          : "ADD A NEW ADDRESS"}
+                      </span>
+                    </div>
+
+                    {showAddForm && (
+                      <div className="border rounded p-3 mb-4 w-100">
+                        <div className="billing-info-wrap">
+                          <div className="row">
+                            <div className="col-lg-6 col-md-6">
+                              <div className="billing-info mb-20">
+                                <label>First Name *</label>
+                                <input
+                                  type="text"
+                                  name="firstName"
+                                  value={formData.firstName}
+                                  onChange={handleInputChange}
+                                  onBlur={handleBlur}
+                                  className={`form-control ${
+                                    errors.firstName && touched.firstName
+                                      ? "is-invalid"
+                                      : ""
+                                  }`}
+                                />
+                                {errors.firstName && touched.firstName && (
+                                  <div className="invalid-feedback">
+                                    {errors.firstName}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="col-lg-6 col-md-6">
+                              <div className="billing-info mb-20">
+                                <label>Last Name *</label>
+                                <input
+                                  type="text"
+                                  name="lastName"
+                                  value={formData.lastName}
+                                  onChange={handleInputChange}
+                                  onBlur={handleBlur}
+                                  className={`form-control ${
+                                    errors.lastName && touched.lastName
+                                      ? "is-invalid"
+                                      : ""
+                                  }`}
+                                />
+                                {errors.lastName && touched.lastName && (
+                                  <div className="invalid-feedback">
+                                    {errors.lastName}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="col-lg-12">
+                              <div className="billing-info mb-20">
+                                <label>Street Address *</label>
+                                <textarea
+                                  className={`form-control ${
+                                    errors.address && touched.address
+                                      ? "is-invalid"
+                                      : ""
+                                  }`}
+                                  placeholder="House number and street name"
+                                  type="text"
+                                  name="address"
+                                  value={formData.address}
+                                  onChange={handleInputChange}
+                                  onBlur={handleBlur}
+                                  rows="4"
+                                />
+                                {errors.address && touched.address && (
+                                  <div className="invalid-feedback">
+                                    {errors.address}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="col-lg-12">
+                              <div className="billing-select mb-20">
+                                <label>Country *</label>
+                                <select
+                                  name="country"
+                                  value={formData.country}
+                                  onChange={handleInputChange}
+                                  onBlur={handleBlur}
+                                  className={`form-control ${
+                                    errors.country && touched.country
+                                      ? "is-invalid"
+                                      : ""
+                                  }`}
+                                >
+                                  <option value="">Select a country</option>
+                                  {countries.map((country, i) => (
+                                    <option key={i} value={country}>
+                                      {country}
+                                    </option>
+                                  ))}
+                                </select>
+                                {errors.country && touched.country && (
+                                  <div className="invalid-feedback">
+                                    {errors.country}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="col-lg-12">
+                              <div className="billing-select mb-20">
+                                <label>State *</label>
+                                <select
+                                  name="state"
+                                  value={formData.state}
+                                  onChange={handleInputChange}
+                                  onBlur={handleBlur}
+                                  disabled={!states.length}
+                                  className={`form-control ${
+                                    errors.state && touched.state
+                                      ? "is-invalid"
+                                      : ""
+                                  }`}
+                                >
+                                  <option value="">Select a state</option>
+                                  {states.map((s, i) => (
+                                    <option key={i} value={s.name}>
+                                      {s.name}
+                                    </option>
+                                  ))}
+                                </select>
+                                {errors.state && touched.state && (
+                                  <div className="invalid-feedback">
+                                    {errors.state}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="col-lg-12">
+                              <div className="billing-select mb-20">
+                                <label>City *</label>
+                                <select
+                                  name="city"
+                                  value={formData.city}
+                                  onChange={handleInputChange}
+                                  onBlur={handleBlur}
+                                  disabled={!cities.length}
+                                  className={`form-control ${
+                                    errors.city && touched.city
+                                      ? "is-invalid"
+                                      : ""
+                                  }`}
+                                >
+                                  <option value="">Select a city</option>
+                                  {cities.map((city, i) => (
+                                    <option key={i} value={city}>
+                                      {city}
+                                    </option>
+                                  ))}
+                                </select>
+                                {errors.city && touched.city && (
+                                  <div className="invalid-feedback">
+                                    {errors.city}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="col-lg-6 col-md-6">
+                              <div className="billing-info mb-20">
+                                <label>Postcode / ZIP *</label>
+                                <input
+                                  type="text"
+                                  name="postcode"
+                                  value={formData.postcode}
+                                  onChange={handleInputChange}
+                                  onBlur={handleBlur}
+                                  className={`form-control ${
+                                    errors.postcode && touched.postcode
+                                      ? "is-invalid"
+                                      : ""
+                                  }`}
+                                />
+                                {errors.postcode && touched.postcode && (
+                                  <div className="invalid-feedback">
+                                    {errors.postcode}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="col-lg-6 col-md-6">
+                              <div className="billing-info mb-20">
+                                <label>Phone *</label>
+                                <input
+                                  type="text"
+                                  name="phone"
+                                  value={formData.phone}
+                                  onChange={handleInputChange}
+                                  onBlur={handleBlur}
+                                  className={`form-control ${
+                                    errors.phone && touched.phone
+                                      ? "is-invalid"
+                                      : ""
+                                  }`}
+                                />
+                                {errors.phone && touched.phone && (
+                                  <div className="invalid-feedback">
+                                    {errors.phone}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="col-lg-6 col-md-6">
+                              <div className="billing-info mb-20">
+                                <label>Email Address *</label>
+                                <input
+                                  type="email"
+                                  name="email"
+                                  value={formData.email}
+                                  onChange={handleInputChange}
+                                  onBlur={handleBlur}
+                                  className={`form-control ${
+                                    errors.email && touched.email
+                                      ? "is-invalid"
+                                      : ""
+                                  }`}
+                                />
+                                {errors.email && touched.email && (
+                                  <div className="invalid-feedback">
+                                    {errors.email}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="col-md-12">
+                              <div className="additional-info-wrap">
+                                <h4>Additional Information</h4>
+                                <div className="additional-info">
+                                  <label>Order Notes</label>
+                                  <textarea
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleInputChange}
+                                    onBlur={handleBlur}
+                                    className="form-control"
+                                    placeholder="Notes about your order, e.g. special notes for delivery."
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="mt-3 d-flex justify-content-end gap-2">
+                            <button
+                              type="button"
+                              className="btn btn-secondary"
+                              onClick={() => setShowAddForm(false)}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-primary"
+                              onClick={handleAddSubmit}
+                            >
+                              Save Address
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                     {data.map((item, index) => (
+                        <div
+                          className="border rounded p-3 mb-3 d-flex align-items-start position-relative"
+                          key={index}
+                        >
+                          <div className="form-check mt-1 me-3">
+                            <input
+                              className="form-check-input"
+                              type="radio"
+                              name="primaryAddress"
+                              checked={item.primary_address === 1}
+                              onChange={() => handleMakePrimary(item.id)}
+                              id={`primary-${item.id}`}
+                            />
+                          </div>
+
+                          <div className="flex-grow-1">
+                            {editIndex === index || null ? (
+                              <div>
+                                <div className="row g-2">
+                                  {[
+                                    "fname",
+                                    "lname",
+                                    "address",
+                                    "city",
+                                    "state",
+                                    "country",
+                                    "postal_code",
+                                    "email",
+                                    "mobile",
+                                    "description",
+                                  ].map((field, i) => (
+                                    <div
+                                      className={`col-md-${
+                                        field === "address" ||
+                                        field === "description"
+                                          ? 12
+                                          : 6
+                                      }`}
+                                      key={i}
+                                    >
+                                      <input
+                                        className="form-control"
+                                        name={field}
+                                        value={editItem[field]}
+                                        onChange={(e) =>
+                                          setEditItem({
+                                            ...editItem,
+                                            [field]: e.target.value,
+                                          })
+                                        }
+                                        required
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                                <div className="mt-3 d-flex justify-content-end gap-2">
+                                  <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={() => setEditIndex(null)}
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={handleUpdate}
+                                    className="btn btn-success"
+                                  >
+                                    Save Changes
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="fw-bold mb-1">
+                                  {item.fname} {item.lname}, {item.postal_code}
+                                  {item.primary_address === 1 && (
+                                    <span className="badge bg-success ms-2">
+                                      Primary
+                                    </span>
+                                  )}
+                                </div>
+                                <div style={{ fontSize: "14px" }}>
+                                  {item.address}, {item.city}, {item.state}
+                                </div>
+                                <div style={{ fontSize: "14px" }}>
+                                  {item.description}
+                                </div>
+
+                                <div className="position-absolute top-0 end-0 d-flex gap-1 p-2">
+                                 <button
+    onClick={() => handleEditClick(item, index)}
+    title="Edit"
+    style={{
+      backgroundColor: "#ffffff",
+      color: "#0D6EFD",
+      fontSize: "22px",
+      minWidth: "57px",
+      marginTop: "16%",
+      minHeight: "10px",
+      lineHeight: "55px",
+      marginBottom: "6px",
+      padding: "0",
+      border: "none",
+      borderRadius: "0",
+    }}
+  >
+    Edit
+    <i className="fa-solid fa-pen-to-square"></i>
+  </button>
+
+  <button
+    onClick={() => handleDelete(item.id)}
+    title="Delete"
+    style={{
+      backgroundColor: "#ffffff",
+      color: "#c2080f",
+      fontSize: "22px",
+      marginTop: "16%",
+      minWidth: "57px",
+      minHeight: "10px",
+      lineHeight: "55px",
+      marginBottom: "6px",
+      padding: "0",
+      border: "none",
+      borderRadius: "0",
+    }}
+  >
+    <i className="fa-solid fa-trash-can"></i>
+    Delete
+  </button>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                   </div>
 
                   <div className="col-lg-5">
@@ -742,7 +1023,7 @@ const Checkout = () => {
                                   <li key={key}>
                                     <span className="order-middle-left">
                                       {cartItem.name} X {cartItem.quantity}
-                                    </span>{" "}
+                                    </span>
                                     <span className="order-price">
                                       {discountedPrice !== null
                                         ? currency.currencySymbol +
@@ -770,14 +1051,17 @@ const Checkout = () => {
                           <div className="your-order-bottom">
                             <ul>
                               <li className="your-order-shipping">Discount</li>
-                              <li>{  "-"+currency.currencySymbol + discount }</li>
+                              <li>
+                                {"-" + currency.currencySymbol + discount}
+                              </li>
                             </ul>
                           </div>
                           <div className="your-order-total">
                             <ul>
                               <li className="order-total">Total</li>
                               <li>
-                                  {currency.currencySymbol + (cartTotalPrice - discount).toFixed(2)}
+                                {currency.currencySymbol +
+                                  (cartTotalPrice - discount).toFixed(2)}
                               </li>
                             </ul>
                           </div>

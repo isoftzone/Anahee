@@ -227,6 +227,7 @@ import ShopSidebar from '../../wrappers/product/ShopSidebar';
 import ShopTopbar from '../../wrappers/product/ShopTopbar';
 import ShopProducts from '../../wrappers/product/ShopProducts';
 const ShopGridStandard = () => {
+  const [selectedCategory, setSelectedCategory] = useState("");
     const [layout, setLayout] = useState('grid three-column');
     const [sortType, setSortType] = useState('');
     const [sortValue, setSortValue] = useState('');
@@ -248,11 +249,26 @@ const ShopGridStandard = () => {
     const getSortParams = (sortType, sortValue) => {
         setSortType(sortType);
         setSortValue(sortValue);
+            setSelectedCategory(sortValue);
     }
+
     const getFilterSortParams = (sortType, sortValue) => {
         setFilterSortType(sortType);
         setFilterSortValue(sortValue);
     }
+
+
+    useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const category = params.get("category");
+    if (category) {
+      getSortParams("category", category);
+    } else {
+      getSortParams("category", "");
+    }
+  }, [location]);
+
+  
     useEffect(() => {
         let sortedProducts = getSortedProducts(products, sortType, sortValue);
         const filterSortedProducts = getSortedProducts(sortedProducts, filterSortType, filterSortValue);

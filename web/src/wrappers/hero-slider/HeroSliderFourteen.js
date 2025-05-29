@@ -10,13 +10,17 @@ import axios from "axios";
 const params = {
   effect: "fade",
   fadeEffect: {
-    crossFade: true
+    crossFade: true,
   },
   modules: [EffectFade],
   loop: true,
   speed: 1000,
   pagination: true,
-  autoHeight: false
+  autoHeight: false,
+  autoplay: {
+    delay: 3000,
+    disableOnInteraction: false,
+  },
 };
 
 const HeroSliderFourteen = () => {
