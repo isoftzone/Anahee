@@ -13,6 +13,7 @@ const Contact = () => {
     from_email: "",
     from_subject: "",
     from_message: "",
+    from_phone:"",
   });
   const [errors, setErrors] = useState({});
   const validate = () => {
@@ -31,6 +32,11 @@ const Contact = () => {
     if (!formData.from_message.trim()) {
       errors.from_message = "Message is required";
     }
+    if (!formData.from_phone.trim()) {
+  errors.from_phone = "Number is required";
+} else if (!/^\d{10}$/.test(formData.from_phone)) {
+  errors.from_phone = "Please enter a valid 10-digit number";
+}
     return errors;
   };
   // console.log("this is error", formErrors);
@@ -54,6 +60,7 @@ const Contact = () => {
       from_email: formData.from_email.trim(),
       from_subject: formData.from_subject.trim(),
       from_message: formData.from_message.trim(),
+      from_phone : formData.from_phone.trim(),
     };
     console.log("Sending template params:", templateParams);
     emailjs
@@ -70,8 +77,12 @@ const Contact = () => {
           from_email: "",
           from_subject: "",
           from_message: "",
+          from_phone:"",
         });
         setErrors({});
+        setTimeout(()=>{
+          setFormMessage("");
+        }, 3000)
       })
       .catch(() => {
         setFormMessage("❌ Please correct the errors in the form.");
@@ -205,6 +216,18 @@ const Contact = () => {
                         />
                         {errors.from_email && (
                           <p className="text-danger">{errors.from_email}</p>
+                        )}
+                      </div>
+                       <div className="col-lg-6">
+                        <input
+                          name="from_phone"
+                          placeholder="Phone No."
+                          type="tel"
+                          value={formData.from_phone}
+                          onChange={handleChange}
+                        />
+                        {errors.from_phone && (
+                          <p className="text-danger">{errors.from_phone}</p>
                         )}
                       </div>
                       <div className="col-lg-12">

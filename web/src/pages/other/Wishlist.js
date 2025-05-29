@@ -38,6 +38,8 @@ const Wishlist = () => {
       const response = await axios.delete(`${BASE_URL}/deletecartWishlist`, { data: payload })
       console.log("this is delete data wishlist", response );
       
+       dispatch(deleteFromWishlist({id: itemIds})); dispatch(deleteFromWishlist({id: itemIds}));
+
     if (response.status === 200 || response.data.success) {
       //  dispatch(deleteFromWishlist(itemIds));
        dispatch(deleteFromWishlist({id: itemIds})); 
