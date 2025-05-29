@@ -12,7 +12,7 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
           <h2 className="collection-title py-3">Shop by Collection</h2>
           <div className="underline mx-auto my-2"></div>
           <div className="links mt-3">
-            <a href="/shop-grid-standard" className="mx-2">
+            <a href="/shop-grid-standard?category=westernwear" className="mx-2">
               Western Wear
             </a>
             <span className="divider">|</span>

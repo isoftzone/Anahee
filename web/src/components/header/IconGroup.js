@@ -169,9 +169,6 @@ const [showLogoutPopup, setShowLogoutPopup] = useState(false);
       setIsLoggedIn(false);
       dispatch(deleteAllFromCart());
     dispatch(deleteAllFromWishlist());
-    //   dispatch(deleteAllFromWishlist());
-    // dispatch(deleteAllFromCart())
-      // navigate("/"); // Uncomment this if you want to redirect after logout
     } else {
       // User clicked "No", do nothing
     }
@@ -183,6 +180,8 @@ const [showLogoutPopup, setShowLogoutPopup] = useState(false);
     localStorage.removeItem("customerinfo");
     setIsLoggedIn(false);
     setShowLogoutPopup(false);
+    dispatch(deleteAllFromCart());
+    dispatch(deleteAllFromWishlist());
     navigate("/"); // optional: redirect to home
   };
   const cancelLogout = () => {
