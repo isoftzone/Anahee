@@ -107,8 +107,29 @@ const ProductImageGallery = ({ product }) => {
                       ref={imgRef}
                       src={process.env.REACT_APP_PUBLIC_URL + single}
                       className="img-fluid"
-                      alt=""
+                      alt="Zoomable"
                     />
+                    {isHovering && (
+                      <div
+                        className="magnifying-lens pointer-events-none absolute rounded-full border border-gray-300 shadow-lg"
+                        style={{
+                          left: lensPosition.x - 75,
+                          top: lensPosition.y - 75,
+                          width: 150,
+                          height: 150,
+                          backgroundImage: `url(${
+                            process.env.REACT_APP_PUBLIC_URL + single
+                          })`,
+                          backgroundRepeat: "no-repeat",
+                          backgroundSize: `${imgRef.current?.width * 2}px ${
+                            imgRef.current?.height * 2
+                          }px`,
+                          backgroundPosition: backgroundPosition,
+                          zIndex: 10,
+                        }}
+                      />
+                    )}
+                    {/* 
                     {isHovering && (
                       <div
                         className="magnifying-lens"
@@ -124,24 +145,8 @@ const ProductImageGallery = ({ product }) => {
                           }px`,
                         }}
                       />
-                    )}
+                    )} */}
                   </div>
-                  {isHovering && (
-                    <div className="zoomed-preview">
-                      <div
-                        className="zoomed-image"
-                        style={{
-                          backgroundImage: `url(${
-                            process.env.REACT_APP_PUBLIC_URL + single
-                          })`,
-                          backgroundPosition: backgroundPosition,
-                          backgroundSize: `${imgRef.current?.width * 2}px ${
-                            imgRef.current?.height * 2
-                          }px`,
-                        }}
-                      />
-                    </div>
-                  )}
                 </div>
               </SwiperSlide>
             ))}

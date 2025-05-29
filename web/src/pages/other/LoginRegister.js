@@ -114,30 +114,31 @@ import Nav from "react-bootstrap/Nav";
 import SEO from "../../components/seo";
 import LayoutOne from "../../layouts/LayoutOne";
 import { BASE_URL } from "../../config";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // Password visibility toggle
   const navigate = useNavigate();
- const validate = () => {
-  const newErrors = {};
-  if (!formData.email.trim()) {
-    newErrors.email = "Email is required";
-  } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-    newErrors.email = "Invalid email format";
-  }
-  if (!formData.password) {
-    newErrors.password = "Password is required";
-  } else if (
-    !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(formData.password)
-  ) {
-    newErrors.password =
-      "Password must be at least 8 characters long and include a letter, a number, and a special character";
-  }
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Invalid email format";
+    }
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (
+      !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(formData.password)
+    ) {
+      newErrors.password = "Incorrect password. Please try again.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
@@ -191,29 +192,60 @@ const Login = () => {
                             {apiError && <p style={{ color: "red" }}>{apiError}</p>}
                             {success && <p style={{ color: "green" }}>{success}</p>}
                             <form onSubmit={handleSubmit} noValidate>
-                              <input
-                                type="email"
-                                name="email"
-                                placeholder="Email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                className={errors.email ? "is-invalid" : ""}
-                              />
-                              {errors.email && <div style={{ color: "red" }}>{errors.email}</div>}
-                              <input
-                                type="password"
-                                name="password"
-                                placeholder="Password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className={errors.password ? "is-invalid" : ""}
-                              />
-                              {errors.password && <div style={{ color: "red" }}>{errors.password}</div>}
-                              <div className="button-box">
+                              <div className="mb-3">
+                                <input
+                                  type="email"
+                                  name="email"
+                                  placeholder="Email"
+                                  value={formData.email}
+                                  onChange={handleChange}
+                                  className={errors.email ? "is-invalid" : ""}
+                                />
+                                {errors.email && (
+                                  <div style={{ color: "red" }}>{errors.email}</div>
+                                )}
+                              </div>
+                              <div className="mb-3" style={{ position: "relative" }}>
+                                <input
+                                  type={showPassword ? "text" : "password"}
+                                  name="password"
+                                  placeholder="Password"
+                                  value={formData.password}
+                                  onChange={handleChange}
+                                  className={errors.password ? "is-invalid" : ""}
+                                  style={{ paddingRight: "40px" }}
+                                />
+                                <i
+                                  className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}
+                                  onClick={() => setShowPassword(!showPassword)}
+                                  style={{
+                                    position: "absolute",
+                                    top: "34%",
+                                    right: "15px",
+                                    // fontSize: "3rem",
+                                    transform: "translateY(-50%)",
+                                    cursor: "pointer",
+                                    fontSize: "2rem",
+                                    color: "#777",
+                                  }}
+                                ></i>
+                                {errors.password && (
+                                  <div style={{ color: "red", marginTop: "0.25rem" }}>
+                                    {errors.password}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="button-box mt-4">
                                 <button type="submit">
                                   <span>Login</span>
                                 </button>
                               </div>
+                              <h5 className="mt-5">
+                                Create a account &nbsp;
+                                <Link to="/register" style={{ color: "#2874F0" }}>
+                                  Register
+                                </Link>
+                              </h5>
                             </form>
                           </div>
                         </div>
@@ -230,3 +262,12 @@ const Login = () => {
   );
 };
 export default Login;
+
+
+
+
+
+
+
+
+

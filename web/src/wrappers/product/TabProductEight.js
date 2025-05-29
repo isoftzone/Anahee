@@ -3,7 +3,6 @@ import clsx from "clsx";
 import Tab from "react-bootstrap/Tab";
 import Nav from "react-bootstrap/Nav";
 import ProductGrid from "./ProductGrid";
-
 const TabProductEight = ({
   spaceTopClass,
   spaceBottomClass,
@@ -77,12 +76,10 @@ const TabProductEight = ({
     </div>
   );
 };
-
 TabProductEight.propTypes = {
   bgColorClass: PropTypes.string,
   category: PropTypes.string,
   spaceBottomClass: PropTypes.string,
   spaceTopClass: PropTypes.string,
 };
-
 export default TabProductEight;

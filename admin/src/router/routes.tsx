@@ -48,6 +48,7 @@ import CustomersL from '../pages/Components/CustomerL';
 import SocialMediaSettingsPage from '../pages/Components/SocialMediaSettingsPage';
 import AboutUs from '../pages/Components/AboutUs';
 import ContactUs from '../pages/Components/ContactUs';
+import EditCustomer from '../pages/Components/EditCustomer';
 
 // import ExchangePolicy from /ExchangePolicy';
 const Index = lazy(() => import('../pages/Index'));
@@ -449,6 +450,10 @@ const routes = [
         element: <CaptionMaster />
     },
     {
+        path:"/components/EditCustomer/:id",
+         element:<EditCustomer />
+        },
+    {
         path: '/Components/discountcouponlist',
         element: <DiscountCouponList />
     },
@@ -509,7 +514,7 @@ const routes = [
         element: <OrderAdd />
     },
     {
-        path: '/Components/orderedit',
+        path: '/Components/orderedit/:saleId',
         element: <OrderEdit />
     },
     {

@@ -1,6 +1,8 @@
 import clsx from "clsx";
-
+import { useNavigate } from "react-router-dom";
 const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
+ const navigate = useNavigate();
+
   return (
     <div
       className={clsx("shop-by-collection my-3", spaceTopClass, spaceBottomClass)}
@@ -10,15 +12,15 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
           <h2 className="collection-title py-3">Shop by Collection</h2>
           <div className="underline mx-auto my-2"></div>
           <div className="links mt-3">
-            <a href="/" className="mx-2">
+            <a href="/shop-grid-standard" className="mx-2">
               Western Wear
             </a>
             <span className="divider">|</span>
-            <a href="/" className="mx-2">
+            <a href="/shop-grid-standard" className="mx-2">
               Suit Sets
             </a>
             <span className="divider">|</span>
-            <a href="/" className="mx-2">
+            <a href="/shop-grid-standard" className="mx-2">
               Cord Sets
             </a>
           </div>
@@ -29,11 +31,15 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
           <div className="col-lg-6 col-12 mb-4">
             <div className="lookbook-main-container d-flex position-relative">
               <div className="lookbook-image">
+
+     <a href="#" className="lookbook-link">
+                   {/* <a href="http://localhost:3000/videos/productsvideo.mp4" className="lookbook-link"> */}
                 <img
                   src="assets/img/banner/Maskgroup__11.png"
                   alt="Lookbook 2025"
                   className="img-fluid"
                 />
+                </a>
               </div>
               <div className="lookbook-text"></div>
               <div className="lookbook-text-content d-flex flex-column justify-content-center align-items-start">
@@ -43,7 +49,7 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
                   <br />
                   <span>Video</span>
                 </h2>
-                <a href="#" className="lookbook-link">
+                <a href="/shop-grid-standard" className="lookbook-link">
                   SHOP NOW
                 </a>
               </div>
@@ -51,8 +57,8 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
           </div>
 
           {/* Right Top and Bottom Images */}
-          <div className="col-lg-3 col-sm-6 col-12 mb-4">
-            <div className="lookbook1">
+       <div className="col-lg-3 col-sm-6 col-12 mb-4">
+            <div className="lookbook1  cursor-pointer" onClick={() => navigate("/shop-grid-standard", { state: { categoryname: "westernwear" } })}>
               <img
                 src="assets/img/banner/Maskgroup__22.png"
                 alt="Blue Dress"
@@ -61,7 +67,7 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
             </div>
           </div>
           <div className="col-lg-3 col-sm-6 col-12 mb-4">
-            <div className="lookbook2">
+            <div className="lookbook2  cursor-pointer" onClick={() => navigate("/shop-grid-standard", { state: { categoryname: "kurta" } })}>
               <img
                 src="assets/img/banner/Maskgroup__33.png"
                 alt="Yellow Dress"

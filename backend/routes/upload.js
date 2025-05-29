@@ -13,7 +13,7 @@ const db = mysql.createConnection({
   host: "4.213.43.18",
   user: "isrbs",
   password: "isoft@1209ISZ",
-  database: "madhuban",
+  database: "anahee",
   port: 3306,
 });
 

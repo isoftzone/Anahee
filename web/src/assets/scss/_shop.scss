@@ -12,6 +12,7 @@
   }
   .select-shoing-wrap {
     display: flex;
+    
     @media #{$xs-layout} {
       display: block;
     }
@@ -438,5 +439,12 @@
     @media #{$xs-layout} {
       padding: 0 15px;
     }
+  }
+}
+
+@media (max-width:375px){
+  .shop-top-bar{
+            margin-bottom: 0;
+
   }
 }

@@ -1,20 +1,25 @@
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
-import { Container, Badge } from "react-bootstrap";
+import { Badge } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../../config";
+import LayoutOne from "../../layouts/LayoutOne";
+
 const Orders = () => {
   const [activeTab, setActiveTab] = useState("all_orders");
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const customerData = JSON.parse(localStorage.getItem("customerinfo"));
     if (customerData?.id) {
       const fetchOrders = async () => {
         try {
           setIsLoading(true);
-          const response = await axios.get(`${BASE_URL}/getallorders/${customerData.id}`);
+          const response = await axios.get(
+            `${BASE_URL}/getallorders/${customerData.id}`
+          );
           if (response.data?.orders) {
             setOrders(response.data.orders);
           }
@@ -27,140 +32,213 @@ const Orders = () => {
       fetchOrders();
     }
   }, []);
-  // Filter orders based on status
-  const cancelledOrders = orders.filter(order => order.ORDER_STATUS === 'Cancel');
-  const deliveredOrders = orders.filter(order => order.ORDER_STATUS === 'Delivered');
-  const openOrders = orders.filter(order => 
-    ['Placed', 'Progress', 'Dispatched'].includes(order.ORDER_STATUS)
+
+  const cancelOrder = async (saleId) => {
+    const confirmCancel = window.confirm(
+      "Do you really want to cancel this order?"
+    );
+    if (!confirmCancel) return;
+
+    try {
+      await axios.put(`${BASE_URL}/cancelorder/${saleId}`);
+      alert("Order cancelled successfully!");
+
+      const customerData = JSON.parse(localStorage.getItem("customerinfo"));
+      const response = await axios.get(
+        `${BASE_URL}/getallorders/${customerData.id}`
+      );
+      setOrders(response.data.orders);
+    } catch (err) {
+      console.error("Cancel failed:", err);
+      alert("Failed to cancel the order. Please try again later.");
+    }
+  };
+
+  const cancelledOrders = orders.filter(
+    (order) => order.ORDER_STATUS === "Cancel"
   );
+  const deliveredOrders = orders.filter(
+    (order) => order.ORDER_STATUS === "Delivered"
+  );
+
   const getStatusBadge = (status) => {
     const variantMap = {
-      'Placed': 'primary',
-      'Progress': 'info',
-      'Dispatched': 'warning',
-      'Delivered': 'success',
-      'Cancel': 'danger'
+      Placed: "primary",
+      Progress: "info",
+      Dispatched: "warning",
+      Delivered: "success",
+      Cancel: "danger",
     };
-    return <Badge pill bg={variantMap[status]} className="status-badge">{status}</Badge>;
+    return (
+      <Badge pill bg={variantMap[status]} className="status-badge">
+        {status}
+      </Badge>
+    );
   };
-const renderOrderCard = (order) => {
-  let totalAmount = 0;
-  return (
-    <div key={order.SALEID} className="order-card mb-4">
-      <div className="order-header">
-        <h3 className="order-number">Order #{order.SALEID}</h3>
-        <div className="order-meta">
-          <span className="order-date">
-            <i className="bi bi-calendar"></i> {new Date(order.CREATEDON).toLocaleDateString()}
-          </span>
-          <span className="order-status">
-            Status: {getStatusBadge(order.ORDER_STATUS)}
-          </span>
+
+  const renderOrderCard = (order) => {
+    let totalAmount = 0;
+    return (
+      <div
+        key={order.SALEID}
+        className="order-card mb-4 p-3 rounded shadow-sm bg-white border"
+      >
+        {/* Header */}
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-start mb-3">
+          <h5 className="order-number mb-2 mb-md-0 fs-3">
+            Order {order.SALEID}
+          </h5>
+          <div className="d-flex flex-column flex-md-row align-items-md-center justify-content-center gap-2">
+            <span className="text-muted small">
+              Status: {getStatusBadge(order.ORDER_STATUS)}
+            </span>
+          </div>
         </div>
-      </div>
-      <div className="order-details">
-        <div className="payment-info">
-          <span className="payment-method">
+
+        {/* Payment Info */}
+        <div className="mb-3">
+          <span className="text-muted small">
+            <i className="bi bi-calendar"></i>{" "}
+            {new Date(order.CREATEDON).toLocaleDateString()}
+          </span>
+          <div className="small text-muted">
             <strong>Payment Method:</strong> {order.PAYMENTMETHOD}
-          </span>
-          <span className="payment-status">
+          </div>
+          <div className="small text-muted">
             <strong>Payment Status:</strong> {order.PAYMENTSTATUS}
-          </span>
+          </div>
         </div>
-        <div className="table-responsive">
-          <table className="table order-items-table">
-            <thead>
-              <tr>
-                <th className="product-col">Product</th>
-                <th className="quantity-col text-center">Qty</th>
-                <th className="amount-col text-end">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {order.ITEMS && order.ITEMS.map((item, index) => {
-                const quantity = parseFloat(item.QUANTITY || 0);
-                const amount = parseFloat(item.AMOUNT || 0);
-                const lineTotal = amount * quantity;
-                totalAmount += lineTotal;
-                return (
-                  <tr key={index}>
-                    <td className="product-cell">
-                      <div className="product-info">
-                        <div className="product-name">{item.ITEMNAME || 'Product Name Not Available'}</div>
-                        {item.DESCRIPTION && (
-                          <div className="product-desc text-muted">{item.DESCRIPTION}</div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="quantity-cell text-center">{quantity}</td>
-                    <td className="amount-cell text-end">${amount.toFixed(2)}</td>
-                  </tr>
-                );
-              })}
-              <tr className="order-total-row">
-                <td colSpan="2" className="text-end total-label"><strong>Total:</strong></td>
-                <td className="text-end total-amount">
-                  <strong>${totalAmount.toFixed(2)}</strong>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+
+        {/* Items */}
+        {order.ITEMS?.map((item, index) => {
+          const quantity = parseFloat(item.QUANTITY || 0);
+          const amount = parseFloat(item.AMOUNT || 0);
+          const lineTotal = amount * quantity;
+          totalAmount += lineTotal;
+          const imageArray = item.PHOTO?.split(",") || [];
+          const firstImage = imageArray[0];
+
+          return (
+            <div
+              className="row border-top pt-3 mb-3 align-items-center"
+              key={index}
+            >
+              {/* Image */}
+              <div className="col-4 col-md-2 mb-2 mb-md-0">
+                {item.PHOTO && (
+                  <img
+                    src={process.env.REACT_APP_PUBLIC_URL + firstImage}
+                    alt={item.ITEMNAME}
+                    className="img-fluid"
+                    style={{
+                      maxHeight: "120px",
+                      objectFit: "contain",
+                      borderRadius: "4px",
+                    }}
+                  />
+                )}
+              </div>
+
+              {/* Details */}
+              <div className="col-8 col-md-10 pt-4">
+                <h6 className="mb-1 fw-bold text-xl md:text-2xl">
+                  {item.ITEMNAME || "Unnamed Product"}
+                </h6>
+
+                {item.DESCRIPTION && (
+                  <p className="text-muted mb-1 small">{item.DESCRIPTION}</p>
+                )}
+                <div className="d-flex flex-wrap gap-3 small">
+                  <span>
+                    <strong>Qty:</strong> {quantity}
+                  </span>
+                  <span>
+                    <strong>Amount:</strong> ₹{amount.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Total + Cancel */}
+        <div className="d-flex justify-content-between align-items-center border-top pt-3">
+          <strong>Total: ₹{totalAmount.toFixed(2)}</strong>
+          {["Placed", "Progress"].includes(order.ORDER_STATUS) && (
+            <button
+              className="py-1"
+              onClick={() => cancelOrder(order.SALEID)}
+              style={{
+                border: "none",
+                marginTop: "5px",
+                fontSize: "10px",
+                backgroundColor: "#DC3545",
+                borderRadius: "5px",
+                color: "#fff",
+                fontWeight: "boLD",
+              }}
+            >
+              Cancel Order
+            </button>
+          )}
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
+
   return (
-    <Container className="orders-container">
-      <div className="page-header">
-        <h1 className="page-title">My Orders</h1>
-        <p className="page-subtitle">View and manage your order history</p>
-      </div>
-      <div className="orders-tabs">
-        <Tabs 
-          activeKey={activeTab} 
-          onSelect={(k) => setActiveTab(k)} 
+    <LayoutOne headerTop="visible">
+      <div className="container orders-container py-4">
+        <div className="page-header text-center mb-4">
+          <h1 className="page-title">My Orders</h1>
+          <p className="page-subtitle text-muted">
+            View and manage your order history
+          </p>
+        </div>
+
+        <Tabs
+          activeKey={activeTab}
+          onSelect={(k) => setActiveTab(k)}
           className="mb-4 custom-tabs"
           justify
         >
+          {/* All Orders */}
           <Tab eventKey="all_orders" title="All Orders">
             <div className="orders-section">
-              <h2 className="section-title">Your Order History</h2>
               {isLoading ? (
-                <div className="loading-spinner">
-                  <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                  <p className="loading-text">Loading your orders...</p>
+                <div className="text-center py-5">
+                  <div className="spinner-border text-primary" role="status" />
+                  <p className="text-muted mt-2">Loading your orders...</p>
                 </div>
               ) : orders.length === 0 ? (
-                <div className="no-orders">
-                  <i className="bi bi-box-seam no-orders-icon"></i>
-                  <h3 className="no-orders-title">No orders found</h3>
-                  <p className="no-orders-message">You haven't placed any orders yet.</p>
+                <div className="text-center py-5">
+                  <i className="bi bi-box-seam fs-1 text-muted" />
+                  <h5 className="mt-2">No orders found</h5>
+                  <p className="text-muted">
+                    You haven't placed any orders yet.
+                  </p>
                 </div>
               ) : (
-                <div className="orders-list">
-                  {orders.map(renderOrderCard)}
-                </div>
+                <div className="orders-list">{orders.map(renderOrderCard)}</div>
               )}
             </div>
           </Tab>
+
+          {/* Delivered Orders */}
           <Tab eventKey="delivered" title="Delivered">
             <div className="orders-section">
-              <h2 className="section-title">Delivered Orders</h2>
               {isLoading ? (
-                <div className="loading-spinner">
-                  <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                  <p className="loading-text">Loading delivered orders...</p>
+                <div className="text-center py-5">
+                  <div className="spinner-border text-primary" role="status" />
+                  <p className="text-muted mt-2">Loading delivered orders...</p>
                 </div>
               ) : deliveredOrders.length === 0 ? (
-                <div className="no-orders">
-                  <i className="bi bi-truck no-orders-icon"></i>
-                  <h3 className="no-orders-title">No delivered orders</h3>
-                  <p className="no-orders-message">Your completed orders will appear here.</p>
+                <div className="text-center py-5">
+                  <i className="bi bi-truck fs-1 text-muted" />
+                  <h5 className="mt-2">No delivered orders</h5>
+                  <p className="text-muted">
+                    Your completed orders will appear here.
+                  </p>
                 </div>
               ) : (
                 <div className="orders-list">
@@ -169,21 +247,22 @@ const renderOrderCard = (order) => {
               )}
             </div>
           </Tab>
+
+          {/* Cancelled Orders */}
           <Tab eventKey="cancelled" title="Cancelled">
             <div className="orders-section">
-              <h2 className="section-title">Cancelled Orders</h2>
               {isLoading ? (
-                <div className="loading-spinner">
-                  <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                  <p className="loading-text">Loading cancelled orders...</p>
+                <div className="text-center py-5">
+                  <div className="spinner-border text-primary" role="status" />
+                  <p className="text-muted mt-2">Loading cancelled orders...</p>
                 </div>
               ) : cancelledOrders.length === 0 ? (
-                <div className="no-orders">
-                  <i className="bi bi-x-circle no-orders-icon"></i>
-                  <h3 className="no-orders-title">No cancelled orders</h3>
-                  <p className="no-orders-message">You haven't cancelled any orders.</p>
+                <div className="text-center py-5">
+                  <i className="bi bi-x-circle fs-1 text-muted" />
+                  <h5 className="mt-2">No cancelled orders</h5>
+                  <p className="text-muted">
+                    You haven't cancelled any orders.
+                  </p>
                 </div>
               ) : (
                 <div className="orders-list">
@@ -194,7 +273,8 @@ const renderOrderCard = (order) => {
           </Tab>
         </Tabs>
       </div>
-    </Container>
+    </LayoutOne>
   );
 };
+
 export default Orders;

@@ -17,9 +17,9 @@ const About = () => {
     <Fragment>
       <SEO
         titleTemplate="About us"
-        description="About page of Anahee react minimalist eCommerce template."
+        description="About page of Anahee Anahee."
       /> 
-      <LayoutOne headerTop="visible">
+      <LayoutOne headerTop="visible" >
         {/* breadcrumb */}
         {/* <Breadcrumb 
           pages={[
@@ -29,7 +29,7 @@ const About = () => {
         /> */}
 
         {/* section title with text */}
-        <SectionTitleWithText spaceTopClass="pt-100" spaceBottomClass="pb-95" />
+        <SectionTitleWithText />
 
         {/* banner */}
         {/* <BannerOne spaceBottomClass="pb-70" /> */}

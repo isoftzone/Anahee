@@ -107,14 +107,18 @@
 // export default IconGroup;
 import PropTypes from "prop-types";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import clsx from "clsx";
 import MenuCart from "./sub-components/MenuCart";
+import { deleteAllFromWishlist } from "../../store/slices/wishlist-slice";
+import { deleteAllFromCart } from "../../store/slices/cart-slice";
 import { useEffect, useState } from "react";
 const IconGroup = ({ iconWhiteClass }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [name, setName] = useState("");
   const navigate = useNavigate();
+  // const dispatch = useDispatch();
+
   // const myItems=localStorage.getItem("customerinfo")
   // :white_check_mark: Check localStorage for login status
   //  const [user, setUser] = useState(null);
@@ -131,7 +135,7 @@ const IconGroup = ({ iconWhiteClass }) => {
         const customer = JSON.parse(customerStr);
         setIsLoggedIn(true);
         setName(customer.name); // assuming `customerinfo` has a `name` field
-        console.log("setName",name)
+        console.log("setName", name);
       } else {
         setIsLoggedIn(false);
         setName("");
@@ -153,15 +157,17 @@ const IconGroup = ({ iconWhiteClass }) => {
   //   // navigate("/");
   // };
   const handleLogout = () => {
-  const confirmLogout = window.confirm("Are you sure you want to logout?");
-  if (confirmLogout) {
-    localStorage.removeItem("customerinfo");
-    setIsLoggedIn(false);
-    // navigate("/"); // Uncomment this if you want to redirect after logout
-  } else {
-    // User clicked "No", do nothing
-  }
-};
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
+    if (confirmLogout) {
+      localStorage.removeItem("customerinfo");
+      setIsLoggedIn(false);
+    //   dispatch(deleteAllFromWishlist());
+    // dispatch(deleteAllFromCart())
+      // navigate("/"); // Uncomment this if you want to redirect after logout
+    } else {
+      // User clicked "No", do nothing
+    }
+  };
   const triggerMobileMenu = () => {
     const offcanvasMobileMenu = document.querySelector(
       "#offcanvas-mobile-menu"
@@ -174,12 +180,24 @@ const IconGroup = ({ iconWhiteClass }) => {
   const { compareItems } = useSelector((state) => state.compare);
   const { wishlistItems } = useSelector((state) => state.wishlist);
   const { cartItems } = useSelector((state) => state.cart);
+  const [searchQuery, setSearchQuery] = useState("");
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const trimmedQuery = searchQuery.trim();
+    if (trimmedQuery) {
+      navigate("/shop-grid-standard", {
+        state: { name: trimmedQuery },
+      });
+    } else {
+      alert("Please enter a valid search term.");
+    }
+  };
   // console.log("cartItems",cartItems);
-  console.log("myItems",name);
+  console.log("myItems", name);
   return (
     <div className={clsx("header-right-wrap", iconWhiteClass)}>
       {/* Search */}
-      <div className="same-style header-search d-none d-lg-block">
+      {/* <div className="same-style header-search d-none d-lg-block">
         <button className="search-active" onClick={handleClick}>
           <i className="pe-7s-search" />
         </button>
@@ -191,9 +209,35 @@ const IconGroup = ({ iconWhiteClass }) => {
             </button>
           </form>
         </div>
+      </div> */}
+      <div className="same-style header-search d-lg-block">
+        <button
+          className="search-active"
+          onClick={(e) => {
+            e.preventDefault();
+            document
+              .querySelector(".search-content")
+              ?.classList.toggle("active");
+          }}
+        >
+          <i className="pe-7s-search" />
+        </button>
+        <div className="search-content">
+          <form onSubmit={handleSearch}>
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button type="submit" className="button-search">
+              <i className="pe-7s-search" />
+            </button>
+          </form>
+        </div>
       </div>
       {/* Account Dropdown */}
-      <div className="same-style account-setting d-none d-lg-block">
+      <div className="same-style account-setting d-lg-block">
         <button
           className="account-setting-active d-flex align-items-center gap-2"
           onClick={handleClick}
@@ -201,7 +245,7 @@ const IconGroup = ({ iconWhiteClass }) => {
           <i className="pe-7s-user-female" />
           {isLoggedIn && (
             <h4
-              className="mb-0 text-truncate text-capitalize"
+              className="mb-0 text-truncate text-capitalize d-block"
               style={{
                 maxWidth: "80px",
                 overflow: "hidden",
@@ -221,7 +265,10 @@ const IconGroup = ({ iconWhiteClass }) => {
             {isLoggedIn ? (
               <>
                 <li>
-                  <Link to="/my-account">My Account</Link>
+                  <Link to="/my-account">Profile</Link>
+                </li>
+                <li>
+                  <Link to="/orders">Orders</Link>
                 </li>
                 <li>
                   <Link to="/" onClick={handleLogout}>

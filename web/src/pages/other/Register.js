@@ -1298,11 +1298,8 @@ import Nav from "react-bootstrap/Nav";
 import SEO from "../../components/seo";
 import LayoutOne from "../../layouts/LayoutOne";
 import { BASE_URL } from "../../config";
-import { useNavigate } from "react-router-dom";
-<<<<<<< HEAD
-
-=======
->>>>>>> main
+import { Link, useNavigate } from "react-router-dom";
+import "bootstrap-icons/font/bootstrap-icons.css";
 const Register = () => {
   const [formData, setFormData] = useState({
     fname: "",
@@ -1312,7 +1309,8 @@ const Register = () => {
     password: "",
     confirmPassword: "",
   });
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
@@ -1321,7 +1319,6 @@ const Register = () => {
 =======
 >>>>>>> main
   useEffect(() => {
-    // Clear form on first load
     setFormData({
       fname: "",
       lname: "",
@@ -1343,15 +1340,12 @@ const Register = () => {
       ...prev,
       [name]: value,
     }));
-<<<<<<< HEAD
   };
 
   const validateForm = () => {
     const { fname, lname, email, mobile, password, confirmPassword } = formData;
-
     if (!fname.trim() || fname.length < 2) return "First name must be at least 2 characters.";
     if (!lname.trim() || lname.length < 2) return "Last name must be at least 2 characters.";
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) return "Enter a valid email address.";
 
@@ -1362,32 +1356,9 @@ const Register = () => {
     if (!passwordRegex.test(password)) {
       return "Password must be 8+ chars, with letter, number & symbol.";
     }
-
-    if (password !== confirmPassword) return "Passwords do not match.";
-
+    if (password !== confirmPassword) return "Password does not match.";
     return null;
   };
-
-=======
-  };
-  const validateForm = () => {
-    const { fname, lname, email, mobile, password, confirmPassword } = formData;
-    if (!fname.trim() || fname.length < 2)
-      return "First name must be at least 2 characters.";
-    if (!lname.trim() || lname.length < 2)
-      return "Last name must be at least 2 characters.";
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) return "Enter a valid email address.";
-    const mobileRegex = /^[0-9]{10}$/;
-    if (!mobileRegex.test(mobile)) return "Mobile number must be 10 digits.";
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
-    if (!passwordRegex.test(password)) {
-      return "Password must be 8+ chars, with letter, number & symbol.";
-    }
-    if (password !== confirmPassword) return "Passwords do not match.";
-    return null;
-  };
->>>>>>> main
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -1443,10 +1414,7 @@ const Register = () => {
 >>>>>>> main
   return (
     <>
-      <SEO
-        titleTemplate="Register"
-        description="Register page of the eCommerce app."
-      />
+      <SEO titleTemplate="Register" description="Register page of the eCommerce app." />
       <LayoutOne headerTop="visible">
         <div className="login-register-area pt-100 pb-100">
           <div className="container">
@@ -1466,13 +1434,7 @@ const Register = () => {
                         <div className="login-form-container">
                           <div className="login-register-form">
                             {error && <p style={{ color: "red" }}>{error}</p>}
-<<<<<<< HEAD
                             {success && <p style={{ color: "green" }}>{success}</p>}
-=======
-                            {success && (
-                              <p style={{ color: "green" }}>{success}</p>
-                            )}
->>>>>>> main
                             <form onSubmit={handleSubmit} autoComplete="off">
                               <input
                                 type="text"
@@ -1480,7 +1442,6 @@ const Register = () => {
                                 placeholder="First Name"
                                 value={formData.fname}
                                 onChange={handleChange}
-                                autoComplete="off"
                                 required
                               />
                               <input
@@ -1489,7 +1450,6 @@ const Register = () => {
                                 placeholder="Last Name"
                                 value={formData.lname}
                                 onChange={handleChange}
-                                autoComplete="off"
                                 required
                               />
                               <input
@@ -1498,7 +1458,6 @@ const Register = () => {
                                 placeholder="Email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                autoComplete="off"
                                 required
                               />
                               <input
@@ -1507,32 +1466,69 @@ const Register = () => {
                                 placeholder="Mobile"
                                 value={formData.mobile}
                                 onChange={handleChange}
-                                autoComplete="off"
                                 required
                               />
-                              <input
-                                type="password"
-                                name="password"
-                                placeholder="Password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                autoComplete="new-password"
-                                required
-                              />
-                              <input
-                                type="password"
-                                name="confirmPassword"
-                                placeholder="Confirm Password"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                autoComplete="new-password"
-                                required
-                              />
+                              {/* Password field */}
+                              <div style={{ position: "relative", marginBottom: "15px" }}>
+                                <input
+                                  type={showPassword ? "text" : "password"}
+                                  name="password"
+                                  placeholder="Password"
+                                  value={formData.password}
+                                  onChange={handleChange}
+                                  required
+                                  style={{ width: "100%", paddingRight: "40px" }}
+                                />
+                                <i
+                                  className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}
+                                  onClick={() => setShowPassword(!showPassword)}
+                                  style={{
+                                    position: "absolute",
+                                    top: "32%",
+                                    right: "10px",
+                                    transform: "translateY(-50%)",
+                                    cursor: "pointer",
+                                    fontSize: "2rem",
+                                    color: "#777",
+                                  }}
+                                ></i>
+                              </div>
+                              {/* Confirm Password field */}
+                              <div style={{ position: "relative", marginBottom: "15px" }}>
+                                <input
+                                  type={showConfirmPassword ? "text" : "password"}
+                                  name="confirmPassword"
+                                  placeholder="Confirm Password"
+                                  value={formData.confirmPassword}
+                                  onChange={handleChange}
+                                  required
+                                  style={{ width: "100%", paddingRight: "40px" }}
+                                />
+                                <i
+                                  className={`bi ${showConfirmPassword ? "bi-eye-slash" : "bi-eye"}`}
+                                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                  style={{
+                                    position: "absolute",
+                                    top: "32%",
+                                    right: "10px",
+                                    transform: "translateY(-50%)",
+                                    cursor: "pointer",
+                                    fontSize: "2rem",
+                                    color: "#777",
+                                  }}
+                                ></i>
+                              </div>
                               <div className="button-box">
                                 <button type="submit">
                                   <span>Register</span>
                                 </button>
                               </div>
+                              <h5 className="mt-5">
+                                Already have an account? Let's get you in &nbsp;{" "}
+                                <Link to="/login-register" style={{ color: "#2874F0" }}>
+                                  Login
+                                </Link>
+                              </h5>
                             </form>
                           </div>
                         </div>

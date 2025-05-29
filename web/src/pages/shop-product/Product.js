@@ -25,7 +25,7 @@ const Product = () => {
     <Fragment>
       <SEO
         titleTemplate="Product Page"
-        description="Product Page of Anahee react minimalist eCommerce template."
+        description="Product Page of Anahee Anahee."
       />
 
       <LayoutOne headerTop="visible">

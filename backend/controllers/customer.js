@@ -152,8 +152,9 @@ exports.getcustomerbyid = (req, res) => {
   
   
 exports.addcustomer = (req, res) => {
-  const { fname, lname, mobile, email, password } = req.body;
-  if (!fname || !lname || !mobile || !email || !password) {
+  const { FNAME, LNAME, MOBILE, email, CADDRESSLINE1 } = req.body;
+  console.log("addcustomer", req.body);
+  if (!FNAME || !LNAME || !MOBILE || !email || !CADDRESSLINE1) {
     return res.status(400).json({
       success: false,
       msg: "All fields are required",
@@ -175,7 +176,7 @@ exports.addcustomer = (req, res) => {
         msg: "Email already exists",
       });
     }
-    const newCustomer = { fname, lname, mobile, email, password };
+    const newCustomer = { FNAME, LNAME, MOBILE, email, CADDRESSLINE1 };
     const insertQuery = "INSERT INTO customermaster SET ?";
     con.query(insertQuery, newCustomer, (insertErr, insertResults) => {
       if (insertErr) {

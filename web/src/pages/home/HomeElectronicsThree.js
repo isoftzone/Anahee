@@ -14,7 +14,7 @@ const HomeElectronicsThree = () => {
     <Fragment>
       <SEO
         titleTemplate="Electronics Home"
-        description="Electronics home of flone react minimalist eCommerce template."
+        description="Electronics home of flone Anahee."
       />
       <LayoutOne headerTop="visible">
         {/* hero slider */}

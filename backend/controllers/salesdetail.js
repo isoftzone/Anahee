@@ -16,7 +16,7 @@ const router = express.Router();
 
 //         // Query the database to find the sales details with the given SALEID
 //         con.query(
-//             "SELECT * FROM madhuban.salesdetail WHERE SALEID = ?", [saleId],
+//             "SELECT * FROM anahee.salesdetail WHERE SALEID = ?", [saleId],
 //             (err, result) => {
 //                 if (err) {
 //                     console.error("❌ Error fetching sales detail:", err);
@@ -45,7 +45,7 @@ exports.getSalesDetail = async (req, res) => {
     console.log(`Fetching Sales Detail for SALEID: ${saleId || "ALL SALES"}`); // Debugging log
 
     try {
-        let query = "SELECT * FROM madhuban.salesdetail";
+        let query = "SELECT * FROM anahee.salesdetail";
         let queryParams = [];
 
         if (saleId) {
@@ -86,7 +86,7 @@ exports.getSalesDetail = async (req, res) => {
 
 //     try {
 //         await con.query(
-//             'INSERT INTO madhuban.salesdetail SET ?', newSalesDetail,
+//             'INSERT INTO anahee.salesdetail SET ?', newSalesDetail,
 //             (err, result) => {
 //                 if (err) {
 //                     console.error("❌ Error inserting sales detail:", err);
@@ -120,7 +120,7 @@ exports.addSalesDetail = async (req, res) => {
             };
 
             con.query(
-                'INSERT INTO madhuban.salesdetail SET ?', newSalesDetail,
+                'INSERT INTO anahee.salesdetail SET ?', newSalesDetail,
                 (err, result) => {
                     if (err) {
                         console.error("❌ Error inserting sales detail:", err);
@@ -159,7 +159,7 @@ exports.updateSalesDetail = async (req, res) => {
 
     try {
         await con.query(
-            "UPDATE madhuban.salesdetail SET ? WHERE SALEID = ? AND SRNO = ?", 
+            "UPDATE anahee.salesdetail SET ? WHERE SALEID = ? AND SRNO = ?", 
             [updatedSalesDetail, saleId, srno], 
             (err, result) => {
                 if (err) {
@@ -187,7 +187,7 @@ exports.deleteSalesDetail = async (req, res) => {
 
     try {
         await con.query(
-            "DELETE FROM madhuban.salesdetail WHERE SALEID = ? AND SRNO = ?", 
+            "DELETE FROM anahee.salesdetail WHERE SALEID = ? AND SRNO = ?", 
             [saleId, srno], 
             (err, result) => {
                 if (err) {
@@ -216,8 +216,8 @@ exports.getInvoices = async (req, res) => {
         sm.EMAIL, 
         sm.CREATED_AT AS date, 
         SUM(sd.AMOUNT) AS amount
-      FROM madhuban.salesmaster sm
-      LEFT JOIN madhuban.salesdetail sd ON sm.SALEID = sd.SALEID
+      FROM anahee.salesmaster sm
+      LEFT JOIN anahee.salesdetail sd ON sm.SALEID = sd.SALEID
       GROUP BY sm.SALEID
       ORDER BY sm.CREATED_AT DESC;
     `;

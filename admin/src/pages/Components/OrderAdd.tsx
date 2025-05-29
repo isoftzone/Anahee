@@ -1,36 +1,29 @@
 import React, { useState } from "react";
-
 const OrderAdd: React.FC = () => {
   const [items, setItems] = useState([{ name: "", description: "", quantity: 0, price: 0 }]);
   const [subtotal, setSubtotal] = useState(0);
   const [tax, setTax] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [shipping, setShipping] = useState(0);
-
   const addItem = () => {
     setItems([...items, { name: "", description: "", quantity: 0, price: 0 }]);
   };
-
   const removeItem = (index: number) => {
     const updatedItems = items.filter((_, i) => i !== index);
     setItems(updatedItems);
     calculateTotal(updatedItems);
   };
-
   const handleChange = (index: number, key: string, value: string | number) => {
     const updatedItems = [...items];
     updatedItems[index] = { ...updatedItems[index], [key]: value };
     setItems(updatedItems);
     calculateTotal(updatedItems);
   };
-
   const calculateTotal = (updatedItems: any[]) => {
     const total = updatedItems.reduce((sum, item) => sum + item.quantity * item.price, 0);
     setSubtotal(total);
   };
-
   const grandTotal = subtotal + (subtotal * tax) / 100 - (subtotal * discount) / 100 + shipping;
-
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* Header */}
@@ -43,7 +36,6 @@ const OrderAdd: React.FC = () => {
           <button className="bg-gray-700 text-white px-4 py-2 rounded-md">Download</button>
         </div>
       </div>
-
       {/* Invoice Form */}
       <div className="bg-white p-6 shadow-md rounded-md">
         {/* Company Details */}
@@ -58,7 +50,6 @@ const OrderAdd: React.FC = () => {
             <input className="border rounded w-full p-2 mt-1" type="text" defaultValue="#8801" />
           </div>
         </div>
-
         {/* Billing & Payment Details */}
         <div className="grid grid-cols-2 gap-6">
           {/* Bill To */}
@@ -69,7 +60,6 @@ const OrderAdd: React.FC = () => {
             <input className="border rounded w-full p-2 mb-2" placeholder="Enter Address" />
             <input className="border rounded w-full p-2 mb-2" placeholder="Enter Phone Number" />
           </div>
-
           {/* Payment Details */}
           <div>
             <h3 className="font-semibold mb-2">Payment Details:</h3>
@@ -79,7 +69,6 @@ const OrderAdd: React.FC = () => {
             <input className="border rounded w-full p-2 mb-2" placeholder="Enter IBAN Number" />
           </div>
         </div>
-
         {/* Invoice Items */}
         <div className="mt-6">
           <h3 className="font-semibold mb-2">Item Details</h3>
@@ -111,12 +100,11 @@ const OrderAdd: React.FC = () => {
                 value={item.price}
                 onChange={(e) => handleChange(index, "price", Number(e.target.value))}
               />
-              <button className="text-red-500" onClick={() => removeItem(index)}>❌</button>
+              <button className="text-red-500" onClick={() => removeItem(index)}>:x:</button>
             </div>
           ))}
           <button className="bg-blue-500 text-white px-4 py-2 rounded-md mt-2" onClick={addItem}>Add Item</button>
         </div>
-
         {/* Pricing Details */}
         <div className="mt-6 grid grid-cols-2 gap-6">
           <div>
@@ -132,7 +120,6 @@ const OrderAdd: React.FC = () => {
             <input className="border rounded w-full p-2 mt-1" type="number" value={shipping} onChange={(e) => setShipping(Number(e.target.value))} />
           </div>
         </div>
-
         {/* Total Section */}
         <div className="text-right mt-6">
           <p>Subtotal: <span className="font-bold">${subtotal.toFixed(2)}</span></p>
@@ -142,5 +129,4 @@ const OrderAdd: React.FC = () => {
     </div>
   );
 };
-
 export default OrderAdd;
