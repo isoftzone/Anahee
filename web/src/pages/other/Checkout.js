@@ -494,6 +494,7 @@ const Checkout = () => {
     try {
       await axios.put(`${BASE_URL}/updatecustomeraddress`, {
         ...itemToUpdate,
+        id:addressId,
         customer_id: customerId,
         primary_address: 1,
       });

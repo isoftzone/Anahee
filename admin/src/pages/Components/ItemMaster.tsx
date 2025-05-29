@@ -476,9 +476,9 @@ const ItemMaster: React.FC = () => {
             });
 
             alert(response.data.message);
-            // if (!id) {
-            //     resetForm();
-            // }
+            if (!id) {
+                resetForm();
+            }
         } catch (error) {
             console.error('Error:', error);
             alert(`Error ${id ? 'updating' : 'saving'} item`);
@@ -496,6 +496,7 @@ const ItemMaster: React.FC = () => {
                 const response = await axios.delete(`${BASE_URL}/delete/${id}`);
                 if (response.data.success) {
                     alert('Item deleted successfully!');
+                    navigate('/Components/items')
                 }
             } catch (error) {
                 console.error('Error deleting item:', error);
