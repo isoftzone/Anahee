@@ -58,7 +58,7 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
 
           {/* Right Top and Bottom Images */}
        <div className="col-lg-3 col-sm-6 col-12 mb-4">
-            <div className="lookbook1  cursor-pointer" onClick={() => navigate("/shop-grid-standard", { state: { categoryname: "westernwear" } })}>
+            <div className="lookbook1 " style={{cursor:"pointer"}} onClick={() => navigate("/shop-grid-standard", { state: { categoryname: "westernwear" } })}>
               <img
                 src="assets/img/banner/Maskgroup__22.png"
                 alt="Blue Dress"
@@ -67,7 +67,7 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
             </div>
           </div>
           <div className="col-lg-3 col-sm-6 col-12 mb-4">
-            <div className="lookbook2  cursor-pointer" onClick={() => navigate("/shop-grid-standard", { state: { categoryname: "kurta" } })}>
+            <div className="lookbook2"  style={{cursor:"pointer"}} onClick={() => navigate("/shop-grid-standard", { state: { categoryname: "kurta" } })}>
               <img
                 src="assets/img/banner/Maskgroup__33.png"
                 alt="Yellow Dress"

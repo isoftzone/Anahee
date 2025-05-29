@@ -771,6 +771,7 @@ const MyAccount = ({ showOrdersView = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const customerinfo = JSON.parse(localStorage.getItem("customerinfo"));
+  console.log("customerinfo",customerinfo)
   const customerId = customerinfo?.id;
 
   if (!customerId) {
@@ -1142,7 +1143,7 @@ const MyAccount = ({ showOrdersView = false }) => {
                         </div>
 
                         {/* Password */}
-                        <div className="col-lg-6 mb-4">
+                        {/* <div className="col-lg-6 mb-4">
                           <label className="d-block mb-2">Old Password</label>
                           <input
                             type="text"
@@ -1152,8 +1153,11 @@ const MyAccount = ({ showOrdersView = false }) => {
                             style={inputStyle}
                             readOnly
                           />
+                        </div> */}
+<div className="col-lg-6 mb-4">
+                          <label className="d-block mb-2">Old Password</label>
+                          <input type="text" name="old_password" value={customer.password}  className="w-100 p-2" style={inputStyle} readOnly/>
                         </div>
-
                         <div
                           className="col-lg-6 mb-4"
                           style={{ position: "relative", marginBottom: "15px" }}
