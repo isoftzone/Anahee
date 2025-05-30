@@ -315,7 +315,7 @@ const FooterOne = ({
                 </li>
                 <li>
                   <Link style={{ fontSize: "15px" }} to="/contact">
-                    Contact
+                    Contact Us
                   </Link>
                 </li>
                 <li>

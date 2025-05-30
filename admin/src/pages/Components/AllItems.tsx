@@ -2,26 +2,24 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
 import { useNavigate } from 'react-router-dom';
-
 type Item = {
   ITEMID?: number;
   ITEMNAME: string;
   BARCODE: string;
   BRAND: string;
   RATE: number;
-  SALEPRICE:number;
+  SALEPRICE: number;
   MRP: number;
   STATUS: string;
 };
-
 export default function ItemManager() {
   const [items, setItems] = useState<Item[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
   const navigate = useNavigate();
-
   useEffect(() => {
     fetchItems();
   }, []);
-
   const fetchItems = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/all_items`, {
@@ -32,17 +30,36 @@ export default function ItemManager() {
       console.error('Error fetching data:', error);
     }
   };
-
-  const handleDelete = async (id?: number) => {
-    if (!id) return;
-    if (confirm('Are you sure you want to delete this item?')) {
-      await axios.delete(`${BASE_URL}/item/${id}`);
-      fetchItems();
+      const handleDelete = async (id?: number) => {
+        if (!id) return;
+        if (confirm('Are you sure you want to delete this item?')) {
+            try {
+                const response = await axios.delete(`${BASE_URL}/delete/${id}`);
+                if (response.data.success) {
+                    setItems((prevItems) => prevItems.filter(item => item.ITEMID !== id));
+                    alert('Item deleted successfully!');
+                }
+            } catch (error) {
+                console.error('Error deleting item:', error);
+                alert('Failed to delete item');
+            }
+        }
+    };
+  const confirmDelete = async () => {
+    if (selectedItemId) {
+      try {
+        await axios.delete(`${BASE_URL}/item/${selectedItemId}`);
+        fetchItems();
+      } catch (error) {
+        console.error('Delete failed:', error);
+      } finally {
+        setShowModal(false);
+        setSelectedItemId(null);
+      }
     }
   };
-
   return (
-    <div className="p-6">
+    <div className="sm:p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Item Manager</h1>
         <button
@@ -52,7 +69,6 @@ export default function ItemManager() {
           Add Item
         </button>
       </div>
-
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full border border-gray-300 text-sm">
@@ -104,6 +120,29 @@ export default function ItemManager() {
           </tbody>
         </table>
       </div>
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+            <h2 className="text-lg font-semibold mb-4">Confirm Deletion</h2>
+            <p className="mb-6">Are you sure you want to delete this item?</p>
+            <div className="flex justify-center space-x-4">
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                onClick={confirmDelete}
+              >
+                Yes, Delete
+              </button>
+              <button
+                className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+                onClick={() => setShowModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -27,7 +27,8 @@ const Wishlist = () => {
   const { wishlistItems } = useSelector((state) => state.wishlist);
   const { cartItems } = useSelector((state) => state.cart);
   const handledeleteWishlist = async (itemIds) => {
-   
+     dispatch(deleteFromWishlist({id: itemIds})); 
+ 
     try {
         const payload = {
         CUSTOMERID,
@@ -38,7 +39,7 @@ const Wishlist = () => {
       const response = await axios.delete(`${BASE_URL}/deletecartWishlist`, { data: payload })
       console.log("this is delete data wishlist", response );
       
-    if (response.status === 200 || response.data.success) {
+     if (response.status === 200 || response.data.success) {
       //  dispatch(deleteFromWishlist(itemIds));
        dispatch(deleteFromWishlist({id: itemIds})); 
     }

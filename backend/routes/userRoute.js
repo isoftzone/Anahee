@@ -103,6 +103,11 @@ router.get("/getEmployee", employee.getEmployee);
 router.get("/getDealer", dealer.getDealer);
 router.get("/getTransport", transport.getTransport);
 router.get("/getCustomer", customer.getCustomer);
+// customerAddress
+router.get("/getcustomeraddress/:customer_id",customer.getAddressesByUserId);
+router.post("/addcustomeraddress", customer.addCustomerAddress);
+router.put("/updatecustomeraddress", customer.updateCustomerAddress);
+router.delete("/deletecustomeraddress/:address_id", customer.deleteCustomerAddress);
 // router.get("/getItem",itemmaster.getItem);
 router.get("/getLable", lablemaster.getLable);
 router.get("/getrfmaster", rfmaster.getrfmaster);

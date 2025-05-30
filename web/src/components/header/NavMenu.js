@@ -25,30 +25,26 @@ const NavMenu = ({ menuWhiteClass, sidebarMenu }) => {
               {t("About")}
             </Link>
           </li>
-          <li>
-            <Link to={process.env.PUBLIC_URL + "/"}>
-              {t("Everday Elegance")}
-              {/* {sidebarMenu ? (
-                <span>
-                  <i className="fa fa-angle-right"></i>
-                </span>
-              ) : (
-                <i className="fa fa-angle-down" />
-              )} */}
-            </Link>
-            {/* <ul className="submenu">
-              <li>
-                <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
-                  {t("Kurta Sets")}
-                </Link>
-              </li>
-            </ul> */}
-          </li>
-          <li>
+          {/* <li>
              <Link to={process.env.PUBLIC_URL + "/"}>
               {t("Western Wear")}
             </Link>
-          </li>
+          </li> */}
+          <li>
+        <Link to={`${process.env.PUBLIC_URL}/shop-grid-standard?category=Kurta`}>
+          {t("Everday Elegance")}
+        </Link>
+      </li>
+          {/* <li>
+             <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
+              {t("Western Wear")}
+            </Link>
+          </li> */}
+            <li>
+        <Link to={`${process.env.PUBLIC_URL}/shop-grid-standard?category=westernwear`}>
+          {t("Western Wear")}
+        </Link>
+      </li>
           
           {/* <li>
             <Link to={process.env.PUBLIC_URL + "/"}>
@@ -146,7 +142,7 @@ const NavMenu = ({ menuWhiteClass, sidebarMenu }) => {
           </li> */}
           <li>
             <Link to={process.env.PUBLIC_URL + "/contact"}>
-              {t("Contact")}
+              {t("Contact Us")}
             </Link>
           </li>
         </ul>
