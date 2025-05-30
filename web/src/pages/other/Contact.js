@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState , useEffect} from "react";
 import { useLocation } from "react-router-dom";
 import SEO from "../../components/seo";
 import LayoutOne from "../../layouts/LayoutOne";
@@ -8,6 +8,9 @@ const Contact = () => {
   const { pathname } = useLocation();
   const [loading, setLoading] = useState(false);
   const [formMessage, setFormMessage] = useState("");
+   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
   const [formData, setFormData] = useState({
     from_name: "",
     from_email: "",
@@ -39,6 +42,22 @@ const Contact = () => {
     }
     return errors;
   };
+   useEffect(() => {
+    const fetchContactUs = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_PUBLIC_URL}/get-page-info?companyid=1&id=19`
+        );
+        const data = await response.json();
+        setPhone(data.phone || "");
+        setEmail(data.email || "");
+        setAddress(data.address || "");
+      } catch (error) {
+        console.error("Error fetching contact us:", error);
+      }
+    };
+    fetchContactUs();
+  }, []);
   // console.log("this is error", formErrors);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -121,16 +140,16 @@ const Contact = () => {
                       <i className="fa fa-phone" />
                     </div>
                     <div className="contact-info-dec">
-                      <a href="tel:+919799906182">+91 9799906182</a>
+                       <a href={`tel:${phone}`}>{phone}</a>
                     </div>
                   </div>
                   <div className="single-contact-info">
                     <div className="contact-icon">
-                      <i className="fa fa-globe" />
+                      <i className="fa fa-envelope" />
                     </div>
                     <div className="contact-info-dec">
                       <p>
-                        <a href="mailto:sahiba@anahee.in">sahiba@anahee.in</a>
+                        <a href={`mailto:${email}`}>{email}</a>
                       </p>
                     </div>
                   </div>
@@ -139,13 +158,12 @@ const Contact = () => {
                       <i className="fa fa-map-marker" />
                     </div>
                     <div className="contact-info-dec">
-                      <a
-                        href="https://www.google.com/maps/search/?q=58, Indira Colony Bani Park, Near Pani Paech Chaurah, Jaipur - 302016"
+                    <a
+                        href={`https://www.google.com/maps/search/?q=58, ${address}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <p>58, Indira Colony Bani Park</p>
-                        <p>Near Pani Paech Chaurah, Jaipur - 302016</p>
+                        <p>{address}</p>
                       </a>
                     </div>
                   </div>

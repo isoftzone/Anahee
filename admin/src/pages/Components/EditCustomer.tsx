@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
 interface Customer {
@@ -195,11 +195,20 @@ const EditCustomer: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="pt-4">
+                <div className="flex gap-3">
+                 <div className="pt-4">
                     <button type="submit" className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition">
                         Update Customer
                     </button>
                 </div>
+                <div className="pt-4">
+                    <Link to="/Components/Customerl">
+                        <button type="button" className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition">
+                            Back
+                        </button>
+                    </Link>
+                </div>
+               </div>
             </form>
         </div>
     );

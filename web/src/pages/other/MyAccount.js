@@ -36,8 +36,12 @@ const MyAccount = () => {
   const [activeView, setActiveView] = useState("profile");
   const [successTimeout, setSuccessTimeout] = useState(null);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [activeProfileSection, setActiveProfileSection] =
-    useState("personalDetails");
+  const [activeProfileSection, setActiveProfileSection] = useState("personalDetails");
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [oldPassword, setoldPassword] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [walletTransactions, setWalletTransactions] = useState([]);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -106,9 +110,41 @@ const MyAccount = () => {
       }
     };
 
+    const fetchWalletData = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/wallet/${customerId}`);
+        setWalletBalance(response.data.balance);
+        setWalletTransactions(response.data.transactions || []);
+      } catch (error) {
+        console.error("Failed to fetch wallet data:", error);
+      }
+    };
+
     fetchCustomerData();
     fetchOrders();
+    fetchWalletData();
   }, [customerId]);
+
+  const cancelOrder = async (saleId) => {
+    const confirmCancel = window.confirm(
+      "Do you really want to cancel this order?"
+    );
+    if (!confirmCancel) return;
+
+    try {
+      await axios.put(`${BASE_URL}/cancelorder/${saleId}`);
+      alert("Order cancelled successfully!");
+
+      const customerData = JSON.parse(localStorage.getItem("customerinfo"));
+      const response = await axios.get(
+        `${BASE_URL}/getallorders/${customerData.id}`
+      );
+      setOrders(response.data.orders);
+    } catch (err) {
+      console.error("Cancel failed:", err);
+      alert("Failed to cancel the order. Please try again later.");
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -205,78 +241,108 @@ const MyAccount = () => {
   const renderOrderCard = (order) => {
     let totalAmount = 0;
     return (
-      <div key={order.SALEID} className="order-card mb-4">
-        <div className="order-header">
-          <h3 className="order-number">Order {order.SALEID}</h3>
-          <div className="order-meta">
-            <span className="order-date">
-              <i className="bi bi-calendar"></i>{" "}
-              {new Date(order.CREATEDON).toLocaleDateString()}
-            </span>
-            <span className="order-status">
+      <div
+        key={order.SALEID}
+        className="order-card mb-4 p-3 rounded shadow-sm bg-white border"
+      >
+        {/* Header */}
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-start mb-3">
+          <h5 className="order-number mb-2 mb-md-0 fs-3">
+            Order {order.SALEID}
+          </h5>
+          <div className="d-flex flex-column flex-md-row align-items-md-center justify-content-center gap-2">
+            <span className="text-muted small">
               Status: {getStatusBadge(order.ORDER_STATUS)}
             </span>
           </div>
         </div>
-        <div className="order-details">
-          <div className="payment-info">
-            <span className="payment-method">
-              <strong>Payment Method:</strong> {order.PAYMENTMETHOD}
-            </span>
-            <span className="payment-status">
-              <strong>Payment Status:</strong> {order.PAYMENTSTATUS}
-            </span>
+
+        {/* Payment Info */}
+        <div className="mb-3">
+          <span className="text-muted small">
+            <i className="bi bi-calendar"></i>{" "}
+            {new Date(order.CREATEDON).toLocaleDateString()}
+          </span>
+          <div className="small text-muted">
+            <strong>Payment Method:</strong> {order.PAYMENTMETHOD}
           </div>
-          <div className="table-responsive">
-            <table className="table order-items-table">
-              <thead>
-                <tr>
-                  <th className="product-col">Product</th>
-                  <th className="quantity-col text-center">Qty</th>
-                  <th className="amount-col text-end">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {order.ITEMS &&
-                  order.ITEMS.map((item, index) => {
-                    const quantity = parseFloat(item.QUANTITY || 0);
-                    const amount = parseFloat(item.AMOUNT || 0);
-                    const lineTotal = amount * quantity;
-                    totalAmount += lineTotal;
-                    return (
-                      <tr key={index}>
-                        <td className="product-cell">
-                          <div className="product-info">
-                            <div className="product-name">
-                              {item.ITEMNAME || "Product Name Not Available"}
-                            </div>
-                            {item.DESCRIPTION && (
-                              <div className="product-desc text-muted">
-                                {item.DESCRIPTION}
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                        <td className="quantity-cell text-center">
-                          {quantity}
-                        </td>
-                        <td className="amount-cell text-end">
-                          {amount.toFixed(2)}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                <tr className="order-total-row">
-                  <td colSpan="2" className="text-end total-label">
-                    <strong>Total:</strong>
-                  </td>
-                  <td className="text-end total-amount">
-                    <strong>{totalAmount.toFixed(2)}</strong>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div className="small text-muted">
+            <strong>Payment Status:</strong> {order.PAYMENTSTATUS}
           </div>
+        </div>
+
+        {/* Items */}
+        {order.ITEMS?.map((item, index) => {
+          const quantity = parseFloat(item.QUANTITY || 0);
+          const amount = parseFloat(item.AMOUNT || 0);
+          const lineTotal = amount * quantity;
+          totalAmount += lineTotal;
+          const imageArray = item.PHOTO?.split(",") || [];
+          const firstImage = imageArray[0];
+
+          return (
+            <div
+              className="row border-top w-full pt-3 mb-3 align-items-center"
+              key={index}
+            >
+              {/* Image */}
+              <div className="col-4 col-md-2 mb-2 mb-md-0">
+                {item.PHOTO && (
+                  <img
+                    src={process.env.REACT_APP_PUBLIC_URL + firstImage}
+                    alt={item.ITEMNAME}
+                    className="img-fluid"
+                    style={{
+                      maxHeight: "120px",
+                      objectFit: "contain",
+                      borderRadius: "4px",
+                    }}
+                  />
+                )}
+              </div>
+
+              {/* Details */}
+              <div className="col-8 col-md-10 pt-4">
+                <h6 className="mb-1 fw-bold text-xl md:text-2xl">
+                  {item.ITEMNAME || "Unnamed Product"}
+                </h6>
+
+                {item.DESCRIPTION && (
+                  <p className="text-muted mb-1 small">{item.DESCRIPTION}</p>
+                )}
+                <div className="d-flex flex-wrap gap-3 small">
+                  <span>
+                    <strong>Qty:</strong> {quantity}
+                  </span>
+                  <span>
+                    <strong>Amount:</strong> ₹{amount.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Total + Cancel */}
+        <div className="d-flex justify-content-between align-items-center border-top pt-3">
+          <strong>Total: ₹{totalAmount.toFixed(2)}</strong>
+          {["Placed", "Progress"].includes(order.ORDER_STATUS) && (
+            <button
+              className="py-1"
+              onClick={() => cancelOrder(order.SALEID)}
+              style={{
+                border: "none",
+                marginTop: "5px",
+                fontSize: "10px",
+                backgroundColor: "#DC3545",
+                borderRadius: "5px",
+                color: "#fff",
+                fontWeight: "boLD",
+              }}
+            >
+              Cancel Order
+            </button>
+          )}
         </div>
       </div>
     );
@@ -284,7 +350,7 @@ const MyAccount = () => {
 
   const renderPersonalDetails = () => (
     <div className="row">
-      <div className="col-lg-6 mb-4">
+      <div className="col-md-6 mb-4">
         <label className="d-block mb-2">First Name</label>
         <input
           type="text"
@@ -296,7 +362,7 @@ const MyAccount = () => {
         />
       </div>
 
-      <div className="col-lg-6 mb-4">
+      <div className="col-md-6 mb-4">
         <label className="d-block mb-2">Last Name</label>
         <input
           type="text"
@@ -308,7 +374,7 @@ const MyAccount = () => {
         />
       </div>
 
-      <div className="col-lg-6 mb-4">
+      <div className="col-md-6 mb-4">
         <label className="d-block mb-2">Email</label>
         <input
           type="email"
@@ -320,7 +386,7 @@ const MyAccount = () => {
         />
       </div>
 
-      <div className="col-lg-6 mb-4">
+      <div className="col-md-6 mb-4">
         <label className="d-block mb-2">Phone</label>
         <input
           type="text"
@@ -332,7 +398,7 @@ const MyAccount = () => {
         />
       </div>
 
-      <div className="col-lg-6 mb-4">
+      <div className="col-md-6 mb-4">
         <label className="d-block mb-2">Address</label>
         <input
           type="text"
@@ -344,7 +410,7 @@ const MyAccount = () => {
         />
       </div>
 
-      <div className="col-lg-6 mb-4">
+      <div className="col-md-6 mb-4">
         <label className="d-block mb-2">City</label>
         <input
           type="text"
@@ -356,7 +422,7 @@ const MyAccount = () => {
         />
       </div>
 
-      <div className="col-lg-6 mb-4">
+      <div className="col-md-6 mb-4">
         <label className="d-block mb-2">State</label>
         <input
           type="text"
@@ -368,7 +434,7 @@ const MyAccount = () => {
         />
       </div>
 
-      <div className="col-lg-6 mb-4">
+      <div className="col-md-6 mb-4">
         <label className="d-block mb-2">Country</label>
         <input
           type="text"
@@ -380,7 +446,7 @@ const MyAccount = () => {
         />
       </div>
 
-      <div className="col-lg-6 mb-4">
+      <div className="col-md-6 mb-4">
         <label className="d-block mb-2">Postal Code</label>
         <input
           type="text"
@@ -396,22 +462,34 @@ const MyAccount = () => {
 
   const renderChangePassword = () => (
     <div className="row">
-      <div className="col-lg-6 mb-4">
+      {/* Old Password */}
+      <div className="col-md-6 mb-4" style={{ position: "relative" }}>
         <label className="d-block mb-2">Old Password</label>
         <input
-          type="text"
+          type={oldPassword ? "text" : "password"}
           name="old_password"
           value={customer.password}
-          className="w-100 p-2"
-          style={inputStyle}
+          className="w-full p-2 pr-10 border border-gray-300 rounded"
           readOnly
         />
+        <i
+          className={`bi ${oldPassword ? "bi-eye-slash" : "bi-eye"}`}
+          onClick={() => setoldPassword(!oldPassword)}
+          style={{
+            position: "absolute",
+            top: "70%",
+            right: "12px",
+            transform: "translateY(-50%)",
+            cursor: "pointer",
+            fontSize: "1.5rem",
+            color: "#777",
+            paddingRight: "10px",
+          }}
+        ></i>
       </div>
 
-      <div
-        className="col-lg-6 mb-4"
-        style={{ position: "relative", marginBottom: "15px" }}
-      >
+      {/* New Password */}
+      <div className="col-md-6 mb-4" style={{ position: "relative" }}>
         <label className="d-block mb-2">New Password</label>
         <input
           type={showPassword ? "text" : "password"}
@@ -419,29 +497,27 @@ const MyAccount = () => {
           placeholder="New Password"
           value={customer.newPassword}
           onChange={handleInputChange}
-          required
-          style={{ width: "100%", paddingRight: "40px" }}
+          className="w-full p-2 pr-10 border border-gray-300 rounded"
           autoComplete="off"
         />
         <i
-          className={`bi pt-5 ${showPassword ? "bi-eye-slash" : "bi-eye"}`}
+          className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}
           onClick={() => setShowPassword(!showPassword)}
           style={{
             position: "absolute",
-            top: "50%",
-            right: "4%",
+            top: "70%",
+            right: "12px",
             transform: "translateY(-50%)",
             cursor: "pointer",
-            fontSize: "2rem",
+            fontSize: "1.5rem",
             color: "#777",
+            paddingRight: "10px",
           }}
         ></i>
       </div>
 
-      <div
-        className="col-lg-6 mb-4"
-        style={{ position: "relative", marginBottom: "15px" }}
-      >
+      {/* Confirm Password */}
+      <div className="col-md-6 mb-4" style={{ position: "relative" }}>
         <label className="d-block mb-2">Confirm Password</label>
         <input
           type={showConfirmPassword ? "text" : "password"}
@@ -449,22 +525,20 @@ const MyAccount = () => {
           placeholder="Confirm Password"
           value={customer.confirmPassword}
           onChange={handleInputChange}
-          required
-          style={{ width: "100%", paddingRight: "40px" }}
+          className="w-full p-2 pr-10 border border-gray-300 rounded"
         />
         <i
-          className={`bi pt-5 ${
-            showConfirmPassword ? "bi-eye-slash" : "bi-eye"
-          }`}
+          className={`bi ${showConfirmPassword ? "bi-eye-slash" : "bi-eye"}`}
           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
           style={{
             position: "absolute",
-            top: "50%",
-            right: "4%",
+            top: "70%",
+            right: "12px",
             transform: "translateY(-50%)",
             cursor: "pointer",
-            fontSize: "2rem",
+            fontSize: "1.5rem",
             color: "#777",
+            paddingRight: "10px",
           }}
         ></i>
       </div>
@@ -475,6 +549,164 @@ const MyAccount = () => {
     <div>
       <p>Email: {customer.email}</p>
       <p>Referral ID: {customer.referralId}</p>
+    </div>
+  );
+
+  const renderAccountDetails = () => (
+    <div>
+      <h4 style={{ fontWeight: "500", marginBottom: "20px" }}>
+        Account Details
+      </h4>
+      <div className="row">
+        <div className="col-md-6 mb-4">
+          <div style={accountDetailCardStyle}>
+            <h5>Wallet Balance</h5>
+            <p style={accountDetailAmountStyle}>₹0.00</p>
+          </div>
+        </div>
+        <div className="col-md-6 mb-4">
+          <div style={accountDetailCardStyle}>
+            <h5>Reward Points</h5>
+            <p style={accountDetailAmountStyle}>0 Points</p>
+          </div>
+        </div>
+        <div className="col-md-6 mb-4">
+          <div style={accountDetailCardStyle}>
+            <h5>Total Orders</h5>
+            <p style={accountDetailAmountStyle}>{orders.length}</p>
+          </div>
+        </div>
+        <div className="col-md-6 mb-4">
+          <div style={accountDetailCardStyle}>
+            <h5>Member Since</h5>
+            <p style={accountDetailAmountStyle}>
+              {new Date().toLocaleDateString()}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <h5 style={{ fontWeight: "500", marginBottom: "15px" }}>
+          Recent Transactions
+        </h5>
+        <div
+          style={{
+            backgroundColor: "white",
+            borderRadius: "8px",
+            padding: "20px",
+          }}
+        >
+          <p className="text-muted">No recent transactions</p>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderWalletView = () => (
+    <div className="wallet-container" style={{ padding: "1rem" }}>
+      <div className="wallet-header">
+        <h2 className="wallet-title">My Wallet</h2>
+        <p className="wallet-subtitle">
+          Manage your wallet balance and transactions
+        </p>
+      </div>
+
+      <div className="wallet-balance-card" style={walletBalanceCardStyle}>
+        <div className="wallet-balance-info">
+          <h3 className="wallet-balance-title">Current Balance</h3>
+          <p
+            className="wallet-balance-amount"
+            style={walletBalanceAmountStyle}
+          >
+            ₹{walletBalance.toFixed(2)}
+          </p>
+        </div>
+        <div className="wallet-actions d-flex flex-wrap gap-2">
+          <button style={walletActionButtonStyle}>
+            <i className="bi bi-plus-circle"></i> Add Money
+          </button>
+          <button style={walletActionButtonStyle}>
+            <i className="bi bi-arrow-up-circle"></i> Withdraw
+          </button>
+        </div>
+      </div>
+
+      <div className="wallet-transactions">
+        <h3 className="wallet-transactions-title">Recent Transactions</h3>
+
+        {walletTransactions.length > 0 ? (
+          <div className="table-responsive">
+            <table
+              className="table wallet-transactions-table"
+              style={walletTableStyle}
+            >
+              <thead>
+                <tr>
+                  <th style={walletTableHeaderStyle}>Date</th>
+                  <th style={walletTableHeaderStyle}>Description</th>
+                  <th style={walletTableHeaderStyle}>Amount</th>
+                  <th style={walletTableHeaderStyle}>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {walletTransactions.map((transaction, index) => (
+                  <tr key={index} style={walletTableRowStyle}>
+                    <td style={walletTableCellStyle}>
+                      {new Date(transaction.date).toLocaleDateString()}
+                    </td>
+                    <td style={walletTableCellStyle}>
+                      {transaction.description}
+                    </td>
+                    <td
+                      style={{
+                        ...walletTableCellStyle,
+                        color:
+                          transaction.type === "credit"
+                            ? "#4CAF50"
+                            : "#F44336",
+                        fontWeight: "500",
+                      }}
+                    >
+                      {transaction.type === "credit" ? "+" : "-"}₹
+                      {transaction.amount.toFixed(2)}
+                    </td>
+                    <td style={walletTableCellStyle}>
+                      <span
+                        style={{
+                          backgroundColor:
+                            transaction.status === "completed"
+                              ? "#E8F5E9"
+                              : "#FFF8E1",
+                          color:
+                            transaction.status === "completed"
+                              ? "#2E7D32"
+                              : "#FF8F00",
+                          padding: "4px 8px",
+                          borderRadius: "4px",
+                          fontSize: "0.8rem",
+                        }}
+                      >
+                        {transaction.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div style={noTransactionsStyle}>
+            <i
+              className="bi bi-wallet2"
+              style={{ fontSize: "3rem", color: "#BDBDBD" }}
+            ></i>
+            <p style={{ marginTop: "1rem", color: "#757575" }}>
+              No transactions found
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 
@@ -491,8 +723,7 @@ const MyAccount = () => {
         <h4 style={{ fontWeight: "500" }}>
           {activeProfileSection === "personalDetails" && "Personal Details"}
           {activeProfileSection === "changePassword" && "Change Password"}
-          {activeProfileSection === "registerPage" &&
-            "Registration Address"}
+          {activeProfileSection === "registerPage" && "Registration Address"}
         </h4>
       </div>
 
@@ -502,15 +733,15 @@ const MyAccount = () => {
 
       <div className="mt-4">
         <button type="submit" className="px-3 py-2" style={buttonStyle}>
-          Update Profile
+          Update Password
         </button>
       </div>
     </form>
   );
 
   const renderOrdersView = () => (
-    <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "2rem" }}>
-      <div className="container orders-container">
+    <div style={{ padding: "1rem" }}>
+      <div className="orders-container">
         <div className="page-header">
           <h1 className="page-title">My Orders</h1>
           <p className="page-subtitle">View and manage your order history</p>
@@ -555,14 +786,74 @@ const MyAccount = () => {
     </div>
   );
 
+  const LogoutConfirmation = () => (
+    <div style={logoutModalStyle}>
+      <div style={logoutModalContentStyle}>
+        <h4>Are you sure you want to logout?</h4>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "20px",
+            marginTop: "20px",
+          }}
+        >
+          <button
+            onClick={() => {
+              localStorage.removeItem("customerinfo");
+              navigate("/login-register");
+            }}
+            style={confirmButtonStyle}
+          >
+            Yes, Logout
+          </button>
+          <button
+            onClick={() => setShowLogoutConfirm(false)}
+            style={cancelButtonStyle}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <Fragment>
       <SEO titleTemplate="My Account" description="My Account page" />
       <LayoutOne headerTop="visible">
-        <div className="myaccount-area" style={{ padding: "2rem 0" }}>
+        <div className="myaccount-area" style={{ padding: "1rem 0" }}>
           <div className="container-fluid">
+            {/* Mobile Menu Toggle Button */}
+            <div className="d-md-none mb-3">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                style={{
+                  backgroundColor: "#3f51b5",
+                  color: "white",
+                  border: "none",
+                  padding: "10px 15px",
+                  borderRadius: "4px",
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <span>Menu</span>
+                <i
+                  className={`bi bi-chevron-${isMobileMenuOpen ? "up" : "down"}`}
+                ></i>
+              </button>
+            </div>
+
             <div className="row">
-              <div className="col-lg-3 col-md-4 ">
+              {/* Sidebar - Conditionally shown on mobile */}
+              <div
+                className={`col-lg-3 col-md-4 ${
+                  isMobileMenuOpen ? "d-block" : "d-none d-md-block"
+                }`}
+              >
                 <div className="account-sidebar" style={sidebarContainerStyle}>
                   <div className="account-sidebar-header">
                     <h3 style={sidebarHeaderStyle}>My Account</h3>
@@ -574,6 +865,7 @@ const MyAccount = () => {
                         onClick={() => {
                           setActiveView("profile");
                           setProfileDropdownOpen(!profileDropdownOpen);
+                          setIsMobileMenuOpen(false);
                         }}
                         style={
                           activeView === "profile"
@@ -601,6 +893,7 @@ const MyAccount = () => {
                             onClick={() => {
                               setActiveProfileSection("personalDetails");
                               setProfileDropdownOpen(false);
+                              setIsMobileMenuOpen(false);
                             }}
                             style={
                               activeProfileSection === "personalDetails"
@@ -619,6 +912,7 @@ const MyAccount = () => {
                             onClick={() => {
                               setActiveProfileSection("changePassword");
                               setProfileDropdownOpen(false);
+                              setIsMobileMenuOpen(false);
                             }}
                             style={
                               activeProfileSection === "changePassword"
@@ -637,6 +931,7 @@ const MyAccount = () => {
                             onClick={() => {
                               setActiveProfileSection("registerPage");
                               setProfileDropdownOpen(false);
+                              setIsMobileMenuOpen(false);
                             }}
                             style={
                               activeProfileSection === "registerPage"
@@ -653,14 +948,56 @@ const MyAccount = () => {
                         </div>
                       )}
                     </li>
-                    
+                    <li style={sidebarItemStyle}>
+                      <button
+                        className="fs-4"
+                        onClick={() => {
+                          setActiveView("accountDetails");
+                          setIsMobileMenuOpen(false);
+                        }}
+                        style={
+                          activeView === "accountDetails"
+                            ? activeSidebarButtonStyle
+                            : sidebarButtonStyle
+                        }
+                      >
+                        <i
+                          className="bi bi-wallet2 fs-4"
+                          style={sidebarIconStyle}
+                        ></i>
+                        Account Details
+                      </button>
+                    </li>
+                    <li style={sidebarItemStyle}>
+                      <button
+                        className="fs-4"
+                        onClick={() => {
+                          setActiveView("wallet");
+                          setIsMobileMenuOpen(false);
+                        }}
+                        style={
+                          activeView === "wallet"
+                            ? activeSidebarButtonStyle
+                            : sidebarButtonStyle
+                        }
+                      >
+                        <i
+                          className="bi bi-credit-card fs-4"
+                          style={sidebarIconStyle}
+                        ></i>
+                        Wallet
+                      </button>
+                    </li>
                     <li
                       style={sidebarItemStyle}
                       className={activeView === "orders" ? "active" : ""}
                     >
                       <button
                         className="fs-4"
-                        onClick={() => setActiveView("orders")}
+                        onClick={() => {
+                          setActiveView("orders");
+                          setIsMobileMenuOpen(false);
+                        }}
                         style={
                           activeView === "orders"
                             ? activeSidebarButtonStyle
@@ -689,20 +1026,21 @@ const MyAccount = () => {
                           ></i>
                           <span className="fs-4">Referral ID</span>
                         </div>
-                        <div style={{ display: "flex", alignItems: "center" }}>
+                        <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
                           <input
                             type="text"
                             value={customer.referralId}
                             readOnly
                             style={{
                               flex: 1,
+                              minWidth: "120px",
                               padding: "8px",
                               border: "1px solid #ddd",
                               borderRadius: "4px",
-                              marginRight: "8px",
                               backgroundColor: "#f8f9fa",
                             }}
                           />
+                          {/* Copy Button */}
                           <button
                             onClick={() => {
                               navigator.clipboard.writeText(
@@ -733,16 +1071,78 @@ const MyAccount = () => {
                             ></i>
                             Copy
                           </button>
+
+                          {/* Share Button */}
+                          <button
+                            onClick={() => {
+                              if (navigator.share) {
+                                navigator
+                                  .share({
+                                    title: "Referral Invitation",
+                                    text: `Join using my referral ID: ${customer.referralId}`,
+                                    url: window.location.href,
+                                  })
+                                  .then(() => {
+                                    setSuccess("Referral shared successfully!");
+                                    if (successTimeout) {
+                                      clearTimeout(successTimeout);
+                                    }
+                                    setSuccessTimeout(
+                                      setTimeout(() => setSuccess(""), 3000)
+                                    );
+                                  })
+                                  .catch((error) =>
+                                    console.log("Share failed:", error)
+                                  );
+                              } else {
+                                setSuccess(
+                                  "Sharing is not supported on this device."
+                                );
+                                if (successTimeout)
+                                  clearTimeout(successTimeout);
+                                setSuccessTimeout(
+                                  setTimeout(() => setSuccess(""), 3000)
+                                );
+                              }
+                            }}
+                            style={{
+                              padding: "8px 12px",
+                              backgroundColor: "#28a745",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "4px",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                            }}
+                          >
+                            <i
+                              className="bi bi-share-fill"
+                              style={{ marginRight: "5px" }}
+                            ></i>
+                            Share
+                          </button>
                         </div>
+
+                        {/* Success Message */}
+                        {success && (
+                          <div
+                            style={{
+                              marginTop: "10px",
+                              color: "#28a745",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {success}
+                          </div>
+                        )}
                       </div>
                     </li>
+
                     <li style={sidebarItemStyle}>
                       <button
                         className="fs-4"
-                        onClick={() => {
-                          localStorage.removeItem("customerinfo");
-                          navigate("/login-register");
-                        }}
+                        onClick={() => setShowLogoutConfirm(true)}
                         style={sidebarButtonStyle}
                       >
                         <i
@@ -768,12 +1168,17 @@ const MyAccount = () => {
 
                   {activeView === "profile"
                     ? renderProfileView()
-                    : renderOrdersView()}
+                    : activeView === "orders"
+                    ? renderOrdersView()
+                    : activeView === "wallet"
+                    ? renderWalletView()
+                    : renderAccountDetails()}
                 </div>
               </div>
             </div>
           </div>
         </div>
+        {showLogoutConfirm && <LogoutConfirmation />}
       </LayoutOne>
     </Fragment>
   );
@@ -799,7 +1204,6 @@ const sidebarContainerStyle = {
   padding: "20px",
   height: "auto",
   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-
 };
 
 const sidebarHeaderStyle = {
@@ -868,5 +1272,135 @@ const contentContainerStyle = {
   minHeight: "400px",
 };
 
+const accountDetailCardStyle = {
+  backgroundColor: "white",
+  borderRadius: "8px",
+  padding: "20px",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  height: "100%",
+};
+
+const accountDetailAmountStyle = {
+  fontSize: "1.5rem",
+  fontWeight: "bold",
+  color: "#3f51b5",
+  marginTop: "10px",
+};
+
+// Wallet Styles
+const walletBalanceCardStyle = {
+  backgroundColor: "#3f51b5",
+  color: "white",
+  borderRadius: "8px",
+  padding: "20px",
+  marginBottom: "30px",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+};
+
+const walletBalanceAmountStyle = {
+  fontSize: "2rem",
+  fontWeight: "bold",
+  margin: "10px 0 0 0",
+};
+
+const walletActionButtonStyle = {
+  backgroundColor: "rgba(255,255,255,0.2)",
+  color: "white",
+  border: "none",
+  borderRadius: "4px",
+  padding: "8px 15px",
+  marginLeft: "10px",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  gap: "5px",
+  transition: "all 0.3s ease",
+  ":hover": {
+    backgroundColor: "rgba(255,255,255,0.3)",
+  },
+};
+
+const walletTableStyle = {
+  width: "100%",
+  borderCollapse: "collapse",
+  marginTop: "20px",
+  backgroundColor: "white",
+  borderRadius: "8px",
+  overflow: "hidden",
+  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+};
+
+const walletTableHeaderStyle = {
+  padding: "12px 15px",
+  textAlign: "left",
+  backgroundColor: "#f5f5f5",
+  fontWeight: "500",
+  color: "#333",
+};
+
+const walletTableRowStyle = {
+  borderBottom: "1px solid #f0f0f0",
+  ":last-child": {
+    borderBottom: "none",
+  },
+};
+
+const walletTableCellStyle = {
+  padding: "12px 15px",
+  verticalAlign: "middle",
+};
+
+const noTransactionsStyle = {
+  backgroundColor: "white",
+  borderRadius: "8px",
+  padding: "40px",
+  textAlign: "center",
+  marginTop: "20px",
+  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+};
+
+const logoutModalStyle = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0,0,0,0.5)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 1000,
+};
+
+const logoutModalContentStyle = {
+  backgroundColor: "white",
+  padding: "30px",
+  borderRadius: "8px",
+  maxWidth: "400px",
+  width: "100%",
+  textAlign: "center",
+  boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+};
+
+const confirmButtonStyle = {
+  padding: "8px 20px",
+  backgroundColor: "#f44336",
+  color: "white",
+  border: "none",
+  borderRadius: "4px",
+  cursor: "pointer",
+};
+
+const cancelButtonStyle = {
+  padding: "8px 20px",
+  backgroundColor: "#e0e0e0",
+  color: "#333",
+  border: "none",
+  borderRadius: "4px",
+  cursor: "pointer",
+};
 
 export default MyAccount;

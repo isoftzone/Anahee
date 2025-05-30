@@ -302,7 +302,7 @@ const Checkout = () => {
         });
 
         resetForm();
-        window.location.href = "/success";
+        window.location.href = "/orders";
       } else {
         setPaymentError("Payment verification failed. Please contact support.");
         setOrderPlaced(false);
@@ -323,7 +323,7 @@ const Checkout = () => {
         orderId: orderId,
         amountInPaisa: (cartTotalPrice - discount) * 100,
         customerPhone: formData.phone || "0000000000",
-        redirectUrl: window.location.origin + "/success",
+        redirectUrl: window.location.origin + "/orders",
         expireAfter: 1200,
         metaInfo: {
           udf1: "Additional Info 1",
@@ -388,14 +388,13 @@ const Checkout = () => {
     // Clear previous payment errors
     setPaymentError("");
 
-  
-  // 🔍 Find the primary address from address list
-  const primaryAddress = data.find((addr) => addr.primary_address === 1);
+    // 🔍 Find the primary address from address list
+    const primaryAddress = data.find((addr) => addr.primary_address === 1);
 
-  if (!primaryAddress) {
-    alert("Please set a primary address before placing the order.");
-    return;
-  }
+    if (!primaryAddress) {
+      alert("Please set a primary address before placing the order.");
+      return;
+    }
 
     const orderData = {
       firstName: primaryAddress.fname,
@@ -411,7 +410,7 @@ const Checkout = () => {
       discount,
       customerId,
       amount: cartTotalPrice - discount,
-      payment_mode:"Cod",
+      payment_mode: "Cod",
       items: cartItems.map((item) => ({
         productId: item.id,
         quantity: item.quantity,
@@ -439,7 +438,7 @@ const Checkout = () => {
           alert("Order placed successfully!");
           resetForm();
           // Optionally redirect to success page
-          window.location.href = "/success";
+          window.location.href = "/orders";
         }
       }
     } catch (error) {
@@ -479,11 +478,9 @@ const Checkout = () => {
         primary_address: editItem.primary_address || 0,
       });
       alert("Address updated successfully");
-      setData(prevData =>
-      prevData.map(item =>
-        item.id === editItem.id ? editItem : item
-      )
-    );
+      setData((prevData) =>
+        prevData.map((item) => (item.id === editItem.id ? editItem : item))
+      );
     } catch (err) {
       alert("Update failed: " + (err.response?.data?.msg || err.message));
     }
@@ -494,16 +491,16 @@ const Checkout = () => {
     try {
       await axios.put(`${BASE_URL}/updatecustomeraddress`, {
         ...itemToUpdate,
-        id:addressId,
+        id: addressId,
         customer_id: customerId,
         primary_address: 1,
       });
-       setData(prevData =>
-      prevData.map(item => ({
-        ...item,
-        primary_address: item.id === addressId ? 1 : 0
-      }))
-    );
+      setData((prevData) =>
+        prevData.map((item) => ({
+          ...item,
+          primary_address: item.id === addressId ? 1 : 0,
+        }))
+      );
     } catch (err) {
       alert("Failed to set primary address");
     }
@@ -515,7 +512,9 @@ const Checkout = () => {
     try {
       await axios.delete(`${BASE_URL}/deletecustomeraddress/${addressId}`);
       alert("Address deleted successfully");
-      setData((prevData) => prevData.filter((address) => address.id !== addressId));
+      setData((prevData) =>
+        prevData.filter((address) => address.id !== addressId)
+      );
     } catch (err) {
       alert("Failed to delete address");
       console.error(err);
@@ -528,7 +527,7 @@ const Checkout = () => {
   };
   const handleAddSubmit = async (e) => {
     e.preventDefault();
-  const allFieldsTouched = {};
+    const allFieldsTouched = {};
     Object.keys(formData).forEach((key) => {
       allFieldsTouched[key] = true;
     });
@@ -855,144 +854,144 @@ const Checkout = () => {
                       </div>
                     )}
 
-                     {data.map((item, index) => (
-                        <div
-                          className="border rounded p-3 mb-3 d-flex align-items-start position-relative"
-                          key={index}
-                        >
-                          <div className="form-check mt-1 me-3">
-                            <input
-                              className="form-check-input"
-                              type="radio"
-                              name="primaryAddress"
-                              checked={item.primary_address === 1}
-                              onChange={() => handleMakePrimary(item.id)}
-                              id={`primary-${item.id}`}
-                            />
-                          </div>
-
-                          <div className="flex-grow-1">
-                            {editIndex === index || null ? (
-                              <div>
-                                <div className="row g-2">
-                                  {[
-                                    "fname",
-                                    "lname",
-                                    "address",
-                                    "city",
-                                    "state",
-                                    "country",
-                                    "postal_code",
-                                    "email",
-                                    "mobile",
-                                    "description",
-                                  ].map((field, i) => (
-                                    <div
-                                      className={`col-md-${
-                                        field === "address" ||
-                                        field === "description"
-                                          ? 12
-                                          : 6
-                                      }`}
-                                      key={i}
-                                    >
-                                      <input
-                                        className="form-control"
-                                        name={field}
-                                        value={editItem[field]}
-                                        onChange={(e) =>
-                                          setEditItem({
-                                            ...editItem,
-                                            [field]: e.target.value,
-                                          })
-                                        }
-                                        required
-                                      />
-                                    </div>
-                                  ))}
-                                </div>
-                                <div className="mt-3 d-flex justify-content-end gap-2">
-                                  <button
-                                    type="button"
-                                    className="btn btn-secondary"
-                                    onClick={() => setEditIndex(null)}
-                                  >
-                                    Cancel
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={handleUpdate}
-                                    className="btn btn-success"
-                                  >
-                                    Save Changes
-                                  </button>
-                                </div>
-                              </div>
-                            ) : (
-                              <>
-                                <div className="fw-bold mb-1">
-                                  {item.fname} {item.lname}, {item.postal_code}
-                                  {item.primary_address === 1 && (
-                                    <span className="badge bg-success ms-2">
-                                      Primary
-                                    </span>
-                                  )}
-                                </div>
-                                <div style={{ fontSize: "14px" }}>
-                                  {item.address}, {item.city}, {item.state}
-                                </div>
-                                <div style={{ fontSize: "14px" }}>
-                                  {item.description}
-                                </div>
-
-                                <div className="position-absolute top-0 end-0 d-flex gap-1 p-2">
-                                 <button
-    onClick={() => handleEditClick(item, index)}
-    title="Edit"
-    style={{
-      backgroundColor: "#ffffff",
-      color: "#0D6EFD",
-      fontSize: "22px",
-      minWidth: "57px",
-      marginTop: "16%",
-      minHeight: "10px",
-      lineHeight: "55px",
-      marginBottom: "6px",
-      padding: "0",
-      border: "none",
-      borderRadius: "0",
-    }}
-  >
-    Edit
-    <i className="fa-solid fa-pen-to-square"></i>
-  </button>
-
-  <button
-    onClick={() => handleDelete(item.id)}
-    title="Delete"
-    style={{
-      backgroundColor: "#ffffff",
-      color: "#c2080f",
-      fontSize: "22px",
-      marginTop: "16%",
-      minWidth: "57px",
-      minHeight: "10px",
-      lineHeight: "55px",
-      marginBottom: "6px",
-      padding: "0",
-      border: "none",
-      borderRadius: "0",
-    }}
-  >
-    <i className="fa-solid fa-trash-can"></i>
-    Delete
-  </button>
-                                </div>
-                              </>
-                            )}
-                          </div>
+                    {data.map((item, index) => (
+                      <div
+                        className="border rounded p-3 mb-3 d-flex align-items-start position-relative"
+                        key={index}
+                      >
+                        <div className="form-check mt-1 me-3">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="primaryAddress"
+                            checked={item.primary_address === 1}
+                            onChange={() => handleMakePrimary(item.id)}
+                            id={`primary-${item.id}`}
+                          />
                         </div>
-                      ))}
+
+                        <div className="flex-grow-1">
+                          {editIndex === index || null ? (
+                            <div>
+                              <div className="row g-2">
+                                {[
+                                  "fname",
+                                  "lname",
+                                  "address",
+                                  "city",
+                                  "state",
+                                  "country",
+                                  "postal_code",
+                                  "email",
+                                  "mobile",
+                                  "description",
+                                ].map((field, i) => (
+                                  <div
+                                    className={`col-md-${
+                                      field === "address" ||
+                                      field === "description"
+                                        ? 12
+                                        : 6
+                                    }`}
+                                    key={i}
+                                  >
+                                    <input
+                                      className="form-control"
+                                      name={field}
+                                      value={editItem[field]}
+                                      onChange={(e) =>
+                                        setEditItem({
+                                          ...editItem,
+                                          [field]: e.target.value,
+                                        })
+                                      }
+                                      required
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                              <div className="mt-3 d-flex justify-content-end gap-2">
+                                <button
+                                  type="button"
+                                  className="btn btn-secondary"
+                                  onClick={() => setEditIndex(null)}
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={handleUpdate}
+                                  className="btn btn-success"
+                                >
+                                  Save Changes
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="fw-bold mb-1">
+                                {item.fname} {item.lname}, {item.postal_code}
+                                {item.primary_address === 1 && (
+                                  <span className="badge bg-success ms-2">
+                                    Primary
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{ fontSize: "14px" }}>
+                                {item.address}, {item.city}, {item.state}
+                              </div>
+                              <div style={{ fontSize: "14px" }}>
+                                {item.description}
+                              </div>
+
+                              <div className="position-absolute top-0 end-0 d-flex gap-1 p-2">
+                                <button
+                                  onClick={() => handleEditClick(item, index)}
+                                  title="Edit"
+                                  style={{
+                                    backgroundColor: "#ffffff",
+                                    color: "#0D6EFD",
+                                    fontSize: "22px",
+                                    minWidth: "57px",
+                                    marginTop: "16%",
+                                    minHeight: "10px",
+                                    lineHeight: "55px",
+                                    marginBottom: "6px",
+                                    padding: "0",
+                                    border: "none",
+                                    borderRadius: "0",
+                                  }}
+                                >
+                                  Edit
+                                  <i className="fa-solid fa-pen-to-square"></i>
+                                </button>
+
+                                <button
+                                  onClick={() => handleDelete(item.id)}
+                                  title="Delete"
+                                  style={{
+                                    backgroundColor: "#ffffff",
+                                    color: "#c2080f",
+                                    fontSize: "22px",
+                                    marginTop: "16%",
+                                    minWidth: "57px",
+                                    minHeight: "10px",
+                                    lineHeight: "55px",
+                                    marginBottom: "6px",
+                                    padding: "0",
+                                    border: "none",
+                                    borderRadius: "0",
+                                  }}
+                                >
+                                  <i className="fa-solid fa-trash-can"></i>
+                                  Delete
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
                   <div className="col-lg-5">
