@@ -112,12 +112,17 @@ router.delete("/deletecustomeraddress/:address_id", customer.deleteCustomerAddre
 router.get("/getLable", lablemaster.getLable);
 router.get("/getrfmaster", rfmaster.getrfmaster);
 router.get("/getMasterSet", rfmaster.getMasterSet);
+router.get("/get-social-links", rfmaster.getSocialLinks);
+router.post('/save-social-links', rfmaster.saveSocialLinks);
+router.get('/social-links', rfmaster.getAllActiveSocialLinks);
 // Coupon Discount
 router.post("/addcoupons", discountController.addDiscountCoupon);
 router.get("/getcoupons", discountController.getAllDiscountCoupons);
 router.get("/getcouponsbyid/:id", discountController.getCouponById);
 router.put("/updatecoupons/:id", discountController.updateDiscountCoupon);
 router.post("/applycoupon", discountController.applyCoupon);
+
+
 
 
 router.post("/addtocartWishlist",addtocartWishlistproduct)

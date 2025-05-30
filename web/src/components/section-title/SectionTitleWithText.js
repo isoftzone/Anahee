@@ -22,12 +22,12 @@ const SectionTitleWithText = ({ spaceTopClass, spaceBottomClass }) => {
   }, []);
   return (
     <div className={clsx("welcome-area mb-5", spaceTopClass, spaceBottomClass)}>
-      <div className="container-fluid" style={{height:"600px"}}>
+      <div className="container-fluid">
         {aboutData.length > 0 ? (
           aboutData.map((section, index) => (
-            <div className="welcome-content text-center mb-6" key={index}>
+            <div className="welcome-content text-center" key={index}>
               {/* <h5>{section.sectionname || "Who Are We"}</h5> */}
-              <h1>{section.sectionname || "Welcome To Anahee"}</h1>
+              {/* <h1>{section.sectionname || "Welcome To Anahee"}</h1> */}
               <div dangerouslySetInnerHTML={{ __html: section.content }} />
             </div>
           ))

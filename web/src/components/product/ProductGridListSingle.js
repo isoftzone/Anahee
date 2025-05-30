@@ -139,6 +139,15 @@ const ProductGridListSingle = ({
             ) : (
               ""
             )}
+             {product.mrp !== null ? (
+            <div className="product-price">
+                <Fragment>
+                  <span className="old">
+                    {currency.currencySymbol + product.mrp}
+                  </span>
+                </Fragment>
+            </div>
+             ) : ("")}
             <div className="product-price">
               {discountedPrice !== null ? (
                 <Fragment>
@@ -196,6 +205,15 @@ const ProductGridListSingle = ({
                     {product.name}
                   </Link>
                 </h3>
+                {product.mrp !== null ? (
+                  <div className="product-list-price">
+                      <Fragment>
+                        <span className="old">
+                          {currency.currencySymbol + product.mrp}
+                        </span>
+                      </Fragment>
+                  </div>
+                ) : ("")}
                 <div className="product-list-price">
                   {discountedPrice !== null ? (
                     <Fragment>

@@ -204,6 +204,7 @@ exports.getallitems = (req, res) => {
         name: item.ITEMNAME, // Item name
         price: item.SALEPRICE, // Sale price
         discount: item.DISCOUNT ? item.DISCOUNT : 0, // Default to 0 if DISCOUNT is null
+        mrp:item.MRP,
         offerEnd: "2024-10-05 12:11:00", // Static value for offerEnd, you might want to change this
         new: false, // Static value, can be set dynamically
         rating: 4, // Placeholder for rating, adjust as needed
