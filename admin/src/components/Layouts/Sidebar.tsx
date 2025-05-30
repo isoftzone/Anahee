@@ -91,6 +91,10 @@ const Sidebar = () => {
         //     setBasicSubMenuOpen(false);
         //     setPurchaseSubMenuOpen(false);
         // }
+        else if (menu === 'Image Update') {
+           
+            setCurrentMenu(currentMenu === menu ? null : menu);
+        }
         else if (menu === 'purchase') {
             setPurchaseSubMenuOpen(!purchaseSubMenuOpen);
             setUserSubMenuOpen(false);
@@ -1067,7 +1071,7 @@ const Sidebar = () => {
                                 <AnimateHeight duration={300} height={currentMenu === 'datalabel' || basicSubMenuOpen ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
                                         <li>
-                                            <button type="button" className={`${basicSubMenuOpen ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('basic')}>
+                                            {/* <button type="button" className={`${basicSubMenuOpen ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('basic')}>
                                                 <div className="flex items-center">
                                                     <IconMenuDatatables className="group-hover:!text-primary shrink-0" />
                                                     <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Settings</span>
@@ -1075,7 +1079,7 @@ const Sidebar = () => {
                                                 <div className={basicSubMenuOpen ? '' : 'rtl:rotate-90 -rotate-90'}>
                                                     <IconCaretDown />
                                                 </div>
-                                            </button>
+                                            </button> */}
 
                                             <AnimateHeight duration={300} height={basicSubMenuOpen ? 'auto' : 0}>
                                                 <ul className="sub-menu text-gray-500">
@@ -1248,7 +1252,7 @@ const Sidebar = () => {
             <li>
                 <NavLink to="/datatables/column-chooser">{t('column_chooser')}</NavLink>
             </li> */}
-                                        <li className="menu nav-item">
+                                        {/* <li className="menu nav-item">
                                             <NavLink to="/Components/item-master" className="group">
                                                 <div className="flex items-center">
                                                     <IconMenuTables className="group-hover:!text-primary shrink-0" />
@@ -1261,25 +1265,38 @@ const Sidebar = () => {
                                                     <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('All Item')}</span>
                                                 </div>
                                             </NavLink>
+                                        </li> */}
+                                          <li>
+                                            <NavLink to="/Components/item-master">Item Master</NavLink>
+                                        </li>
+                                          <li>
+                                            <NavLink to="/Components/items">All Item</NavLink>
                                         </li>
 
-                                        <li className="menu nav-item">
+                                        {/* <li className="menu nav-item">
                                             <NavLink to="/Components/Customerl" className="group">
                                                 <div className="flex items-center">
                                                     <IconMenuTables className="group-hover:!text-primary shrink-0" />
                                                     <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Customer Master')}</span>
                                                 </div>
                                             </NavLink>
+                                        </li> */}
+                                        <li>
+                                            <NavLink to="/Components/Customerl">Customer Master</NavLink>
                                         </li>
 
-                                        <li className="menu nav-item">
+
+                                        {/* <li className="menu nav-item">
                                             <NavLink to="/Components/users" className="group">
                                                 <div className="flex items-center">
                                                     <IconMenuTables className="group-hover:!text-primary shrink-0" />
                                                     <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('User Master')}</span>
                                                 </div>
                                             </NavLink>
-                                        </li>
+                                        </li> */}
+                                         {/* <li>
+                                            <NavLink to="/Components/users">User Master</NavLink>
+                                        </li> */}
 
                                         {/* /Components/users */}
                                     </ul>
@@ -1318,486 +1335,7 @@ const Sidebar = () => {
                                 </AnimateHeight>
                             </li>
 
-                            <li className="menu nav-item">
-                                <button type="button" className={`${currentMenu === 'datalab' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('datalab')}>
-                                    <div className="flex items-center">
-                                        <IconMenuDatatables className="group-hover:!text-primary shrink-0" />
-                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Reports</span>
-                                    </div>
-                                    <div className={currentMenu !== 'datalab' ? 'rtl:rotate-90 -rotate-90' : ''}>
-                                        <IconCaretDown />
-                                    </div>
-                                </button>
-
-                                <AnimateHeight duration={300} height={currentMenu === 'datalab' || basicSubMenuOpen ? 'auto' : 0}>
-                                    <ul className="sub-menu text-gray-500">
-                                        <li>
-                                            <button type="button" className={`${basicSubMenuOpen ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('basic')}>
-                                                <div className="flex items-center">
-                                                    <IconMenuDatatables className="group-hover:!text-primary shrink-0" />
-                                                    <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Master</span>
-                                                </div>
-                                                <div className={basicSubMenuOpen ? '' : 'rtl:rotate-90 -rotate-90'}>
-                                                    <IconCaretDown />
-                                                </div>
-                                            </button>
-
-                                            <AnimateHeight duration={300} height={basicSubMenuOpen ? 'auto' : 0}>
-                                                <ul className="sub-menu text-gray-500">
-                                                    {/* <li>
-                                                        <NavLink to="/datatables/advanced">Agent</NavLink>
-                                                    </li>
-                                                    <li>
-                                                        <NavLink to="/datatables/customer">Customers</NavLink>
-                                                    </li>
-                                                    <li>
-                                                        <NavLink to="/datatables/customer_env">Customer Envelope</NavLink>
-                                                    </li>
-                                                    <li>
-                                                        <NavLink to="/datatables/dealers">Dealers</NavLink>
-                                                    </li>
-                                                    <li>
-                                                        <NavLink to="/datatables/employees">Employees</NavLink>
-                                                    </li>
-                                                    <li>
-                                                        <NavLink to="/datatables/items">Items</NavLink>
-                                                    </li>
-                                                    <li>
-                                                        <NavLink to="/datatables/transport">Transport</NavLink>
-                                                    </li>
-                                                    <li>
-                                                        <NavLink to="/datatables/lable">Lable</NavLink>
-                                                    </li> */}
-
-                                                    <li>
-                                                        {/* <button type="button" className={`${bestInSubMenuOpen ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('best_in')}>
-                                                            <div className="flex items-center">
-                                                                  <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Setting</span>
-                                                            </div>
-                                                            <div className={bestInSubMenuOpen ? '' : 'rtl:rotate-90 -rotate-90'}>
-                                                                <IconCaretDown />
-                                                            </div>
-                                                        </button> */}
-
-                                                        <AnimateHeight duration={300} height={bestInSubMenuOpen ? 'auto' : 0}>
-                                                            <ul className="sub-menu text-gray-500">
-                                                                <li>
-                                                                    <NavLink to="/datatables/masterInput">Search</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=brand">Brand</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=formName">FromName</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=control">Control</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=c_name">C_Name</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=c_type">C_Type</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=c_value">C_Value</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=product">Product</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=buyer">Buyer</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=colour">Colour</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=scolor">SColor</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=category">Category</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=subCategory">Sub Category</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=group">Group</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=subGroup">Sub Group</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=material">Material</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=size">Size</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=style">Style</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=section">Section</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=season">Season</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=unit">Unit</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=packing">Packing</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=gender">Gender</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/datatables/frmCodeType?category=tag">Tag</NavLink>
-                                                                </li>
-                                                            </ul>
-                                                        </AnimateHeight>
-                                                    </li>
-                                                </ul>
-                                            </AnimateHeight>
-                                        </li>
-                                        {/* <li>
-                                            <button type="button" className={`${purchaseSubMenuOpen ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('purchase')}>
-                                                <div className="flex items-center">
-                                                    <IconMenuDatatables className="group-hover:!text-primary shrink-0" />
-                                                    <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Purchase</span>
-                                                </div>
-                                                <div className={purchaseSubMenuOpen ? '' : 'rtl:rotate-90 -rotate-90'}>
-                                                    <IconCaretDown />
-                                                </div>
-                                            </button>
-
-                                            <AnimateHeight duration={300} height={purchaseSubMenuOpen ? 'auto' : 0}>
-                                                <ul className="sub-menu text-gray-500">
-                                                    <li>
-                                                        <button type="button" className={`${innPurchaseSubMenuOpen ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('inn_purchase')}>
-                                                            <div className="flex items-center">
-                                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Purchase Report</span>
-                                                            </div>
-                                                            <div className={innPurchaseSubMenuOpen ? '' : 'rtl:rotate-90 -rotate-90'}>
-                                                                <IconCaretDown />
-                                                            </div>
-                                                        </button>
-
-                                                        <AnimateHeight duration={300} height={innPurchaseSubMenuOpen ? 'auto' : 0}>
-                                                            <ul className="sub-menu text-gray-500">
-                                                                <li>
-                                                                    <NavLink to="#">Purchase</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Purchase Register</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Purchase Detail</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Purchase Summary</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Dealer Wise Purchase</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Dealer Wise Purchase Detail</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Dealer Wise Purchase Comparison</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Best Purchase Brand</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Best Purchase Product Brand Wise</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Best Purchase Iteam Name Wise</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Purchase Date Wise</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Daily Purchase Group Wise</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Item Wise Purchase Summary</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Item Wise Purchase Tax</NavLink>
-                                                                </li>
-                                                            </ul>
-                                                        </AnimateHeight>
-                                                    </li>
-                                                    <li>
-                                                        <button type="button" className={`${purReturnSubMenuOpen ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('pur_return')}>
-                                                            <div className="flex items-center">
-                                                                 <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Purchase Return</span>
-                                                            </div>
-                                                            <div className={purReturnSubMenuOpen ? '' : 'rtl:rotate-90 -rotate-90'}>
-                                                                <IconCaretDown />
-                                                            </div>
-                                                        </button>
-
-                                                        <AnimateHeight duration={300} height={purReturnSubMenuOpen ? 'auto' : 0}>
-                                                            <ul className="sub-menu text-gray-500">
-                                                                <li>
-                                                                    <NavLink to="#">Purchase Return Summary</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Purchase Return report</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Purchase Return Detail Report</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Purchase Return Register </NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Dealer Wise Purchase Return</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Dealer Wise Purchase Return Detail</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Dealer Wise Purchase Return Comparison</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Purchase return date Wise</NavLink>
-                                                                </li>
-
-                                                                <li>
-                                                                    <NavLink to="#">Purchase Date Wise</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Daily Purchase Return Group Wise</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Item Wise Purchase Return Summary</NavLink>
-                                                                </li>
-                                                            </ul>
-                                                        </AnimateHeight>
-                                                    </li>
-
-                                                  
-                                                </ul>
-                                            </AnimateHeight>
-                                        </li> */}
-                                        <li>
-                                            <button type="button" className={`${stockSubMenuOpen ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('stock')}>
-                                                <div className="flex items-center">
-                                                    <IconMenuDatatables className="group-hover:!text-primary shrink-0" />
-                                                    <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Stock</span>
-                                                </div>
-                                                <div className={stockSubMenuOpen ? '' : 'rtl:rotate-90 -rotate-90'}>
-                                                    <IconCaretDown />
-                                                </div>
-                                            </button>
-
-                                            {/* <AnimateHeight duration={300} height={stockSubMenuOpen ? 'auto' : 0}>
-                                                <ul className="sub-menu text-gray-500">
-                                                    <li>
-                                                        <NavLink to="/stockTables/stockDetail">Stock Detail</NavLink>
-                                                    </li>
-                                                    <li>
-                                                        <NavLink to="/stockTables/brandItem">Brand Item Wise</NavLink>
-                                                    </li>
-                                                    <li>
-                                                        <NavLink to="/stockTables/itemBrand">Item Brand Wise</NavLink>
-                                                    </li>
-                                                    <li>
-                                                        <NavLink to="/stockTables/itemSize">Item Size Wise</NavLink>
-                                                    </li>
-                                                    <li>
-                                                        <NavLink to="/stockTables/stockMovement">Stock Movement</NavLink>
-                                                    </li>
-                                                    <li>
-                                                        <NavLink to="/stockTables/stockReport">Stock Report</NavLink>
-                                                    </li>
-                                                    <li>
-                                                        <NavLink to="/stockTables/stockAging">Stock Aging</NavLink>
-                                                    </li>
-                                                    <li>
-                                                        <NavLink to="/stockTables/stockSummary">Stock Summary Item Name Wise</NavLink>
-                                                    </li>
-                                                </ul>
-                                            </AnimateHeight> */}
-
-                                            <AnimateHeight duration={300} height={stockSubMenuOpen ? 'auto' : 0}>
-                                                <ul className="sub-menu text-gray-500">
-                                                    {menuItems.map((item, index) => (
-                                                        <li key={index}>
-                                                            <NavLink to={`/stockTables/${item.FormName.toLowerCase().replace(/\s+/g, '')}`}>{item.FormName}</NavLink>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </AnimateHeight>
-                                        </li>
-                                        <li>
-                                            <button type="button" className={`${salesSubMenuOpen ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('sales')}>
-                                                <div className="flex items-center">
-                                                    <IconMenuDatatables className="group-hover:!text-primary shrink-0" />
-                                                    <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Sales</span>
-                                                </div>
-                                                <div className={salesSubMenuOpen ? '' : 'rtl:rotate-90 -rotate-90'}>
-                                                    <IconCaretDown />
-                                                </div>
-                                            </button>
-
-                                            <AnimateHeight duration={300} height={salesSubMenuOpen ? 'auto' : 0}>
-                                                <ul className="sub-menu text-gray-500">
-                                                    <li>
-                                                        <button type="button" className={`${salesReportSubMenuOpen ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('inn_sales')}>
-                                                            <div className="flex items-center">
-                                                                {/* <IconMenuDatatables className="group-hover:!text-primary shrink-0" /> */}
-                                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Sales</span>
-                                                            </div>
-                                                            <div className={salesReportSubMenuOpen ? '' : 'rtl:rotate-90 -rotate-90'}>
-                                                                <IconCaretDown />
-                                                            </div>
-                                                        </button>
-
-                                                        <AnimateHeight duration={300} height={salesReportSubMenuOpen ? 'auto' : 0}>
-                                                            <ul className="sub-menu text-gray-500">
-                                                                <li>
-                                                                    <NavLink to="#">Sales Report</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Sales Register</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Sales Summary</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Sales Detail Report</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Sales Profit</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Sales Outstanding</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Sales Profit MR</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Discount Sale</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Dealer Wise Sales</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Sales</NavLink>
-                                                                </li>
-                                                            </ul>
-                                                        </AnimateHeight>
-                                                    </li>
-                                                    <li>
-                                                        <button type="button" className={`${salesReturnSubMenuOpen ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('sales_return')}>
-                                                            <div className="flex items-center">
-                                                                {/* <IconMenuDatatables className="group-hover:!text-primary shrink-0" /> */}
-                                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Sales Return</span>
-                                                            </div>
-                                                            <div className={salesReturnSubMenuOpen ? '' : 'rtl:rotate-90 -rotate-90'}>
-                                                                <IconCaretDown />
-                                                            </div>
-                                                        </button>
-
-                                                        <AnimateHeight duration={300} height={salesReturnSubMenuOpen ? 'auto' : 0}>
-                                                            <ul className="sub-menu text-gray-500">
-                                                                <li>
-                                                                    <NavLink to="#">Sales Return Report</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Sales Return Summary</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Sales Return Register </NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Sales Return Detail Report</NavLink>
-                                                                </li>
-
-                                                                <li>
-                                                                    <NavLink to="#">Customer Wise Sales Return</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Customer Wise Sales Return Detail</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Employee Wise Sales Return</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Employee Wise Sales Return Comparison</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Employee Wise Sales Return Comparison(Qty)</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Dealer Wise Sales Return</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Dealer Wise Sales Return Comparison</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Sales Return Profit</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Sales Return Outstanding</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Daily Sales Return Group Wise</NavLink>
-                                                                </li>
-                                                            </ul>
-                                                        </AnimateHeight>
-                                                    </li>
-                                                    <li>
-                                                        <button type="button" className={`${bestInSubMenuOpen ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('best_in')}>
-                                                            <div className="flex items-center">
-                                                                {/* <IconMenuDatatables className="group-hover:!text-primary shrink-0" /> */}
-                                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Best In</span>
-                                                            </div>
-                                                            <div className={bestInSubMenuOpen ? '' : 'rtl:rotate-90 -rotate-90'}>
-                                                                <IconCaretDown />
-                                                            </div>
-                                                        </button>
-
-                                                        <AnimateHeight duration={300} height={bestInSubMenuOpen ? 'auto' : 0}>
-                                                            <ul className="sub-menu text-gray-500">
-                                                                <li>
-                                                                    <NavLink to="/salesTables/sellingBrand">Best Selling Brand</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/salesTables/sellingProduct">Best Selling Product Brand Wise</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="#">Best Selling Product Gender Wise</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/salesTables/sellingItem">Best Selling Item Name Wise</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/salesTables/sellingCustomer">Best Selling Customer</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/salesTables/salesComparison">Sales Tax Comparison</NavLink>
-                                                                </li>
-                                                                <li>
-                                                                    <NavLink to="/salesTables/itemWiseSale">Item Wise Sale Tax</NavLink>
-                                                                </li>
-                                                            </ul>
-                                                        </AnimateHeight>
-                                                    </li>
-
-                                                    <li>
-                                                        <NavLink to="/salesTables/delChallan">Delivery Challan</NavLink>
-                                                    </li>
-                                                </ul>
-                                            </AnimateHeight>
-                                        </li>
-                                    </ul>
-                                </AnimateHeight>
-                            </li>
+                           
 
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'Man' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Man')}>
@@ -1838,7 +1376,7 @@ const Sidebar = () => {
                                 </AnimateHeight>
                             </li>
 
-                            <li className="menu nav-item">
+                            {/* <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'Pro' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Pro')}>
                                     <div className="flex items-center">
                                         <IconMenuPages className="group-hover:!text-primary shrink-0" />
@@ -1851,9 +1389,9 @@ const Sidebar = () => {
                                 </button>
                                 <AnimateHeight duration={300} height={currentMenu === 'Pro' ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
-                                        {/* <li>
+                                        <li>
                                             <NavLink to="/pages/knowledge-base">{t('knowledge_base')}</NavLink>
-                                        </li> */}
+                                         </li>
                                         <li>
                                             <NavLink to="/Components/promotionbanners">Promotion Banner</NavLink>
                                         </li>
@@ -1865,7 +1403,7 @@ const Sidebar = () => {
                                         </li>
                                     </ul>
                                 </AnimateHeight>
-                            </li>
+                            </li> */}
 
                             {/* <li className="menu nav-item">
                                 <NavLink to="/Components/layoutsetting" className="group">
@@ -1876,14 +1414,23 @@ const Sidebar = () => {
                                 </NavLink>
                             </li> */}
 
-                            <li className="menu nav-item">
-                                <NavLink to="/Components/image-update" className="group">
-                                    <div className="flex items-center">
-                                        <IconMenuTables className="group-hover:!text-primary shrink-0" />
-                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Image Update')}</span>
-                                    </div>
-                                </NavLink>
-                            </li>
+                           <li className="menu nav-item">
+    <button
+        type="button"
+        className={`${currentMenu === 'image' ? 'active' : ''} nav-link group w-full`}
+        onClick={() => {
+            toggleMenu('image');
+            navigate('/Components/image-update'); 
+        }}
+    >
+        <div className="flex items-center">
+            <IconMenuTables className="group-hover:!text-primary shrink-0" />
+            <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                {t('Image Update')}
+            </span>
+        </div>
+    </button>
+</li>
                             {/* <li className="menu nav-item">
                                 <NavLink to="/Components/item-master" className="group">
                                     <div className="flex items-center">
@@ -1892,31 +1439,31 @@ const Sidebar = () => {
                                     </div>
                                 </NavLink>
                             </li> */}
-                            <li className="menu nav-item">
+                            {/* <li className="menu nav-item">
                                 <NavLink to="/Components/remotefromMaster" className="group">
                                     <div className="flex items-center">
                                         <IconMenuTables className="group-hover:!text-primary shrink-0" />
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Remote From Master')}</span>
                                     </div>
                                 </NavLink>
-                            </li>
-                            <li className="menu nav-item">
+                            </li> */}
+                            {/* <li className="menu nav-item">
                                 <NavLink to="/Components/mastersetting" className="group">
                                     <div className="flex items-center">
                                         <IconMenuTables className="group-hover:!text-primary shrink-0" />
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Master Setting')}</span>
                                     </div>
                                 </NavLink>
-                            </li>
-                            <li className="menu nav-item">
+                            </li> */}
+                            {/* <li className="menu nav-item">
                                 <NavLink to="/Components/formmaster" className="group">
                                     <div className="flex items-center">
                                         <IconMenuTables className="group-hover:!text-primary shrink-0" />
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Admin Settings')}</span>
                                     </div>
                                 </NavLink>
-                            </li>
-
+                            </li> */}
+{/* 
                             <li className="menu nav-item">
                                 <NavLink to="/components/notification" className="group">
                                     <div className="flex items-center">
@@ -1924,16 +1471,16 @@ const Sidebar = () => {
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Notification')}</span>
                                     </div>
                                 </NavLink>
-                            </li>
+                            </li> */}
 
-                            <li className="menu nav-item">
+                            {/* <li className="menu nav-item">
                                 <NavLink to="/Components/reportfromstock" className="group">
                                     <div className="flex items-center">
                                         <IconMenuTables className="group-hover:!text-primary shrink-0" />
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Report From Stock')}</span>
                                     </div>
                                 </NavLink>
-                            </li>
+                            </li> */}
 
                             {/* <li className="menu nav-item">
                                 <NavLink to="/components/exchange-policy" className="group">
@@ -1992,7 +1539,7 @@ const Sidebar = () => {
                                 </NavLink>
                             </li> */}
 
-                            <li className="menu nav-item">
+                            {/* <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'master' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('master')}>
                                     <div className="flex items-center">
                                         <IconMenuPages className="group-hover:!text-primary shrink-0" />
@@ -2005,21 +1552,21 @@ const Sidebar = () => {
                                 </button>
                                 <AnimateHeight duration={300} height={currentMenu === 'master' ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
-                                        {/* <li>
+                                        <li>
                                             <NavLink to="/pages/knowledge-base">{t('knowledge_base')}</NavLink>
-                                        </li> */}
+                                        </li>
                                         <li>
                                             <NavLink to="/Components/minimumbillingsetting">Minimum Billing Setting</NavLink>
                                         </li>
-                                        {/* <li>
+                                        <li>
                                             <NavLink to="/Components/users">Users</NavLink>
                                         </li>
                                         <li>
                                             <NavLink to="/Components/Customerl">Customer</NavLink>
-                                        </li> */}
+                                        </li>
                                     </ul>
                                 </AnimateHeight>
-                            </li>
+                            </li> */}
 
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'dash' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('dash')}>
@@ -2076,7 +1623,7 @@ const Sidebar = () => {
                                 </AnimateHeight>
                             </li>
 
-                            <li className="menu nav-item">
+                            {/* <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'app' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('app')}>
                                     <div className="flex items-center">
                                         <IconMenuPages className="group-hover:!text-primary shrink-0" />
@@ -2089,9 +1636,9 @@ const Sidebar = () => {
                                 </button>
                                 <AnimateHeight duration={300} height={currentMenu === 'app' ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
-                                        {/* <li>
+                                        <li>
                                             <NavLink to="/pages/knowledge-base">{t('knowledge_base')}</NavLink>
-                                        </li> */}
+                                        </li>
                                         <li>
                                             <NavLink to="/Components/report">Report</NavLink>
                                         </li>
@@ -2115,14 +1662,14 @@ const Sidebar = () => {
                                         </li>
                                     </ul>
                                 </AnimateHeight>
-                            </li>
+                            </li> */}
 
-                            <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
+                            {/* <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
                                 <IconMinus className="w-4 h-5 flex-none hidden" />
                                 <span>{t('user_and_pages')}</span>
-                            </h2>
+                            </h2> */}
 
-                            <li className="menu nav-item">
+                            {/* <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'page' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('page')}>
                                     <div className="flex items-center">
                                         <IconMenuPages className="group-hover:!text-primary shrink-0" />
@@ -2136,19 +1683,19 @@ const Sidebar = () => {
 
                                 <AnimateHeight duration={300} height={currentMenu === 'page' ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
-                                        {/* <li>
+                                        <li>
                                             <NavLink to="/pages/knowledge-base">{t('knowledge_base')}</NavLink>
-                                        </li> */}
+                                        </li>
                                         <li>
                                             <NavLink to="/pages/contact-us-boxed" target="_blank">
                                                 {t('contact_us_boxed')}
                                             </NavLink>
                                         </li>
-                                        {/* <li>
+                                        <li>
                                             <NavLink to="/pages/contact-us-cover" target="_blank">
                                                 {t('contact_us_cover')}
                                             </NavLink>
-                                        </li> */}
+                                        </li>
                                         <li>
                                             <NavLink to="/pages/faq">{t('faq')}</NavLink>
                                         </li>
@@ -2157,11 +1704,11 @@ const Sidebar = () => {
                                                 {t('coming_soon_boxed')}
                                             </NavLink>
                                         </li>
-                                        {/* <li>
+                                        <li>
                                             <NavLink to="/pages/coming-soon-cover" target="_blank">
                                                 {t('coming_soon_cover')}
                                             </NavLink>
-                                        </li> */}
+                                        </li>
                                         <li className="menu nav-item">
                                             <button
                                                 type="button"
@@ -2203,9 +1750,9 @@ const Sidebar = () => {
                                         </li>
                                     </ul>
                                 </AnimateHeight>
-                            </li>
+                            </li> */}
 
-                            <li className="menu nav-item">
+                            {/* <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'auth' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('auth')}>
                                     <div className="flex items-center">
                                         <IconMenuAuthentication className="group-hover:!text-primary shrink-0" />
@@ -2219,7 +1766,7 @@ const Sidebar = () => {
 
                                 <AnimateHeight duration={300} height={currentMenu === 'auth' ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
-                                        {/* <li>
+                                        <li>
                                             <NavLink to="/auth/boxed-signin" target="_blank">
                                                 {t('login_boxed')}
                                             </NavLink>
@@ -2228,26 +1775,26 @@ const Sidebar = () => {
                                             <NavLink to="/auth/boxed-signup" target="_blank">
                                                 {t('register_boxed')}
                                             </NavLink>
-                                        </li> */}
-                                        {/* <li>
+                                        </li> 
+                                        <li>
                                             <NavLink to="/auth/boxed-lockscreen" target="_blank">
                                                 {t('unlock_boxed')}
                                             </NavLink>
-                                        </li> */}
-                                        {/* <li>
+                                        </li> 
+                                         <li>
                                             <NavLink to="/auth/boxed-password-reset" target="_blank">
                                                 {t('recover_id_boxed')}
                                             </NavLink>
-                                        </li> */}
+                                        </li>
                                         <li>
                                             <button onClick={handleLogout}>{t('login_cover')}</button>
                                         </li>
-                                        {/* <li>
+                                         <li>
                                             <NavLink to="/auth/cover-register" target="_blank">
                                                 {t('register_cover')}
                                             </NavLink>
-                                        </li> */}
-                                        {/* <li>
+                                        </li>
+                                         <li>
                                             <NavLink to="/auth/cover-lockscreen" target="_blank">
                                                 {t('unlock_cover')}
                                             </NavLink>
@@ -2256,10 +1803,10 @@ const Sidebar = () => {
                                             <NavLink to="/auth/cover-password-reset" target="_blank">
                                                 {t('recover_id_cover')}
                                             </NavLink>
-                                        </li> */}
+                                        </li>
                                     </ul>
                                 </AnimateHeight>
-                            </li>
+                            </li> */}
 
                             {/* <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
                                 <IconMinus className="w-4 h-5 flex-none hidden" />

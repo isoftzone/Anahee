@@ -33,7 +33,7 @@ const TermsOfService = () => {
           { label: "Terms of Service", path: pathname }
         ]}
       /> */}
-      <div className="container-fluid mb-4">
+      <div className="container-fluid mb-5">
         {policies.length > 0 ? (
           policies.map((policy, index) => (
             <div key={index} className="mb-4">

@@ -36,16 +36,16 @@ const TermsAndConditions = () => {
           { label: "Terms and Conditions", path: pathname }
         ]}
       /> */}
-      <div className="container-fluid mb-4">
+      <div className="container-fluid mb-5">
         {policies.length > 0 ? (
           policies.map((policy, index) => (
-            <div key={index} className="mb-4">
+            <div key={index}>
               <h3 className="fw-bold">{policy.sectionname}</h3>
               <div
                 dangerouslySetInnerHTML={{ __html: policy.content }}
                 style={{
                   listStyleType: 'disc',
-                  padding: '20px'
+                  
                 }}
               />
             </div>

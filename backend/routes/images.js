@@ -9,7 +9,7 @@ const db = mysql.createConnection({
   host: process.env.DB_HOST || "4.213.43.18",
   user: process.env.DB_USER || "isrbs",
   password: process.env.DB_PASS || "isoft@1209ISZ",
-  database: process.env.DB_NAME || "madhuban",
+  database: process.env.DB_NAME || "anahee",
 });
 
 // Connect to MySQL

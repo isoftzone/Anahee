@@ -6,6 +6,10 @@ import SEO from "../../components/seo";
 import LayoutOne from "../../layouts/LayoutOne";
 import { BASE_URL } from "../../config";
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import axios from 'axios'
+import { useDispatch } from "react-redux";
+import { setCartItems } from "../../store/slices/cart-slice"; 
+import { setwishlistItems } from "../../store/slices/wishlist-slice";
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
@@ -13,6 +17,7 @@ const Login = () => {
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false); // Password visibility toggle
   const navigate = useNavigate();
+  const dispatch = useDispatch()
   const validate = () => {
     const newErrors = {};
     if (!formData.email.trim()) {
@@ -47,9 +52,21 @@ const Login = () => {
       });
       const data = await response.json();
       if (response.ok) {
+        const userData = data.customer;
         localStorage.setItem("customerinfo", JSON.stringify(data.customer));
         setSuccess("Login successful!");
         setFormData({ email: "", password: "" });
+        try {
+          const response = await axios.get(`http://localhost:3000/getalladdtocart/${userData.id}`);
+          const allCartItems = response.data.data;
+          const wishlistdata = await axios.get(`http://localhost:3000/getwishlist/${userData.id}`);
+          const allwishlistitem = wishlistdata.data.data;
+          dispatch(setCartItems(allCartItems));
+          dispatch(setwishlistItems(allwishlistitem));
+        } catch (fetchErr) {
+          console.error("Error fetching wishlist/cart:", fetchErr);
+        }
+
         navigate("/");
       } else {
         setApiError(data.msg || "Login failed");

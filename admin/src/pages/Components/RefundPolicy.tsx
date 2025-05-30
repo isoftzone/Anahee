@@ -54,7 +54,7 @@ const RefundPolicy: React.FC = () => {
     <div className="privacy-policy-editor">
       <h1 className="mb-3" style={{ fontWeight: "700" }}>Refund Policy</h1>
       {/* Section Name Input */}
-      <Form.Group className="mb-3">
+      <Form.Group className="">
         <Form.Label>Section Name</Form.Label>
         <Form.Control
           type="text"
@@ -68,7 +68,7 @@ const RefundPolicy: React.FC = () => {
         onChange={setContent}
         placeholder="Edit your Refund policy here..."
       />
-      <div className="mt-4 flex gap-3">
+      <div className="flex gap-3">
         <Button onClick={handleSave} className="bg-green-500">Save</Button>
         <Button variant="outline" onClick={() => setContent("")}>Reset</Button>
       </div>

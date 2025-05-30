@@ -19,7 +19,7 @@ const addProductData = require("../controllers/addProductData");
 // const imageupdate = require("../controllers/imageupdate");
 const master = require("../controllers/master");
 const salesmaster = require("../controllers/salesmaster");
-const discountController = require("../controllers/discountController")
+const discountController = require("../controllers/discountController");
 const salesdetail = require("../controllers/salesdetail");
 const rfmaster = require("../controllers/rfmaster");
 const upload = require("../middlewares/imageupload");
@@ -55,6 +55,7 @@ router.get("/getSalesMaster/:saleId", salesmaster.getSalesMaster);
 router.post("/addSalesMaster", salesmaster.addSalesMaster);
 router.put("/updateSalesMaster", salesmaster.updateSalesMaster);
 router.put("/update-order-status", salesmaster.updateOrderStatus);
+router.put("/cancelorder/:saleId", salesmaster.cancelOrder);
 router.get("/getSalesDetail/:saleId?", salesdetail.getSalesDetail);
 router.post("/addSalesDetail", salesdetail.addSalesDetail);
 // :white_check_mark: Route to Get Invoices
@@ -67,9 +68,15 @@ router.put("/editUser/:id", users.editUser);
 router.post("/add_customer", customer.addcustomer);
 router.post("/login_customer", customer.logincustomer);
 router.get("/getallorders/:customerId", salesmaster.getAllOrders);
+router.put("/updateSales/:id", salesmaster.updateSales);
 router.get("/getcustomerbyid/:customerId", customer.getcustomerbyid);
-router.put("/updateCustomerInfo", customer.updateCustomerInfo);
+router.put("/updateCustomerInfo/:id", customer.updateCustomerInfo);
 router.get("/getAllcustomer", customer.getAll);
+router.delete("/deletecustomer/:id",customer.deletecustomer);
+
+const { addtocartWishlistproduct, getCartWishlistProduct, deletefromcartWishlist, clearALlcartwishlist, addtocartwishlistAction, getAllWishlistItems, getAllCartItems } = require("../controllers/addtocartWishlistController");
+
+
 // router.delete("/deletecustomer/:id",customer.deletecustomer);
 // router.put("/editcustomer/:id",customer.editcustomer);
 //homepage
@@ -96,6 +103,11 @@ router.get("/getEmployee", employee.getEmployee);
 router.get("/getDealer", dealer.getDealer);
 router.get("/getTransport", transport.getTransport);
 router.get("/getCustomer", customer.getCustomer);
+// customerAddress
+router.get("/getcustomeraddress/:customer_id",customer.getAddressesByUserId);
+router.post("/addcustomeraddress", customer.addCustomerAddress);
+router.put("/updatecustomeraddress", customer.updateCustomerAddress);
+router.delete("/deletecustomeraddress/:address_id", customer.deleteCustomerAddress);
 // router.get("/getItem",itemmaster.getItem);
 router.get("/getLable", lablemaster.getLable);
 router.get("/getrfmaster", rfmaster.getrfmaster);
@@ -104,6 +116,16 @@ router.get("/getMasterSet", rfmaster.getMasterSet);
 router.post("/addcoupons", discountController.addDiscountCoupon);
 router.get("/getcoupons", discountController.getAllDiscountCoupons);
 router.get("/getcouponsbyid/:id", discountController.getCouponById);
-router.put('/updatecoupons/:id', discountController.updateDiscountCoupon);
+router.put("/updatecoupons/:id", discountController.updateDiscountCoupon);
 router.post("/applycoupon", discountController.applyCoupon);
+
+
+router.post("/addtocartWishlist",addtocartWishlistproduct)
+router.post("/addtocartAction",addtocartwishlistAction)
+router.get('/getaddtocartdata/:CUSTOMERID', getCartWishlistProduct)
+router.get('/getwishlist/:customerId', getAllWishlistItems)
+router.get('/getalladdtocart/:customerId', getAllCartItems)
+router.delete("/deletecartWishlist", deletefromcartWishlist)
+router.delete("/clearAllcartWishlist", clearALlcartwishlist)
+
 module.exports = router;

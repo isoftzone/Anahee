@@ -2006,3 +2006,21 @@ button:disabled {
     max-width: 29% !important;
   }
 }
+
+
+@media (max-width:375px){
+  *,
+*::after,
+*::before {
+  box-sizing: border-box;
+        font-size:15px;
+}
+.pe-7s-close:before{
+  font-size: 36px;
+}
+}
+
+.swiper-horizontal>.swiper-pagination-bullets, .swiper-pagination-bullets.swiper-pagination-horizontal{
+  position: relative !important;
+  bottom: 1px !important;
+}

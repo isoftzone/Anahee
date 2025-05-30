@@ -115,7 +115,7 @@ const DiscountCouponList: React.FC = () => {
   if (error) return <div className="error">Error: {error}</div>;
 
   return (
-    <div className="p-4">
+    <div>
       <h1 className="text-2xl font-bold mb-4">Discount Coupon List</h1>
 
       <button

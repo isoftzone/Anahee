@@ -1,51 +1,5 @@
-const express = require("express");
 const con = require("../config");
-// GET API endpoint to fetch all records from the salesmaster table
-// exports.getSalesMaster = async (req, res) => {
-//   const { saleId } = req.params; // Assuming you're passing SaleID to fetch specific sales data
-//   console.log(`Looking for Sale ID: ${saleId}`); // Debugging log
-//   try {
-//     await con.query(
-//       "SELECT * FROM madhuban.salesmaster WHERE SALEID = ?",
-//       [saleId],
-//       (err, result) => {
-//         if (err) {
-//           console.error("❌ Error fetching sales data:", err);
-//           return res.status(500).json({ error: "Database error" });
-//         }
-//         if (result.length === 0) {
-//           console.log(`No sale found for Sale ID: ${saleId}`); // Debugging log
-//           return res.status(404).json({ error: "Sale data not found" });
-//         }
-//         console.log("Fetched Sale Data:", result); // Debugging log
-//         res.json({ saleData: result }); // Return sales data
-//       }
-//     );
-//   } catch (error) {
-//     console.error("❌ Unexpected error:", error);
-//     res.status(500).json({ error: "Server error" });
-//   }
-// };
-// exports.getSalesMaster = async (req, res) => {
-//   const { saleId } = req.params;
-//   let query = "SELECT * FROM madhuban.salesmaster ORDER BY SALEID DESC";
-//   let params = [];
-//   // If saleId is provided, filter by ID
-//   if (saleId) {
-//     query += " WHERE SALEID = ?";
-//     params.push(saleId);
-//   }
-//   con.query(query, params, (err, result) => {
-//     if (err) {
-//       console.error("❌ Error fetching sales data:", err);
-//       return res.status(500).json({ error: "Database error" });
-//     }
-//     if (result.length === 0) {
-//       return res.status(404).json({ error: "No sales data found" });
-//     }
-//     res.json({ sales: result }); // Always return an array
-//   });
-// };
+
 exports.getSalesMaster = (req, res) => {
   const { saleId } = req.params;
   let query = `
@@ -61,30 +15,38 @@ exports.getSalesMaster = (req, res) => {
       sm.CREATEDON, 
       sm.payment_status,
       sm.ORDER_STATUS,
+      sm.DISCAMOUNT,
       sd.ITEMID,
       sd.QTY,
       sd.AMOUNT,
-      im.ITEMNAME ,
+      im.ITEMNAME,
       im.DESCRIPTION
-    FROM madhuban.salesmaster sm
-    JOIN madhuban.salesdetail sd ON sm.SALEID = sd.SALEID
-    JOIN madhuban.itemmaster im ON sd.ITEMID = im.ITEMID
+    FROM salesmaster sm
+    JOIN salesdetail sd ON sm.SALEID = sd.SALEID
+    JOIN itemmaster im ON sd.ITEMID = im.ITEMID
   `;
+
   const params = [];
+
   // Filter if specific saleId is requested
   if (saleId) {
     query += " WHERE sm.SALEID = ?";
     params.push(saleId);
   }
+
+  // Ensure results are ordered by SALEID in descending order
   query += " ORDER BY sm.SALEID DESC";
+
   con.query(query, params, (err, results) => {
     if (err) {
       console.error("❌ Error fetching sales details:", err);
       return res.status(500).json({ error: "Database error" });
     }
+
     if (results.length === 0) {
       return res.status(404).json({ error: "No sales found" });
     }
+
     // Group by SALEID to organize order with its items
     const grouped = {};
     results.forEach((row) => {
@@ -97,14 +59,15 @@ exports.getSalesMaster = (req, res) => {
           COUNTRY: row.COUNTRY,
           ADDRESS: row.ADDRESS,
           NUMBER: row.NUMBER,
-          // AMOUNT: row.AMOUNT,
           PAYMENTMETHOD: row.payment_mode,
           CREATEDON: row.CREATEDON,
           PAYMENTSTATUS: row.payment_status,
           ORDER_STATUS: row.ORDER_STATUS,
+          DISCAMOUNT:row.DISCAMOUNT,
           ITEMS: [],
         };
       }
+
       grouped[row.SALEID].ITEMS.push({
         ITEMID: row.ITEMID,
         ITEMNAME: row.ITEMNAME,
@@ -113,54 +76,15 @@ exports.getSalesMaster = (req, res) => {
         AMOUNT: row.AMOUNT,
       });
     });
-    // Convert grouped object to array
+
+    // Convert grouped object to array and sort by SALEID in descending order
     const finalResult = Object.values(grouped);
+    finalResult.sort((a, b) => b.SALEID - a.SALEID); // Ensure correct order
+
     res.status(200).json({ sales: finalResult });
   });
 };
-// exports.getSalesMaster = async (req, res) => {
-//   const { saleId } = req.params; // Assuming you're passing SaleID to fetch specific sales data
-//   con.query("SELECT * FROM madhuban.salesmaster WHERE SALEID = ?", [saleId], (err, result) => {
-//       if (err) {
-//           console.error("❌ Error fetching sales data:", err);
-//           return res.status(500).json({ error: "Database error" });
-//       }
-//       if (result.length === 0) {
-//           return res.status(404).json({ error: "Sale data not found" });
-//       }
-//       // res.json({ sale: result[0] });
-//       res.json({ sale: result }); // Ensure it's an array
-//   });
-// };
-// POST API endpoint to insert data into salesmaster table
-// exports.addSalesMaster = async (req, res) => {
-//   const { firstName, lastName, companyName, country, address, city, state, postcode, phone, email } = req.body;
-//   const newSale = {
-//     NAME: `${firstName} ${lastName}`,
-//     CNAME: companyName,
-//     COUNTRY: country,
-//     ADDRESS: `${address}, ${city}, ${state}, ${postcode}`,
-//     NUMBER: phone,
-//     EMAIL: email,
-//   };
-//   console.log("addSalesMaster",req.body);
-//   try {
-//     await con.query(
-//       'INSERT INTO madhuban.salesmaster SET ?', newSale,
-//       (err, result) => {
-//         if (err) {
-//           console.error("❌ Error inserting sale record:", err);
-//           return res.status(500).json({ error: "Database error" });
-//         }
-//         console.log("✅ Insert Success:", result);
-//         res.json({ success: true, saleId:result.insertId, message: "Sale record added successfully!" });
-//       }
-//     );
-//   } catch (error) {
-//     console.error("❌ Unexpected error:", error);
-//     res.status(500).json({ error: "Server error" });
-//   }
-// };
+
 exports.addSalesMaster = (req, res) => {
   const {
     firstName,
@@ -175,19 +99,21 @@ exports.addSalesMaster = (req, res) => {
     email,
     items,
     // amount,
-    paymentMethod,
+    discount,
+    payment_mode,
     customerId
   } = req.body;
   const now = new Date();
   const newSale = {
     NAME: `${firstName} ${lastName}`,
-    CNAME: companyName,
+    CNAME: companyName || "",
     COUNTRY: country,
     ADDRESS: `${address}, ${city}, ${state}, ${postcode}`,
     NUMBER: phone,
     EMAIL: email,
     // AMOUNT: amount,
-    payment_mode: paymentMethod,
+    DISCAMOUNT:discount,
+    payment_mode: payment_mode,
     CUSTOMERID:customerId,
     CREATEDON: now,
     UPDATEDON: now,
@@ -195,7 +121,7 @@ exports.addSalesMaster = (req, res) => {
   console.log("📥 Incoming sale:", req.body);
   // Step 1: Insert into salesmaster
   con.query(
-    "INSERT INTO madhuban.salesmaster SET ?",
+    "INSERT INTO  salesmaster SET ?",
     newSale,
     (err, result) => {
       if (err) {
@@ -217,7 +143,7 @@ exports.addSalesMaster = (req, res) => {
           AMOUNT: item.price,
         };
         con.query(
-          "INSERT INTO madhuban.salesdetail SET ?",
+          "INSERT INTO  salesdetail SET ?",
           detail,
           (err, result) => {
             if (err) {
@@ -245,29 +171,6 @@ exports.addSalesMaster = (req, res) => {
     }
   );
 };
-// exports.addSalesMaster = async (req, res) => {
-//     const { COMPANYID, FINYEAR, SERIES, SALEID, SALEDATE, TMODE, CUSTOMERID, ITEMQTY, TOTALAMOUNT, DISCOUNT, DISCAMOUNT, NETAMOUNT, AMOUNTPAID, BALANCE } = req.body;
-//     const newSale = {
-//         COMPANYID, FINYEAR, SERIES, SALEID, SALEDATE, TMODE, CUSTOMERID, ITEMQTY, TOTALAMOUNT, DISCOUNT, DISCAMOUNT, NETAMOUNT, AMOUNTPAID, BALANCE
-//     };
-//     try {
-//         await con.query(
-//             'INSERT INTO madhuban.salesmaster SET ?', newSale,
-//             (err, result) => {
-//                 if (err) {
-//                     console.error("❌ Error inserting sale record:", err);
-//                     return res.status(500).json({ error: "Database error" });
-//                 }
-//                 console.log("✅ Insert Success:", result);
-//                 res.json({ success: true, message: "Sale record added successfully!", saleID: result.insertId });
-//             }
-//         );
-//     } catch (error) {
-//         console.error("❌ Unexpected error:", error);
-//         res.status(500).json({ error: "Server error" });
-//     }
-// };
-// GET API endpoint to handle pagination for salesmaster table
 exports.salesMasterPaginated = (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10; // Number of records per page
@@ -306,103 +209,106 @@ exports.salesMasterPaginated = (req, res) => {
     }
   );
 };
-// exports.addSalesMaster = async (req, res) => {
-//     const {
-//       firstName,
-//       lastName,
-//       companyName,
-//       country,
-//       streetAddress,
-//       townCity,
-//       stateCounty,
-//       postcodeZip,
-//       phone,
-//       emailAddress,
-//       orderNotes,
-//       saleId,
-//       saleDate,
-//       totalAmount,
-//       discount,
-//       discountAmount,
-//       netAmount,
-//       amountPaid,
-//       balance
-//     } = req.body;
-//     const newSale = {
-//       COMPANYID: 'YourCompanyID', // Replace with actual company ID
-//       FINYEAR: 'YourFinancialYear', // Replace with actual financial year
-//       SERIES: 'YourSeries', // Replace with actual series
-//       SALEID: saleId,
-//       SALEDATE: saleDate,
-//       TMODE: 'YourTransactionMode', // Replace with actual transaction mode
-//       CUSTOMERID: 'YourCustomerID', // Replace with actual customer ID
-//       ITEMQTY: 'YourItemQuantity', // Replace with actual item quantity
-//       TOTALAMOUNT: totalAmount,
-//       DISCOUNT: discount,
-//       DISCAMOUNT: discountAmount,
-//       NETAMOUNT: netAmount,
-//       AMOUNTPAID: amountPaid,
-//       BALANCE: balance,
-//       NAME: `${firstName} ${lastName}`, // Combine first and last name
-//       CNAME: companyName,
-//       ADDRESS: `${streetAddress}, ${townCity}, ${stateCounty}, ${postcodeZip}`, // Combine address fields
-//       COUNTRY: country,
-//       NUMBER: phone,
-//       EMAIL: emailAddress
-//     };
-//     try {
-//       await con.query(
-//         'INSERT INTO madhuban.salesmaster SET ?', newSale,
-//         (err, result) => {
-//           if (err) {
-//             console.error("❌ Error inserting sale record:", err);
-//             return res.status(500).json({ error: "Database error" });
-//           }
-//           console.log("✅ Insert Success:", result);
-//           res.json({ success: true, message: "Sale record added successfully!", saleID: result.insertId });
-//         }
-//       );
-//     } catch (error) {
-//       console.error("❌ Unexpected error:", error);
-//       res.status(500).json({ error: "Server error" });
-//     }
-//   };
 // Update SalesMaster Item
-// exports.updateSalesMaster = async (req, res) => {
-//     const { id } = req.params;  // Ensure id is coming from URL params
-//     console.log("Received SalesMaster ID for Update:", id);
-//     if (!id) {
-//         return res.status(400).json({ error: "Missing SalesMaster ID" });
-//     }
-//     const editId = Number(id); // Convert id to a number
-//     if (isNaN(editId)) {
-//         return res.status(400).json({ error: "Invalid SalesMaster ID" });
-//     }
-//     upload.single('photo')(req, res, function (err) {
-//         if (err) {
-//             console.error("❌ Error uploading files:", err);
-//             return res.status(500).json({ error: "File upload error" });
-//         }
-//         const { COMPANYID, FINYEAR, SERIES, SALEID, SALEDATE, TMODE, CUSTOMERID, ITEMQTY, TOTALAMOUNT, DISCOUNT, DISCAMOUNT, NETAMOUNT, AMOUNTPAID, BALANCE } = req.body;
-//         let photo = req.file ? req.file.filename : null; // Get the uploaded file if any
-//         const updatedSalesMaster = {
-//             COMPANYID, FINYEAR, SERIES, SALEID, SALEDATE, TMODE, CUSTOMERID, ITEMQTY, TOTALAMOUNT, DISCOUNT, DISCAMOUNT, NETAMOUNT, AMOUNTPAID, BALANCE, PHOTO: photo
-//         };
-//         try {
-//             // Update the salesmaster record
-//             con.query("UPDATE salesmaster SET ? WHERE SALEID = ?", [updatedSalesMaster, editId], (err, result) => {
-//                 if (err) {
-//                     console.error("❌ Error updating salesmaster:", err);
-//                     return res.status(500).json({ error: "Database error" });
-//                 }
-//                 res.json({ success: true, message: "SalesMaster updated successfully!" });
-//             });
-//         } catch (error) {
-//             console.error("❌ Unexpected error:", error);
-//             res.status(500).json({ error: "Server error" });
-//         }
-//     });
-// };
+exports.updateSales = async (req, res) => {
+    const { id } = req.params;
+    console.log("📝 Updating SALEID:", id);
+
+    if (!id) return res.status(400).json({ error: "Missing SALEID" });
+    const saleId = Number(id);
+    if (isNaN(saleId)) return res.status(400).json({ error: "Invalid SALEID" });
+
+    const { items, tax, discount, shipping, customerDetails } = req.body;
+
+    if (!customerDetails || typeof customerDetails !== 'object') {
+        return res.status(400).json({ error: "Missing or invalid customerDetails" });
+    }
+
+    const {
+        COMPANYID, FINYEAR, SERIES, SALEDATE, TMODE,
+        CUSTOMERID, TOTALAMOUNT, DISCAMOUNT, NETAMOUNT,
+        AMOUNTPAID, BALANCE
+    } = customerDetails;
+
+    const ITEMQTY = items.reduce((sum, item) => sum + (item.QUANTITY || 0), 0);
+
+    const updatedSalesMaster = {
+        COMPANYID,
+        FINYEAR,
+        SERIES,
+        SALEDATE,
+        TMODE,
+        CUSTOMERID,
+        ITEMQTY,
+        TOTALAMOUNT,
+        DISCOUNT: discount,
+        DISCAMOUNT,
+        NETAMOUNT,
+        AMOUNTPAID,
+        BALANCE
+    };
+
+    try {
+        // 1. Update salesmaster table
+        await new Promise((resolve, reject) => {
+            con.query("UPDATE salesmaster SET ? WHERE SALEID = ?", [updatedSalesMaster, saleId], (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+            });
+        });
+
+        // 2. Update each item in itemmaster (ITEMNAME, DESCRIPTION, AMOUNT)
+        for (const item of items) {
+            const { ITEMID, ITEMNAME, DESCRIPTION } = item;
+
+            await new Promise((resolve, reject) => {
+                con.query(
+                    "UPDATE itemmaster SET ITEMNAME = ?, DESCRIPTION = ? WHERE ITEMID = ?",
+                    [ITEMNAME, DESCRIPTION, ITEMID],
+                    (err, result) => {
+                        if (err) return reject(err);
+                        resolve(result);
+                    }
+                );
+            });
+        }
+
+        // 3. Delete existing salesdetail entries for this SALEID
+        await new Promise((resolve, reject) => {
+            con.query("DELETE FROM salesdetail WHERE SALEID = ?", [saleId], (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+            });
+        });
+
+        // 4. Insert new salesdetail rows with QTY
+        const salesDetailValues = items.map(item => [
+            saleId,
+            item.ITEMID,
+            item.QUANTITY,
+            item.AMOUNT
+        ]);
+
+        await new Promise((resolve, reject) => {
+            con.query(
+                "INSERT INTO salesdetail (SALEID, ITEMID, QTY, AMOUNT) VALUES ?",
+                [salesDetailValues],
+                (err, result) => {
+                    if (err) return reject(err);
+                    resolve(result);
+                }
+            );
+        });
+
+        res.json({ success: true, message: "Sales, items, and quantities updated successfully!" });
+    } catch (error) {
+        console.error("❌ Error updating sale:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+
+
 exports.updateOrderStatus = async (req, res) => {
   const { SALEID, ORDER_STATUS } = req.body;
   if (!SALEID) {
@@ -455,7 +361,7 @@ exports.updateSalesMaster = async (req, res) => {
   };
   try {
     await con.query(
-      "UPDATE madhuban.salesmaster SET ? WHERE SALEID = ?",
+      "UPDATE  salesmaster SET ? WHERE SALEID = ?",
       [updateFields, saleId],
       (err, result) => {
         if (err) {
@@ -483,29 +389,29 @@ exports.getAllOrders = (req, res) => {
 
   const query = `
     SELECT
-  sm.SALEID,
-  sm.NAME,
-  sm.EMAIL,
-  sm.CNAME,
-  sm.COUNTRY,
-  sm.ADDRESS,
-  sm.NUMBER,
-  sm.payment_mode,
-  sm.CREATEDON,
-  sm.payment_status,
-  sm.ORDER_STATUS,
-  sd.ITEMID,
-  sd.QTY,
-  sd.AMOUNT,
-  im.ITEMNAME,
-  im.DESCRIPTION,
-  ii.PHOTO
-FROM madhuban.salesmaster sm
-LEFT JOIN madhuban.salesdetail sd ON sm.SALEID = sd.SALEID
-LEFT JOIN madhuban.itemmaster im ON sd.ITEMID = im.ITEMID
-LEFT JOIN madhuban.itemimage ii ON im.ITEMID = ii.ITEMID
-WHERE sm.CUSTOMERID = ?
-ORDER BY sm.SALEID DESC, sd.ITEMID
+      sm.SALEID,
+      sm.NAME,
+      sm.EMAIL,
+      sm.CNAME,
+      sm.COUNTRY,
+      sm.ADDRESS,
+      sm.NUMBER,
+      sm.payment_mode,
+      sm.CREATEDON,
+      sm.payment_status,
+      sm.ORDER_STATUS,
+      sd.ITEMID,
+      sd.QTY,
+      sd.AMOUNT,
+      im.ITEMNAME,
+      im.DESCRIPTION,
+      ii.PHOTO
+    FROM  salesmaster sm
+    LEFT JOIN  salesdetail sd ON sm.SALEID = sd.SALEID
+    LEFT JOIN  itemmaster im ON sd.ITEMID = im.ITEMID
+    LEFT JOIN  itemimage ii ON im.ITEMID = ii.ITEMID
+    WHERE sm.CUSTOMERID = ?
+    ORDER BY sm.SALEID DESC
   `;
 
   con.query(query, [customerId], (err, results) => {
@@ -543,11 +449,31 @@ ORDER BY sm.SALEID DESC, sd.ITEMID
         DESCRIPTION: row.DESCRIPTION,
         QUANTITY: row.QTY,
         AMOUNT: row.AMOUNT,
-        PHOTO:row.PHOTO
+        PHOTO: row.PHOTO,
       });
     });
 
     const finalResult = Object.values(grouped);
+    finalResult.sort((a, b) => b.SALEID - a.SALEID); // Ensure descending order
+
     res.status(200).json({ orders: finalResult });
+  });
+};
+
+exports.cancelOrder = (req, res) => {
+  const { saleId } = req.params;
+
+  const query = `
+    UPDATE  salesmaster
+    SET ORDER_STATUS = 'Cancel'
+    WHERE SALEID = ?
+  `;
+
+  con.query(query, [saleId], (err, result) => {
+    if (err) {
+      console.error("❌ Error cancelling order:", err);
+      return res.status(500).json({ error: "Failed to cancel order" });
+    }
+    res.status(200).json({ message: "Order cancelled successfully" });
   });
 };

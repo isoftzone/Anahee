@@ -7,7 +7,7 @@ import { getDiscountPrice } from "../../helpers/product";
 import Rating from "./sub-components/ProductRating";
 import ProductModal from "./ProductModal";
 import { addToCart } from "../../store/slices/cart-slice";
-import { addToWishlist } from "../../store/slices/wishlist-slice";
+import { addToWishlist,deleteFromWishlist,deleteWFromWishlist } from "../../store/slices/wishlist-slice";
 import { addToCompare } from "../../store/slices/compare-slice";
 
 const ProductGridSingleEight = ({
@@ -81,18 +81,23 @@ const ProductGridSingleEight = ({
 
           <div className="product-action">
             <div className="pro-same-action pro-wishlist">
-              <button
-                className={wishlistItem !== undefined ? "active" : ""}
-                disabled={wishlistItem !== undefined}
-                title={
-                  wishlistItem !== undefined
-                    ? "Added to wishlist"
-                    : "Add to wishlist"
-                }
-                onClick={() => dispatch(addToWishlist(product))}
-              >
-                <i className="pe-7s-like" />
-              </button>
+             <button
+              className={`transition-all duration-300 text-2xl ${
+                wishlistItem ? "text-danger" : "text-gray-400"
+              }`}
+              title={wishlistItem ? "Remove from wishlist" : "Add to wishlist"}
+              onClick={() =>
+                wishlistItem
+                  ? dispatch(deleteFromWishlist(product))
+                  : dispatch(addToWishlist(product))
+              }
+            >
+              {wishlistItem ? (
+                <i className="fa fa-heart "></i>
+              ) : (
+                <i className="fa fa-heart-o"></i>
+              )}
+            </button>
             </div>
             <div className="pro-same-action pro-cart">
               {product.affiliateLink ? (

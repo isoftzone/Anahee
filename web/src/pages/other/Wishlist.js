@@ -10,6 +10,15 @@ import {
   deleteAllFromWishlist,
 } from "../../store/slices/wishlist-slice";
 
+import axios from "axios";
+import { BASE_URL } from "../../config";
+// const URL = "http://localhost:3000"; // Adjust as needed
+const customerInfoSting= localStorage.getItem('customerinfo');
+const customerinfo = customerInfoSting ? JSON.parse(customerInfoSting) : null;
+console.log("this is id customer description", customerinfo?.id);
+const CUSTOMERID = customerinfo?.id;
+console.log("this is customer id", CUSTOMERID);
+
 const Wishlist = () => {
   const dispatch = useDispatch();
   let { pathname } = useLocation();
@@ -17,7 +26,48 @@ const Wishlist = () => {
   const currency = useSelector((state) => state.currency);
   const { wishlistItems } = useSelector((state) => state.wishlist);
   const { cartItems } = useSelector((state) => state.cart);
-
+  const handledeleteWishlist = async (itemIds) => {
+     dispatch(deleteFromWishlist({id: itemIds})); 
+ 
+    try {
+        const payload = {
+        CUSTOMERID,
+        ITEMID: itemIds,
+        type: "wishlist",
+      }
+       //   delete api
+      const response = await axios.delete(`${BASE_URL}/deletecartWishlist`, { data: payload })
+      console.log("this is delete data wishlist", response );
+      
+     if (response.status === 200 || response.data.success) {
+      //  dispatch(deleteFromWishlist(itemIds));
+       dispatch(deleteFromWishlist({id: itemIds})); 
+    }
+    }
+    catch (error) {
+      console.log("this is failed to wishlist data backend", error)
+    }
+  }
+  const handleAllcleareWishlist = async () => {
+    try {
+      dispatch(deleteAllFromWishlist())
+      const payload = {
+        CUSTOMERID,
+        type: "wishlist",
+      }
+      console.log("this is payload delete data", payload);
+      //   delete api
+      const response = await axios.delete(`${BASE_URL}/clearAllcartWishlist`, { data: payload })
+      console.log("this is delete data", response.data);
+      
+    // if (response.status === 200 || response.data.success) {
+    //   dispatch(deleteAllFromWishlist());
+    // }
+    }
+    catch (error) {
+      console.log("this is failed to wishlist data backend", error)
+    }
+  }
   return (
     <Fragment>
       <SEO
@@ -123,12 +173,12 @@ const Wishlist = () => {
                                       </a>
                                     ) : wishlistItem.variation &&
                                       wishlistItem.variation.length >= 1 ? (
-                                      <button
+                                      <Link
                                         to={`${process.env.PUBLIC_URL}/product/${wishlistItem.id}`}
-                                       className="px-4 py-3 text-sm sm:px-5 sm:py-5 sm:text-base"
+                                        className="px-4 py-3 text-sm sm:px-5 sm:py-5 sm:text-base"
                                       >
                                         Select option
-                                      </button>
+                                      </Link>
                                     ) : wishlistItem.stock &&
                                       wishlistItem.stock > 0 ? (
                                       <button
@@ -164,15 +214,19 @@ const Wishlist = () => {
                                   </td>
 
                                   <td className="product-remove">
-                                    <button
+
+                                  <button onClick={() =>  handledeleteWishlist(wishlistItem.id)}>
+                                    <i className="fa fa-times"></i>
+                                  </button>
+                                    {/* <button
                                       onClick={() =>
                                         dispatch(
-                                          deleteFromWishlist(wishlistItem.id)
+                                          deleteFromWishlist(wishlistItem)
                                         )
                                       }
                                     >
                                       <i className="fa fa-times"></i>
-                                    </button>
+                                    </button> */}
                                   </td>
                                 </tr>
                               );
@@ -195,11 +249,15 @@ const Wishlist = () => {
                         </Link>
                       </div>
                       <div className="cart-clear">
-                        <button
+
+                        <button onClick={handleAllcleareWishlist}>
+                          Clear Wishlist
+                        </button>
+                        {/* <button
                           onClick={() => dispatch(deleteAllFromWishlist())}
                         >
                           Clear Wishlist
-                        </button>
+                        </button> */}
                       </div>
                     </div>
                   </div>
@@ -214,9 +272,7 @@ const Wishlist = () => {
                     </div>
                     <div className="item-empty-area__text">
                       No items found in wishlist <br />
-                      <Link
-                        to={process.env.PUBLIC_URL + "/shop-grid-standard"}
-                      >
+                      <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
                         Add Items
                       </Link>
                     </div>

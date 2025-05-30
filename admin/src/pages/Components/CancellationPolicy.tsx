@@ -52,10 +52,10 @@ const CancellationPolicy: React.FC = () => {
 
   return (
     <div className="privacy-policy-editor">
-      <h1 className="mb-3" style={{ fontWeight: "700" }}>Cancellation Policy</h1>
+      <h1 className="" style={{ fontWeight: "700" }}>Cancellation Policy</h1>
       
       {/* Section Name Input */}
-      <Form.Group className="mb-3">
+      <Form.Group className="">
         <Form.Label>Section Name</Form.Label>
         <Form.Control
           type="text"
@@ -71,7 +71,7 @@ const CancellationPolicy: React.FC = () => {
         placeholder="Edit your Cancellation policy here..."
       />
       
-      <div className="mt-4 flex gap-3">
+      <div className="flex gap-3">
         <Button onClick={handleSave} className="bg-green-500">Save</Button>
         <Button variant="outline" onClick={() => setContent("")}>Reset</Button>
       </div>

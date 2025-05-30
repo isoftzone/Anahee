@@ -15,7 +15,7 @@ const location = useLocation();
   }
 
   return (
-    <div className="shop-bottom-area mt-35">
+    <div className="shop-bottom-area">
       <div className={clsx("row", layout)}>
         <ProductgridList products={products} spaceBottomClass="mb-25" />
       </div>
