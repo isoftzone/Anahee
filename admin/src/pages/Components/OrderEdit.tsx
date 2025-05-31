@@ -55,7 +55,6 @@ const OrderEdit: React.FC = () => {
         payment_mode: '',
     });
 
-    // Add the salesMasterData state
     const [salesMasterData, setSalesMasterData] = useState<SalesMasterData>({
         COMPANYID: 1,
         FINYEAR: new Date().getFullYear(),
@@ -72,8 +71,6 @@ const OrderEdit: React.FC = () => {
 
     const [invoiceNumber, setInvoiceNumber] = useState(saleId);
 
-    console.log('wewe id', saleId);
-
     useEffect(() => {
         if (saleId) {
             fetchSalesData();
@@ -87,7 +84,6 @@ const OrderEdit: React.FC = () => {
             if (response.data?.sales?.[0]) {
                 const sale = response.data.sales[0];
 
-                // Set customer details
                 setCustomerDetails({
                     name: sale.NAME,
                     email: sale.EMAIL,
@@ -98,7 +94,6 @@ const OrderEdit: React.FC = () => {
                     payment_mode: sale.PAYMENTMETHOD,
                 });
 
-                // Set items
                 setItems(
                     sale.ITEMS?.map((item: any) => ({
                         id: item.ITEMID,
@@ -109,7 +104,6 @@ const OrderEdit: React.FC = () => {
                     })) || []
                 );
 
-                // Set sales master data
                 setSalesMasterData({
                     COMPANYID: sale.COMPANYID || 1,
                     FINYEAR: sale.FINYEAR || new Date().getFullYear(),
@@ -124,7 +118,6 @@ const OrderEdit: React.FC = () => {
                     BALANCE: sale.BALANCE || 0,
                 });
 
-                // Set existing tax, discount, shipping if available
                 setTax(sale.TAX || 0);
                 setDiscount(sale.DISCAMOUNT || 0);
                 setShipping(sale.SHIPPING || 0);
@@ -139,7 +132,7 @@ const OrderEdit: React.FC = () => {
 
     const calculateSubtotal = () => items.reduce((sum, item) => sum + item.quantity * item.price, 0);
     const subtotal = calculateSubtotal();
-    const grandTotal = subtotal + (subtotal * tax) / 100 -  discount + shipping;
+    const grandTotal = subtotal + (subtotal * tax) / 100 - discount + shipping;
 
     const addItem = () => {
         setItems([...items, { name: '', description: null, quantity: 1, price: 0 }]);
@@ -162,14 +155,12 @@ const OrderEdit: React.FC = () => {
         try {
             setLoading(true);
 
-            // Calculate totals
             const subtotal = calculateSubtotal();
             const taxAmount = (subtotal * tax) / 100;
             const discountAmount = discount;
             const totalAmount = subtotal + taxAmount;
             const netAmount = totalAmount - discountAmount + shipping;
 
-            // Prepare the data structure expected by your controller
             const updateData = {
                 items: items.map((item) => ({
                     ITEMID: item.id || null,
@@ -182,7 +173,7 @@ const OrderEdit: React.FC = () => {
                 discount: discount,
                 shipping: shipping,
                 customerDetails: {
-                    ...salesMasterData, // Use the stored sales master data
+                    ...salesMasterData,
                     ITEMQTY: items.reduce((sum, item) => sum + item.quantity, 0),
                     TOTALAMOUNT: totalAmount,
                     DISCAMOUNT: discountAmount,
@@ -202,7 +193,6 @@ const OrderEdit: React.FC = () => {
         }
     };
 
-    // Generate PDF content as HTML string
     const generateInvoiceHTML = () => {
         const currentDate = new Date().toLocaleDateString();
 
@@ -277,7 +267,7 @@ const OrderEdit: React.FC = () => {
                 <div class="totals">
                     <div><span>Subtotal:</span><span>$${subtotal.toFixed(2)}</span></div>
                     <div><span>Tax (${tax}%):</span><span>$${((subtotal * tax) / 100).toFixed(2)}</span></div>
-                    <div><span>Discount (${discount}%):</span><span>-$${(discount).toFixed(2)}</span></div>
+                    <div><span>Discount (${discount}%):</span><span>-$${discount.toFixed(2)}</span></div>
                     <div><span>Shipping:</span><span>$${shipping.toFixed(2)}</span></div>
                     <div class="grand-total"><span>Grand Total:</span><span>$${grandTotal.toFixed(2)}</span></div>
                 </div>
@@ -286,22 +276,15 @@ const OrderEdit: React.FC = () => {
         `;
     };
 
-    // Send Invoice via Email
     const handleSendInvoice = async () => {
         try {
             setLoading(true);
-
-            // First save the current state
             await handleSaveOrder();
 
-            // Generate invoice content
             const invoiceHTML = generateInvoiceHTML();
-
-            // Create a blob with the HTML content
             const blob = new Blob([invoiceHTML], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
 
-            // Create a download link
             const a = document.createElement('a');
             a.href = url;
             a.download = `invoice_${invoiceNumber}.html`;
@@ -310,7 +293,6 @@ const OrderEdit: React.FC = () => {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            // Open email client after a short delay
             setTimeout(() => {
                 const subject = `Invoice #${invoiceNumber} from Your Company`;
                 const body = `Please find attached invoice #${invoiceNumber}.`;
@@ -327,12 +309,10 @@ const OrderEdit: React.FC = () => {
         }
     };
 
-    // Preview Invoice
     const handlePreview = () => {
         setShowPreview(true);
     };
 
-    // Download Invoice as PDF
     const handleDownload = () => {
         const invoiceHTML = generateInvoiceHTML();
         const newWindow = window.open('', '_blank');
@@ -340,14 +320,12 @@ const OrderEdit: React.FC = () => {
             newWindow.document.write(invoiceHTML);
             newWindow.document.close();
 
-            // Trigger print dialog for PDF save
             setTimeout(() => {
                 newWindow.print();
             }, 1000);
         }
     };
 
-    // Alternative download method using blob
     const handleDownloadAlternative = () => {
         const invoiceHTML = generateInvoiceHTML();
         const blob = new Blob([invoiceHTML], { type: 'text/html' });
@@ -370,21 +348,35 @@ const OrderEdit: React.FC = () => {
     }
 
     return (
-        <div className="p-6 bg-gray-100 min-h-screen">
+        <div className="p-4 md:p-6 bg-gray-100 min-h-screen">
             {/* Header */}
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Edit Order {saleId}</h1>
-                <div className="flex space-x-4">
-                    <button onClick={handleSaveOrder} className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors" disabled={loading}>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <h1 className="text-xl md:text-2xl font-bold">Edit Order {saleId}</h1>
+                <div className="flex flex-wrap gap-2 w-full md:w-auto">
+                    <button 
+                        onClick={handleSaveOrder} 
+                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 md:px-4 md:py-2 rounded-md transition-colors text-sm md:text-base" 
+                        disabled={loading}
+                    >
                         {loading ? 'Saving...' : 'Save'}
                     </button>
-                    <button onClick={handleSendInvoice} className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors" disabled={loading}>
+                    <button 
+                        onClick={handleSendInvoice} 
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 md:px-4 md:py-2 rounded-md transition-colors text-sm md:text-base" 
+                        disabled={loading}
+                    >
                         Send Invoice
                     </button>
-                    <button onClick={handlePreview} className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-md transition-colors">
+                    <button 
+                        onClick={handlePreview} 
+                        className="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 md:px-4 md:py-2 rounded-md transition-colors text-sm md:text-base"
+                    >
                         Preview
                     </button>
-                    <button onClick={handleDownload} className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-md transition-colors">
+                    <button 
+                        onClick={handleDownload} 
+                        className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1 md:px-4 md:py-2 rounded-md transition-colors text-sm md:text-base"
+                    >
                         Download
                     </button>
                 </div>
@@ -393,14 +385,14 @@ const OrderEdit: React.FC = () => {
             {/* Preview Modal */}
             {showPreview && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg max-w-4xl max-h-[90vh] overflow-auto">
+                    <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-auto">
                         <div className="flex justify-between items-center p-4 border-b">
                             <h2 className="text-xl font-bold">Invoice Preview</h2>
                             <button onClick={() => setShowPreview(false)} className="text-gray-500 hover:text-gray-700 text-2xl">
                                 ×
                             </button>
                         </div>
-                        <div className="p-6" dangerouslySetInnerHTML={{ __html: generateInvoiceHTML() }} />
+                        <div className="p-4 md:p-6" dangerouslySetInnerHTML={{ __html: generateInvoiceHTML() }} />
                         <div className="flex justify-end space-x-4 p-4 border-t">
                             <button onClick={() => setShowPreview(false)} className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
                                 Close
@@ -414,24 +406,44 @@ const OrderEdit: React.FC = () => {
             )}
 
             {/* Invoice Form */}
-            <div className="bg-white p-6 shadow-md rounded-md">
+            <div className="bg-white p-4 md:p-6 shadow-md rounded-md">
                 {/* Company Details */}
-                <div className="flex justify-between mb-6">
-                    <div className="w-1/3">
+                <div className="flex flex-col md:flex-row justify-between mb-6 gap-4">
+                    <div className="w-full md:w-1/3">
                         <label className="block text-sm font-medium">Invoice Number</label>
                         <input className="border rounded w-full p-2 mt-1" value={invoiceNumber} onChange={(e) => setInvoiceNumber(e.target.value)} />
                     </div>
                 </div>
 
                 {/* Billing & Payment Details */}
-                <div className="grid grid-cols-2 gap-6 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     {/* Bill To */}
                     <div>
                         <h3 className="font-semibold mb-2">Bill To:</h3>
-                        <input className="border rounded w-full p-2 mb-2" value={customerDetails.name} onChange={(e) => setCustomerDetails({ ...customerDetails, name: e.target.value })} />
-                        <input className="border rounded w-full p-2 mb-2" value={customerDetails.email} onChange={(e) => setCustomerDetails({ ...customerDetails, email: e.target.value })} />
-                        <input className="border rounded w-full p-2 mb-2" value={customerDetails.address} onChange={(e) => setCustomerDetails({ ...customerDetails, address: e.target.value })} />
-                        <input className="border rounded w-full p-2 mb-2" value={customerDetails.phone} onChange={(e) => setCustomerDetails({ ...customerDetails, phone: e.target.value })} />
+                        <input 
+                            className="border rounded w-full p-2 mb-2" 
+                            value={customerDetails.name} 
+                            onChange={(e) => setCustomerDetails({ ...customerDetails, name: e.target.value })} 
+                            placeholder="Customer Name"
+                        />
+                        <input 
+                            className="border rounded w-full p-2 mb-2" 
+                            value={customerDetails.email} 
+                            onChange={(e) => setCustomerDetails({ ...customerDetails, email: e.target.value })} 
+                            placeholder="Email"
+                        />
+                        <input 
+                            className="border rounded w-full p-2 mb-2" 
+                            value={customerDetails.address} 
+                            onChange={(e) => setCustomerDetails({ ...customerDetails, address: e.target.value })} 
+                            placeholder="Address"
+                        />
+                        <input 
+                            className="border rounded w-full p-2 mb-2" 
+                            value={customerDetails.phone} 
+                            onChange={(e) => setCustomerDetails({ ...customerDetails, phone: e.target.value })} 
+                            placeholder="Phone"
+                        />
                         <div className="mt-2">
                             <span className="font-medium">Country: </span>
                             <span>{customerDetails.country}</span>
@@ -439,7 +451,7 @@ const OrderEdit: React.FC = () => {
                         <div className="mt-1">
                             <span className="font-medium">Payment Status: </span>
                             <span
-                                className={`px-2 py-1 rounded ${
+                                className={`px-2 py-1 rounded text-sm ${
                                     customerDetails.paymentStatus === 'PENDING'
                                         ? 'bg-yellow-100 text-yellow-800'
                                         : customerDetails.paymentStatus === 'PAID'
@@ -453,14 +465,13 @@ const OrderEdit: React.FC = () => {
                     </div>
 
                     {/* Payment Details */}
-                    {/* Payment Details */}
                     <div>
                         <h3 className="font-semibold mb-2">Payment Details:</h3>
                         <div className="mb-2">
                             <label className="block text-sm font-medium">Payment Mode:</label>
                             <input
                                 className="border rounded w-full p-2"
-                                value={customerDetails.payment_mode || 'N/A' }
+                                value={customerDetails.payment_mode || 'N/A'}
                                 onChange={(e) => setCustomerDetails({ ...customerDetails, payment_mode: e.target.value })}
                             />
                         </div>
@@ -468,7 +479,7 @@ const OrderEdit: React.FC = () => {
                             <label className="block text-sm font-medium">Payment Status:</label>
                             <input
                                 className="border rounded w-full p-2"
-                                value={customerDetails.paymentStatus || 'N/A' }
+                                value={customerDetails.paymentStatus || 'N/A'}
                                 onChange={(e) => setCustomerDetails({ ...customerDetails, paymentStatus: e.target.value })}
                             />
                         </div>
@@ -478,44 +489,135 @@ const OrderEdit: React.FC = () => {
                 {/* Invoice Items */}
                 <div className="mt-6">
                     <h3 className="font-semibold mb-2">Item Details</h3>
-                    <div className="grid grid-cols-12 gap-2 mb-2 font-medium">
-                        <div className="col-span-4">Item Name</div>
-                        <div className="col-span-3">Description</div>
-                        <div className="col-span-1">Quantity</div>
-                        <div className="col-span-1">Price</div>
-                        <div className="col-span-1">Total</div>
-                        <div className="col-span-1">Delete</div>
-                    </div>
-                    {items.map((item, index) => (
-                        <div key={index} className="grid grid-cols-12 gap-2 items-center mb-2">
-                            <input className="col-span-4 border rounded p-2" value={item.name} onChange={(e) => handleItemChange(index, 'name', e.target.value)} />
-                            <input className="col-span-3 border rounded p-2" value={item.description || ''} onChange={(e) => handleItemChange(index, 'description', e.target.value)} />
-                            <input className="col-span-1 border rounded p-2" type="number" min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} />
-                            <input className="col-span-1 border rounded p-2" type="number" min="0" step="0.01" value={item.price} onChange={(e) => handleItemChange(index, 'price', e.target.value)} />
-                            <input className="col-span-1 border rounded p-2" type="number" min="0" step="0.01" value={item.price * item.quantity} onChange={(e) => handleItemChange(index, 'price', e.target.value)} />
-                            <button className="col-span-1 text-red-500 hover:text-red-700" onClick={() => removeItem(index)}>
-                                ❌
-                            </button>
-                        </div>
-                    ))}
-                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md mt-2 transition-colors" onClick={addItem}>
+                   <div className="overflow-x-auto">
+  <div className="min-w-full md:min-w-[600px]">
+    {/* Header Row */}
+    <div className="hidden md:grid grid-cols-12 gap-2 mb-2 text-start font-medium text-sm">
+      <div className="col-span-4 md:col-span-5">Item Name</div>
+      <div className="col-span-3 md:col-span-2">Description</div>
+      <div className="col-span-1">Qty</div>
+      <div className="col-span-1">Price</div>
+      <div className="col-span-1">Total</div>
+      <div className="col-span-1 text-center">Delete</div>
+    </div>
+
+    {/* Items List */}
+    {items.map((item, index) => (
+      <div
+        key={index}
+        className="grid grid-cols-1 md:grid-cols-12 gap-2 items-start mb-3 text-sm border-b pb-2"
+      >
+        {/* Item Name */}
+        <div className="md:col-span-5">
+          <label className="md:hidden block text-xs text-start text-gray-500 mb-1">Item Name</label>
+          <input
+            className="w-full border rounded p-2"
+            value={item.name}
+            onChange={(e) => handleItemChange(index, 'name', e.target.value)}
+          />
+        </div>
+
+        {/* Description */}
+        <div className="md:col-span-2">
+          <label className="md:hidden block text-xs  text-start text-gray-500 mb-1">Description</label>
+          <input
+            className="w-full border rounded p-2"
+            value={item.description || ''}
+            onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+          />
+        </div>
+
+        {/* Quantity */}
+        <div className="md:col-span-1">
+          <label className="md:hidden block text-xs  text-start text-gray-500 mb-1">Qty</label>
+          <input
+            className="w-full border rounded p-2"
+            type="number"
+            min="1"
+            value={item.quantity}
+            onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+          />
+        </div>
+
+        {/* Price */}
+        <div className="md:col-span-1">
+          <label className="md:hidden block text-xs  text-start text-gray-500 mb-1">Price</label>
+          <input
+            className="w-full border rounded p-2"
+            type="number"
+            min="0"
+            step="0.01"
+            value={item.price}
+            onChange={(e) => handleItemChange(index, 'price', e.target.value)}
+          />
+        </div>
+
+        {/* Total (Read-only) */}
+        <div className="md:col-span-1">
+          <label className="md:hidden block text-xs  text-start text-gray-500 mb-1">Total</label>
+          <input
+            className="w-full border rounded p-2 bg-gray-50"
+            type="number"
+            readOnly
+            value={(item.price * item.quantity).toFixed(2)}
+          />
+        </div>
+
+        {/* Delete Button */}
+        <div className="md:col-span-1 flex justify-center  text-start mt-2 md:mt-0">
+          <button
+            className="text-red-500 hover:text-red-700"
+            onClick={() => removeItem(index)}
+            title="Delete item"
+          >
+            ❌
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+                    <button 
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 md:px-4 md:py-2 rounded-md mt-2 transition-colors text-sm md:text-base"
+                        onClick={addItem}
+                    >
                         Add Item
                     </button>
                 </div>
 
                 {/* Pricing Details */}
-                <div className="mt-6 grid grid-cols-3 gap-4">
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     <div>
-                        <label className="block text-sm font-medium">Tax</label>
-                        <input className="border rounded w-full p-2 mt-1" type="number" min="0" value={tax} onChange={(e) => setTax(Number(e.target.value))} />
+                        <label className="block text-sm font-medium">Tax (%)</label>
+                        <input 
+                            className="border rounded w-full p-2 mt-1" 
+                            type="number" 
+                            min="0" 
+                            value={tax} 
+                            onChange={(e) => setTax(Number(e.target.value))} 
+                        />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium">Discount</label>
-                        <input className="border rounded w-full p-2 mt-1" type="number" min="0" value={discount} onChange={(e) => setDiscount(Number(e.target.value))} />
+                        <label className="block text-sm font-medium">Discount ($)</label>
+                        <input 
+                            className="border rounded w-full p-2 mt-1" 
+                            type="number" 
+                            min="0" 
+                            value={discount} 
+                            onChange={(e) => setDiscount(Number(e.target.value))} 
+                        />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium">Shipping</label>
-                        <input className="border rounded w-full p-2 mt-1" type="number" min="0" step="0.01" value={shipping} onChange={(e) => setShipping(Number(e.target.value))} />
+                        <label className="block text-sm font-medium">Shipping ($)</label>
+                        <input 
+                            className="border rounded w-full p-2 mt-1" 
+                            type="number" 
+                            min="0" 
+                            step="0.01" 
+                            value={shipping} 
+                            onChange={(e) => setShipping(Number(e.target.value))} 
+                        />
                     </div>
                 </div>
 
@@ -523,23 +625,23 @@ const OrderEdit: React.FC = () => {
                 <div className="mt-6 p-4 bg-gray-50 rounded-md">
                     <div className="flex justify-between mb-2">
                         <span>Subtotal:</span>
-                        <span className="font-medium">{subtotal.toFixed(2)}</span>
+                        <span className="font-medium">${subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between mb-2">
                         <span>Tax ({tax}%):</span>
-                        <span>{((subtotal * tax) / 100).toFixed(2)}</span>
+                        <span>${((subtotal * tax) / 100).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between mb-2">
                         <span>Discount Amount:</span>
-                        <span>-{(discount).toFixed(2)}</span>
+                        <span>-${discount.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between mb-2">
                         <span>Shipping:</span>
-                        <span>{shipping.toFixed(2)}</span>
+                        <span>${shipping.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between pt-2 border-t border-gray-200">
                         <span className="font-bold">Grand Total:</span>
-                        <span className="text-xl font-bold">{grandTotal.toFixed(2)}</span>
+                        <span className="text-lg md:text-xl font-bold">${grandTotal.toFixed(2)}</span>
                     </div>
                 </div>
             </div>

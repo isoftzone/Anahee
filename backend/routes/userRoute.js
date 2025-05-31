@@ -86,6 +86,7 @@ router.delete("/delete_data/:id", homepage.delete_data);
 router.put("/update_data/:id", homepage.update_data);
 //hometable
 router.post("/add_hometable", hometable.add_data);
+router.put("/update_hometable_positions", hometable.update_hometable_positions);
 router.get("/get_hometable", hometable.get_data);
 router.put("/update_hometable/:id", hometable.update_data);
 // router.delete("/delete_hometable/:id", hometable.delete_data);

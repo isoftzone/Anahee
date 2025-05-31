@@ -85,8 +85,30 @@ import PropTypes from "prop-types";
 import { setActiveSort } from "../../helpers/product";
 import Accordion from 'react-bootstrap/Accordion';
 import { useTranslation } from "react-i18next";
-const ShopCategories = ({ categories, getSortParams,selectedCategory }) => {
+import { useState } from "react";
+
+const ShopCategories = ({ categories, getSortParams }) => {
+    const [selectedCategories, setSelectedCategories] = useState([]);
+      // const [categories, setCategories] = useState([]);
+
   const { t } = useTranslation();
+  const handleToggle = (value) => {
+    const newSelection =
+      value === ""
+        ? []
+        : selectedCategories.includes(value)
+        ? selectedCategories.filter((c) => c !== value)
+        : [...selectedCategories, value];
+
+    setSelectedCategories(newSelection);
+    getSortParams("categories", newSelection);
+  };
+
+  const isSelected = (value) => {
+    return value === ""
+      ? selectedCategories.length === 0
+      : selectedCategories.includes(value);
+  };
   return (
     <div className="sidebar-widget">
         <Accordion.Item eventKey="0">
@@ -96,33 +118,26 @@ const ShopCategories = ({ categories, getSortParams,selectedCategory }) => {
         {categories ? (
           <ul>
             <li>
-              <div className="sidebar-widget-list-left">
-                <button
-                  onClick={(e) => {
-                    getSortParams("category", "");
-                    setActiveSort(e);
-                  }}
-                   className={!selectedCategory ? "active" : ""}
-                >
-                  <span className="checkmark" /> All Categories
-                </button>
-              </div>
-            </li>
-            {categories.map((categoryKey, key) => {
-              return (
-                <li key={key}>
-                  <div className="sidebar-widget-list-left">
+               <div className="sidebar-widget-list-left">
                     <button
-                      onClick={(e) => {
-                        getSortParams("category", categoryKey);
-                        setActiveSort(e);
-                      }}
-                      className={selectedCategory === categoryKey ? "active" : ""}
+                      onClick={() => handleToggle("")}
+                      className={isSelected("") ? "active" : ""}
                     >
-                      {" "}
-                    <span className="checkmark" /> {t(categoryKey)}
+                      <span className="checkmark" /> All Categories
                     </button>
                   </div>
+            </li>
+            {categories.map((category, key) => {
+              return (
+                <li key={key}>
+                 <div className="sidebar-widget-list-left">
+                      <button
+                        onClick={() => handleToggle(category)}
+                        className={isSelected(category) ? "active" : ""}
+                      >
+                        <span className="checkmark" /> {category}
+                      </button>
+                    </div>
                 </li>
               );
             })}
