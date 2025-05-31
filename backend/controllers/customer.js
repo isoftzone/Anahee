@@ -193,35 +193,60 @@ exports.deletecustomer = (req, res) => {
 
 
 exports.addcustomer = (req, res) => {
-  const { FNAME, LNAME, MOBILE, email, CADDRESSLINE1 } = req.body;
-  console.log("addcustomer", req.body);
-  if (!FNAME || !LNAME || !MOBILE || !email || !CADDRESSLINE1) {
+  console.log("📥 Received request to add customer:", req.body);
+  const { fname, lname, mobile, email, password } = req.body;
+  // Validate required fields
+  if (!fname || !lname || !mobile || !email || !password) {
     return res.status(400).json({
       success: false,
       msg: "All fields are required",
     });
   }
-  const checkEmailQuery = "SELECT * FROM customermaster WHERE email = ?";
-  con.query(checkEmailQuery, [email], (err, results) => {
+  // Check if email or mobile already exist
+  const checkQuery = "SELECT email, MOBILE FROM customermaster WHERE email = ? OR MOBILE = ?";
+  con.query(checkQuery, [email, mobile], (err, results) => {
     if (err) {
-      console.error(":x: Email check error:", err);
+      console.error("❌ Error checking email/mobile:", err);
       return res.status(500).json({
         success: false,
         msg: "Internal server error",
         error: err.message,
       });
     }
-    if (results.length > 0) {
+    let emailExists = false;
+    let mobileExists = false;
+    results.forEach((row) => {
+      if (row.email === email) emailExists = true;
+      if (row.MOBILE === mobile) mobileExists = true;
+    });
+    if (emailExists && mobileExists) {
+      return res.status(400).json({
+        success: false,
+        msg: "Email and Mobile number already exist",
+      });
+    } else if (emailExists) {
       return res.status(400).json({
         success: false,
         msg: "Email already exists",
       });
+    } else if (mobileExists) {
+      return res.status(400).json({
+        success: false,
+        msg: "Mobile number already exists",
+      });
     }
-    const newCustomer = { FNAME, LNAME, MOBILE, email, CADDRESSLINE1 };
+    // Store new customer
+    const newCustomer = {
+      FNAME: fname,
+      LNAME: lname,
+      MOBILE: mobile,
+      EMAIL: email,
+      PASSWORD: password, // Ideally hash before storing
+    };
     const insertQuery = "INSERT INTO customermaster SET ?";
     con.query(insertQuery, newCustomer, (insertErr, insertResults) => {
       if (insertErr) {
-        console.error(":x: Insert error:", insertErr);
+        console.error("❌ Insert error:", insertErr);
         return res.status(500).json({
           success: false,
           msg: "Internal server error",

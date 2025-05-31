@@ -39,14 +39,19 @@ const Register = () => {
       [name]: value,
     }));
   };
+
   const validateForm = () => {
     const { fname, lname, email, mobile, password, confirmPassword } = formData;
-    if (!fname.trim() || fname.length < 2) return "First name must be at least 2 characters.";
-    if (!lname.trim() || lname.length < 2) return "Last name must be at least 2 characters.";
+    if (!fname.trim() || fname.length < 2)
+      return "First name must be at least 2 characters.";
+    if (!lname.trim() || lname.length < 2)
+      return "Last name must be at least 2 characters.";
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) return "Enter a valid email address.";
+
     const mobileRegex = /^[0-9]{10}$/;
     if (!mobileRegex.test(mobile)) return "Mobile number must be 10 digits.";
+
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
     if (!passwordRegex.test(password)) {
       return "Password must be 8+ chars, with letter, number & symbol.";
@@ -91,7 +96,10 @@ const Register = () => {
   };
   return (
     <>
-      <SEO titleTemplate="Register" description="Register page of the eCommerce app." />
+      <SEO
+        titleTemplate="Register"
+        description="Register page of the eCommerce app."
+      />
       <LayoutOne headerTop="visible">
         <div className="login-register-area pt-100 pb-100">
           <div className="container">
@@ -111,7 +119,9 @@ const Register = () => {
                         <div className="login-form-container">
                           <div className="login-register-form">
                             {error && <p style={{ color: "red" }}>{error}</p>}
-                            {success && <p style={{ color: "green" }}>{success}</p>}
+                            {success && (
+                              <p style={{ color: "green" }}>{success}</p>
+                            )}
                             <form onSubmit={handleSubmit} autoComplete="off">
                               <input
                                 type="text"
@@ -119,7 +129,6 @@ const Register = () => {
                                 placeholder="First Name"
                                 value={formData.fname}
                                 onChange={handleChange}
-                                required
                               />
                               <input
                                 type="text"
@@ -127,7 +136,6 @@ const Register = () => {
                                 placeholder="Last Name"
                                 value={formData.lname}
                                 onChange={handleChange}
-                                required
                               />
                               <input
                                 type="email"
@@ -135,29 +143,46 @@ const Register = () => {
                                 placeholder="Email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                required
                               />
                               <input
                                 type="tel"
                                 name="mobile"
                                 placeholder="Mobile"
                                 value={formData.mobile}
-                                onChange={handleChange}
-                                required
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  // Allow only digits
+                                  if (/^\d*$/.test(value)) {
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      mobile: value,
+                                    }));
+                                  }
+                                }}
+                            
                               />
                               {/* Password field */}
-                              <div style={{ position: "relative", marginBottom: "15px" }}>
+                              <div
+                                style={{
+                                  position: "relative",
+                                  marginBottom: "15px",
+                                }}
+                              >
                                 <input
                                   type={showPassword ? "text" : "password"}
                                   name="password"
                                   placeholder="Password"
                                   value={formData.password}
                                   onChange={handleChange}
-                                  required
-                                  style={{ width: "100%", paddingRight: "40px" }}
+                                  style={{
+                                    width: "100%",
+                                    paddingRight: "40px",
+                                  }}
                                 />
                                 <i
-                                  className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}
+                                  className={`bi ${
+                                    showPassword ? "bi-eye-slash" : "bi-eye"
+                                  }`}
                                   onClick={() => setShowPassword(!showPassword)}
                                   style={{
                                     position: "absolute",
@@ -171,19 +196,34 @@ const Register = () => {
                                 ></i>
                               </div>
                               {/* Confirm Password field */}
-                              <div style={{ position: "relative", marginBottom: "15px" }}>
+                              <div
+                                style={{
+                                  position: "relative",
+                                  marginBottom: "15px",
+                                }}
+                              >
                                 <input
-                                  type={showConfirmPassword ? "text" : "password"}
+                                  type={
+                                    showConfirmPassword ? "text" : "password"
+                                  }
                                   name="confirmPassword"
                                   placeholder="Confirm Password"
                                   value={formData.confirmPassword}
                                   onChange={handleChange}
-                                  required
-                                  style={{ width: "100%", paddingRight: "40px" }}
+                                  style={{
+                                    width: "100%",
+                                    paddingRight: "40px",
+                                  }}
                                 />
                                 <i
-                                  className={`bi ${showConfirmPassword ? "bi-eye-slash" : "bi-eye"}`}
-                                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                  className={`bi ${
+                                    showConfirmPassword
+                                      ? "bi-eye-slash"
+                                      : "bi-eye"
+                                  }`}
+                                  onClick={() =>
+                                    setShowConfirmPassword(!showConfirmPassword)
+                                  }
                                   style={{
                                     position: "absolute",
                                     top: "32%",
@@ -202,7 +242,10 @@ const Register = () => {
                               </div>
                               <h5 className="mt-5">
                                 Already have an account? Let's get you in &nbsp;{" "}
-                                <Link to="/login-register" style={{ color: "#2874F0" }}>
+                                <Link
+                                  to="/login-register"
+                                  style={{ color: "#2874F0" }}
+                                >
                                   Login
                                 </Link>
                               </h5>

@@ -261,7 +261,7 @@ const FooterOne = ({
         spaceRightClass
       )}
     >
-      <div className={`${containerClass || "container-fluid"}`}>
+      <div className={`${containerClass || "container-fluid mb-5"}`}>
         <div className="row justify-content-center pt-5 gy-4">
           {/* Logo Section */}
           <div className="col-12 col-sm-6 col-md-6 col-lg-3">
@@ -341,11 +341,7 @@ const FooterOne = ({
                     Contact Us
                   </Link>
                 </li>
-                <li>
-                  <Link style={{ fontSize: "15px" }} to="/terms-conditions">
-                    Terms & Condition
-                  </Link>
-                </li>
+               
               </ul>
             </div>
           </div>
@@ -357,21 +353,26 @@ const FooterOne = ({
                 Hidden
               </h4>
               <ul className="list-unstyled d-flex flex-column align-items-center align-items-md-center">
+                 <li>
+                  <Link style={{ fontSize: "15px" }} to="/terms-conditions">
+                    Terms & Condition
+                  </Link>
+                </li>
                 <li>
                   <Link style={{ fontSize: "15px" }} to="/shipping-locations">
                     Shipping Locations
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link style={{ fontSize: "15px" }} to="/terms-of-service">
                     Terms of Service
                   </Link>
-                </li>
-                <li>
+                </li> */}
+                {/* <li>
                   <Link style={{ fontSize: "15px" }} to="/exchange-process">
                     Exchange Process
                   </Link>
-                </li>
+                </li> */}
               </ul>
             </div>
           </div>
@@ -388,11 +389,11 @@ const FooterOne = ({
                     Cancellation Policy
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link style={{ fontSize: "15px" }} to="/refund-policy">
                     Refund Policy
                   </Link>
-                </li>
+                </li> */}
                 <li>
                   <Link style={{ fontSize: "15px" }} to="/privacy-policy">
                     Privacy Policy
