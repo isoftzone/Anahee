@@ -13,7 +13,6 @@ const ProductImageDescription = ({
   galleryType,
   product,
 }) => {
-  console.log("product", product);
   const currency = useSelector((state) => state.currency);
   const { cartItems } = useSelector((state) => state.cart);
   const { wishlistItems } = useSelector((state) => state.wishlist);
@@ -29,16 +28,10 @@ const ProductImageDescription = ({
 
   return (
     <div className={clsx("shop-area", spaceTopClass, spaceBottomClass)}>
-      <div className="container-fluid">
-        <div
-          className="row gx-2 gap-4 gy-4 justify-content-center"
-          style={{ minHeight: "100%" }}
-        >
-          <div
-            className="d-flex flex-column col-md-6 col-custom-29"
-            style={{ minHeight: "500px" }}
-          >
-            {/* product image gallery */}
+      <div className="container-fluid px-lg-4 px-md-3 px-2">
+        <div className="row">
+          {/* Product Image Column */}
+          <div className="col-md-6 col-xs-12 mb-md-4 mb-3">
             {galleryType === "leftThumb" ? (
               <ProductImageGallerySideThumb
                 product={product}
@@ -53,11 +46,8 @@ const ProductImageDescription = ({
             )}
           </div>
 
-          <div
-            className="d-flex flex-column col-md-6"
-            style={{ minHeight: "500px" }}
-          >
-            {/* product description info */}
+          {/* Product Description Column */}
+          <div className="col-md-6 col-xs-12">
             <ProductDescriptionInfo
               product={product}
               discountedPrice={discountedPrice}

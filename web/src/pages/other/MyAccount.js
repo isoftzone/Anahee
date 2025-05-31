@@ -36,7 +36,8 @@ const MyAccount = () => {
   const [activeView, setActiveView] = useState("profile");
   const [successTimeout, setSuccessTimeout] = useState(null);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [activeProfileSection, setActiveProfileSection] = useState("personalDetails");
+  const [activeProfileSection, setActiveProfileSection] =
+    useState("personalDetails");
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [oldPassword, setoldPassword] = useState(false);
   const [walletBalance, setWalletBalance] = useState(0);
@@ -243,7 +244,7 @@ const MyAccount = () => {
     return (
       <div
         key={order.SALEID}
-        className="order-card mb-4 p-3 rounded shadow-sm bg-white border"
+        className="order-card mb-4 p-5 rounded shadow-sm bg-white border"
       >
         {/* Header */}
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-start mb-3">
@@ -357,7 +358,7 @@ const MyAccount = () => {
           name="FNAME"
           value={customer.FNAME}
           onChange={handleInputChange}
-          className="w-100 p-2"
+          className="w-100 p-4 ms-0"
           style={inputStyle}
         />
       </div>
@@ -369,7 +370,7 @@ const MyAccount = () => {
           name="LNAME"
           value={customer.LNAME}
           onChange={handleInputChange}
-          className="w-100 p-2"
+          className="w-100 p-4 ms-0"
           style={inputStyle}
         />
       </div>
@@ -381,7 +382,7 @@ const MyAccount = () => {
           name="email"
           value={customer.email}
           disabled
-          className="w-100 p-2"
+          className="w-100 p-4 ms-0"
           style={{ ...inputStyle, color: "#777" }}
         />
       </div>
@@ -393,11 +394,11 @@ const MyAccount = () => {
           name="MOBILE"
           value={customer.MOBILE}
           onChange={handleInputChange}
-          className="w-100 p-2"
+          className="w-100 p-4 ms-0"
           style={inputStyle}
         />
       </div>
-
+      {/* 
       <div className="col-md-6 mb-4">
         <label className="d-block mb-2">Address</label>
         <input
@@ -408,9 +409,9 @@ const MyAccount = () => {
           className="w-100 p-2"
           style={inputStyle}
         />
-      </div>
+      </div> */}
 
-      <div className="col-md-6 mb-4">
+      {/* <div className="col-md-6 mb-4">
         <label className="d-block mb-2">City</label>
         <input
           type="text"
@@ -420,8 +421,8 @@ const MyAccount = () => {
           className="w-100 p-2"
           style={inputStyle}
         />
-      </div>
-
+      </div> */}
+      {/* 
       <div className="col-md-6 mb-4">
         <label className="d-block mb-2">State</label>
         <input
@@ -432,9 +433,9 @@ const MyAccount = () => {
           className="w-100 p-2"
           style={inputStyle}
         />
-      </div>
+      </div> */}
 
-      <div className="col-md-6 mb-4">
+      {/* <div className="col-md-6 mb-4">
         <label className="d-block mb-2">Country</label>
         <input
           type="text"
@@ -444,9 +445,9 @@ const MyAccount = () => {
           className="w-100 p-2"
           style={inputStyle}
         />
-      </div>
+      </div> */}
 
-      <div className="col-md-6 mb-4">
+      {/* <div className="col-md-6 mb-4">
         <label className="d-block mb-2">Postal Code</label>
         <input
           type="text"
@@ -456,7 +457,7 @@ const MyAccount = () => {
           className="w-100 p-2"
           style={inputStyle}
         />
-      </div>
+      </div> */}
     </div>
   );
 
@@ -560,26 +561,26 @@ const MyAccount = () => {
       <div className="row">
         <div className="col-md-6 mb-4">
           <div style={accountDetailCardStyle}>
-            <h5>Wallet Balance</h5>
-            <p style={accountDetailAmountStyle}>₹0.00</p>
+            <h5 className="fs-3">Wallet Balance</h5>
+            <p className="fs-4" style={accountDetailAmountStyle}>₹0.00</p>
           </div>
         </div>
         <div className="col-md-6 mb-4">
           <div style={accountDetailCardStyle}>
-            <h5>Reward Points</h5>
-            <p style={accountDetailAmountStyle}>0 Points</p>
+            <h5 className="fs-3">Reward Points</h5>
+            <p className="fs-4" style={accountDetailAmountStyle}>0 Points</p>
           </div>
         </div>
         <div className="col-md-6 mb-4">
           <div style={accountDetailCardStyle}>
-            <h5>Total Orders</h5>
-            <p style={accountDetailAmountStyle}>{orders.length}</p>
+            <h5 className="fs-3">Total Orders</h5>
+            <p className="fs-4" style={accountDetailAmountStyle}>{orders.length}</p>
           </div>
         </div>
         <div className="col-md-6 mb-4">
           <div style={accountDetailCardStyle}>
-            <h5>Member Since</h5>
-            <p style={accountDetailAmountStyle}>
+            <h5 className="fs-3">Member Since</h5>
+            <p className="fs-4" style={accountDetailAmountStyle}>
               {new Date().toLocaleDateString()}
             </p>
           </div>
@@ -604,74 +605,321 @@ const MyAccount = () => {
   );
 
   const renderWalletView = () => (
-    <div className="wallet-container" style={{ padding: "1rem" }}>
-      <div className="wallet-header">
-        <h2 className="wallet-title">My Wallet</h2>
-        <p className="wallet-subtitle">
+    <div
+      className="wallet-container"
+      style={{ padding: "1rem", maxWidth: "100%", overflowX: "hidden" }}
+    >
+      {/* Wallet Header */}
+      <div className="wallet-header" style={{ marginBottom: "1.5rem" }}>
+        <h2
+          className="wallet-title"
+          style={{
+            fontSize: "clamp(1.5rem, 4vw, 2rem)",
+            marginBottom: "0.5rem",
+            fontWeight: "600",
+          }}
+        >
+          My Wallet
+        </h2>
+        <p
+          className="wallet-subtitle"
+          style={{
+            fontSize: "clamp(15px, 2vw, 1rem)",
+            color: "#666",
+            margin: 0,
+          }}
+        >
           Manage your wallet balance and transactions
         </p>
       </div>
 
-      <div className="wallet-balance-card" style={walletBalanceCardStyle}>
+      {/* Wallet Balance Card */}
+      <div
+        className="wallet-balance-card"
+        style={{
+          ...walletBalanceCardStyle,
+          padding: "1.5rem",
+          marginBottom: "2rem",
+          borderRadius: "12px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+          display: "flex",
+          flexDirection: window.innerWidth < 768 ? "column" : "row",
+          justifyContent: "space-between",
+          alignItems: window.innerWidth < 768 ? "flex-start" : "center",
+          gap: "1rem",
+        }}
+      >
         <div className="wallet-balance-info">
-          <h3 className="wallet-balance-title">Current Balance</h3>
+          <h3
+            className="wallet-balance-title"
+            style={{
+              fontSize: "2rem",
+              color: "#fff",
+              marginBottom: "0.5rem",
+            }}
+          >
+            Current Balance
+          </h3>
           <p
             className="wallet-balance-amount"
-            style={walletBalanceAmountStyle}
+            style={{
+              ...walletBalanceAmountStyle,
+              fontSize: "clamp(1.5rem, 5vw, 2.5rem)",
+              margin: 0,
+            }}
           >
             ₹{walletBalance.toFixed(2)}
           </p>
         </div>
-        <div className="wallet-actions d-flex flex-wrap gap-2">
-          <button style={walletActionButtonStyle}>
-            <i className="bi bi-plus-circle"></i> Add Money
+        <div
+          className="wallet-actions"
+          style={{
+            display: "flex",
+            flexDirection: window.innerWidth < 400 ? "column" : "row",
+            gap: "0.75rem",
+            width: window.innerWidth < 768 ? "100%" : "auto",
+          }}
+        >
+          <button
+            style={{
+              ...walletActionButtonStyle,
+              padding: "0.75rem 1.25rem",
+              fontSize: "0.9rem",
+              width: window.innerWidth < 768 ? "100%" : "auto",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.5rem",
+            }}
+            
+          >
+            <i className="bi bi-plus-circle"></i>
+            <span>Add Money</span>
           </button>
-          <button style={walletActionButtonStyle}>
-            <i className="bi bi-arrow-up-circle"></i> Withdraw
+          <button
+            style={{
+              ...walletActionButtonStyle,
+              padding: "0.75rem 1.25rem",
+              fontSize: "0.9rem",
+              width: window.innerWidth < 768 ? "100%" : "auto",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.5rem",
+            }}
+      
+
+          >
+            <i className="bi bi-arrow-up-circle"></i>
+            <span>Withdraw</span>
           </button>
         </div>
       </div>
 
+      {/* Transactions Section */}
       <div className="wallet-transactions">
-        <h3 className="wallet-transactions-title">Recent Transactions</h3>
+        <h3
+          className="wallet-transactions-title"
+          style={{
+            fontSize: "1.5rem",
+            marginBottom: "1rem",
+            fontWeight: "600",
+          }}
+        >
+          Recent Transactions
+        </h3>
 
         {walletTransactions.length > 0 ? (
-          <div className="table-responsive">
-            <table
-              className="table wallet-transactions-table"
-              style={walletTableStyle}
-            >
-              <thead>
-                <tr>
-                  <th style={walletTableHeaderStyle}>Date</th>
-                  <th style={walletTableHeaderStyle}>Description</th>
-                  <th style={walletTableHeaderStyle}>Amount</th>
-                  <th style={walletTableHeaderStyle}>Status</th>
-                </tr>
-              </thead>
-              <tbody>
+          <>
+            {/* Desktop Table View */}
+            <div className="d-none d-md-block">
+              <div className="table-responsive">
+                <table
+                  className="table wallet-transactions-table"
+                  style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    borderRadius: "8px",
+                    overflow: "hidden",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                  }}
+                >
+                  <thead>
+                    <tr style={{ backgroundColor: "#f8f9fa" }}>
+                      <th
+                        style={{
+                          ...walletTableHeaderStyle,
+                          padding: "12px 16px",
+                          textAlign: "left",
+                          fontWeight: "500",
+                        }}
+                      >
+                        Date
+                      </th>
+                      <th
+                        style={{
+                          ...walletTableHeaderStyle,
+                          padding: "12px 16px",
+                          textAlign: "left",
+                          fontWeight: "500",
+                        }}
+                      >
+                        Description
+                      </th>
+                      <th
+                        style={{
+                          ...walletTableHeaderStyle,
+                          padding: "12px 16px",
+                          textAlign: "right",
+                          fontWeight: "500",
+                        }}
+                      >
+                        Amount
+                      </th>
+                      <th
+                        style={{
+                          ...walletTableHeaderStyle,
+                          padding: "12px 16px",
+                          textAlign: "center",
+                          fontWeight: "500",
+                        }}
+                      >
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {walletTransactions.map((transaction, index) => (
+                      <tr
+                        key={index}
+                        style={{
+                          ...walletTableRowStyle,
+                          borderBottom: "1px solid #eee",
+                          "&:last-child": { borderBottom: "none" },
+                        }}
+                      >
+                        <td
+                          style={{
+                            ...walletTableCellStyle,
+                            padding: "12px 16px",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {new Date(transaction.date).toLocaleDateString()}
+                        </td>
+                        <td
+                          style={{
+                            ...walletTableCellStyle,
+                            padding: "12px 16px",
+                            maxWidth: "200px",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {transaction.description}
+                        </td>
+                        <td
+                          style={{
+                            ...walletTableCellStyle,
+                            padding: "12px 16px",
+                            textAlign: "right",
+                            fontWeight: "500",
+                            color:
+                              transaction.type === "credit"
+                                ? "#4CAF50"
+                                : "#F44336",
+                          }}
+                        >
+                          {transaction.type === "credit" ? "+" : "-"}₹
+                          {transaction.amount.toFixed(2)}
+                        </td>
+                        <td
+                          style={{
+                            ...walletTableCellStyle,
+                            padding: "12px 16px",
+                            textAlign: "center",
+                          }}
+                        >
+                          <span
+                            style={{
+                              backgroundColor:
+                                transaction.status === "completed"
+                                  ? "#E8F5E9"
+                                  : "#FFF8E1",
+                              color:
+                                transaction.status === "completed"
+                                  ? "#2E7D32"
+                                  : "#FF8F00",
+                              padding: "4px 12px",
+                              borderRadius: "12px",
+                              fontSize: "0.8rem",
+                              display: "inline-block",
+                              minWidth: "80px",
+                            }}
+                          >
+                            {transaction.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Mobile Cards View */}
+            <div className="d-md-none">
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.75rem",
+                }}
+              >
                 {walletTransactions.map((transaction, index) => (
-                  <tr key={index} style={walletTableRowStyle}>
-                    <td style={walletTableCellStyle}>
-                      {new Date(transaction.date).toLocaleDateString()}
-                    </td>
-                    <td style={walletTableCellStyle}>
-                      {transaction.description}
-                    </td>
-                    <td
+                  <div
+                    key={index}
+                    style={{
+                      backgroundColor: "#fff",
+                      borderRadius: "8px",
+                      padding: "1rem",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gridTemplateRows: "auto auto",
+                      gap: "0.5rem",
+                    }}
+                  >
+                    <div style={{ gridColumn: "1 / span 2" }}>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontWeight: "500",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {transaction.description}
+                      </p>
+                      <p
+                        style={{
+                          margin: "0.25rem 0 0",
+                          fontSize: "0.8rem",
+                          color: "#666",
+                        }}
+                      >
+                        {new Date(transaction.date).toLocaleDateString()}
+                      </p>
+                    </div>
+
+                    <div
                       style={{
-                        ...walletTableCellStyle,
-                        color:
-                          transaction.type === "credit"
-                            ? "#4CAF50"
-                            : "#F44336",
-                        fontWeight: "500",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
                       }}
                     >
-                      {transaction.type === "credit" ? "+" : "-"}₹
-                      {transaction.amount.toFixed(2)}
-                    </td>
-                    <td style={walletTableCellStyle}>
                       <span
                         style={{
                           backgroundColor:
@@ -682,26 +930,65 @@ const MyAccount = () => {
                             transaction.status === "completed"
                               ? "#2E7D32"
                               : "#FF8F00",
-                          padding: "4px 8px",
-                          borderRadius: "4px",
+                          padding: "4px 12px",
+                          borderRadius: "12px",
                           fontSize: "0.8rem",
                         }}
                       >
                         {transaction.status}
                       </span>
-                    </td>
-                  </tr>
+                    </div>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-end",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontWeight: "500",
+                          color:
+                            transaction.type === "credit"
+                              ? "#4CAF50"
+                              : "#F44336",
+                        }}
+                      >
+                        {transaction.type === "credit" ? "+" : "-"}₹
+                        {transaction.amount.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </div>
+            </div>
+          </>
         ) : (
-          <div style={noTransactionsStyle}>
+          <div
+            style={{
+              ...noTransactionsStyle,
+              textAlign: "center",
+              padding: "2rem",
+              backgroundColor: "#fafafa",
+              borderRadius: "8px",
+            }}
+          >
             <i
               className="bi bi-wallet2"
-              style={{ fontSize: "3rem", color: "#BDBDBD" }}
+              style={{
+                fontSize: "3rem",
+                color: "#e0e0e0",
+                marginBottom: "1rem",
+              }}
             ></i>
-            <p style={{ marginTop: "1rem", color: "#757575" }}>
+            <p
+              style={{
+                margin: 0,
+                color: "#757575",
+                fontSize: "1rem",
+              }}
+            >
               No transactions found
             </p>
           </div>
@@ -733,57 +1020,98 @@ const MyAccount = () => {
 
       <div className="mt-4">
         <button type="submit" className="px-3 py-2" style={buttonStyle}>
-          Update Password
+          Update
         </button>
       </div>
     </form>
   );
 
   const renderOrdersView = () => (
-    <div style={{ padding: "1rem" }}>
-      <div className="orders-container">
-        <div className="page-header">
+  <div className="container orders-container py-4">
+        <div className="page-header text-center mb-4">
           <h1 className="page-title">My Orders</h1>
-          <p className="page-subtitle">View and manage your order history</p>
+          <p className="page-subtitle text-muted">
+            View and manage your order history
+          </p>
         </div>
-        <div className="orders-tabs">
-          <Tabs
-            activeKey={activeTab}
-            onSelect={(k) => setActiveTab(k)}
-            className="mb-4 custom-tabs"
-            justify
-          >
-            <Tab eventKey="all_orders" title="All Orders">
+
+        <Tabs
+          activeKey={activeTab}
+          onSelect={(k) => setActiveTab(k)}
+          className="mb-4 custom-tabs"
+          justify
+        >
+          {/* All Orders */}
+          <Tab eventKey="all_orders" title="All Orders">
+            <div className="orders-section">
               {isLoading ? (
-                <p>Loading orders...</p>
-              ) : orders.length > 0 ? (
-                orders.map((order) => renderOrderCard(order))
+                <div className="text-center py-5">
+                  <div className="spinner-border text-primary" role="status" />
+                  <p className="text-muted mt-2">Loading your orders...</p>
+                </div>
+              ) : orders.length === 0 ? (
+                <div className="text-center py-5">
+                  <i className="bi bi-box-seam fs-1 text-muted" />
+                  <h5 className="mt-2">No orders found</h5>
+                  <p className="text-muted">
+                    You haven't placed any orders yet.
+                  </p>
+                </div>
               ) : (
-                <p>No orders found</p>
+                <div className="orders-list">{orders.map(renderOrderCard)}</div>
               )}
-            </Tab>
-            <Tab eventKey="delivered" title="Delivered">
+            </div>
+          </Tab>
+
+          {/* Delivered Orders */}
+          <Tab eventKey="delivered" title="Delivered">
+            <div className="orders-section">
               {isLoading ? (
-                <p>Loading orders...</p>
-              ) : deliveredOrders.length > 0 ? (
-                deliveredOrders.map((order) => renderOrderCard(order))
+                <div className="text-center py-5">
+                  <div className="spinner-border text-primary" role="status" />
+                  <p className="text-muted mt-2">Loading delivered orders...</p>
+                </div>
+              ) : deliveredOrders.length === 0 ? (
+                <div className="text-center py-5">
+                  <i className="bi bi-truck fs-1 text-muted" />
+                  <h5 className="mt-2">No delivered orders</h5>
+                  <p className="text-muted">
+                    Your completed orders will appear here.
+                  </p>
+                </div>
               ) : (
-                <p>No delivered orders found</p>
+                <div className="orders-list">
+                  {deliveredOrders.map(renderOrderCard)}
+                </div>
               )}
-            </Tab>
-            <Tab eventKey="cancelled" title="Cancelled">
+            </div>
+          </Tab>
+
+          {/* Cancelled Orders */}
+          <Tab eventKey="cancelled" title="Cancelled">
+            <div className="orders-section">
               {isLoading ? (
-                <p>Loading orders...</p>
-              ) : cancelledOrders.length > 0 ? (
-                cancelledOrders.map((order) => renderOrderCard(order))
+                <div className="text-center py-5">
+                  <div className="spinner-border text-primary" role="status" />
+                  <p className="text-muted mt-2">Loading cancelled orders...</p>
+                </div>
+              ) : cancelledOrders.length === 0 ? (
+                <div className="text-center py-5">
+                  <i className="bi bi-x-circle fs-1 text-muted" />
+                  <h5 className="mt-2">No cancelled orders</h5>
+                  <p className="text-muted">
+                    You haven't cancelled any orders.
+                  </p>
+                </div>
               ) : (
-                <p>No cancelled orders found</p>
+                <div className="orders-list">
+                  {cancelledOrders.map(renderOrderCard)}
+                </div>
               )}
-            </Tab>
-          </Tabs>
-        </div>
+            </div>
+          </Tab>
+        </Tabs>
       </div>
-    </div>
   );
 
   const LogoutConfirmation = () => (
@@ -842,17 +1170,25 @@ const MyAccount = () => {
               >
                 <span>Menu</span>
                 <i
-                  className={`bi bi-chevron-${isMobileMenuOpen ? "up" : "down"}`}
+                  className={`bi bi-chevron-${
+                    isMobileMenuOpen ? "up" : "down"
+                  }`}
                 ></i>
               </button>
             </div>
 
             <div className="row">
-              {/* Sidebar - Conditionally shown on mobile */}
+              {/* Sidebar - shown on desktop by default, conditionally shown on mobile */}
               <div
-                className={`col-lg-3 col-md-4 ${
+                className={`col-xl-3 col-lg-4 col-md-4 ${
                   isMobileMenuOpen ? "d-block" : "d-none d-md-block"
                 }`}
+                style={{
+                  position: "sticky",
+                  top: "20px",
+                  height: "fit-content",
+                  alignSelf: "flex-start",
+                }}
               >
                 <div className="account-sidebar" style={sidebarContainerStyle}>
                   <div className="account-sidebar-header">
@@ -861,23 +1197,25 @@ const MyAccount = () => {
                   <ul className="account-menu" style={sidebarMenuStyle}>
                     <li style={sidebarItemStyle}>
                       <button
-                        className="fs-4"
+                        className="fs-4 w-100 text-start"
                         onClick={() => {
                           setActiveView("profile");
                           setProfileDropdownOpen(!profileDropdownOpen);
                           setIsMobileMenuOpen(false);
                         }}
-                        style={
-                          activeView === "profile"
+                        style={{
+                          ...(activeView === "profile"
                             ? activeSidebarButtonStyle
-                            : sidebarButtonStyle
-                        }
+                            : sidebarButtonStyle),
+                          display: "flex",
+                          alignItems: "center",
+                        }}
                       >
                         <i
                           className="bi bi-person fs-4"
                           style={sidebarIconStyle}
                         ></i>
-                        My Profile
+                        <span style={{ marginLeft: "10px" }}>My Profile</span>
                         <i
                           className={`fs-4 bi bi-chevron-${
                             profileDropdownOpen ? "up" : "down"
@@ -889,126 +1227,143 @@ const MyAccount = () => {
                       {profileDropdownOpen && (
                         <div style={{ paddingLeft: "30px" }}>
                           <button
-                            className="fs-5"
+                            className="fs-4 w-100 text-start"
                             onClick={() => {
                               setActiveProfileSection("personalDetails");
                               setProfileDropdownOpen(false);
                               setIsMobileMenuOpen(false);
                             }}
-                            style={
-                              activeProfileSection === "personalDetails"
+                            style={{
+                              ...(activeProfileSection === "personalDetails"
                                 ? activeDropdownButtonStyle
-                                : dropdownButtonStyle
-                            }
+                                : dropdownButtonStyle),
+                              display: "flex",
+                              alignItems: "center",
+                            }}
                           >
                             <i
-                              className=" fs-5 bi bi-person-lines-fill"
+                              className="fs-4 bi bi-person-lines-fill"
                               style={sidebarIconStyle}
                             ></i>
-                            Personal Details
+                            <span style={{ marginLeft: "10px" }}>
+                              Personal Details
+                            </span>
                           </button>
                           <button
-                            className="fs-5"
+                            className="fs-4 w-100 text-start"
                             onClick={() => {
                               setActiveProfileSection("changePassword");
                               setProfileDropdownOpen(false);
                               setIsMobileMenuOpen(false);
                             }}
-                            style={
-                              activeProfileSection === "changePassword"
+                            style={{
+                              ...(activeProfileSection === "changePassword"
                                 ? activeDropdownButtonStyle
-                                : dropdownButtonStyle
-                            }
+                                : dropdownButtonStyle),
+                              display: "flex",
+                              alignItems: "center",
+                            }}
                           >
                             <i
-                              className="fs-5 bi bi-shield-lock"
+                              className="fs-4 bi bi-shield-lock"
                               style={sidebarIconStyle}
                             ></i>
-                            Change Password
+                            <span style={{ marginLeft: "10px" }}>
+                              Change Password
+                            </span>
                           </button>
                           <button
-                            className="fs-5"
+                            className="fs-4 w-100 text-start"
                             onClick={() => {
                               setActiveProfileSection("registerPage");
                               setProfileDropdownOpen(false);
                               setIsMobileMenuOpen(false);
                             }}
-                            style={
-                              activeProfileSection === "registerPage"
+                            style={{
+                              ...(activeProfileSection === "registerPage"
                                 ? activeDropdownButtonStyle
-                                : dropdownButtonStyle
-                            }
+                                : dropdownButtonStyle),
+                              display: "flex",
+                              alignItems: "center",
+                            }}
                           >
                             <i
-                              className="fs-5 bi bi-house-door"
+                              className="fs-4 bi bi-house-door"
                               style={sidebarIconStyle}
                             ></i>
-                            Register Address
+                            <span style={{ marginLeft: "10px" }}>
+                              Register Address
+                            </span>
                           </button>
                         </div>
                       )}
                     </li>
                     <li style={sidebarItemStyle}>
                       <button
-                        className="fs-4"
+                        className="fs-4 w-100 text-start"
                         onClick={() => {
                           setActiveView("accountDetails");
                           setIsMobileMenuOpen(false);
                         }}
-                        style={
-                          activeView === "accountDetails"
+                        style={{
+                          ...(activeView === "accountDetails"
                             ? activeSidebarButtonStyle
-                            : sidebarButtonStyle
-                        }
+                            : sidebarButtonStyle),
+                          display: "flex",
+                          alignItems: "center",
+                        }}
                       >
                         <i
                           className="bi bi-wallet2 fs-4"
                           style={sidebarIconStyle}
                         ></i>
-                        Account Details
+                        <span style={{ marginLeft: "10px" }}>
+                          Account Details
+                        </span>
                       </button>
                     </li>
                     <li style={sidebarItemStyle}>
                       <button
-                        className="fs-4"
+                        className="fs-4 w-100 text-start"
                         onClick={() => {
                           setActiveView("wallet");
                           setIsMobileMenuOpen(false);
                         }}
-                        style={
-                          activeView === "wallet"
+                        style={{
+                          ...(activeView === "wallet"
                             ? activeSidebarButtonStyle
-                            : sidebarButtonStyle
-                        }
+                            : sidebarButtonStyle),
+                          display: "flex",
+                          alignItems: "center",
+                        }}
                       >
                         <i
                           className="bi bi-credit-card fs-4"
                           style={sidebarIconStyle}
                         ></i>
-                        Wallet
+                        <span style={{ marginLeft: "10px" }}>Wallet</span>
                       </button>
                     </li>
-                    <li
-                      style={sidebarItemStyle}
-                      className={activeView === "orders" ? "active" : ""}
-                    >
+                    <li style={sidebarItemStyle}>
                       <button
-                        className="fs-4"
+                        className="fs-4 w-100 text-start"
                         onClick={() => {
                           setActiveView("orders");
                           setIsMobileMenuOpen(false);
                         }}
-                        style={
-                          activeView === "orders"
+                        style={{
+                          ...(activeView === "orders"
                             ? activeSidebarButtonStyle
-                            : sidebarButtonStyle
-                        }
+                            : sidebarButtonStyle),
+                          display: "flex",
+                          alignItems: "center",
+                        }}
                       >
                         <i
                           className="bi bi-bag fs-4"
                           style={sidebarIconStyle}
                         ></i>
-                        My Orders
+                        <span style={{ marginLeft: "10px" }}>My Orders</span>
                       </button>
                     </li>
                     <li style={sidebarItemStyle}>
@@ -1024,22 +1379,34 @@ const MyAccount = () => {
                             className="fs-4 bi bi-person-plus"
                             style={sidebarIconStyle}
                           ></i>
-                          <span className="fs-4">Referral ID</span>
+                          <span style={{ marginLeft: "10px" }}>
+                            Referral ID
+                          </span>
                         </div>
-                        <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
-                          <input
+                        <input
                             type="text"
                             value={customer.referralId}
                             readOnly
                             style={{
-                              flex: 1,
+                              flex: "1 1 120px",
                               minWidth: "120px",
                               padding: "8px",
+                              marginBottom:"10px",
                               border: "1px solid #ddd",
                               borderRadius: "4px",
                               backgroundColor: "#f8f9fa",
                             }}
+                            className="ms-0 w-full "
                           />
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                            gap: "8px",
+                          }}
+                        >
+                          
                           {/* Copy Button */}
                           <button
                             onClick={() => {
@@ -1063,6 +1430,8 @@ const MyAccount = () => {
                               cursor: "pointer",
                               display: "flex",
                               alignItems: "center",
+                              flex: "1 1 auto",
+                              justifyContent: "center",
                             }}
                           >
                             <i
@@ -1114,6 +1483,8 @@ const MyAccount = () => {
                               cursor: "pointer",
                               display: "flex",
                               alignItems: "center",
+                              flex: "1 1 auto",
+                              justifyContent: "center",
                             }}
                           >
                             <i
@@ -1141,25 +1512,33 @@ const MyAccount = () => {
 
                     <li style={sidebarItemStyle}>
                       <button
-                        className="fs-4"
+                        className="fs-4 w-100 text-start"
                         onClick={() => setShowLogoutConfirm(true)}
-                        style={sidebarButtonStyle}
+                        style={{
+                          ...sidebarButtonStyle,
+                          display: "flex",
+                          alignItems: "center",
+                        }}
                       >
                         <i
                           className="bi bi-box-arrow-right fs-4"
                           style={sidebarIconStyle}
                         ></i>
-                        Logout
+                        <span style={{ marginLeft: "10px" }}>Logout</span>
                       </button>
                     </li>
                   </ul>
                 </div>
               </div>
 
-              <div className="col-lg-9 col-md-8">
+              {/* Main Content Area */}
+              <div className="col-xl-9 col-lg-8 col-md-8">
                 <div
-                  className="myaccount-content"
-                  style={contentContainerStyle}
+                  className="myaccount-content p-5"
+                  style={{
+                    ...contentContainerStyle,
+                    // Add some bottom margin on mobile
+                  }}
                 >
                   {error && <div className="alert alert-danger">{error}</div>}
                   {success && (
@@ -1207,7 +1586,7 @@ const sidebarContainerStyle = {
 };
 
 const sidebarHeaderStyle = {
-  fontSize: "1.5rem",
+  fontSize: "2rem",
   fontWeight: "600",
   marginBottom: "20px",
   color: "#333",
@@ -1222,7 +1601,7 @@ const sidebarMenuStyle = {
 };
 
 const sidebarItemStyle = {
-  marginBottom: "10px",
+  // marginBottom: "10px",
 };
 
 const sidebarButtonStyle = {
@@ -1261,30 +1640,29 @@ const activeDropdownButtonStyle = {
 
 const sidebarIconStyle = {
   marginRight: "10px",
-  fontSize: "1.2rem",
+  // fontSize: "1.2rem",
 };
 
 const contentContainerStyle = {
   backgroundColor: "#F8F9FA",
   borderRadius: "8px",
-  padding: "30px",
+  // padding: "30px",
   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-  minHeight: "400px",
+  minHeight: "490px",
 };
 
 const accountDetailCardStyle = {
   backgroundColor: "white",
   borderRadius: "8px",
-  padding: "20px",
+  padding: "15px",
   boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
   height: "100%",
 };
 
 const accountDetailAmountStyle = {
-  fontSize: "1.5rem",
   fontWeight: "bold",
   color: "#3f51b5",
-  marginTop: "10px",
+  marginTop: "5px",
 };
 
 // Wallet Styles
@@ -1381,6 +1759,7 @@ const logoutModalContentStyle = {
   borderRadius: "8px",
   maxWidth: "400px",
   width: "100%",
+  margin: "15px",
   textAlign: "center",
   boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
 };

@@ -115,15 +115,16 @@ import { deleteAllFromCart } from "../../store/slices/cart-slice";
 import { useEffect, useState } from "react";
 const IconGroup = ({ iconWhiteClass }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const cartCount = useSelector((state) => state.cart.cartItems.length) || 0 ;
-  const wishlistCount = useSelector((state)=> state.wishlist.wishlistItems?.length) || 0;
+  const cartCount = useSelector((state) => state.cart.cartItems.length) || 0;
+  const wishlistCount =
+    useSelector((state) => state.wishlist.wishlistItems?.length) || 0;
   const [name, setName] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-const [showLogoutPopup, setShowLogoutPopup] = useState(false);
-  console.log("this is cartCount", cartCount)
-  
-  console.log("this is cartCount", wishlistCount)
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false);
+  console.log("this is cartCount", cartCount);
+
+  console.log("this is cartCount", wishlistCount);
 
   // const myItems=localStorage.getItem("customerinfo")
   // :white_check_mark: Check localStorage for login status
@@ -168,7 +169,7 @@ const [showLogoutPopup, setShowLogoutPopup] = useState(false);
       localStorage.removeItem("customerinfo");
       setIsLoggedIn(false);
       dispatch(deleteAllFromCart());
-    dispatch(deleteAllFromWishlist());
+      dispatch(deleteAllFromWishlist());
     } else {
       // User clicked "No", do nothing
     }
@@ -228,7 +229,7 @@ const [showLogoutPopup, setShowLogoutPopup] = useState(false);
           </form>
         </div>
       </div> */}
-      <div className="same-style header-search d-lg-block">
+      <div className="same-style header-search d-none d-lg-block">
         <button
           className="search-active"
           onClick={(e) => {
@@ -255,7 +256,7 @@ const [showLogoutPopup, setShowLogoutPopup] = useState(false);
         </div>
       </div>
       {/* Account Dropdown */}
-      <div className="same-style account-setting d-lg-block">
+      <div className="same-style account-setting d-lg-block d-none">
         <button
           className="account-setting-active d-flex align-items-center gap-2"
           onClick={handleClick}
@@ -317,14 +318,14 @@ const [showLogoutPopup, setShowLogoutPopup] = useState(false);
       {/* Wishlist */}
       <div className="same-style header-wishlist">
         <Link to="/wishlist">
-          <i className="pe-7s-like" />
+          <i className="pe-7s-like icon-like-cart" />
           <span className="count-style">{wishlistItems?.length || 0}</span>
         </Link>
       </div>
       {/* Cart (Desktop) */}
-      <div className="same-style cart-wrap d-none d-lg-block">
+      <div className="same-style cart-wrap  d-none d-lg-block">
         <button className="icon-cart" onClick={handleClick}>
-          <i className="pe-7s-shopbag" />
+          <i className="pe-7s-shopbag  icon-like-cart" />
           <span className="count-style">{cartItems?.length || 0}</span>
         </button>
         <MenuCart />
@@ -371,15 +372,29 @@ const [showLogoutPopup, setShowLogoutPopup] = useState(false);
             <p style={{ marginBottom: "20px", fontSize: "16px" }}>
               Are you sure you want to logout?
             </p>
-            <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
-              <button onClick={confirmLogout} style={{ padding: "6px 12px", background:"#000" , color:"#fff", borderRadius:
-                "10px"
-               }}>
+            <div
+              style={{ display: "flex", justifyContent: "center", gap: "10px" }}
+            >
+              <button
+                onClick={confirmLogout}
+                style={{
+                  padding: "6px 12px",
+                  background: "#000",
+                  color: "#fff",
+                  borderRadius: "10px",
+                }}
+              >
                 Yes
               </button>
-              <button onClick={cancelLogout} style={{ padding: "6px 12px", background:"#000" , color:"#fff", borderRadius:
-                "10px"
-               }}>
+              <button
+                onClick={cancelLogout}
+                style={{
+                  padding: "6px 12px",
+                  background: "#000",
+                  color: "#fff",
+                  borderRadius: "10px",
+                }}
+              >
                 No
               </button>
             </div>

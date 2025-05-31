@@ -8,6 +8,7 @@ import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import axios from "axios";
 import { BASE_URL } from "./../../config";
 import { deleteAllFromCart } from "../../store/slices/cart-slice";
+
 const Checkout = () => {
   let cartTotalPrice = 0;
   const dispatch = useDispatch();
@@ -44,12 +45,27 @@ const Checkout = () => {
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(true);
   const [discount, setDiscount] = useState(0);
+  const [showPopup, setShowPopup] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  // let discountedTotal = cartTotalPrice - discount;
+  // Show popup for 3 seconds
   useEffect(() => {
-    // Validate all fields when component mounts or when formData changes
+    if (showPopup) {
+      const timer = setTimeout(() => {
+        setShowPopup(false);
+        if (isSuccess) {
+          navigate("/orders");
+        }
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showPopup, isSuccess, navigate]);
+
+  // Validate all fields when component mounts or when formData changes
+  useEffect(() => {
     validateForm();
   }, [formData]);
+
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
@@ -64,6 +80,7 @@ const Checkout = () => {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const couponCode = params.get("couponCode");
+
   useEffect(() => {
     if (couponCode) {
       const applyCoupon = async () => {
@@ -82,6 +99,7 @@ const Checkout = () => {
       applyCoupon();
     }
   }, [couponCode, cartTotalPrice]);
+
   // Fetch countries on mount
   useEffect(() => {
     const customerData = JSON.parse(localStorage.getItem("customerinfo"));
@@ -105,6 +123,7 @@ const Checkout = () => {
     };
     fetchCountries();
   }, []);
+
   useEffect(() => {
     const fetchAddresses = (customerId) => {
       axios
@@ -301,14 +320,19 @@ const Checkout = () => {
           },
         });
 
+        setIsSuccess(true);
+        setShowPopup(true);
         resetForm();
-        window.location.href = "/orders";
       } else {
+        setIsSuccess(false);
+        setShowPopup(true);
         setPaymentError("Payment verification failed. Please contact support.");
         setOrderPlaced(false);
       }
     } catch (error) {
       console.error("Error verifying payment:", error);
+      setIsSuccess(false);
+      setShowPopup(true);
       setPaymentError(
         "There was an error verifying your payment. Please contact support."
       );
@@ -433,17 +457,17 @@ const Checkout = () => {
         if (formData.paymentMethod === "Paid") {
           await initiatePhonePePayment(saleId);
         } else {
-          // For COD, complete the order
+          // For COD, show success popup
+          setIsSuccess(true);
+          setShowPopup(true);
           setIsLoading(false);
-          alert("Order placed successfully!");
           resetForm();
-          // Optionally redirect to success page
-          window.location.href = "/orders";
         }
       }
     } catch (error) {
       console.error("Error placing order:", error);
-      alert("There was an error placing your order.");
+      setIsSuccess(false);
+      setShowPopup(true);
       setIsLoading(false);
       setOrderPlaced(false);
     }
@@ -551,7 +575,7 @@ const Checkout = () => {
       );
     }
   };
-  console.log("addres data", data);
+
   return (
     <Fragment>
       <SEO
@@ -559,6 +583,84 @@ const Checkout = () => {
         description="Checkout page of Anahee react minimalist eCommerce template."
       />
       <LayoutOne headerTop="visible">
+        {/* Success/Failure Popup */}
+        {showPopup && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0,0,0,0.7)",
+              zIndex: 9999,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <div
+              className="container py-5"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <div
+                className="row justify-content-center"
+                style={{ width: "800px" }}
+              >
+                <div className="col-12 col-sm-10 col-md-8 col-lg-6">
+                  <div
+                    className="text-center p-4"
+                    style={{
+                      backgroundColor: "white",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                    }}
+                  >
+                    <div
+                      className="icon-circle mb-3"
+                      style={{
+                        width: "80px",
+                        height: "80px",
+                        borderRadius: "50%",
+                        backgroundColor: isSuccess ? "#28a745" : "#dc3545",
+                        display: "inline-flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        fontSize: "40px",
+                        color: "white",
+                      }}
+                    >
+                      <i
+                        className={`fa ${
+                          isSuccess ? "fa-check" : "fa-close"
+                        }`}
+                        aria-hidden="true"
+                      ></i>
+                    </div>
+                    <h2
+                      className="fs-2"
+                      style={{ color: isSuccess ? "#28a745" : "#dc3545" }}
+                    >
+                      {isSuccess
+                        ? "Your order was successful"
+                        : "Your order failed"}
+                    </h2>
+                    <p className="fs-4 mb-0">
+                      {isSuccess
+                        ? "Thank you for your order. We will be in contact with more details shortly."
+                        : "Please try again later or contact support."}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="checkout-area pt-10 pb-30">
           <div className="container">
             {cartItems && cartItems.length >= 1 ? (
