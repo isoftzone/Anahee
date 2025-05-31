@@ -81,7 +81,7 @@ const Orders = () => {
     return (
       <div
         key={order.SALEID}
-        className="order-card mb-4 p-3 rounded shadow-sm bg-white border"
+        className="order-card mb-4 p-5 rounded shadow-sm bg-white border"
       >
         {/* Header */}
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-start mb-3">

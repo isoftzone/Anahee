@@ -2013,10 +2013,14 @@ button:disabled {
 *::after,
 *::before {
   box-sizing: border-box;
-        font-size:15px;
+        font-size:10px;
 }
 .pe-7s-close:before{
   font-size: 36px;
+}
+.icon-like-cart{
+  font-size: 15px !important;
+  width: 14px;
 }
 }
 
