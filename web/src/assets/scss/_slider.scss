@@ -25882,18 +25882,18 @@ a,
 
 .pincode-form input {
   padding: 10px;
-  border: none; /* Removed border */
-  font-size: 16px;
+  font-size: 12px;
 }
 
 .pincode-form button {
-  background-color: #e7d6b5;
+  background-color: #ffeaf1;
   color: #333;
   border: none; /* Removed border */
   padding: 10px 20px;
-  font-size: 16px;
+  font-size: 12px;
   cursor: pointer;
   margin-left: 10px;
+  font-weight: bold;
 }
 
 .delivery-info {

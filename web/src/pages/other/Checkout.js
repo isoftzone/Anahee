@@ -18,6 +18,7 @@ const Checkout = () => {
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
+  const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -101,11 +102,33 @@ const Checkout = () => {
   }, [couponCode, cartTotalPrice]);
 
   // Fetch countries on mount
+  // useEffect(() => {
+  //   const customerData = JSON.parse(localStorage.getItem("customerinfo"));
+
+  //   if (!customerData || !customerData.id) {
+  //     navigate("/login-register");
+  //   } else {
+  //     setCustomerId(customerData.id);
+  //   }
+  //   const fetchCountries = async () => {
+  //     try {
+  //       const res = await axios.get(
+  //         "https://countriesnow.space/api/v0.1/countries/positions"
+  //       );
+  //       if (res.data && res.data.data) {
+  //         setCountries(res.data.data.map((c) => c.name));
+  //       }
+  //     } catch (err) {
+  //       console.error("Failed to fetch countries:", err);
+  //     }
+  //   };
+  //   fetchCountries();
+  // }, []);
+
   useEffect(() => {
     const customerData = JSON.parse(localStorage.getItem("customerinfo"));
-
     if (!customerData || !customerData.id) {
-      navigate("/login-register");
+      setShowModal(true); // Show the modal
     } else {
       setCustomerId(customerData.id);
     }
@@ -635,9 +658,7 @@ const Checkout = () => {
                       }}
                     >
                       <i
-                        className={`fa ${
-                          isSuccess ? "fa-check" : "fa-close"
-                        }`}
+                        className={`fa ${isSuccess ? "fa-check" : "fa-close"}`}
                         aria-hidden="true"
                       ></i>
                     </div>
@@ -665,7 +686,7 @@ const Checkout = () => {
           <div className="container">
             {cartItems && cartItems.length >= 1 ? (
               <form onSubmit={handleSubmit}>
-                <div className="row">
+                <div className="row pb-5">
                   <div className="col-lg-7">
                     <div className="billing-info-wrap">
                       <div className="accordion-item">
@@ -1051,9 +1072,8 @@ const Checkout = () => {
                                   onClick={() => handleEditClick(item, index)}
                                   title="Edit"
                                   style={{
-                                    backgroundColor: "#ffffff",
                                     color: "#0D6EFD",
-                                    fontSize: "22px",
+                                    fontSize: "15px",
                                     minWidth: "57px",
                                     marginTop: "16%",
                                     minHeight: "10px",
@@ -1065,16 +1085,14 @@ const Checkout = () => {
                                   }}
                                 >
                                   Edit
-                                  <i className="fa-solid fa-pen-to-square"></i>
                                 </button>
 
                                 <button
                                   onClick={() => handleDelete(item.id)}
                                   title="Delete"
                                   style={{
-                                    backgroundColor: "#ffffff",
                                     color: "#c2080f",
-                                    fontSize: "22px",
+                                    fontSize: "15px",
                                     marginTop: "16%",
                                     minWidth: "57px",
                                     minHeight: "10px",
@@ -1084,8 +1102,8 @@ const Checkout = () => {
                                     border: "none",
                                     borderRadius: "0",
                                   }}
+                                  // className="btn btn-danger"
                                 >
-                                  <i className="fa-solid fa-trash-can"></i>
                                   Delete
                                 </button>
                               </div>
@@ -1222,6 +1240,7 @@ const Checkout = () => {
                                 border: "1px solid #dee2e6",
                                 borderRadius: "4px",
                                 marginBottom: "10px",
+                                fontSize:"15px"
                               }}
                             >
                               Payment Method
@@ -1378,10 +1397,56 @@ const Checkout = () => {
               </div>
             )}
           </div>
+          {showModal && (
+            <div style={modalBackdropStyle}>
+              <div style={modalStyle}>
+                <p className="fs-2 text-dark">You are not logged in</p>
+                <p>Please login or register to continue.</p>
+                <div className="d-flex gap-4 justify-content-center">
+                  <button
+                    style={stylebutton}
+                    onClick={() => navigate("/login-register")}
+                  >
+                    Login
+                  </button>
+                  <button
+                    style={stylebutton}
+                    onClick={() => navigate("/register")}
+                  >
+                    Register
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </LayoutOne>
     </Fragment>
   );
 };
-
+const modalBackdropStyle = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100vw",
+  height: "100vh",
+  backgroundColor: "rgba(0,0,0,0.5)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 1000,
+};
+const modalStyle = {
+  backgroundColor: "#fff",
+  padding: "30px",
+  borderRadius: "8px",
+  textAlign: "center",
+  width: "300px",
+};
+const stylebutton = {
+  color: "#fff",
+  backgroundColor: "#000",
+  borderRadius: "10px",
+  padding: "10px",
+};
 export default Checkout;
