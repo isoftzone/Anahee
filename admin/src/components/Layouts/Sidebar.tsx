@@ -1322,13 +1322,13 @@ const Sidebar = () => {
                                         <li>
                                             <NavLink to="/Components/orderlist">List</NavLink>
                                         </li>
-                                        {/* <li>
+                                         {/* <li>
                                             <NavLink to="/Components/orderpreview">Preview</NavLink>
-                                        </li>
+                                        </li> */}
                                         <li>
                                             <NavLink to="/Components/orderadd">Add</NavLink>
                                         </li>
-                                        <li>
+                                        {/* <li>
                                             <NavLink to="/Components/orderedit">Edit</NavLink>
                                         </li> */}
                                     </ul>

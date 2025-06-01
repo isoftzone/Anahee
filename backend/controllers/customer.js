@@ -405,20 +405,20 @@ exports.updateCustomerAddress = (req, res) => {
   const {
     id,
     customer_id,
-    fname,
-    lname,
+    firstName,
+    lastName,
+    country,
     address,
     city,
     state,
-    country,
-    postal_code,
+    postcode,
+    phone,
     email,
-    mobile,
     description = '',
     primary_address = 0
   } = req.body;
   // Input validation
-  const requiredFields = { id, customer_id, fname, lname, address, city, state, country, postal_code, email, mobile };
+  const requiredFields = { id, customer_id, firstName, lastName, address, city, state, country, postcode, phone };
   for (const [key, value] of Object.entries(requiredFields)) {
     if (value === undefined || value === '') {
       return res.status(400).json({ msg: `${key} is required` });
@@ -432,8 +432,8 @@ exports.updateCustomerAddress = (req, res) => {
       WHERE id = ? AND customer_id = ?
     `;
     const values = [
-      fname, lname, address, city, state, country,
-      description, postal_code, email, mobile,
+      firstName, lastName, address, city, state, country,
+      description, postcode, email, phone,
       primary_address, id, customer_id
     ];
     con.query(sql, values, (err, result) => {
@@ -464,6 +464,8 @@ exports.updateCustomerAddress = (req, res) => {
     handleUpdate();
   }
 };
+
+
 exports.getAddressesByUserId = (req, res) => {
   const { customer_id } = req.params;
   const { primary_address } = req.query; // use query string: ?primary_address=1

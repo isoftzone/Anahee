@@ -19,6 +19,8 @@ interface CustomerDetails {
     country: string;
     paymentStatus: string;
     payment_mode: string;
+    ORDER_STATUS: string;
+    coupon_code: string;
 }
 
 interface SalesMasterData {
@@ -53,6 +55,9 @@ const OrderEdit: React.FC = () => {
         country: '',
         paymentStatus: '',
         payment_mode: '',
+        ORDER_STATUS:'',
+        coupon_code:'',
+
     });
 
     const [salesMasterData, setSalesMasterData] = useState<SalesMasterData>({
@@ -92,6 +97,14 @@ const OrderEdit: React.FC = () => {
                     country: sale.COUNTRY,
                     paymentStatus: sale.PAYMENTSTATUS,
                     payment_mode: sale.PAYMENTMETHOD,
+                    ORDER_STATUS: sale.ORDER_STATUS,
+        coupon_code: sale.coupon_code,
+
+
+
+
+
+
                 });
 
                 setItems(
@@ -410,7 +423,7 @@ const OrderEdit: React.FC = () => {
                 {/* Company Details */}
                 <div className="flex flex-col md:flex-row justify-between mb-6 gap-4">
                     <div className="w-full md:w-1/3">
-                        <label className="block text-sm font-medium">Invoice Number</label>
+                        <label className="block text-sm font-medium">Order Number</label>
                         <input className="border rounded w-full p-2 mt-1" value={invoiceNumber} onChange={(e) => setInvoiceNumber(e.target.value)} />
                     </div>
                 </div>
@@ -448,7 +461,13 @@ const OrderEdit: React.FC = () => {
                             <span className="font-medium">Country: </span>
                             <span>{customerDetails.country}</span>
                         </div>
-                        <div className="mt-1">
+                        {customerDetails?.coupon_code && (
+                            <div className="mt-2">
+                                <span className="font-medium">Coupon Code: </span>
+                                <span>{customerDetails.coupon_code}</span>
+                            </div>
+                        )}
+                        {/* <div className="mt-1">
                             <span className="font-medium">Payment Status: </span>
                             <span
                                 className={`px-2 py-1 rounded text-sm ${
@@ -461,14 +480,14 @@ const OrderEdit: React.FC = () => {
                             >
                                 {customerDetails.paymentStatus}
                             </span>
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Payment Details */}
                     <div>
-                        <h3 className="font-semibold mb-2">Payment Details:</h3>
+                        {/* <h3 className="font-semibold mb-2">Payment Details:</h3> */}
                         <div className="mb-2">
-                            <label className="block text-sm font-medium">Payment Mode:</label>
+                            <label className=" font-semibold">Payment Mode:</label>
                             <input
                                 className="border rounded w-full p-2"
                                 value={customerDetails.payment_mode || 'N/A'}
@@ -482,6 +501,20 @@ const OrderEdit: React.FC = () => {
                                 value={customerDetails.paymentStatus || 'N/A'}
                                 onChange={(e) => setCustomerDetails({ ...customerDetails, paymentStatus: e.target.value })}
                             />
+                        </div>
+                        <div className="mb-2">
+                            <label className="block text-sm font-medium">Order Status:</label>
+                            <select
+                                value={customerDetails.ORDER_STATUS}
+                                onChange={(e) => setCustomerDetails({ ...customerDetails, ORDER_STATUS: e.target.value })}
+                                className="border rounded w-full p-2"
+                            >
+                                <option value="Placed">Placed</option>
+                                <option value="Progress">Progress</option>
+                                <option value="Dispatched">Dispatched</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Cancel">Cancel</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -625,23 +658,23 @@ const OrderEdit: React.FC = () => {
                 <div className="mt-6 p-4 bg-gray-50 rounded-md">
                     <div className="flex justify-between mb-2">
                         <span>Subtotal:</span>
-                        <span className="font-medium">${subtotal.toFixed(2)}</span>
+                        <span className="font-medium">{subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between mb-2">
                         <span>Tax ({tax}%):</span>
-                        <span>${((subtotal * tax) / 100).toFixed(2)}</span>
+                        <span>{((subtotal * tax) / 100).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between mb-2">
                         <span>Discount Amount:</span>
-                        <span>-${discount.toFixed(2)}</span>
+                        <span>-{discount.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between mb-2">
                         <span>Shipping:</span>
-                        <span>${shipping.toFixed(2)}</span>
+                        <span>{shipping.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between pt-2 border-t border-gray-200">
                         <span className="font-bold">Grand Total:</span>
-                        <span className="text-lg md:text-xl font-bold">${grandTotal.toFixed(2)}</span>
+                        <span className="text-lg md:text-xl font-bold">{grandTotal.toFixed(2)}</span>
                     </div>
                 </div>
             </div>
