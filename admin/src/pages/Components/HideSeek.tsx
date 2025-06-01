@@ -263,7 +263,7 @@ const HideSeek = () => {
             </form>
 
             {/* Display hometable records in a draggable table */}
-            <div className="mt-6 max-w-2xl mx-auto">
+            <div className="mt-6 max-w-6xl mx-auto">
                 <h3 className="text-lg font-semibold text-center mb-2">Saved Records</h3>
                 <p className="text-sm text-gray-600 text-center mb-4">💡 Drag and drop rows to reorder the layout</p>
                 <table className="w-full border-collapse border border-gray-300">
@@ -301,7 +301,7 @@ const HideSeek = () => {
                                         onChange={() => {
                                             toggleFlag(item.id);
                                             // Remove the window.location.reload() as it's not needed
-                                            // window.location.reload();
+                                            window.location.reload();
                                         }}
                                         className="form-checkbox cursor-pointer"
                                     />
@@ -309,7 +309,7 @@ const HideSeek = () => {
                                 </td>
 
                                 <td className="border p-2">{item.name}</td>
-                                <td className="border p-2">{item.value}</td>
+                                <td className="border p-2">{item.flag}</td>
                                 <td className="border p-2">{item.sequence || 'N/A'}</td>
                                 <td className="border p-2 text-center">
                                     <Tippy content="Edit">
