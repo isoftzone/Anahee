@@ -87,7 +87,7 @@ import Accordion from 'react-bootstrap/Accordion';
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 
-const ShopCategories = ({ categories, getSortParams }) => {
+const ShopCategories = ({ categories, getSortParams,selectedCategory }) => {
     const [selectedCategories, setSelectedCategories] = useState([]);
       // const [categories, setCategories] = useState([]);
 
@@ -123,7 +123,8 @@ const ShopCategories = ({ categories, getSortParams }) => {
                       onClick={() => handleToggle("")}
                       className={isSelected("") ? "active" : ""}
                     >
-                      <span className="checkmark" /> All Categories
+                        <span className="checkmark" /> {t("All Categories")}
+                      {/* <span className="checkmark" /> All Categories */}
                     </button>
                   </div>
             </li>
@@ -131,12 +132,21 @@ const ShopCategories = ({ categories, getSortParams }) => {
               return (
                 <li key={key}>
                  <div className="sidebar-widget-list-left">
-                      <button
+                      {/* <button
                         onClick={() => handleToggle(category)}
                         className={isSelected(category) ? "active" : ""}
                       >
                         <span className="checkmark" /> {category}
-                      </button>
+                      </button> */}
+                          <button
+                      onClick={(e) => {
+                        getSortParams("category", category);
+                        setActiveSort(e);
+                      }}
+                      className={selectedCategory === category ? "active" : ""}
+                    >
+                      <span className="checkmark" /> {t(category)}
+                    </button>
                     </div>
                 </li>
               );
