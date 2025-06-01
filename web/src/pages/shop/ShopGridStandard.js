@@ -913,14 +913,14 @@ const ShopGridStandard = () => {
 
                 {/* shop product pagination */}
        {/* Results info */}
-                <div className="mb-3">
+                {/* <div className="mb-3">
                   <p className="text-muted">
                     Showing {currentData.length} of {sortedProducts.length}{" "}
                     results
                     {getActiveFilterCount() > 0 &&
                       ` (${getActiveFilterCount()} filters applied)`}
                   </p>
-                </div>
+                </div> */}
 
                 {/* Shop products */}
                 <ShopProducts layout={layout} products={currentData} />

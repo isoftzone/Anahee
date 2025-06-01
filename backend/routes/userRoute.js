@@ -23,6 +23,7 @@ const discountController = require("../controllers/discountController");
 const salesdetail = require("../controllers/salesdetail");
 const rfmaster = require("../controllers/rfmaster");
 const upload = require("../middlewares/imageupload");
+const userMaster = require("../controllers/userMaster");
 router.post("/addProducts", addProductData.addProducts);
 router.get("/getCodeTypeData", addProductData.getCodeTypeData);
 router.get("/getCodeTypeAllData", addProductData.getCodeTypeAllData);
@@ -74,7 +75,7 @@ router.put("/updateCustomerInfo/:id", customer.updateCustomerInfo);
 router.get("/getAllcustomer", customer.getAll);
 router.delete("/deletecustomer/:id",customer.deletecustomer);
 
-const { addtocartWishlistproduct, getCartWishlistProduct, deletefromcartWishlist, clearALlcartwishlist, addtocartwishlistAction, getAllWishlistItems, getAllCartItems } = require("../controllers/addtocartWishlistController");
+const { addtocartWishlistproduct, getCartWishlistProduct, deletefromcartWishlist, clearALlcartwishlist, addtocartwishlistAction, getAllWishlistItems, getAllCartItems, addtocartdata, wishlistData } = require("../controllers/addtocartWishlistController");
 
 
 // router.delete("/deletecustomer/:id",customer.deletecustomer);
@@ -133,5 +134,14 @@ router.get('/getwishlist/:customerId', getAllWishlistItems)
 router.get('/getalladdtocart/:customerId', getAllCartItems)
 router.delete("/deletecartWishlist", deletefromcartWishlist)
 router.delete("/clearAllcartWishlist", clearALlcartwishlist)
+router.post("/addtocartdata",addtocartdata)
+router.post("/addwishlistdata",wishlistData)
+
+router.post("/upload_userMaster",upload.single('PROFILEIMAGE'),userMaster.upload_userMaster);
+router.get("/getid_userMaster/:id",userMaster.getOneMaster);
+router.get("/get_userMaster",userMaster.get_data);
+router.post("/add_userMaster",userMaster.add_data);
+//router.get('/check-user/:userid',verifyToken,userMaster.checkid_userMaster);
+//router.get('/max-userid',verifyToken,userMaster.getMax_userMaster);
 
 module.exports = router;

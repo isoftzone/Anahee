@@ -112,7 +112,11 @@ import clsx from "clsx";
 import MenuCart from "./sub-components/MenuCart";
 import { deleteAllFromWishlist } from "../../store/slices/wishlist-slice";
 import { deleteAllFromCart } from "../../store/slices/cart-slice";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { setCartItems } from "../../store/slices/cart-slice";
+import { setwishlistItems } from "../../store/slices/wishlist-slice";
+import axios from "axios";
+import { BASE_URL } from "../../config";
 const IconGroup = ({ iconWhiteClass }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const cartCount = useSelector((state) => state.cart.cartItems.length) || 0;
@@ -122,6 +126,14 @@ const IconGroup = ({ iconWhiteClass }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
+   const [searchQuery, setSearchQuery] = useState("");
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+ const { compareItems } = useSelector((state) => state.compare);
+  const { products } = useSelector((state) => state.product);
+  const { wishlistItems } = useSelector((state) => state.wishlist);
+  const { cartItems } = useSelector((state) => state.cart);
+  const searchRef = useRef(null);
   console.log("this is cartCount", cartCount);
 
   console.log("this is cartCount", wishlistCount);
@@ -136,13 +148,28 @@ const IconGroup = ({ iconWhiteClass }) => {
   //   }
   // }, []);
   useEffect(() => {
-    const checkLogin = () => {
+    const checkLogin = async() => {
       const customerStr = localStorage.getItem("customerinfo");
       if (customerStr) {
         const customer = JSON.parse(customerStr);
         setIsLoggedIn(true);
         setName(customer.name); // assuming `customerinfo` has a `name` field
         console.log("setName", name);
+         try{
+         const response = await axios.get(`http://localhost:3000/getalladdtocart/${customer.id}`);
+          const allCartItems = response.data.data;
+          const wishlistdata = await axios.get(`http://localhost:3000/getwishlist/${customer.id}`);
+          const allwishlistitem = wishlistdata.data.data;
+          
+          console.log("this is long time login cart data ", allCartItems);
+              console.log("this is long time login wishlist data ", allwishlistitem);
+      
+          dispatch(setCartItems(allCartItems));
+          dispatch(setwishlistItems(allwishlistitem));
+        }
+        catch(error){
+          console.log("this is fetching cart/wishlist", error);
+        }
       } else {
         setIsLoggedIn(false);
         setName("");
@@ -153,6 +180,26 @@ const IconGroup = ({ iconWhiteClass }) => {
     window.addEventListener("storage", checkLogin);
     return () => window.removeEventListener("storage", checkLogin);
   }, []);
+
+   // Handle search input changes
+// Handle search input changes
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setShowSearchResults(false);
+      return;
+    }
+    // const results = products.filter(product =>
+    //   product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    //   .slice(0, 5); // Show only top 5 results
+const results = products
+  .filter(product =>
+    product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+  .slice(0, 5); // Show only top 5 results
+    setSearchResults(results);
+    setShowSearchResults(results.length > 0);
+  }, [searchQuery, products]);
+
   const handleClick = (e) => {
     e.currentTarget.nextSibling.classList.toggle("active");
   };
@@ -196,21 +243,39 @@ const IconGroup = ({ iconWhiteClass }) => {
       offcanvasMobileMenu.classList.add("active");
     }
   };
-  const { compareItems } = useSelector((state) => state.compare);
-  const { wishlistItems } = useSelector((state) => state.wishlist);
-  const { cartItems } = useSelector((state) => state.cart);
-  const [searchQuery, setSearchQuery] = useState("");
-  const handleSearch = (e) => {
+   const handleSearch = (e) => {
     e.preventDefault();
-    const trimmedQuery = searchQuery.trim();
+    const trimmedQuery = searchQuery.trim().toLowerCase();
+    
     if (trimmedQuery) {
+      const filteredProducts = products.filter(product => 
+        product.name.toLowerCase().includes(trimmedQuery)
+      );
+      
       navigate("/shop-grid-standard", {
-        state: { name: trimmedQuery },
+        state: { 
+          searchQuery: trimmedQuery,
+          filteredProducts: filteredProducts 
+        },
       });
-    } else {
-      alert("Please enter a valid search term.");
+      setSearchQuery("");
+      setShowSearchResults(false);
     }
   };
+
+  useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (searchRef.current && !searchRef.current.contains(event.target)) {
+      setShowSearchResults(false);
+      document.querySelector(".search-content")?.classList.remove("active");
+    }
+  };
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+
   // console.log("cartItems",cartItems);
   console.log("myItems", name);
   return (
@@ -248,10 +313,64 @@ const IconGroup = ({ iconWhiteClass }) => {
               placeholder="Search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => searchQuery && setShowSearchResults(true)}
+  // onBlur={() => setShowSearchResults(false)}
             />
             <button type="submit" className="button-search">
               <i className="pe-7s-search" />
             </button>
+            {showSearchResults && (
+  <div className="search-results-dropdown">
+    {searchResults.map((product) => (
+      <Link
+        key={product.id}
+        to={`/product/${product.id}`}
+        className="search-result-item"
+        onClick={() => {
+          setSearchQuery("");
+          setShowSearchResults(false);
+        }}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          padding: "10px",
+          borderBottom: "1px solid #eee",
+          textDecoration: "none",
+          color: "#000",
+        }}
+      >
+        <div
+          className="search-result-image"
+          style={{ width: "50px", height: "50px", flexShrink: 0 }}
+        >
+          <img
+            src={
+              product.image?.[0]
+                ? `${BASE_URL}/${product.image[0]}`
+                : "/assets/img/default.jpg"
+            }
+            alt={product.name}
+            style={{ width: "50px", height: "50px" }}
+            className="object-cover rounded"
+          />
+        </div>
+        <div
+          className="search-result-details"
+          style={{ display: "flex", flexDirection: "column" }}
+        >
+          <h6 style={{ margin: 0, fontSize: "14px", fontWeight: "bold" }}>
+            {product.name}
+          </h6>
+          <span style={{ fontSize: "12px", color: "#666" }}>
+            {product.category || "Uncategorized"}
+          </span>
+        </div>
+      </Link>
+    ))}
+  </div>
+)}
+
           </form>
         </div>
       </div>
@@ -333,14 +452,14 @@ const IconGroup = ({ iconWhiteClass }) => {
       {/* Cart (Mobile) */}
       <div className="same-style cart-wrap d-block d-lg-none">
         <Link className="icon-cart" to="/cart">
-          <i className="pe-7s-shopbag" />
+          <i className="pe-7s-shopbag  icon-like-cart" />
           <span className="count-style">{cartItems?.length || 0}</span>
         </Link>
       </div>
       {/* Mobile Menu Toggle */}
       <div className="same-style mobile-off-canvas d-block d-lg-none">
         <button className="mobile-aside-button" onClick={triggerMobileMenu}>
-          <i className="pe-7s-menu" />
+          <i className="pe-7s-menu  icon-like-cart" />
         </button>
       </div>
       {/* Logout Confirmation Popup (Inline) */}

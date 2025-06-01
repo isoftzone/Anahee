@@ -126,7 +126,7 @@ const ProductGridListSingle = ({
               </div>
             </div>
           </div>
-          <div className="product-content text-center">
+          <div className="product-content text-center mb-5">
             <h3>
               <Link to={process.env.PUBLIC_URL + "/product/" + product.id}>
                 {product.name}
@@ -146,11 +146,10 @@ const ProductGridListSingle = ({
                     {currency.currencySymbol + product.mrp}
                   </span>
                 </Fragment>
-            </div>
-             ) : ("")}
-            <div className="product-price">
-              {discountedPrice !== null ? (
+                <span className="product-price">
+                  {discountedPrice !== null ? (
                 <Fragment>
+                  
                   <span>{currency.currencySymbol + finalDiscountedPrice}</span>{" "}
                   <span className="old">
                     {currency.currencySymbol + finalProductPrice}
@@ -159,7 +158,12 @@ const ProductGridListSingle = ({
               ) : (
                 <span>{currency.currencySymbol + finalProductPrice} </span>
               )}
+                </span>
             </div>
+             ) : ("")}
+            {/* <div className="product-price">
+              
+            </div> */}
           </div>
         </div>
         <div className="shop-list-wrap mb-30">
