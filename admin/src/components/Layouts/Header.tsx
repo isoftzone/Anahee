@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, NavLink, useLocation,useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { IRootState } from '../../store';
 import { toggleRTL, toggleTheme, toggleSidebar } from '../../store/themeConfigSlice';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +34,7 @@ import IconMenuPages from '../Icon/Menu/IconMenuPages';
 import IconMenuMore from '../Icon/Menu/IconMenuMore';
 import { Button } from 'react-bootstrap';
 import axios from 'axios';
-import {BASE_URL} from '../../config'
+import { BASE_URL } from '../../config';
 
 const Header = () => {
     const location = useLocation();
@@ -60,43 +60,173 @@ const Header = () => {
     }, [location]);
 
     // const [user, setUser] = useState(null); // State to hold user information
-    const [user, setUser] = useState<{ name: string, email: string } | null>(null);
+    // const [user, setUser] = useState<{ name: string, email: string } | null>(null);
+    interface User {
+        name: string;
+        email: string;
+        profileImage?: string;
+        // Add other fields as needed
+    }
 
+    const [user, setUser] = useState<any | null>(null);
 
-    useEffect(() => {
-        const userDataString = localStorage.getItem('userData');
+    // useEffect(() => {
+    //     const userDataString = localStorage.getItem('userData');
+    //     if (userDataString) {
+    //         const users = JSON.parse(userDataString);
+    //         setUser(users);
+    //     }
+    // }, []);
+
+    // useEffect(() => {
+    //     const userDataString = localStorage.getItem('userDatas');
+    //     if (userDataString) {
+    //         try {
+    //             const users = JSON.parse(userDataString);
+    //             // Ensure it has both name and email
+    //             console.log('Parsed user data:', users);
+    //             if (users.FNAME && users.EMAIL) {
+    //                 setUser(users.PROFILEIMAGE);
+    //                 console.log('User data set:', users.PROFILEIMAGE);
+    //             } else {
+    //                 console.warn('Invalid user data in localStorage');
+    //             }
+    //         } catch (err) {
+    //             console.error('Failed to parse user data:', err);
+    //         }
+    //     }
+    // }, []);
+
+    // const [user, setUser] = useState<any | null>(null);
+      useEffect(() => {
+        const userDataString = localStorage.getItem('userDatas');
         if (userDataString) {
-            const user = JSON.parse(userDataString);
-            setUser(user);
+            try {
+                const users = JSON.parse(userDataString);
+                // Ensure it has both name and email
+                console.log('Parsed user data:', users);
+                if (users.FNAME && users.EMAIL) {
+                    setUser(users);
+                    console.log('User data set:', users.PROFILEIMAGE);
+                } else {
+                    console.warn('Invalid user data in localStorage');
+                }
+            } catch (err) {
+                console.error('Failed to parse user data:', err);
+            }
         }
     }, []);
+    
+
+    console.log('user', user);
+    // useEffect(() => {
+    //     const fetchUserData = async () => {
+    //       try {
+    //         // const email = 'user@example.com'; // Replace with actual email
+    //         // const password = 'password123';   // Replace with actual password
+
+    //         // console.log('Request body:', { email, password });
+
+    //         // const response = await axios.post(`${BASE_URL}/login`, { email, password }, {
+    //         //   headers: {
+    //         //     'Content-Type': 'application/json'
+    //         //   }
+    //         // });
+
+    //        let localStorageData = localStorage.getItem('userData');
+
+    //         const responses = await axios.get(`${BASE_URL}/getid_userMaster/${localStorageData.id}`, {
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //   });
+    //    const userData = responses.data;
+    //   setUser(userData);
+    //       } catch (error) {
+    //         console.error('Error fetching user data:', error);
+    //         // setError(error.response?.data?.msg || 'An error occurred during login.');
+    //       }
+    //     };
+
+    //     fetchUserData();
+    //   }, []);
+
+    // useEffect(() => {
+    //   const fetchUserData = async () => {
+    //     try {
+    //       const localStorageData = localStorage.getItem('userDatas');
+    // console.log('localStorageData=', localStorageData);
+    //       if (!localStorageData) return;
+
+    //       const parsedData = JSON.parse(localStorageData);
+    //       if (!parsedData?.USERID) return;
+
+    //     //   const response = await axios.get(`${BASE_URL}/getid_userMaster/${parsedData.id}`, {
+    //     //     headers: {
+    //     //       'Content-Type': 'application/json',
+    //     //     },
+    //     //   });
+
+    //     //   const userData = response.data;
+    //     let v=localStorageData.PROFILEIMAGE;
+    //       setUser(userData);
+    //     } catch (error) {
+    //       console.error('Error fetching user data:', error);
+    //     }
+    //   };
+
+    //   fetchUserData();
+
+    //   // ✅ Set up listener to update on localStorage change event
+    //   const handleUpdate = () => {
+    //     fetchUserData(); // re-fetch data
+    //   };
+
+    //   window.addEventListener('userDataUpdated', handleUpdate);
+
+    //   return () => {
+    //     window.removeEventListener('userDataUpdated', handleUpdate);
+    //   };
+    // }, []);
 
     useEffect(() => {
         const fetchUserData = async () => {
-          try {
-            const email = 'user@example.com'; // Replace with actual email
-            const password = 'password123';   // Replace with actual password
-    
-            console.log('Request body:', { email, password });
-    
-            const response = await axios.post(`${BASE_URL}/login`, { email, password }, {
-              headers: {
-                'Content-Type': 'application/json'
-              }
-            });
-    
-            const userData = response.data;
-            setUser(userData);
-          } catch (error) {
-            console.error('Error fetching user data:', error);
-            // setError(error.response?.data?.msg || 'An error occurred during login.');
-          }
-        };
-    
-        fetchUserData();
-      }, []);
-  
+            try {
+                const localStorageData = localStorage.getItem('userData');
+                console.log('localStorageData =', localStorageData);
 
+                if (!localStorageData) return;
+
+                const parsedData = JSON.parse(localStorageData);
+                if (!parsedData?.USERID) return;
+
+                // If you just want to use data from localStorage (no backend request):
+                setUser(parsedData.PROFILEIMAGE); // set user from local storage directly
+
+                // If you need to refresh from backend, uncomment this part:
+                // const response = await axios.get(`${BASE_URL}/getid_userMaster/${parsedData.USERID}`, {
+                //   headers: {
+                //     'Content-Type': 'application/json',
+                //   },
+                // });
+                // setUser(response.data);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+
+        fetchUserData();
+
+        const handleUpdate = () => {
+            fetchUserData(); // re-fetch data if another component updates localStorage
+        };
+
+        window.addEventListener('userDataUpdated', handleUpdate);
+
+        return () => {
+            window.removeEventListener('userDataUpdated', handleUpdate);
+        };
+    }, []);
 
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
 
@@ -167,7 +297,7 @@ const Header = () => {
     };
 
     const [search, setSearch] = useState(false);
-   
+
     const setLocale = (flag: string) => {
         setFlag(flag);
         if (flag.toLowerCase() === 'ae') {
@@ -182,10 +312,12 @@ const Header = () => {
     const navigate = useNavigate();
     const handleLogout = () => {
         // Perform logout actions here (e.g., clearing authentication token, resetting state)
-       // Then redirect to login page
-       navigate('/', { replace: true }); // Use replace option to prevent going back
-   };
-
+        // Then redirect to login page
+        localStorage.removeItem('userData');
+        localStorage.removeItem('userDatas');
+        navigate('/', { replace: true }); // Use replace option to prevent going back
+    };
+    console.log('username=', user);
     return (
         <header className={`z-40 ${themeConfig.semidark && themeConfig.menu === 'horizontal' ? 'dark' : ''}`}>
             <div className="shadow-sm">
@@ -467,26 +599,35 @@ const Header = () => {
                                 offset={[0, 8]}
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
                                 btnClassName="relative group block"
-                                button={<img className="w-9 h-9 rounded-full object-cover saturate-50 group-hover:saturate-100" src="/assets/images/user-profile.jpeg" alt="userProfile" />}
+                                button={
+                                    <img
+                                        className="w-9 h-9 rounded-full object-cover saturate-50 group-hover:saturate-100"
+                                        //  src="/assets/images/user-profile.jpeg"
+                                        // src={user ? `${BASE_URL}/${user}` : '/assets/images/profile-0350.png'}
+                                        // src={user ? `${BASE_URL}/images/banner/${user}` : '/assets/images/profile-0350.png'}
+                                         src={user ? `${BASE_URL}/images/banner/${user.PROFILEIMAGE}` : '/assets/images/profile-0350.png'}
+                                        alt="userProfile"
+                                    />
+                                }
                             >
                                 <ul className="text-dark dark:text-white-dark !py-0 w-[230px] font-semibold dark:text-white-light/90">
                                     <li>
                                         <div className="flex items-center px-4 py-4">
-                                            <img className="rounded-md w-10 h-10 object-cover" src="/assets/images/user-profile.jpeg" alt="userProfile" />
+                                            <img className="rounded-md w-10 h-10 object-cover" src={user ? `${BASE_URL}/images/banner/${user}` : '/assets/images/profile-0350.png'} alt="userProfile" />
                                             <div className="ltr:pl-4 rtl:pr-4 truncate">
-                                            <div>
-      {user && (
-        <div>
-          <h4 className="text-base">
-            {user.name}
-            <span className="text-xs bg-success-light rounded text-success px-1 ltr:ml-2 rtl:ml-2">Pro</span>
-          </h4>
-          <button type="button" className="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white">
-            {user.email}
-          </button>
-        </div>
-      )}
-    </div>
+                                                <div>
+                                                    {user && (
+                                                        <div>
+                                                            <h4 className="text-base">
+                                                                {user.name}
+                                                                <span className="text-xs bg-success-light rounded text-success px-1 ltr:ml-2 rtl:ml-2">Pro</span>
+                                                            </h4>
+                                                            <button type="button" className="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white">
+                                                                {user.email}
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
                                                 {/* <h4 className="text-base">
                                                     John Doe
                                                     <span className="text-xs bg-success-light rounded text-success px-1 ltr:ml-2 rtl:ml-2">Pro</span>
@@ -494,7 +635,6 @@ const Header = () => {
                                                 <button type="button" className="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white">
                                                     johndoe@gmail.com
                                                 </button> */}
-                                                
                                             </div>
                                         </div>
                                     </li>
@@ -517,9 +657,7 @@ const Header = () => {
                                         </Link>
                                     </li> */}
                                     <li className="border-t border-white-light dark:border-white-light/10">
-                                        <a  onClick={handleLogout} className="text-danger !py-3"
-                                        style={{cursor:'pointer'}}
-                                        >
+                                        <a onClick={handleLogout} className="text-danger !py-3" style={{ cursor: 'pointer' }}>
                                             <IconLogout className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 rotate-90 shrink-0" />
                                             Sign Out
                                         </a>

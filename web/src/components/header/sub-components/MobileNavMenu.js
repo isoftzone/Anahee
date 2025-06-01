@@ -55,7 +55,7 @@ const MobileNavMenu = () => {
               backgroundColor: showDropdown ? "#f5f5f5" : "transparent",
             }}
           >
-            <i className="pe-7s-user-female" style={{ fontSize: "20px" }}></i>
+            <i className="pe-7s-user-female admin-name-icon" style={{ fontSize: "20px" }}></i>
             <span
               style={{
                 fontWeight: "500",
