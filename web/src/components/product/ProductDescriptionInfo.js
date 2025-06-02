@@ -411,8 +411,8 @@ const ProductDescriptionInfo = ({
       <div className="delivery-check">
         <h3>Check Delivery Pincode</h3>
         <div className="pincode-form flex gap-2">
-          <input type="text" placeholder="ENTER ZIP CODE" />
-          <button>CHECK</button>
+          <input type="text" placeholder="Enter Zip Code Here" />
+          <button>Check</button>
         </div>
         <div className="delivery-info flex flex-wrap gap-4 mt-4">
           <div className="free-shipping flex items-center gap-2">

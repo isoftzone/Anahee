@@ -23,6 +23,7 @@ const discountController = require("../controllers/discountController");
 const salesdetail = require("../controllers/salesdetail");
 const rfmaster = require("../controllers/rfmaster");
 const upload = require("../middlewares/imageupload");
+const userMaster = require("../controllers/userMaster");
 router.post("/addProducts", addProductData.addProducts);
 router.get("/getCodeTypeData", addProductData.getCodeTypeData);
 router.get("/getCodeTypeAllData", addProductData.getCodeTypeAllData);
@@ -74,7 +75,7 @@ router.put("/updateCustomerInfo/:id", customer.updateCustomerInfo);
 router.get("/getAllcustomer", customer.getAll);
 router.delete("/deletecustomer/:id",customer.deletecustomer);
 
-const { addtocartWishlistproduct, getCartWishlistProduct, deletefromcartWishlist, clearALlcartwishlist, addtocartwishlistAction, getAllWishlistItems, getAllCartItems } = require("../controllers/addtocartWishlistController");
+const { addtocartWishlistproduct, getCartWishlistProduct, deletefromcartWishlist, clearALlcartwishlist, addtocartwishlistAction, getAllWishlistItems, getAllCartItems, addtocartdata, wishlistData } = require("../controllers/addtocartWishlistController");
 
 
 // router.delete("/deletecustomer/:id",customer.deletecustomer);
@@ -86,6 +87,7 @@ router.delete("/delete_data/:id", homepage.delete_data);
 router.put("/update_data/:id", homepage.update_data);
 //hometable
 router.post("/add_hometable", hometable.add_data);
+router.put("/update_hometable_positions", hometable.update_hometable_positions);
 router.get("/get_hometable", hometable.get_data);
 router.put("/update_hometable/:id", hometable.update_data);
 // router.delete("/delete_hometable/:id", hometable.delete_data);
@@ -112,12 +114,17 @@ router.delete("/deletecustomeraddress/:address_id", customer.deleteCustomerAddre
 router.get("/getLable", lablemaster.getLable);
 router.get("/getrfmaster", rfmaster.getrfmaster);
 router.get("/getMasterSet", rfmaster.getMasterSet);
+router.get("/get-social-links", rfmaster.getSocialLinks);
+router.post('/save-social-links', rfmaster.saveSocialLinks);
+router.get('/social-links', rfmaster.getAllActiveSocialLinks);
 // Coupon Discount
 router.post("/addcoupons", discountController.addDiscountCoupon);
 router.get("/getcoupons", discountController.getAllDiscountCoupons);
 router.get("/getcouponsbyid/:id", discountController.getCouponById);
 router.put("/updatecoupons/:id", discountController.updateDiscountCoupon);
 router.post("/applycoupon", discountController.applyCoupon);
+
+
 
 
 router.post("/addtocartWishlist",addtocartWishlistproduct)
@@ -127,5 +134,14 @@ router.get('/getwishlist/:customerId', getAllWishlistItems)
 router.get('/getalladdtocart/:customerId', getAllCartItems)
 router.delete("/deletecartWishlist", deletefromcartWishlist)
 router.delete("/clearAllcartWishlist", clearALlcartwishlist)
+router.post("/addtocartdata",addtocartdata)
+router.post("/addwishlistdata",wishlistData)
+
+router.post("/upload_userMaster",upload.single('PROFILEIMAGE'),userMaster.upload_userMaster);
+router.get("/getid_userMaster/:id",userMaster.getOneMaster);
+router.get("/get_userMaster",userMaster.get_data);
+router.post("/add_userMaster",userMaster.add_data);
+//router.get('/check-user/:userid',verifyToken,userMaster.checkid_userMaster);
+//router.get('/max-userid',verifyToken,userMaster.getMax_userMaster);
 
 module.exports = router;

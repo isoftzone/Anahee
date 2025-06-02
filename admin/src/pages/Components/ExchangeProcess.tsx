@@ -52,10 +52,10 @@ const ExchangeProcess: React.FC = () => {
 
   return (
     <div className="privacy-policy-editor">
-      <h1 className="" style={{ fontWeight: "700" }}>Exchange Process</h1>
+      <h1 className="" style={{ fontWeight: "700" }}>{sectionname}</h1>
 
       {/* Section Name Input */}
-      <Form.Group className="">
+      {/* <Form.Group className="">
         <Form.Label>Section Name</Form.Label>
         <Form.Control
           type="text"
@@ -63,7 +63,7 @@ const ExchangeProcess: React.FC = () => {
           value={sectionname}
           onChange={(e) => setSectionname(e.target.value)}
         />
-      </Form.Group>
+      </Form.Group> */}
 
       <ReactQuill
         value={content}

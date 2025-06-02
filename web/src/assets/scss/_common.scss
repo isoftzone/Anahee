@@ -2013,14 +2013,21 @@ button:disabled {
 *::after,
 *::before {
   box-sizing: border-box;
-        font-size:15px;
+        font-size:10px;
 }
 .pe-7s-close:before{
   font-size: 36px;
 }
+.admin-name-icon:before{
+  font-size: 20px !important;
+}
+.icon-like-cart:before{
+  font-size: 15px !important;
+  width: 14px;
+}
 }
 
-.swiper-horizontal>.swiper-pagination-bullets, .swiper-pagination-bullets.swiper-pagination-horizontal{
-  position: relative !important;
-  bottom: 1px !important;
-}
+// .swiper-horizontal>.swiper-pagination-bullets, .swiper-pagination-bullets.swiper-pagination-horizontal{
+//   position: relative !important;
+//   bottom: 1px !important;
+// }

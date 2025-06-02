@@ -145,3 +145,69 @@ exports.getMasterSet = async (req, res) => {
         });
     }
 };
+
+exports.getSocialLinks = (req, res) => {
+  const sql = `SELECT platform, url, status FROM social_links`;
+  con.query(sql, (err, results) => {
+    if (err) {
+      console.error("❌ Error getting social links:", err);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+
+    const data = {};
+    results.forEach(row => {
+      data[row.platform.toLowerCase()] = {
+        url: row.url,
+        status: row.status,
+      };
+    });
+
+    res.json(data);
+  });
+};
+
+exports.saveSocialLinks = (req, res) => {
+  const { links, ...enabled } = req.body;
+  const platforms = ['facebook', 'instagram', 'youtube'];
+
+  // Helper function to update each platform's social link
+  const updateLink = (platform, url, status) => {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        INSERT INTO social_links (platform, url, status)
+        VALUES (?, ?, ?)
+        ON DUPLICATE KEY UPDATE url = VALUES(url), status = VALUES(status)
+      `;
+      con.query(sql, [platform, url, status], (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
+    });
+  };
+
+  (async () => {
+    try {
+      for (const platform of platforms) {
+        const url = (links && links[platform]) || null;
+        const status = enabled[`${platform}Enabled`] ? 1 : 0;
+        await updateLink(platform, url, status);
+      }
+      res.json({ success: true, message: "Social media links updated." });
+    } catch (error) {
+      console.error("❌ Error saving links:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  })();
+};
+
+exports.getAllActiveSocialLinks = (req, res) => {
+  const query = 'SELECT * FROM social_links WHERE status = 1';
+
+  con.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching active social links:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.status(200).json(results);
+  });
+};

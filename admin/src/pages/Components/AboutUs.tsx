@@ -53,9 +53,9 @@ const AboutUs: React.FC = () => {
 
   return (
     <div className="privacy-policy-editor">
-      <h1 className="mb-3" style={{ fontWeight: "700" }}>About Us</h1>
+      <h1 className="mb-3" style={{ fontWeight: "700" }}>{sectionname}</h1>
        {/* Section Name Input */}
-       <Form.Group className="mb-3">
+       {/* <Form.Group className="mb-3">
         <Form.Label>Section Name</Form.Label>
         <Form.Control
           type="text"
@@ -63,7 +63,7 @@ const AboutUs: React.FC = () => {
           value={sectionname}
           onChange={(e) => setSectionname(e.target.value)}
         />
-      </Form.Group>
+      </Form.Group> */}
       <ReactQuill
         value={content}
         onChange={setContent}

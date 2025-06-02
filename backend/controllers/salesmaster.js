@@ -6,11 +6,12 @@ exports.getSalesMaster = (req, res) => {
     SELECT 
       sm.SALEID,
       sm.NAME,
-      sm.EMAIL,
+      cm.email as EMAIL,
       sm.CNAME,
       sm.COUNTRY,
       sm.ADDRESS,
       sm.NUMBER,
+      sm.coupon_code,
       sm.payment_mode,
       sm.CREATEDON, 
       sm.payment_status,
@@ -24,6 +25,7 @@ exports.getSalesMaster = (req, res) => {
     FROM salesmaster sm
     JOIN salesdetail sd ON sm.SALEID = sd.SALEID
     JOIN itemmaster im ON sd.ITEMID = im.ITEMID
+    JOIN customermaster cm ON sm.CUSTOMERID = cm.CUSTOMERID
   `;
 
   const params = [];
@@ -59,6 +61,7 @@ exports.getSalesMaster = (req, res) => {
           COUNTRY: row.COUNTRY,
           ADDRESS: row.ADDRESS,
           NUMBER: row.NUMBER,
+          coupon_code:row.coupon_code,
           PAYMENTMETHOD: row.payment_mode,
           CREATEDON: row.CREATEDON,
           PAYMENTSTATUS: row.payment_status,
@@ -101,6 +104,8 @@ exports.addSalesMaster = (req, res) => {
     // amount,
     discount,
     payment_mode,
+    payment_status,
+    coupon_code,
     customerId
   } = req.body;
   const now = new Date();
@@ -114,6 +119,8 @@ exports.addSalesMaster = (req, res) => {
     // AMOUNT: amount,
     DISCAMOUNT:discount,
     payment_mode: payment_mode,
+    payment_status,
+    coupon_code,
     CUSTOMERID:customerId,
     CREATEDON: now,
     UPDATEDON: now,
@@ -397,6 +404,8 @@ exports.getAllOrders = (req, res) => {
       sm.ADDRESS,
       sm.NUMBER,
       sm.payment_mode,
+      sm.coupon_code,
+      sm.DISCAMOUNT,
       sm.CREATEDON,
       sm.payment_status,
       sm.ORDER_STATUS,
@@ -436,6 +445,8 @@ exports.getAllOrders = (req, res) => {
           ADDRESS: row.ADDRESS,
           NUMBER: row.NUMBER,
           PAYMENTMETHOD: row.payment_mode,
+          coupon_code:row.coupon_code,
+          DISCAMOUNT:row.DISCAMOUNT,
           CREATEDON: row.CREATEDON,
           PAYMENTSTATUS: row.payment_status,
           ORDER_STATUS: row.ORDER_STATUS,
