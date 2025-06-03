@@ -3,7 +3,7 @@ import { setActiveSort } from "../../helpers/product";
 import Accordion from 'react-bootstrap/Accordion';
 const ShopColor = ({ colors, getSortParams }) => {
   return (
-    <div className="sidebar-widget mt-50">
+    <div className="sidebar-widget mb-4">
      <Accordion.Item eventKey="1">
          <Accordion.Header><h4 className="pro-sidebar-title">Color</h4></Accordion.Header>
                   <Accordion.Body>

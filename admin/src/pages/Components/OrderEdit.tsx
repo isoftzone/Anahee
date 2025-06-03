@@ -55,9 +55,8 @@ const OrderEdit: React.FC = () => {
         country: '',
         paymentStatus: '',
         payment_mode: '',
-        ORDER_STATUS:'',
-        coupon_code:'',
-
+        ORDER_STATUS: '',
+        coupon_code: '',
     });
 
     const [salesMasterData, setSalesMasterData] = useState<SalesMasterData>({
@@ -98,13 +97,7 @@ const OrderEdit: React.FC = () => {
                     paymentStatus: sale.PAYMENTSTATUS,
                     payment_mode: sale.PAYMENTMETHOD,
                     ORDER_STATUS: sale.ORDER_STATUS,
-        coupon_code: sale.coupon_code,
-
-
-
-
-
-
+                    coupon_code: sale.coupon_code,
                 });
 
                 setItems(
@@ -366,30 +359,24 @@ const OrderEdit: React.FC = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <h1 className="text-xl md:text-2xl font-bold">Edit Order {saleId}</h1>
                 <div className="flex flex-wrap gap-2 w-full md:w-auto">
-                    <button 
-                        onClick={handleSaveOrder} 
-                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 md:px-4 md:py-2 rounded-md transition-colors text-sm md:text-base" 
+                    <button
+                        onClick={handleSaveOrder}
+                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 md:px-4 md:py-2 rounded-md transition-colors text-sm md:text-base"
                         disabled={loading}
                     >
                         {loading ? 'Saving...' : 'Save'}
                     </button>
-                    <button 
-                        onClick={handleSendInvoice} 
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 md:px-4 md:py-2 rounded-md transition-colors text-sm md:text-base" 
+                    <button
+                        onClick={handleSendInvoice}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 md:px-4 md:py-2 rounded-md transition-colors text-sm md:text-base"
                         disabled={loading}
                     >
                         Send Invoice
                     </button>
-                    <button 
-                        onClick={handlePreview} 
-                        className="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 md:px-4 md:py-2 rounded-md transition-colors text-sm md:text-base"
-                    >
+                    <button onClick={handlePreview} className="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 md:px-4 md:py-2 rounded-md transition-colors text-sm md:text-base">
                         Preview
                     </button>
-                    <button 
-                        onClick={handleDownload} 
-                        className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1 md:px-4 md:py-2 rounded-md transition-colors text-sm md:text-base"
-                    >
+                    <button onClick={handleDownload} className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1 md:px-4 md:py-2 rounded-md transition-colors text-sm md:text-base">
                         Download
                     </button>
                 </div>
@@ -433,28 +420,28 @@ const OrderEdit: React.FC = () => {
                     {/* Bill To */}
                     <div>
                         <h3 className="font-semibold mb-2">Bill To:</h3>
-                        <input 
-                            className="border rounded w-full p-2 mb-2" 
-                            value={customerDetails.name} 
-                            onChange={(e) => setCustomerDetails({ ...customerDetails, name: e.target.value })} 
+                        <input
+                            className="border rounded w-full p-2 mb-2"
+                            value={customerDetails.name}
+                            onChange={(e) => setCustomerDetails({ ...customerDetails, name: e.target.value })}
                             placeholder="Customer Name"
                         />
-                        <input 
-                            className="border rounded w-full p-2 mb-2" 
-                            value={customerDetails.email} 
-                            onChange={(e) => setCustomerDetails({ ...customerDetails, email: e.target.value })} 
+                        <input
+                            className="border rounded w-full p-2 mb-2"
+                            value={customerDetails.email}
+                            onChange={(e) => setCustomerDetails({ ...customerDetails, email: e.target.value })}
                             placeholder="Email"
                         />
-                        <input 
-                            className="border rounded w-full p-2 mb-2" 
-                            value={customerDetails.address} 
-                            onChange={(e) => setCustomerDetails({ ...customerDetails, address: e.target.value })} 
+                        <input
+                            className="border rounded w-full p-2 mb-2"
+                            value={customerDetails.address}
+                            onChange={(e) => setCustomerDetails({ ...customerDetails, address: e.target.value })}
                             placeholder="Address"
                         />
-                        <input 
-                            className="border rounded w-full p-2 mb-2" 
-                            value={customerDetails.phone} 
-                            onChange={(e) => setCustomerDetails({ ...customerDetails, phone: e.target.value })} 
+                        <input
+                            className="border rounded w-full p-2 mb-2"
+                            value={customerDetails.phone}
+                            onChange={(e) => setCustomerDetails({ ...customerDetails, phone: e.target.value })}
                             placeholder="Phone"
                         />
                         <div className="mt-2">
@@ -522,99 +509,76 @@ const OrderEdit: React.FC = () => {
                 {/* Invoice Items */}
                 <div className="mt-6">
                     <h3 className="font-semibold mb-2">Item Details</h3>
-                   <div className="overflow-x-auto">
-  <div className="min-w-full md:min-w-[600px]">
-    {/* Header Row */}
-    <div className="hidden md:grid grid-cols-12 gap-2 mb-2 text-start font-medium text-sm">
-      <div className="col-span-4 md:col-span-5">Item Name</div>
-      <div className="col-span-3 md:col-span-2">Description</div>
-      <div className="col-span-1">Qty</div>
-      <div className="col-span-1">Price</div>
-      <div className="col-span-1">Total</div>
-      <div className="col-span-1 text-center">Delete</div>
-    </div>
+                    <div className="overflow-x-auto">
+                        <div className="min-w-full md:min-w-[600px]">
+                            {/* Header Row */}
+                            <div className="hidden md:grid grid-cols-12 gap-2 mb-2 text-start font-medium text-sm">
+                                <div className="col-span-4 md:col-span-5">Item Name</div>
+                                <div className="col-span-3 md:col-span-2">Description</div>
+                                <div className="col-span-1">Qty</div>
+                                <div className="col-span-1">Price</div>
+                                <div className="col-span-1">Total</div>
+                                <div className="col-span-1 text-center">Delete</div>
+                            </div>
 
-    {/* Items List */}
-    {items.map((item, index) => (
-      <div
-        key={index}
-        className="grid grid-cols-1 md:grid-cols-12 gap-2 items-start mb-3 text-sm border-b pb-2"
-      >
-        {/* Item Name */}
-        <div className="md:col-span-5">
-          <label className="md:hidden block text-xs text-start text-gray-500 mb-1">Item Name</label>
-          <input
-            className="w-full border rounded p-2"
-            value={item.name}
-            onChange={(e) => handleItemChange(index, 'name', e.target.value)}
-          />
-        </div>
+                            {/* Items List */}
+                            {items.map((item, index) => (
+                                <div key={index} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-start mb-3 text-sm border-b pb-2">
+                                    {/* Item Name */}
+                                    <div className="md:col-span-5">
+                                        <label className="md:hidden block text-xs text-start text-gray-500 mb-1">Item Name</label>
+                                        <input className="w-full border rounded p-2" value={item.name} onChange={(e) => handleItemChange(index, 'name', e.target.value)} />
+                                    </div>
 
-        {/* Description */}
-        <div className="md:col-span-2">
-          <label className="md:hidden block text-xs  text-start text-gray-500 mb-1">Description</label>
-          <input
-            className="w-full border rounded p-2"
-            value={item.description || ''}
-            onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-          />
-        </div>
+                                    {/* Description */}
+                                    <div className="md:col-span-2">
+                                        <label className="md:hidden block text-xs  text-start text-gray-500 mb-1">Description</label>
+                                        <input className="w-full border rounded p-2" value={item.description || ''} onChange={(e) => handleItemChange(index, 'description', e.target.value)} />
+                                    </div>
 
-        {/* Quantity */}
-        <div className="md:col-span-1">
-          <label className="md:hidden block text-xs  text-start text-gray-500 mb-1">Qty</label>
-          <input
-            className="w-full border rounded p-2"
-            type="number"
-            min="1"
-            value={item.quantity}
-            onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-          />
-        </div>
+                                    {/* Quantity */}
+                                    <div className="md:col-span-1">
+                                        <label className="md:hidden block text-xs  text-start text-gray-500 mb-1">Qty</label>
+                                        <input
+                                            className="w-full border rounded p-2"
+                                            type="number"
+                                            min="1"
+                                            value={item.quantity}
+                                            onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                                        />
+                                    </div>
 
-        {/* Price */}
-        <div className="md:col-span-1">
-          <label className="md:hidden block text-xs  text-start text-gray-500 mb-1">Price</label>
-          <input
-            className="w-full border rounded p-2"
-            type="number"
-            min="0"
-            step="0.01"
-            value={item.price}
-            onChange={(e) => handleItemChange(index, 'price', e.target.value)}
-          />
-        </div>
+                                    {/* Price */}
+                                    <div className="md:col-span-1">
+                                        <label className="md:hidden block text-xs  text-start text-gray-500 mb-1">Price</label>
+                                        <input
+                                            className="w-full border rounded p-2"
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            value={item.price}
+                                            onChange={(e) => handleItemChange(index, 'price', e.target.value)}
+                                        />
+                                    </div>
 
-        {/* Total (Read-only) */}
-        <div className="md:col-span-1">
-          <label className="md:hidden block text-xs  text-start text-gray-500 mb-1">Total</label>
-          <input
-            className="w-full border rounded p-2 bg-gray-50"
-            type="number"
-            readOnly
-            value={(item.price * item.quantity).toFixed(2)}
-          />
-        </div>
+                                    {/* Total (Read-only) */}
+                                    <div className="md:col-span-1">
+                                        <label className="md:hidden block text-xs  text-start text-gray-500 mb-1">Total</label>
+                                        <input className="w-full border rounded p-2 bg-gray-50" type="number" readOnly value={(item.price * item.quantity).toFixed(2)} />
+                                    </div>
 
-        {/* Delete Button */}
-        <div className="md:col-span-1 flex justify-center  text-start mt-2 md:mt-0">
-          <button
-            className="text-red-500 hover:text-red-700"
-            onClick={() => removeItem(index)}
-            title="Delete item"
-          >
-            ❌
-          </button>
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
+                                    {/* Delete Button */}
+                                    <div className="md:col-span-1 flex justify-center  text-start mt-2 md:mt-0">
+                                        <button className="text-red-500 hover:text-red-700" onClick={() => removeItem(index)} title="Delete item">
+                                            ❌
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
 
-                    <button 
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 md:px-4 md:py-2 rounded-md mt-2 transition-colors text-sm md:text-base"
-                        onClick={addItem}
-                    >
+                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 md:px-4 md:py-2 rounded-md mt-2 transition-colors text-sm md:text-base" onClick={addItem}>
                         Add Item
                     </button>
                 </div>
@@ -623,34 +587,15 @@ const OrderEdit: React.FC = () => {
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     <div>
                         <label className="block text-sm font-medium">Tax (%)</label>
-                        <input 
-                            className="border rounded w-full p-2 mt-1" 
-                            type="number" 
-                            min="0" 
-                            value={tax} 
-                            onChange={(e) => setTax(Number(e.target.value))} 
-                        />
+                        <input className="border rounded w-full p-2 mt-1" type="number" min="0" value={tax} onChange={(e) => setTax(Number(e.target.value))} />
                     </div>
                     <div>
                         <label className="block text-sm font-medium">Discount ($)</label>
-                        <input 
-                            className="border rounded w-full p-2 mt-1" 
-                            type="number" 
-                            min="0" 
-                            value={discount} 
-                            onChange={(e) => setDiscount(Number(e.target.value))} 
-                        />
+                        <input className="border rounded w-full p-2 mt-1" type="number" min="0" value={discount} onChange={(e) => setDiscount(Number(e.target.value))} />
                     </div>
                     <div>
                         <label className="block text-sm font-medium">Shipping ($)</label>
-                        <input 
-                            className="border rounded w-full p-2 mt-1" 
-                            type="number" 
-                            min="0" 
-                            step="0.01" 
-                            value={shipping} 
-                            onChange={(e) => setShipping(Number(e.target.value))} 
-                        />
+                        <input className="border rounded w-full p-2 mt-1" type="number" min="0" step="0.01" value={shipping} onChange={(e) => setShipping(Number(e.target.value))} />
                     </div>
                 </div>
 

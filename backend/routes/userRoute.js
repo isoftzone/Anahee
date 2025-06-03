@@ -72,6 +72,7 @@ router.get("/getallorders/:customerId", salesmaster.getAllOrders);
 router.put("/updateSales/:id", salesmaster.updateSales);
 router.get("/getcustomerbyid/:customerId", customer.getcustomerbyid);
 router.put("/updateCustomerInfo/:id", customer.updateCustomerInfo);
+router.put("/updateCustomerInfo", customer.updateCustomerInfo);
 router.get("/getAllcustomer", customer.getAll);
 router.delete("/deletecustomer/:id",customer.deletecustomer);
 

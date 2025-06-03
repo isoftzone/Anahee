@@ -59,178 +59,43 @@ const Header = () => {
         }
     }, [location]);
 
-    // const [user, setUser] = useState(null); // State to hold user information
-    // const [user, setUser] = useState<{ name: string, email: string } | null>(null);
     interface User {
         name: string;
         email: string;
         profileImage?: string;
-        // Add other fields as needed
     }
 
     const [user, setUser] = useState<any | null>(null);
-
-    // useEffect(() => {
-    //     const userDataString = localStorage.getItem('userData');
-    //     if (userDataString) {
-    //         const users = JSON.parse(userDataString);
-    //         setUser(users);
-    //     }
-    // }, []);
-
-    // useEffect(() => {
-    //     const userDataString = localStorage.getItem('userDatas');
-    //     if (userDataString) {
-    //         try {
-    //             const users = JSON.parse(userDataString);
-    //             // Ensure it has both name and email
-    //             console.log('Parsed user data:', users);
-    //             if (users.FNAME && users.EMAIL) {
-    //                 setUser(users.PROFILEIMAGE);
-    //                 console.log('User data set:', users.PROFILEIMAGE);
-    //             } else {
-    //                 console.warn('Invalid user data in localStorage');
-    //             }
-    //         } catch (err) {
-    //             console.error('Failed to parse user data:', err);
-    //         }
-    //     }
-    // }, []);
-
-    // const [user, setUser] = useState<any | null>(null);
-      useEffect(() => {
-        const userDataString = localStorage.getItem('userDatas');
-        if (userDataString) {
-            try {
-                const users = JSON.parse(userDataString);
-                // Ensure it has both name and email
-                console.log('Parsed user data:', users);
-                if (users.FNAME && users.EMAIL) {
-                    setUser(users);
-                    console.log('User data set:', users.PROFILEIMAGE);
-                } else {
-                    console.warn('Invalid user data in localStorage');
-                }
-            } catch (err) {
-                console.error('Failed to parse user data:', err);
-            }
-        }
-    }, []);
-    
-
-    console.log('user', user);
-    // useEffect(() => {
-    //     const fetchUserData = async () => {
-    //       try {
-    //         // const email = 'user@example.com'; // Replace with actual email
-    //         // const password = 'password123';   // Replace with actual password
-
-    //         // console.log('Request body:', { email, password });
-
-    //         // const response = await axios.post(`${BASE_URL}/login`, { email, password }, {
-    //         //   headers: {
-    //         //     'Content-Type': 'application/json'
-    //         //   }
-    //         // });
-
-    //        let localStorageData = localStorage.getItem('userData');
-
-    //         const responses = await axios.get(`${BASE_URL}/getid_userMaster/${localStorageData.id}`, {
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //   });
-    //    const userData = responses.data;
-    //   setUser(userData);
-    //       } catch (error) {
-    //         console.error('Error fetching user data:', error);
-    //         // setError(error.response?.data?.msg || 'An error occurred during login.');
-    //       }
-    //     };
-
-    //     fetchUserData();
-    //   }, []);
-
-    // useEffect(() => {
-    //   const fetchUserData = async () => {
-    //     try {
-    //       const localStorageData = localStorage.getItem('userDatas');
-    // console.log('localStorageData=', localStorageData);
-    //       if (!localStorageData) return;
-
-    //       const parsedData = JSON.parse(localStorageData);
-    //       if (!parsedData?.USERID) return;
-
-    //     //   const response = await axios.get(`${BASE_URL}/getid_userMaster/${parsedData.id}`, {
-    //     //     headers: {
-    //     //       'Content-Type': 'application/json',
-    //     //     },
-    //     //   });
-
-    //     //   const userData = response.data;
-    //     let v=localStorageData.PROFILEIMAGE;
-    //       setUser(userData);
-    //     } catch (error) {
-    //       console.error('Error fetching user data:', error);
-    //     }
-    //   };
-
-    //   fetchUserData();
-
-    //   // ✅ Set up listener to update on localStorage change event
-    //   const handleUpdate = () => {
-    //     fetchUserData(); // re-fetch data
-    //   };
-
-    //   window.addEventListener('userDataUpdated', handleUpdate);
-
-    //   return () => {
-    //     window.removeEventListener('userDataUpdated', handleUpdate);
-    //   };
-    // }, []);
+    const [imageUrl, setImageUrl] = useState<string>('/assets/images/profile-0350.png');
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const localStorageData = localStorage.getItem('userData');
-                console.log('localStorageData =', localStorageData);
-
-                if (!localStorageData) return;
-
-                const parsedData = JSON.parse(localStorageData);
-                if (!parsedData?.USERID) return;
-
-                // If you just want to use data from localStorage (no backend request):
-                setUser(parsedData.PROFILEIMAGE); // set user from local storage directly
-
-                // If you need to refresh from backend, uncomment this part:
-                // const response = await axios.get(`${BASE_URL}/getid_userMaster/${parsedData.USERID}`, {
-                //   headers: {
-                //     'Content-Type': 'application/json',
-                //   },
-                // });
-                // setUser(response.data);
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        };
-
-        fetchUserData();
-
-        const handleUpdate = () => {
-            fetchUserData(); // re-fetch data if another component updates localStorage
-        };
-
-        window.addEventListener('userDataUpdated', handleUpdate);
-
-        return () => {
-            window.removeEventListener('userDataUpdated', handleUpdate);
-        };
+        const userDataString = localStorage.getItem('userData');
+        if (userDataString) {
+            const users = JSON.parse(userDataString);
+            setUser(users);
+        }
     }, []);
+
+    const users = useSelector((state: IRootState) => state.user);
+
+    useEffect(() => {
+        if (users?.profileImage) {
+            setImageUrl(`${BASE_URL}/images/banner/${users.profileImage}`);
+        } else if (user?.profileImage) {
+            setImageUrl(`${BASE_URL}/images/banner/${user.profileImage}`);
+        }else{
+             setImageUrl('/assets/images/profile-0350.png');
+        }
+    }, [users, user]);
+
+    console.log('user.profileImage', user?.profileImage);
+    console.log('imageUrl', imageUrl);
 
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
 
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);
+
+    console.log('users=-', users);
     const dispatch = useDispatch();
 
     function createMarkup(messages: any) {
@@ -605,7 +470,8 @@ const Header = () => {
                                         //  src="/assets/images/user-profile.jpeg"
                                         // src={user ? `${BASE_URL}/${user}` : '/assets/images/profile-0350.png'}
                                         // src={user ? `${BASE_URL}/images/banner/${user}` : '/assets/images/profile-0350.png'}
-                                         src={user ? `${BASE_URL}/images/banner/${user.PROFILEIMAGE}` : '/assets/images/profile-0350.png'}
+                                        //  src={user ? `${BASE_URL}/images/banner/${user.PROFILEIMAGE}` : '/assets/images/profile-0350.png'}
+                                        src={imageUrl}
                                         alt="userProfile"
                                     />
                                 }
@@ -613,7 +479,10 @@ const Header = () => {
                                 <ul className="text-dark dark:text-white-dark !py-0 w-[230px] font-semibold dark:text-white-light/90">
                                     <li>
                                         <div className="flex items-center px-4 py-4">
-                                            <img className="rounded-md w-10 h-10 object-cover" src={user ? `${BASE_URL}/images/banner/${user}` : '/assets/images/profile-0350.png'} alt="userProfile" />
+                                            <img className="rounded-md w-10 h-10 object-cover" 
+                                            // src={user ? `${BASE_URL}/images/banner/${user}` : '/assets/images/profile-0350.png'}
+                                             src={imageUrl}
+                                             alt="userProfile" />
                                             <div className="ltr:pl-4 rtl:pr-4 truncate">
                                                 <div>
                                                     {user && (

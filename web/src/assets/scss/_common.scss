@@ -2007,27 +2007,38 @@ button:disabled {
   }
 }
 
-
-@media (max-width:375px){
+@media (max-width: 375px) {
   *,
-*::after,
-*::before {
-  box-sizing: border-box;
-        font-size:10px;
-}
-.pe-7s-close:before{
-  font-size: 36px;
-}
-.admin-name-icon:before{
-  font-size: 20px !important;
-}
-.icon-like-cart:before{
-  font-size: 15px !important;
-  width: 14px;
-}
+  *::after,
+  *::before {
+    box-sizing: border-box;
+    font-size: 10px;
+  }
+  .pe-7s-close:before {
+    font-size: 36px;
+  }
+  .admin-name-icon:before {
+    font-size: 20px !important;
+  }
+  .icon-like-cart:before {
+    font-size: 15px !important;
+    width: 14px;
+  }
+  .contact-icon i:before {
+    font-size: 18px !important;
+  }
 }
 
 // .swiper-horizontal>.swiper-pagination-bullets, .swiper-pagination-bullets.swiper-pagination-horizontal{
 //   position: relative !important;
 //   bottom: 1px !important;
 // }
+
+.swiper-wrapper {
+  transform: translate3d(0px, 0, 0);
+  padding-bottom: 28px;
+  -webkit-transform: translate3d(0px, 0, 0);
+  -moz-transform: translate3d(0px, 0, 0);
+  -ms-transform: translate3d(0px, 0, 0);
+  -o-transform: translate3d(0px, 0, 0);
+}

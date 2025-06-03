@@ -110,11 +110,11 @@ const ShopCategories = ({ categories, getSortParams,selectedCategory }) => {
       : selectedCategories.includes(value);
   };
   return (
-    <div className="sidebar-widget">
+    <div className="sidebar-widget mb-4">
         <Accordion.Item eventKey="0">
     <Accordion.Header><h4 className="pro-sidebar-title">{t("Categories")}</h4></Accordion.Header>
     <Accordion.Body>
-      <div className="sidebar-widget-list mt-30">
+      <div className="sidebar-widget-list">
         {categories ? (
           <ul>
             <li>

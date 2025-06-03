@@ -20,6 +20,8 @@ interface Customer {
     CADDRESSLINE1?: string;
     NAME?: string;
     email?: string;
+    CSTATE?:string;
+    CCOUNTRY?:string;
 }
 
 interface SortConfig {
@@ -44,11 +46,13 @@ const CustomersL: React.FC = () => {
         { key: 'LNAME', label: 'Last Name' },
         { key: 'CUSTOMERID', label: 'Customer ID' },
         { key: 'MOBILE', label: 'Phone No.' },
+        { key: 'CCOUNTRY', label: 'Country' },
+        { key: 'CSTATE', label: 'State' },
         { key: 'CCITY', label: 'City' },
-        { key: 'STATE', label: 'State' },
         { key: 'CPINCODE', label: 'Pincode' },
         { key: 'CADDRESSLINE1', label: 'Address' },
-        { key: 'NAME', label: 'NAME' },
+        // { key: 'CADDRESSLINE1', label: 'Address' },
+        // { key: 'NAME', label: 'NAME' },
         { key: 'email', label: 'email' },
     ];
 
@@ -171,11 +175,12 @@ const CustomersL: React.FC = () => {
                                     <td className="p-2 border">{customer.LNAME}</td>
                                     <td className="p-2 border">{customer.CUSTOMERID}</td>
                                     <td className="p-2 border">{customer.MOBILE}</td>
+                                    <td className="p-2 border">{customer.CCOUNTRY}</td>
+                                    <td className="p-2 border">{customer.CSTATE}</td>
                                     <td className="p-2 border">{customer.CCITY}</td>
-                                    <td className="p-2 border">{customer.STATE}</td>
                                     <td className="p-2 border">{customer.CPINCODE}</td>
                                     <td className="p-2 border">{customer.CADDRESSLINE1}</td>
-                                    <td className="p-2 border">{customer.NAME}</td>
+                                    {/* <td className="p-2 border">{customer.NAME}</td> */}
                                     <td className="p-2 border">{customer.email}</td>
                                     <td className="p-2 border">
                                         <div className="flex gap-2">
