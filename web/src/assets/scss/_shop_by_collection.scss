@@ -27,14 +27,14 @@
     border: 1px solid #eee;
     height: 600px;
     .lookbook-image {
-      width: 70%;
+      width: 100%;
       height: 100%;
       background-color: #ffeaf1;
       img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
-        object-position: left center;
+        object-fit: cover !important;
+        // object-position: left center;
       }
     }
     .lookbook-text {
@@ -89,9 +89,9 @@
   .lookbook2 {
     height: 600px;
     img {
-      width: 100%;
+      width: 70%;
       height: 100%;
-      object-fit: cover;
+      object-fit: cover !important;
     }
   }
   .lookbook1 {
@@ -100,15 +100,15 @@
   .lookbook2 {
     background: #f4efe1;
   }
-  .lookbook1,
-  .lookbook2 {
-    height: 600px;
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  }
+  // .lookbook1,
+  // .lookbook2 {
+  //   height: 600px;
+  //   img {
+  //     width: 100%;
+  //     height: 100%;
+  //     object-fit: cover;
+  //   }
+  // }
 
   @media (max-width: 1440px) {
     .lookbook-main-container {
@@ -129,7 +129,7 @@
   @media (max-width: 1440px) {
     .lookbook-main-container {
       .lookbook-text-content {
-        left: 55%;
+        left: 60%;
       }
     }
   }
@@ -210,20 +210,39 @@
 }
 
 @media (max-width: 375px) {
- .lookbook-main-container {
-      .lookbook-text-content {
-        left: 45% !important;
-      }
+  .lookbook-main-container {
+    .lookbook-text-content {
+      left: 45% !important;
     }
+  }
 }
 
 @media (max-width: 375px) {
- .lookbook-main-container {
-      .lookbook-text-content {
-        left: 40% !important;
-      }
-      .lookbook-title{
-        font-size: 6rem !important;
-      }
+  .lookbook-main-container {
+    .lookbook-text-content {
+      left: 40% !important;
     }
+    .lookbook-title {
+      font-size: 6rem !important;
+    }
+  }
 }
+
+// @media (max-width: 2560px) {
+//   .lookbook-main-container {
+//     background-color: #fff;
+//     border: 1px solid #eee;
+//     height: 600px;
+//     .lookbook-image {
+//       width: 70%;
+//       height: 100%;
+//       background-color: #ffeaf1;
+//       img {
+//         width: 100%;
+//         height: 100%;
+//         object-fit: cover;
+//         object-position: left center;
+//       }
+//     }
+//   }
+// }

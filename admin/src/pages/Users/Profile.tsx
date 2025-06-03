@@ -25,25 +25,46 @@ const Profile = () => {
     // useEffect(() => {
     //     dispatch(setPageTitle('Profile'));
     // });
-    const [user, setUser] = useState<any | null>(null);
-    useEffect(() => {
-        const userDataString = localStorage.getItem('userDatas');
-        if (userDataString) {
-            try {
+    // const [user, setUser] = useState<any | null>(null);
+    // useEffect(() => {
+    //     const userDataString = localStorage.getItem('userDatas');
+    //     if (userDataString) {
+    //         try {
+    //             const users = JSON.parse(userDataString);
+    //             // Ensure it has both name and email
+    //             console.log('Parsed user data:', users);
+    //             if (users.FNAME && users.EMAIL) {
+    //                 setUser(users);
+    //                 console.log('User data set:', users.PROFILEIMAGE);
+    //             } else {
+    //                 console.warn('Invalid user data in localStorage');
+    //             }
+    //         } catch (err) {
+    //             console.error('Failed to parse user data:', err);
+    //         }
+    //     }
+    // }, []);
+       const [imageUrl, setImageUrl] = useState<string>('/assets/images/profile-0350.png');
+       const [user, setUser] = useState<any | null>(null);
+        useEffect(() => {
+            const userDataString = localStorage.getItem('userData');
+            if (userDataString) {
                 const users = JSON.parse(userDataString);
-                // Ensure it has both name and email
-                console.log('Parsed user data:', users);
-                if (users.FNAME && users.EMAIL) {
-                    setUser(users);
-                    console.log('User data set:', users.PROFILEIMAGE);
-                } else {
-                    console.warn('Invalid user data in localStorage');
-                }
-            } catch (err) {
-                console.error('Failed to parse user data:', err);
+                setUser(users);
             }
-        }
-    }, []);
+        }, []);
+    
+        const users = useSelector((state: IRootState) => state.user);
+    
+        useEffect(() => {
+            if (users?.profileImage) {
+                setImageUrl(`${BASE_URL}/images/banner/${users.profileImage}`);
+            } else if (user?.profileImage) {
+                setImageUrl(`${BASE_URL}/images/banner/${user.profileImage}`);
+            }else{
+                 setImageUrl('/assets/images/profile-0350.png');
+            }
+        }, [users, user]);
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     return (
         <div>
@@ -73,7 +94,8 @@ const Profile = () => {
                                     className="w-24 h-24 rounded-full object-cover  mb-5"
                                     //  src="/assets/images/user-profile.jpeg"
                                     // src={user ? `${BASE_URL}/${user}` : '/assets/images/profile-0350.png'}
-                                    src={user ? `${BASE_URL}/images/banner/${user.PROFILEIMAGE}` : '/assets/images/profile-0350.png'}
+                                    // src={user ? `${BASE_URL}/images/banner/${user.PROFILEIMAGE}` : '/assets/images/profile-0350.png'}
+                                    src={imageUrl}
                                     alt="userProfile"
                                 />
                               {user && <p className="font-semibold text-primary text-xl">{user.FNAME}</p>}

@@ -236,7 +236,7 @@ const Orders = () => {
 
   return (
     <LayoutOne headerTop="visible">
-      <div className="container orders-container py-4">
+      <div className="container-fluid orders-container py-4">
         <div className="page-header text-center mb-4">
           <h1 className="page-title">My Orders</h1>
           <p className="page-subtitle text-muted">

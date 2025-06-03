@@ -10,7 +10,7 @@
 }
 
 .contact-info-wrap {
-  padding:20px;
+  padding: 20px;
 
   background-color: #f3f3f3;
   @media #{$lg-layout} {
@@ -28,11 +28,11 @@
     display: flex;
     align-items: center;
 
-    margin-bottom: 34px;
+    margin-bottom: 25px;
     .contact-icon {
       margin-right: 20px;
       i {
-        font-size: 20px;
+        font-size: 20px !important;
         line-height: 40px;
 
         display: inline-block;
@@ -129,8 +129,8 @@
     input,
     textarea {
       height: 40px;
-      margin-bottom: 6px;
-      padding:7px;
+      margin-bottom: 20px;
+      padding: 7px;
 
       color: #000;
       border: 1px solid #c1c1c1;
@@ -184,13 +184,19 @@
 
   @media (max-width: 1440px) {
     .contact-info-wrap {
-      padding:20px;;
+      padding: 20px;
+    }
+    .contact-info-wrap .single-contact-info {
+      margin-bottom: 25px;
     }
   }
 
   @media (max-width: 1024px) {
     .contact-info-wrap {
       padding: 20px;
+    }
+    .contact-info-wrap .single-contact-info {
+      margin-bottom: 24px;
     }
     .contact-form {
       padding: 28px;
@@ -212,7 +218,7 @@
     .contact-title h2 {
       margin-bottom: -16px;
     }
-    .contact-info-wrap{
+    .contact-info-wrap {
       margin-bottom: 10px;
     }
   }
@@ -223,7 +229,7 @@
       margin-top: 64px !important;
       margin-bottom: 14px;
     }
-    .contact-form{
+    .contact-form {
       margin-bottom: 11px;
     }
   }

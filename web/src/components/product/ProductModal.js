@@ -6,10 +6,15 @@ import { useDispatch, useSelector } from "react-redux";
 import Rating from "./sub-components/ProductRating";
 import Swiper, { SwiperSlide } from "../../components/swiper";
 import { getProductCartQuantity } from "../../helpers/product";
-import { addToCart } from "../../store/slices/cart-slice";
-import { addToWishlist, deleteFromWishlist } from "../../store/slices/wishlist-slice";
+import { addToCart, deleteFromCart } from "../../store/slices/cart-slice";
+import { addToWishlist, deleteFromWishlist, removeColorFromWishlist } from "../../store/slices/wishlist-slice";
 import { addToCompare } from "../../store/slices/compare-slice";
-
+import axios from "axios";
+import { BASE_URL } from "../../config";
+const customerInfoSting= localStorage.getItem('customerinfo');
+const customerinfo = customerInfoSting ? JSON.parse(customerInfoSting) : null;
+console.log("this is id customer description", customerinfo?.id);
+const CUSTOMERID = customerinfo?.id;
 function ProductModal({
   product,
   currency,
@@ -69,6 +74,86 @@ function ProductModal({
     // Add Pagination module
     
   };
+  const handleAddtocart = async () => {
+    // Create cart item object
+    const cartItem = {
+      ...product,
+      quantity: quantityCount,
+      };
+      console.log("this is034", cartItem);
+    // Always add to Redux store (works for both logged-in and guest users)
+    dispatch(addToCart(cartItem));
+    // Only call API if user is logged in
+    if (CUSTOMERID) {
+      console.log("this is 05");
+      try {
+        const payload = {
+          CUSTOMERID,
+          ITEMID: product.id,
+          quantity: quantityCount,
+          type: "cart",
+        };
+        const response = await axios.post(`${BASE_URL}/addtocartWishlist`, payload);
+        console.log("Item added to server cart:", response.data);
+      } catch (error) {
+        console.error("Failed to add to server cart:", error);
+        // Optional: Remove from Redux if server update fails
+        dispatch(deleteFromCart(cartItem.cartItemId));
+      }
+    }
+    // Reset quantity after adding to cart
+    setQuantityCount(1);
+  };
+
+  const handleWishlist = async () => {
+  // Always add to Redux store (works for both logged-in and guest users)
+  dispatch(addToWishlist(product));
+  // Only call API if user is logged in
+  if (CUSTOMERID) {
+    try {
+      const payload = {
+        CUSTOMERID,
+        ITEMID: product.id,
+        type: "wishlist"
+      };
+      const response = await axios.post(`${BASE_URL}/addtocartWishlist`, payload);
+      console.log("Item added to server wishlist:", response.data);
+    } catch (error) {
+      console.error("Failed to add to server wishlist:", error);
+      // Optional: Remove from Redux if server update fails
+      dispatch(deleteFromWishlist(product));
+    }
+  }
+};
+
+
+const handledeleteWishlist = async () => {
+  // Always remove from Redux store immediately (optimistic update)
+  dispatch(deleteFromWishlist(product));
+  // Only call API if user is logged in
+  if (CUSTOMERID) {
+    try {
+      const payload = {
+        CUSTOMERID,
+        ITEMID: product.id,
+        type: "wishlist"
+      };
+      const response = await axios.delete(`${BASE_URL}/deletecartWishlist`, {
+        data: payload
+      });
+      if (!response.data?.success) {
+        // If server deletion fails, re-add to Redux
+        dispatch(addToWishlist(product));
+        console.error('Failed to delete from server wishlist');
+      }
+    } catch (error) {
+      // If API call fails, re-add to Redux
+      dispatch(addToWishlist(product));
+      console.error('Error deleting from wishlist:', error);
+    }
+  }
+};
+
   const onCloseModal = () => {
     setThumbsSwiper(null);
     onHide();
@@ -287,24 +372,25 @@ function ProductModal({
                   <div className="pro-details-cart btn-hover">
                     {productStock && productStock > 0 ? (
                       <button
-                        onClick={() =>
-                          dispatch(
-                            addToCart({
-                              ...product,
-                              quantity: quantityCount,
-                              selectedProductColor: selectedProductColor
-                                ? selectedProductColor
-                                : product.selectedProductColor
-                                ? product.selectedProductColor
-                                : null,
-                              selectedProductSize: selectedProductSize
-                                ? selectedProductSize
-                                : product.selectedProductSize
-                                ? product.selectedProductSize
-                                : null,
-                            })
-                          )
-                        }
+                     onClick={handleAddtocart}
+                        // onClick={() =>
+                        //   dispatch(
+                        //     addToCart({
+                        //       ...product,
+                        //       quantity: quantityCount,
+                        //       selectedProductColor: selectedProductColor
+                        //         ? selectedProductColor
+                        //         : product.selectedProductColor
+                        //         ? product.selectedProductColor
+                        //         : null,
+                        //       selectedProductSize: selectedProductSize
+                        //         ? selectedProductSize
+                        //         : product.selectedProductSize
+                        //         ? product.selectedProductSize
+                        //         : null,
+                        //     })
+                        //   )
+                        // }
                         disabled={productCartQty >= productStock}
                       >
                         {" "}
@@ -320,10 +406,15 @@ function ProductModal({
                 wishlistItem ? "text-danger" : "text-gray-400"
               }`}
               title={wishlistItem ? "Remove from wishlist" : "Add to wishlist"}
+              // onClick={() =>
+              //   wishlistItem
+              //     ? dispatch(deleteFromWishlist(product))
+              //     : dispatch(addToWishlist(product))
+              // }
               onClick={() =>
                 wishlistItem
-                  ? dispatch(deleteFromWishlist(product))
-                  : dispatch(addToWishlist(product))
+                  ?  handledeleteWishlist()
+                  : handleWishlist()
               }
             >
               {wishlistItem ? (

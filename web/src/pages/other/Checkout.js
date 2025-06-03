@@ -8,6 +8,7 @@ import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import axios from "axios";
 import { BASE_URL } from "./../../config";
 import { deleteAllFromCart } from "../../store/slices/cart-slice";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 const Checkout = () => {
   let cartTotalPrice = 0;
@@ -169,11 +170,14 @@ const Checkout = () => {
       };
       fetchStates();
     }
-  }, [formData.country,editItem?.country]);
+  }, [formData.country, editItem?.country]);
 
   // Fetch cities on state change
   useEffect(() => {
-    if (formData.country && formData.state || editItem?.country && editItem?.state) {
+    if (
+      (formData.country && formData.state) ||
+      (editItem?.country && editItem?.state)
+    ) {
       const fetchCities = async () => {
         try {
           const res = await axios.post(
@@ -191,7 +195,7 @@ const Checkout = () => {
       };
       fetchCities();
     }
-  }, [formData.state,editItem?.state]);
+  }, [formData.state, editItem?.state]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -409,7 +413,7 @@ const Checkout = () => {
     }
   };
 
-  const resetForm = () => {
+  const resetForm = async () => {
     setFormData({
       firstName: "",
       lastName: "",
@@ -429,6 +433,28 @@ const Checkout = () => {
     setTouched({});
     setOrderId("");
     dispatch(deleteAllFromCart()); // Clear cart items
+    try {
+      const payload = {
+        CUSTOMERID: customerId,
+        type: "cart",
+      };
+      const response = await axios.delete(`${BASE_URL}/clearAllcartWishlist`, {
+        data: payload,
+      });
+      if (response.status === 200 && response.data?.success) {
+        console.log("Successfully cleared all cart items from server.");
+        // No need to dispatch again, already cleared optimistically
+      } else {
+        console.warn(
+          "Server clear all cart failed:",
+          response.data?.message ?? response.data
+        );
+        // Optional: Re-fetch cart or show error if server clear failed and you want strict consistency
+      }
+    } catch (error) {
+      console.error("Error clearing all cart items from backend:", error);
+      // Optional: Re-fetch cart or show error
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -446,15 +472,15 @@ const Checkout = () => {
     }
 
     const orderData = {
-      firstName: primaryAddress.fname,
-      lastName: primaryAddress.lname,
-      // email: primaryAddress.email,
-      phone: primaryAddress.mobile,
+      firstName: primaryAddress.firstName,
+      lastName: primaryAddress.lastName,
+      email: "",
+      phone: primaryAddress.phone,
       address: primaryAddress.address,
       city: primaryAddress.city,
       state: primaryAddress.state,
       country: primaryAddress.country,
-      postcode: primaryAddress.postal_code,
+      postcode: primaryAddress.postcode,
       description: primaryAddress.description,
       discount,
       customerId,
@@ -761,7 +787,7 @@ const Checkout = () => {
         <div className="checkout-area pt-10 pb-30">
           <div className="container">
             {cartItems && cartItems.length >= 1 ? (
-              <div>
+              <form onSubmit={handleSubmit}>
                 <div className="row pb-5">
                   <div className="col-lg-7">
                     <div className="billing-info-wrap">
@@ -800,13 +826,15 @@ const Checkout = () => {
                                   onChange={handleInputChange}
                                   onBlur={handleBlur}
                                   className={`form-control ${
-                                    activeForm === 'add' && errors.firstName &&
+                                    activeForm === "add" &&
+                                    errors.firstName &&
                                     touched.firstName
                                       ? "is-invalid"
                                       : ""
                                   }`}
                                 />
-                                {activeForm === 'add' && errors.firstName &&
+                                {activeForm === "add" &&
+                                  errors.firstName &&
                                   touched.firstName && (
                                     <div className="invalid-feedback">
                                       {errors.firstName}
@@ -824,12 +852,15 @@ const Checkout = () => {
                                   onChange={handleInputChange}
                                   onBlur={handleBlur}
                                   className={`form-control ${
-                                    activeForm === 'add' && errors.lastName && touched.lastName
+                                    activeForm === "add" &&
+                                    errors.lastName &&
+                                    touched.lastName
                                       ? "is-invalid"
                                       : ""
                                   }`}
                                 />
-                                {activeForm === 'add' && errors.lastName &&
+                                {activeForm === "add" &&
+                                  errors.lastName &&
                                   touched.lastName && (
                                     <div className="invalid-feedback">
                                       {errors.lastName}
@@ -843,7 +874,9 @@ const Checkout = () => {
                                 <label>Street Address *</label>
                                 <textarea
                                   className={`form-control ${
-                                    activeForm === 'add' && errors.address && touched.address
+                                    activeForm === "add" &&
+                                    errors.address &&
+                                    touched.address
                                       ? "is-invalid"
                                       : ""
                                   }`}
@@ -855,11 +888,13 @@ const Checkout = () => {
                                   onBlur={handleBlur}
                                   rows="4"
                                 />
-                                {activeForm === 'add' && errors.address && touched.address && (
-                                  <div className="invalid-feedback">
-                                    {errors.address}
-                                  </div>
-                                )}
+                                {activeForm === "add" &&
+                                  errors.address &&
+                                  touched.address && (
+                                    <div className="invalid-feedback">
+                                      {errors.address}
+                                    </div>
+                                  )}
                               </div>
                             </div>
 
@@ -872,7 +907,9 @@ const Checkout = () => {
                                   onChange={handleInputChange}
                                   onBlur={handleBlur}
                                   className={`form-control ${
-                                    activeForm === 'add' && errors.country && touched.country
+                                    activeForm === "add" &&
+                                    errors.country &&
+                                    touched.country
                                       ? "is-invalid"
                                       : ""
                                   }`}
@@ -884,11 +921,13 @@ const Checkout = () => {
                                     </option>
                                   ))}
                                 </select>
-                                {activeForm === 'add' && errors.country && touched.country && (
-                                  <div className="invalid-feedback">
-                                    {errors.country}
-                                  </div>
-                                )}
+                                {activeForm === "add" &&
+                                  errors.country &&
+                                  touched.country && (
+                                    <div className="invalid-feedback">
+                                      {errors.country}
+                                    </div>
+                                  )}
                               </div>
                             </div>
 
@@ -902,7 +941,9 @@ const Checkout = () => {
                                   onBlur={handleBlur}
                                   disabled={!states.length}
                                   className={`form-control ${
-                                   activeForm === 'add' && errors.state && touched.state
+                                    activeForm === "add" &&
+                                    errors.state &&
+                                    touched.state
                                       ? "is-invalid"
                                       : ""
                                   }`}
@@ -914,11 +955,13 @@ const Checkout = () => {
                                     </option>
                                   ))}
                                 </select>
-                                {activeForm === 'add' && errors.state && touched.state && (
-                                  <div className="invalid-feedback">
-                                    {errors.state}
-                                  </div>
-                                )}
+                                {activeForm === "add" &&
+                                  errors.state &&
+                                  touched.state && (
+                                    <div className="invalid-feedback">
+                                      {errors.state}
+                                    </div>
+                                  )}
                               </div>
                             </div>
 
@@ -932,7 +975,9 @@ const Checkout = () => {
                                   onBlur={handleBlur}
                                   disabled={!cities.length}
                                   className={`form-control ${
-                                   activeForm === 'add' && errors.city && touched.city
+                                    activeForm === "add" &&
+                                    errors.city &&
+                                    touched.city
                                       ? "is-invalid"
                                       : ""
                                   }`}
@@ -944,11 +989,13 @@ const Checkout = () => {
                                     </option>
                                   ))}
                                 </select>
-                                {activeForm === 'add' && errors.city && touched.city && (
-                                  <div className="invalid-feedback">
-                                    {errors.city}
-                                  </div>
-                                )}
+                                {activeForm === "add" &&
+                                  errors.city &&
+                                  touched.city && (
+                                    <div className="invalid-feedback">
+                                      {errors.city}
+                                    </div>
+                                  )}
                               </div>
                             </div>
 
@@ -962,12 +1009,15 @@ const Checkout = () => {
                                   onChange={handleInputChange}
                                   onBlur={handleBlur}
                                   className={`form-control ${
-                                   activeForm === 'add' && errors.postcode && touched.postcode
+                                    activeForm === "add" &&
+                                    errors.postcode &&
+                                    touched.postcode
                                       ? "is-invalid"
                                       : ""
                                   }`}
                                 />
-                                {activeForm === 'add' && errors.postcode &&
+                                {activeForm === "add" &&
+                                  errors.postcode &&
                                   touched.postcode && (
                                     <div className="invalid-feedback">
                                       {errors.postcode}
@@ -985,16 +1035,20 @@ const Checkout = () => {
                                   onChange={handleInputChange}
                                   onBlur={handleBlur}
                                   className={`form-control ${
-                                   activeForm === 'add' && errors.phone && touched.phone
+                                    activeForm === "add" &&
+                                    errors.phone &&
+                                    touched.phone
                                       ? "is-invalid"
                                       : ""
                                   }`}
                                 />
-                                {activeForm === 'add' && errors.phone && touched.phone && (
-                                  <div className="invalid-feedback">
-                                    {errors.phone}
-                                  </div>
-                                )}
+                                {activeForm === "add" &&
+                                  errors.phone &&
+                                  touched.phone && (
+                                    <div className="invalid-feedback">
+                                      {errors.phone}
+                                    </div>
+                                  )}
                               </div>
                             </div>
                             {/* <div className="col-lg-6 col-md-6">
@@ -1040,15 +1094,21 @@ const Checkout = () => {
                           <div className="mt-3 d-flex justify-content-end gap-2">
                             <button
                               type="button"
-                              className="btn btn-secondary"
+                              // className="btn btn-secondary"
                               onClick={handleCancelAdd}
+                               style={{ background: "#ffeaf1", border: "0" }}
+                              className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded bg-pink-100 hover:bg-pink-200 transition d-flex align-items-center gap-2"
+                            
                             >
                               Cancel
                             </button>
                             <button
                               type="button"
-                              className="btn btn-primary"
+                              // className="btn btn-primary"
                               onClick={handleAddSubmit}
+                               style={{ background: "#ffeaf1", border: "0" }}
+                              className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded bg-pink-100 hover:bg-pink-200 transition d-flex align-items-center gap-2"
+                            
                             >
                               Save Address
                             </button>
@@ -1096,13 +1156,15 @@ const Checkout = () => {
                                             }
                                           }}
                                           className={`form-control ${
-                                            activeForm === 'edit' && editErrors.firstName &&
+                                            activeForm === "edit" &&
+                                            editErrors.firstName &&
                                             editTouched.firstName
                                               ? "is-invalid"
                                               : ""
                                           }`}
                                         />
-                                        {activeForm === 'edit' && editErrors.firstName &&
+                                        {activeForm === "edit" &&
+                                          editErrors.firstName &&
                                           editTouched.firstName && (
                                             <div className="invalid-feedback">
                                               {editErrors.firstName}
@@ -1127,12 +1189,15 @@ const Checkout = () => {
                                             }
                                           }}
                                           className={`form-control ${
-                                           activeForm === 'edit' &&  editErrors.lastName && editTouched.lastName
+                                            activeForm === "edit" &&
+                                            editErrors.lastName &&
+                                            editTouched.lastName
                                               ? "is-invalid"
                                               : ""
                                           }`}
                                         />
-                                        {activeForm === 'edit' && editErrors.lastName &&
+                                        {activeForm === "edit" &&
+                                          editErrors.lastName &&
                                           editTouched.lastName && (
                                             <div className="invalid-feedback">
                                               {editErrors.lastName}
@@ -1146,7 +1211,9 @@ const Checkout = () => {
                                         <label>Street Address *</label>
                                         <textarea
                                           className={`form-control ${
-                                            activeForm === 'edit' && editErrors.address && editTouched.address
+                                            activeForm === "edit" &&
+                                            editErrors.address &&
+                                            editTouched.address
                                               ? "is-invalid"
                                               : ""
                                           }`}
@@ -1165,11 +1232,13 @@ const Checkout = () => {
                                           }}
                                           rows="4"
                                         />
-                                        {activeForm === 'edit' && editErrors.address && editTouched.address && (
-                                          <div className="invalid-feedback">
-                                            {editErrors.address}
-                                          </div>
-                                        )}
+                                        {activeForm === "edit" &&
+                                          editErrors.address &&
+                                          editTouched.address && (
+                                            <div className="invalid-feedback">
+                                              {editErrors.address}
+                                            </div>
+                                          )}
                                       </div>
                                     </div>
 
@@ -1189,7 +1258,9 @@ const Checkout = () => {
                                             }
                                           }}
                                           className={`form-control ${
-                                           activeForm === 'edit' &&  editErrors.country && editTouched.country
+                                            activeForm === "edit" &&
+                                            editErrors.country &&
+                                            editTouched.country
                                               ? "is-invalid"
                                               : ""
                                           }`}
@@ -1203,11 +1274,13 @@ const Checkout = () => {
                                             </option>
                                           ))}
                                         </select>
-                                        {activeForm === 'edit' && editErrors.country && editTouched.country && (
-                                          <div className="invalid-feedback">
-                                            {editErrors.country}
-                                          </div>
-                                        )}
+                                        {activeForm === "edit" &&
+                                          editErrors.country &&
+                                          editTouched.country && (
+                                            <div className="invalid-feedback">
+                                              {editErrors.country}
+                                            </div>
+                                          )}
                                       </div>
                                     </div>
 
@@ -1228,7 +1301,9 @@ const Checkout = () => {
                                           }}
                                           disabled={!states.length}
                                           className={`form-control ${
-                                            activeForm === 'edit' && editErrors.state && editTouched.state
+                                            activeForm === "edit" &&
+                                            editErrors.state &&
+                                            editTouched.state
                                               ? "is-invalid"
                                               : ""
                                           }`}
@@ -1242,11 +1317,13 @@ const Checkout = () => {
                                             </option>
                                           ))}
                                         </select>
-                                        {activeForm === 'edit' && editErrors.state && editTouched.state && (
-                                          <div className="invalid-feedback">
-                                            {editErrors.state}
-                                          </div>
-                                        )}
+                                        {activeForm === "edit" &&
+                                          editErrors.state &&
+                                          editTouched.state && (
+                                            <div className="invalid-feedback">
+                                              {editErrors.state}
+                                            </div>
+                                          )}
                                       </div>
                                     </div>
 
@@ -1267,7 +1344,9 @@ const Checkout = () => {
                                           }}
                                           disabled={!cities.length}
                                           className={`form-control ${
-                                            activeForm === 'edit' && editErrors.city && editTouched.city
+                                            activeForm === "edit" &&
+                                            editErrors.city &&
+                                            editTouched.city
                                               ? "is-invalid"
                                               : ""
                                           }`}
@@ -1281,11 +1360,13 @@ const Checkout = () => {
                                             </option>
                                           ))}
                                         </select>
-                                        {activeForm === 'edit' &&  editErrors.city && editTouched.city && (
-                                          <div className="invalid-feedback">
-                                            {editErrors.city}
-                                          </div>
-                                        )}
+                                        {activeForm === "edit" &&
+                                          editErrors.city &&
+                                          editTouched.city && (
+                                            <div className="invalid-feedback">
+                                              {editErrors.city}
+                                            </div>
+                                          )}
                                       </div>
                                     </div>
 
@@ -1306,12 +1387,15 @@ const Checkout = () => {
                                             }
                                           }}
                                           className={`form-control ${
-                                           activeForm === 'edit' &&  editErrors.postcode && editTouched.postcode
+                                            activeForm === "edit" &&
+                                            editErrors.postcode &&
+                                            editTouched.postcode
                                               ? "is-invalid"
                                               : ""
                                           }`}
                                         />
-                                        {activeForm === 'edit' && editErrors.postcode &&
+                                        {activeForm === "edit" &&
+                                          editErrors.postcode &&
                                           editTouched.postcode && (
                                             <div className="invalid-feedback">
                                               {editErrors.postcode}
@@ -1336,16 +1420,20 @@ const Checkout = () => {
                                             }
                                           }}
                                           className={`form-control ${
-                                            activeForm === 'edit' && editErrors.phone && editTouched.phone
+                                            activeForm === "edit" &&
+                                            editErrors.phone &&
+                                            editTouched.phone
                                               ? "is-invalid"
                                               : ""
                                           }`}
                                         />
-                                        {activeForm === 'edit' && editErrors.phone && editTouched.phone && (
-                                          <div className="invalid-feedback">
-                                            {editErrors.phone}
-                                          </div>
-                                        )}
+                                        {activeForm === "edit" &&
+                                          editErrors.phone &&
+                                          editTouched.phone && (
+                                            <div className="invalid-feedback">
+                                              {editErrors.phone}
+                                            </div>
+                                          )}
                                       </div>
                                     </div>
                                     {/* <div className="col-lg-6 col-md-6">
@@ -1427,46 +1515,25 @@ const Checkout = () => {
                           )}
                         </div>
                         {editIndex !== index ? (
-                          <div className="form-check mt-1 me-3">
+                          <div className="form-check d-flex gap-4 mt-4 me-3">
                             <button
                               type="button"
                               onClick={() => handleEditClick(item, index)}
                               title="Edit"
-                              style={{
-                                color: "#0D6EFD",
-                                fontSize: "15px",
-                                minWidth: "57px",
-                                marginTop: "16%",
-                                minHeight: "10px",
-                                lineHeight: "55px",
-                                marginBottom: "6px",
-                                padding: "0",
-                                border: "none",
-                                borderRadius: "0",
-                              }}
+                              style={{ background: "#ffeaf1", border: "0" }}
+                              className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded bg-pink-100 hover:bg-pink-200 transition d-flex align-items-center gap-2"
                             >
-                              Edit
+                              <FaEdit className="fs-3" />
                             </button>
 
                             <button
                               type="button"
                               onClick={() => handleDelete(item.id)}
                               title="Delete"
-                              style={{
-                                color: "#c2080f",
-                                fontSize: "15px",
-                                marginTop: "16%",
-                                minWidth: "57px",
-                                minHeight: "10px",
-                                lineHeight: "55px",
-                                marginBottom: "6px",
-                                padding: "0",
-                                border: "none",
-                                borderRadius: "0",
-                              }}
-                              // className="btn btn-danger"
+                              style={{ background: "#ffeaf1", border: "0" }}
+                              className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded bg-pink-100 hover:bg-pink-200 transition d-flex align-items-center gap-2"
                             >
-                              Delete
+                              <FaTrash className="fs-3" />
                             </button>
                           </div>
                         ) : (
@@ -1717,8 +1784,7 @@ const Checkout = () => {
                       </div>
                       <div className="place-order mt-25">
                         <button
-                          type="button"
-                          onclic={handleSubmit}
+                          type="submit"
                           className="btn-hover"
                           disabled={isLoading}
                         >
@@ -1741,7 +1807,7 @@ const Checkout = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </form>
             ) : (
               <div className="row">
                 <div className="col-lg-12">
