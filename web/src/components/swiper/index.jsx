@@ -63,7 +63,7 @@ const SwiperSlider = forwardRef(
           {`
             .swiper-navigation-container {
               position: absolute;
-              top: 50%;
+              top: 43%;
               left: 0;
               right: 0;
               display: flex;

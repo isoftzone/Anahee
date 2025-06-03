@@ -71,7 +71,7 @@ const handlePlayPause = async (index) => {
 
   return (
     <div className={`image-slider-area ${spaceTopClass || ""} ${spaceBottomClass || ""}`}>
-      <div className="image-slider-active mx-sm-5 px-sm-5">
+      <div className="image-slider-active mx-sm-5 px-sm-5" style={{paddingBottom:"10px"}}>
         <div className="text-center single-image-text flex">
           <h1 className="social-media">Social Media Presence</h1>
           {/* <button

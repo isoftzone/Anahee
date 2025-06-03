@@ -1,4 +1,4 @@
-import { Fragment, useState , useEffect} from "react";
+import { Fragment, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import SEO from "../../components/seo";
 import LayoutOne from "../../layouts/LayoutOne";
@@ -8,7 +8,7 @@ const Contact = () => {
   const { pathname } = useLocation();
   const [loading, setLoading] = useState(false);
   const [formMessage, setFormMessage] = useState("");
-   const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [formData, setFormData] = useState({
@@ -42,7 +42,7 @@ const Contact = () => {
     }
     return errors;
   };
-   useEffect(() => {
+  useEffect(() => {
     const fetchContactUs = async () => {
       try {
         const response = await fetch(
@@ -120,9 +120,18 @@ const Contact = () => {
         <div className="contact-area pt-100 pb-3">
           <div className="container-fluid">
             <div className="contact-map ">
-              <iframe
+              {/* <iframe
                 title="Anahee Location"
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10985.797589222544!2d75.77160155541992!3d26.936704!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396db37fbb01310f%3A0x4916f277d8d96683!2sIndira%20colony%20near%20bani%20park!5e1!3m2!1sen!2sin!4v1747910028780!5m2!1sen!2sin"
+                width="100%"
+                height="450"
+                style={{ border: 0 }}
+                allowFullScreen={true}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe> */}
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d3508.766135104959!2d77.07065737617916!3d28.426312743414044!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1sC3GF%2BF8R%20The%20White%20House%2C%20H%20Block%2C%20Block%20H%2C%20Sector%2057%2C%20Gurugram%2C%20Samaspur%2C%20Haryana%20122003!5e0!3m2!1sen!2sin!4v1748930636524!5m2!1sen!2sin"
                 width="100%"
                 height="450"
                 style={{ border: 0 }}
@@ -133,14 +142,14 @@ const Contact = () => {
             </div>
             <div className="custom-row-2">
               {/* Contact Info */}
-              <div className="col-12 col-lg-4">
+              <div className="col-12 col-lg-6">
                 <div className="contact-info-wrap">
                   <div className="single-contact-info">
                     <div className="contact-icon">
                       <i className="fa fa-phone" />
                     </div>
                     <div className="contact-info-dec">
-                       <a href={`tel:${phone}`}>{phone}</a>
+                      <a href={`tel:${phone}`}>{phone}</a>
                     </div>
                   </div>
                   <div className="single-contact-info">
@@ -158,7 +167,26 @@ const Contact = () => {
                       <i className="fa fa-map-marker" />
                     </div>
                     <div className="contact-info-dec">
-                    <a
+                      <label className="fw-bold">Main Address</label>
+                      <a
+                        href={`https://www.google.com/maps/search/?q=58, ${address}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <p>
+                          78, Second Floor, the White House Society, Sector-57,
+                          Gurugaon-122003
+                        </p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="single-contact-info">
+                    <div className="contact-icon">
+                      <i className="fa fa-map-marker" />
+                    </div>
+                    <div className="contact-info-dec">
+                      <label className="fw-bold">Main Address</label>
+                      <a
                         href={`https://www.google.com/maps/search/?q=58, ${address}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -205,7 +233,7 @@ const Contact = () => {
                 </div>
               </div>
               {/* Contact Form */}
-              <div className="col-12 col-lg-8">
+              <div className="col-12 col-lg-6">
                 <div className="contact-form">
                   <div className="contact-title mb-30">
                     <h2 className="fw-bold">Get In Touch</h2>
@@ -261,7 +289,8 @@ const Contact = () => {
                         )}
                       </div>
                       <div className="col-lg-12">
-                        <textarea  rows={2}
+                        <textarea
+                          rows={2}
                           name="from_message"
                           placeholder="Your Message*"
                           value={formData.from_message}
@@ -270,14 +299,15 @@ const Contact = () => {
                         {errors.from_message && (
                           <p className="text-danger">{errors.from_message}</p>
                         )}
-                        <button
-                          className="submit"
-                          type="submit"
-                          disabled={loading}
-                        >
-                          {loading ? "Sending..." : "SEND"}
-                        </button>
+                          <button
+                        className="submit mt-3"
+                        type="submit"
+                        disabled={loading}
+                      >
+                        {loading ? "Sending..." : "SEND"}
+                      </button>
                       </div>
+                    
                     </div>
                   </form>
                   {formMessage && (

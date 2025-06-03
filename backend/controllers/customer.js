@@ -74,12 +74,87 @@ exports.getCustomer = async (req, res) => {
 //       .json({ message: "Account Information updated successfully" });
 //   });
 // };
+
+//update customerInfo
+// exports.updateCustomerInfo = (req, res) => {
+//  let id=req.params.id
+//   const {
+//     FNAME,
+//     LNAME,
+//     email,
+//     customerId=id,
+//     MOBILE,
+//     CADDRESSLINE1,
+//     CCITY,
+//     CSTATE,
+//     CCOUNTRY,
+//     CDISTRICT,
+//     CPINCODE,
+//     password,
+//   } = req.body;
+ 
+//   if (!customerId) {
+//     return res.status(400).json({ error: "Customer ID is missing" });
+//   }
+//   // Build query
+//   const fields = [
+//     "FNAME = ?",
+//     "LNAME = ?",
+//     "email = ?",
+//     "MOBILE = ?",
+//     "CADDRESSLINE1 = ?",
+//     "CCITY = ?",
+//     "CSTATE = ?",
+//     "CCOUNTRY = ?",
+//     "CDISTRICT = ?",
+//     "CPINCODE = ?",
+//   ];
+//   const values = [
+//     FNAME,
+//     LNAME,
+//     email,
+//     MOBILE,
+//     CADDRESSLINE1,
+//     CCITY,
+//     CSTATE,
+//     CCOUNTRY,
+//     CDISTRICT,
+//     CPINCODE,
+//   ];
+//   if (password) {
+//     fields.push("password = ?");
+//     values.push(password); // plain text password
+//   }
+//   values.push(customerId); // for WHERE condition
+//   const sql = `UPDATE customermaster SET ${fields.join(
+//     ", "
+//   )} WHERE CUSTOMERID = ?`;
+//   con.query(sql, values, (err, result) => {
+//     if (err) {
+//       console.error("Database update error:", err);
+//       return res
+//         .status(500)
+//         .json({ error: "Database update failed", message: err.message });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Customer not found" });
+//     }
+//     return res
+//       .status(200)
+//       // .json({ message: "Account Information updated successfully" });
+//   });
+// };
+
+
+
+///update
 exports.updateCustomerInfo = (req, res) => {
+ let id=req.params.id
   const {
     FNAME,
     LNAME,
     email,
-    customerId,
+    customerId=id,
     MOBILE,
     CADDRESSLINE1,
     CCITY,
@@ -89,6 +164,7 @@ exports.updateCustomerInfo = (req, res) => {
     CPINCODE,
     password,
   } = req.body;
+ 
   if (!customerId) {
     return res.status(400).json({ error: "Customer ID is missing" });
   }
@@ -137,9 +213,77 @@ exports.updateCustomerInfo = (req, res) => {
     }
     return res
       .status(200)
-      .json({ message: "Account Information updated successfully" });
+      // .json({ message: "Account Information updated successfully" });
   });
 };
+
+
+// exports.updateCustomerInfo = (req, res) => {
+//   const {
+//     FNAME,
+//     LNAME,
+//     email,
+//     customerId,
+//     MOBILE,
+//     CADDRESSLINE1,
+//     CCITY,
+//     CSTATE,
+//     CCOUNTRY,
+//     CDISTRICT,
+//     CPINCODE,
+//     password,
+//   } = req.body;
+//   if (!customerId) {
+//     return res.status(400).json({ error: "Customer ID is missing" });
+//   }
+//   // Build query
+//   const fields = [
+//     "FNAME = ?",
+//     "LNAME = ?",
+//     "email = ?",
+//     "MOBILE = ?",
+//     "CADDRESSLINE1 = ?",
+//     "CCITY = ?",
+//     "CSTATE = ?",
+//     "CCOUNTRY = ?",
+//     "CDISTRICT = ?",
+//     "CPINCODE = ?",
+//   ];
+//   const values = [
+//     FNAME,
+//     LNAME,
+//     email,
+//     MOBILE,
+//     CADDRESSLINE1,
+//     CCITY,
+//     CSTATE,
+//     CCOUNTRY,
+//     CDISTRICT,
+//     CPINCODE,
+//   ];
+//   if (password) {
+//     fields.push("password = ?");
+//     values.push(password); // plain text password
+//   }
+//   values.push(customerId); // for WHERE condition
+//   const sql = `UPDATE customermaster SET ${fields.join(
+//     ", "
+//   )} WHERE CUSTOMERID = ?`;
+//   con.query(sql, values, (err, result) => {
+//     if (err) {
+//       console.error("Database update error:", err);
+//       return res
+//         .status(500)
+//         .json({ error: "Database update failed", message: err.message });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Customer not found" });
+//     }
+//     return res
+//       .status(200)
+//       .json({ message: "Account Information updated successfully" });
+//   });
+// };
 
 
 
@@ -192,61 +336,152 @@ exports.deletecustomer = (req, res) => {
 
 
 
+// exports.addcustomer = (req, res) => {
+//   console.log("📥 Received request to add customer:", req.body);
+//   const { fname, lname, mobile, email, password } = req.body;
+//   // Validate required fields
+//   if (!fname || !lname || !mobile || !email || !password) {
+//     return res.status(400).json({
+//       success: false,
+//       msg: "All fields are required",
+//     });
+//   }
+//   // Check if email or mobile already exist
+//   const checkQuery = "SELECT email, MOBILE FROM customermaster WHERE email = ? OR MOBILE = ?";
+//   con.query(checkQuery, [email, mobile], (err, results) => {
+//     if (err) {
+//       console.error("❌ Error checking email/mobile:", err);
+//       return res.status(500).json({
+//         success: false,
+//         msg: "Internal server error",
+//         error: err.message,
+//       });
+//     }
+//     let emailExists = false;
+//     let mobileExists = false;
+//     results.forEach((row) => {
+//       if (row.email === email) emailExists = true;
+//       if (row.MOBILE === mobile) mobileExists = true;
+//     });
+//     if (emailExists && mobileExists) {
+//       return res.status(400).json({
+//         success: false,
+//         msg: "Email and Mobile number already exist",
+//       });
+//     } else if (emailExists) {
+//       return res.status(400).json({
+//         success: false,
+//         msg: "Email already exists",
+//       });
+//     } else if (mobileExists) {
+//       return res.status(400).json({
+//         success: false,
+//         msg: "Mobile number already exists",
+//       });
+//     }
+//     // Store new customer
+//     const newCustomer = {
+//       FNAME: fname,
+//       LNAME: lname,
+//       MOBILE: mobile,
+//       EMAIL: email,
+//       PASSWORD: password, // Ideally hash before storing
+//     };
+//     const insertQuery = "INSERT INTO customermaster SET ?";
+//     con.query(insertQuery, newCustomer, (insertErr, insertResults) => {
+//       if (insertErr) {
+//         console.error("❌ Insert error:", insertErr);
+//         return res.status(500).json({
+//           success: false,
+//           msg: "Internal server error",
+//           error: insertErr.message,
+//         });
+//       }
+//       return res.status(201).json({
+//         success: true,
+//         msg: "New customer created successfully",
+//         newCustomer,
+//       });
+//     });
+//   });
+// };
+
+// exports.addcustomer = (req, res) => {
+//   const { FNAME, LNAME,  email , MOBILE, CSTATE, CCITY,CCOUNTRY, CPINCODE, CADDRESSLINE1 } = req.body;
+//   console.log("addcustomer", req.body);
+//   // if (!FNAME || !LNAME || !MOBILE || !email || !CADDRESSLINE1 || PEMAILID || MOBILE2|| PSTATE|| PCITY|| PPINCODE|| PADDRESSLINE1) {
+//   //   return res.status(400).json({
+//   //     success: false,
+//   //     msg: "All fields are required",
+//   //   });
+//   // }
+//   const checkEmailQuery = "SELECT * FROM customermaster WHERE email = ?";
+//   con.query(checkEmailQuery, [email], (err, results) => {
+//     if (err) {
+//       console.error(":x: Email check error:", err);
+//       return res.status(500).json({
+//         success: false,
+//         msg: "Internal server error",
+//         error: err.message,
+//       });
+//     }
+//     if (results.length > 0) {
+//       return res.status(400).json({
+//         success: false,
+//         msg: "Email already exists",
+//       });
+//     }
+//     const newCustomer = { FNAME, LNAME, email, MOBILE, CSTATE ,CCOUNTRY, CCITY, CPINCODE, CADDRESSLINE1};
+//     const insertQuery = "INSERT INTO customermaster SET ?";
+//     con.query(insertQuery, newCustomer, (insertErr, insertResults) => {
+//       if (insertErr) {
+//         console.error(":x: Insert error:", insertErr);
+//         return res.status(500).json({
+//           success: false,
+//           msg: "Internal server error",
+//           error: insertErr.message,
+//         });
+//       }
+//       return res.status(201).json({
+//         success: true,
+//         msg: "New customer created successfully",
+//         newCustomer,
+//       });
+//     });
+//   });
+// };
+
+
 exports.addcustomer = (req, res) => {
-  console.log("📥 Received request to add customer:", req.body);
-  const { fname, lname, mobile, email, password } = req.body;
-  // Validate required fields
-  if (!fname || !lname || !mobile || !email || !password) {
-    return res.status(400).json({
-      success: false,
-      msg: "All fields are required",
-    });
-  }
-  // Check if email or mobile already exist
-  const checkQuery = "SELECT email, MOBILE FROM customermaster WHERE email = ? OR MOBILE = ?";
-  con.query(checkQuery, [email, mobile], (err, results) => {
+  const { FNAME, LNAME,  email , MOBILE, CSTATE, CCITY,CCOUNTRY, CPINCODE,password,CADDRESSLINE1} = req.body;
+  console.log("addcustomer", req.body);
+  // if (!FNAME || !LNAME || !MOBILE || !email || !CADDRESSLINE1 || PEMAILID || MOBILE2|| PSTATE|| PCITY|| PPINCODE|| PADDRESSLINE1) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     msg: "All fields are required",
+  //   });
+  // }
+  const checkEmailQuery = "SELECT * FROM customermaster WHERE email = ?";
+  con.query(checkEmailQuery, [email], (err, results) => {
     if (err) {
-      console.error("❌ Error checking email/mobile:", err);
+      console.error(":x: Email check error:", err);
       return res.status(500).json({
         success: false,
         msg: "Internal server error",
         error: err.message,
       });
     }
-    let emailExists = false;
-    let mobileExists = false;
-    results.forEach((row) => {
-      if (row.email === email) emailExists = true;
-      if (row.MOBILE === mobile) mobileExists = true;
-    });
-    if (emailExists && mobileExists) {
-      return res.status(400).json({
-        success: false,
-        msg: "Email and Mobile number already exist",
-      });
-    } else if (emailExists) {
+    if (results.length > 0) {
       return res.status(400).json({
         success: false,
         msg: "Email already exists",
       });
-    } else if (mobileExists) {
-      return res.status(400).json({
-        success: false,
-        msg: "Mobile number already exists",
-      });
     }
-    // Store new customer
-    const newCustomer = {
-      FNAME: fname,
-      LNAME: lname,
-      MOBILE: mobile,
-      EMAIL: email,
-      PASSWORD: password, // Ideally hash before storing
-    };
+    const newCustomer = { FNAME, LNAME,password,email, MOBILE, CSTATE ,CCOUNTRY, CCITY, CPINCODE, CADDRESSLINE1};
     const insertQuery = "INSERT INTO customermaster SET ?";
     con.query(insertQuery, newCustomer, (insertErr, insertResults) => {
       if (insertErr) {
-        console.error("❌ Insert error:", insertErr);
+        console.error(":x: Insert error:", insertErr);
         return res.status(500).json({
           success: false,
           msg: "Internal server error",
@@ -261,6 +496,8 @@ exports.addcustomer = (req, res) => {
     });
   });
 };
+
+
 exports.getAll = async (req, res) => {
   await con.query("SELECT * FROM customermaster", (err, result) => {
     if (err) {
@@ -327,6 +564,7 @@ exports.logincustomer = (req, res) => {
     });
   });
 };
+
 exports.editcustomer = async (req, res) => {
   try {
     const { id } = req.params;

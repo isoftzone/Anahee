@@ -6,7 +6,8 @@ import { getDiscountPrice } from "../../helpers/product";
 import LayoutOne from "../../layouts/LayoutOne";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import {
-  addToCart,
+  addToCart, // You might need this for adding to cart initially
+  increaseQuantity,
   decreaseQuantity,
   deleteFromCart,
   deleteAllFromCart,
@@ -175,40 +176,101 @@ const handleAllclearAddtocart = async () => {
     }
   }
  
-  const handleQuantityChange = async(item, action) =>{
-     if(action === 'decrement' && item.quantity <= 1){
-        return ;
-      }
-    try{ 
+  // const handleQuantityChange = async(item, action) =>{
+  //    if(action === 'decrement' && item.quantity <= 1){
+  //       return ;
+  //     }
+  //   try{ 
      
+  //     const payload = {
+  //       CUSTOMERID,
+  //       ITEMID: item.id,
+  //       type: "cart",
+  //       action : action
+  //     }
+  //    console.log("this is responsive quantity change", payload);
+ 
+  //    const response = await axios.post(`${BASE_URL}/addtocartAction`, payload)
+  //    console.log("this is response data", response.data);
+  //    if(response.status === 200)
+  //    {
+  //      if(action === 'increment'){
+  //       dispatch(addToCart({...item, quantity : 1}));
+  //     }
+  //     else if(action === 'decrement'){
+  //       dispatch(decreaseQuantity(item))
+  //     }
+  //    }
+  //    else {
+  //     alert("failed to update cart item.")
+  //    }
+  //   }
+  //   catch(error){
+  //     console.error("Error fetching cart item", error);
+  //     alert("there was an error updating your cart")
+  //   }
+  // }
+
+const handleQuantityChange = async (item, action) => {
+    // Prevent quantity from going below 1 for decrement
+    if (action === 'decrement' && item.quantity <= 1) {
+      return;
+    }
+    // Prevent quantity from exceeding stock for increment
+    const stock = cartItemStock(
+      item,
+      item.selectedProductColor,
+      item.selectedProductSize
+    );
+    if (action === 'increment' && item.quantity >= stock) {
+      // cogoToast.error("No more stock available!", { position: "bottom-left" });
+      return;
+    }
+    // Update Redux state immediately (optimistic UI update)
+    if (action === 'increment') {
+      dispatch(increaseQuantity(item));
+    } else if (action === 'decrement') {
+      dispatch(decreaseQuantity(item));
+    }
+    // If no customer ID, we're done (guest user)
+    if (!CUSTOMERID) {
+      console.log(`Guest user - item quantity ${action}d locally.`);
+      return;
+    }
+    // For logged-in users, make API call
+    try {
       const payload = {
         CUSTOMERID,
         ITEMID: item.id,
         type: "cart",
-        action : action
+        action: action
+      };
+      const response = await axios.post(`${BASE_URL}/addtocartAction`, payload);
+      if (response.status === 200) {
+        console.log(`Server updated quantity for item ${item.id}: ${action}`);
+      } else {
+        console.error("Failed to update cart item quantity on server.");
+        // Revert Redux state if server update fails (optional, for strict consistency)
+        if (action === 'increment') {
+          dispatch(decreaseQuantity(item)); // Revert increment
+        } else if (action === 'decrement') {
+          dispatch(increaseQuantity(item)); // Revert decrement
+        }
+        alert("Failed to update cart item quantity on server.");
       }
-     console.log("this is responsive quantity change", payload);
- 
-     const response = await axios.post(`${BASE_URL}/addtocartAction`, payload)
-     console.log("this is response data", response.data);
-     if(response.status === 200)
-     {
-       if(action === 'increment'){
-        dispatch(addToCart({...item, quantity : 1}));
+    } catch (error) {
+      console.error("Error updating cart item quantity on server:", error);
+      // Revert Redux state if API call fails
+      if (action === 'increment') {
+        dispatch(decreaseQuantity(item)); // Revert increment
+      } else if (action === 'decrement') {
+        dispatch(increaseQuantity(item)); // Revert decrement
       }
-      else if(action === 'decrement'){
-        dispatch(decreaseQuantity(item))
-      }
-     }
-     else {
-      alert("failed to update cart item.")
-     }
+      alert("There was an error updating your cart quantity.");
     }
-    catch(error){
-      console.error("Error fetching cart item", error);
-      alert("there was an error updating your cart")
-    }
-  }
+  };
+
+
   return (
     <Fragment>
       <SEO

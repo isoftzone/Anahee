@@ -71,7 +71,7 @@ const AccountSetting = () => {
     const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' | '' }>({ message: '', type: '' });
     const navigate = useNavigate();
 
-
+    // let users = useSelector((state: IRootState) => state.user);
      
   
     const storedUser = JSON.parse(localStorage.getItem('userData') || '{}') as User;
@@ -101,6 +101,86 @@ const AccountSetting = () => {
     }
   }, []);
 
+    // // Get the item from localStorage
+    // const userString = localStorage.getItem('userData');
+
+    // let Id: number | null = null;
+
+    // if (userString) {
+    //     const userLocal: User = JSON.parse(userString);
+    //     Id = userLocal.id;
+    // }
+
+    // console.log('User ID 223232:', Id);
+    // useEffect(() => {
+    //     console.log(profileImage);
+    // }, [profileImage]);
+
+    // useEffect(() => {
+    //     const fetchUserData = async () => {
+    //         try {
+    //             const response = await axios.get(`${BASE_URL}/getid_userMaster/${LocalData.id}`, {
+    //                 // withCredentials: true,
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                 },
+    //             });
+    //             const userData = response.data;
+    //             setresponseData(userData);
+    //             // Now set individual field values
+    //             setTITLE(userData.TITLE || '');
+    //             setBUSINESSTITLE(userData.BUSINESSTITLE || '');
+    //             setFNAME(userData.FNAME || '');
+    //             setMNAME(userData.MNAME || '');
+    //             setLNAME(userData.LNAME || '');
+
+    //             setPHONE(userData.PHONE || '');
+    //             setMOBILE(userData.MOBILE || '');
+    //             setSTATUS(userData.STATUS || '');
+    //             setUSERNAME(userData.USERNAME || '');
+    //             setPASSWORD(userData.PASSWORD || '');
+    //             setCREATEDBY(userData.CREATEDBY || '');
+    //             setCREATEDON(userData.CREATEDON || '');
+
+    //             setUPDATEDBY(userData.UPDATEDBY || '');
+    //             setUPDATEDON(userData.UPDATEDON || '');
+    //             setDS_ON(userData.DS_ON || '');
+    //             setDS_OFF(userData.DS_OFF || '');
+    //             setFULLNAME(userData.FULLNAME || '');
+    //             setPROFESSION(userData.PROFESSION || '');
+    //             setCOUNTRY(userData.COUNTRY || '');
+               
+    //             setEMAIL(userData.EMAIL || '');
+
+    //             setProfileImg(userData.PROFILEIMAGE || '');
+
+    //             setUSERTYPE(userData.USERTYPE || '');
+
+    //             setADDRESS(userData.ADDRESS || '');
+    //             setLOCATION(userData.LOCATION || '');
+
+    //             setWEBSITE(userData.WEBSITE || '');
+
+    //             dispatch(
+    //                 setUsers({
+    //                     id: userData.USERID,
+    //                     name: userData.FNAME + ' ' + userData.LNAME,
+    //                     email: userData.EMAIL,
+    //                     password: userData.PASSWORD,
+    //                     companyid: userData.COMPANYID,
+    //                     Profession: userData.PROFESSION,
+    //                     mobile:userData.MOBILE,
+    //                     createdon: userData.CREATEDON,
+    //                     location: userData.LOCATION,
+    //                     profileImage: userData.PROFILEIMAGE,
+    //                 })
+    //             );
+    //         } catch (error) {
+    //             console.error('Error fetching user data:', error);
+    //         }
+    //     };
+    //     fetchUserData();
+    // }, []);
     useEffect(() => {
   const fetchUserData = async () => {
     if (!LocalData) return; // ⛔ Guard clause for null check
@@ -166,6 +246,25 @@ const AccountSetting = () => {
 }, [LocalData]); // ✅ Add LocalData to the dependency array
 
 
+    // Debounce effect: Update `debouncedData` only when user stops typing
+
+    // useEffect(() => {
+    //     return () => {
+    //         if (profileImg && profileImg) {
+    //             URL.revokeObjectURL(profileImg);
+    //         }
+    //     };
+    // }, [profileImg]);
+
+    // useEffect(() => {
+    //     if (Id !== null) {
+    //         const savedImage = localStorage.getItem(`user_image_${Id}`);
+    //         if (savedImage) {
+    //             setProfileImg(savedImage);
+    //         }
+    //     }
+    // }, [Id]);
+
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
@@ -195,7 +294,280 @@ const AccountSetting = () => {
         setTabs(name);
     };
 
+    // const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    //     e.preventDefault();
 
+    //     try {
+    //         // let userlocal = localStorage.getItem('userData');
+    //         // const userData = JSON.parse(userlocal || '');
+    //         // let finalUserId = userData.USERID;
+
+    //         // Create an object with the current form state
+    //         const currentFormData = {
+    //             COMPANYID,
+    //             TITLE,
+    //             BUSINESSTITLE,
+    //             FNAME,
+    //             MNAME,
+    //             LNAME,
+    //             PHONE,
+    //             MOBILE,
+    //             EMAIL,
+    //             STATUS,
+    //             USERTYPE,
+    //             USERNAME,
+    //             PASSWORD,
+    //             CREATEDBY,
+    //             CREATEDON,
+    //             UPDATEDBY,
+    //             UPDATEDON,
+    //             DS_ON,
+    //             DS_OFF,
+    //             FULLNAME,
+    //             COUNTRY,
+    //             LOCATION,
+    //             PROFESSION,
+    //             ADDRESS,
+    //             WEBSITE,
+    //         };
+
+    //         const data = new FormData();
+
+    //         for (const [key, value] of Object.entries(currentFormData)) {
+    //             if (value != null) {
+    //                 data.append(key, String(value)); // Ensure value is a string before appending
+    //             }
+    //         }
+    //         if (PROFILEIMAGE) {
+    //             data.append('PROFILEIMAGE', PROFILEIMAGE);
+    //         }
+
+    //         const response = await axios.post(`${BASE_URL}/upload_userMaster`, data, {
+    //             withCredentials: true,
+    //             headers: { 'Content-Type': 'multipart/form-data' },
+    //         });
+
+    //         if (response.status === 200 || response.status === 201) {
+    //             const userData = response.data.user;
+    //             dispatch(
+    //                 setUsers({
+    //                     id: userData.USERID,
+    //                     name: userData.FNAME + ' ' + userData.LNAME,
+    //                     email: userData.EMAIL,
+    //                     password: userData.PASSWORD,
+    //                     companyid: userData.COMPANYID,
+    //                       Profession: userData.PROFESSION,
+    //                      mobile:userData.MOBILE,
+    //                      createdon: userData.CREATEDON,
+    //                      location: userData.LOCATION,
+    //                     profileImage: userData.PROFILEIMAGE,
+    //                 })
+    //             );
+    //             //localStorage.setItem('userDatas', JSON.stringify(userData));
+    //             setAlert({ message: 'User saved successfully!', type: 'success' });
+    //         } else {
+    //             setAlert({ message: 'Unexpected server response.', type: 'error' });
+    //         }
+    //     } catch (error) {
+    //         if (axios.isAxiosError(error)) {
+    //             setAlert({ message: error.response?.data?.msg || 'Server error.', type: 'error' });
+    //         } else {
+    //             console.error('Unexpected error:', error);
+    //             setAlert({ message: 'Unexpected error occurred.', type: 'error' });
+    //         }
+    //     }
+    // };
+    // Above your return statement (inside the component)
+    // const imgUrl =
+    //     PROFILEIMAGE || // selected new image (base64)
+    //     (PROFILEIMAGE ? `${BASE_URL}/${PROFILEIMAGE}`:`${BASE_URL}/${profileImg}` : '/assets/images/profile-035.png');
+
+
+
+//     const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+//   e.preventDefault();
+
+//   try {
+//     const currentFormData = {
+//       COMPANYID,
+//       USERID,
+//       TITLE,
+//       BUSINESSTITLE,
+//       FNAME,
+//       MNAME,
+//       LNAME,
+//       PHONE,
+//       MOBILE,
+//       EMAIL,
+//       STATUS,
+//       USERTYPE,
+//       USERNAME,
+//       PASSWORD,
+//       CREATEDBY,
+//       CREATEDON,
+//       UPDATEDBY,
+//       UPDATEDON,
+//       DS_ON,
+//       DS_OFF,
+//       FULLNAME,
+//       COUNTRY,
+//       LOCATION,
+//       PROFESSION,
+//       ADDRESS,
+//       WEBSITE,
+//     };
+
+//     const data = new FormData();
+//     for (const [key, value] of Object.entries(currentFormData)) {
+//       if (value != null) {
+//         data.append(key, String(value));
+//       }
+//     }
+//     if (PROFILEIMAGE) {
+//       data.append('PROFILEIMAGE', PROFILEIMAGE);
+//     }
+
+//     const isUpdate = !!USERID;
+//     const url = isUpdate
+//       ? `${BASE_URL}/update_userMaster`
+//       : `${BASE_URL}/upload_userMaster`;
+
+//     const response = await axios.post(url, data, {
+//       withCredentials: true,
+//       headers: { 'Content-Type': 'multipart/form-data' },
+//     });
+
+//     if (response.status === 200 || response.status === 201) {
+//       const userData = response.data.user;
+//       dispatch(
+//         setUsers({
+//           id: userData.USERID,
+//           name: `${userData.FNAME} ${userData.LNAME}`,
+//           email: userData.EMAIL,
+//           password: userData.PASSWORD,
+//           companyid: userData.COMPANYID,
+//           Profession: userData.PROFESSION,
+//           mobile: userData.MOBILE,
+//           createdon: userData.CREATEDON,
+//           location: userData.LOCATION,
+//           profileImage: userData.PROFILEIMAGE,
+//         })
+//       );
+//       setAlert({ message: 'User saved successfully!', type: 'success' });
+//     } else {
+//       setAlert({ message: 'Unexpected server response.', type: 'error' });
+//     }
+//   } catch (error) {
+//     if (axios.isAxiosError(error)) {
+//       setAlert({ message: error.response?.data?.msg || 'Server error.', type: 'error' });
+//     } else {
+//       console.error('Unexpected error:', error);
+//       setAlert({ message: 'Unexpected error occurred.', type: 'error' });
+//     }
+//   }
+// };
+
+
+
+
+
+// const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+//   e.preventDefault();
+//  if (!LocalData) {
+//     setAlert({ message: "User data is missing. Please log in again.", type: "error" });
+//     return;
+//   }
+//   try {
+//     // Collect all current form field values
+//     const currentFormData = {
+//       COMPANYID,
+//       USERID: LocalData.id,
+//       TITLE,
+//       BUSINESSTITLE,
+//       FNAME,
+//       MNAME,
+//       LNAME,
+//       PHONE,
+//       MOBILE,
+//       EMAIL,
+//       STATUS,
+//       USERTYPE,
+//       USERNAME,
+//       PASSWORD,
+//       CREATEDBY,
+//       CREATEDON,
+//       UPDATEDBY,
+//       UPDATEDON,
+//       DS_ON,
+//       DS_OFF,
+//       FULLNAME,
+//       COUNTRY,
+//       LOCATION,
+//       PROFESSION,
+//       ADDRESS,
+//       WEBSITE,
+//     };
+
+//     const data = new FormData();
+
+//     // Append only fields that are not null or undefined
+//     for (const [key, value] of Object.entries(currentFormData)) {
+//       if (value !== undefined && value !== null) {
+//         data.append(key, String(value));
+//       }
+//     }
+
+//     // ✅ Append the image file only if selected (matches backend logic)
+//     if (PROFILEIMAGE) {
+//       data.append('PROFILEIMAGE', PROFILEIMAGE);
+//     }
+
+//     // Determine if this is an update or insert
+//     const isUpdate = !!USERID;
+//     const url = isUpdate
+//       ? `${BASE_URL}/update_userMaster`
+//       : `${BASE_URL}/upload_userMaster`;
+
+//     // Send the form data
+//     const response = await axios.post(url, data, {
+//       withCredentials: true,
+//       headers: { 'Content-Type': 'multipart/form-data' },
+//     });
+
+//     if (response.status === 200 || response.status === 201) {
+//       const userData = response.data.user;
+
+//       dispatch(
+//         setUsers({
+//           id: userData.USERID,
+//           name: `${userData.FNAME} ${userData.LNAME}`,
+//           email: userData.EMAIL,
+//           password: userData.PASSWORD,
+//           companyid: userData.COMPANYID,
+//           Profession: userData.PROFESSION,
+//           mobile: userData.MOBILE,
+//           createdon: userData.CREATEDON,
+//           location: userData.LOCATION,
+//           profileImage: userData.PROFILEIMAGE,
+//         })
+//       );
+
+//       setAlert({ message: 'User saved successfully!', type: 'success' });
+//     } else {
+//       setAlert({ message: 'Unexpected server response.', type: 'error' });
+//     }
+//   } catch (error) {
+//     if (axios.isAxiosError(error)) {
+//       setAlert({
+//         message: error.response?.data?.msg || 'Server error.',
+//         type: 'error',
+//       });
+//     } else {
+//       console.error('Unexpected error:', error);
+//       setAlert({ message: 'Unexpected error occurred.', type: 'error' });
+//     }
+//   }
+// };
 
 
 const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -257,25 +629,52 @@ const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
       withCredentials: true,
       headers: { "Content-Type": "multipart/form-data" },
     });
-
+console.log('name',response);
     if (response.status === 200 || response.status === 201) {
       const userData = response.data.user;
 
+         dispatch(
+                    setUsers({
+                        id: userData.USERID,
+                        name: userData.FNAME,
+                        email: userData.EMAIL,
+                        password: userData.PASSWORD,
+                        companyid: userData.COMPANYID,
+                          Profession: userData.PROFESSION,
+                         mobile:userData.MOBILE,
+                         createdon: userData.CREATEDON,
+                         location: userData.LOCATION,
+                        profileImage: userData.PROFILEIMAGE,
+                    })
+                );
       // ✅ Save to localStorage
-      localStorage.setItem("userDatas", JSON.stringify(userData));
+      localStorage.setItem('userDatas', JSON.stringify({
+                    id: userData.USERID,
+                    name: userData.FNAME,
+                    email: userData.EMAIL,
+                    password: userData.PASSWORD,
+                    companyid: userData.COMPANYID,
+                    profession: userData.PROFESSION,
+                    mobile: userData.MOBILE,
+                    createdon: userData.CREATEDON,
+                    location: userData.LOCATION,
+                    profileImage: userData.PROFILEIMAGE,
+                }));
 
       // ✅ Broadcast to update other components (like Header)
       window.dispatchEvent(new Event("userDataUpdated"));
+// setAlert({ message: "User saved successfully!", type: "success" });
 
 setTimeout(() => {
   setAlert({ message: "User saved successfully!", type: "success" });
 
   setTimeout(() => {
-    setAlert({ message: "", type: "" }); // Clear the alert by resetting to default
-  }, 3000);
-}, 800);
+    setAlert({ message: "", type: "" });
+  }, 3000); // clear 3 seconds after showing
+}, 1000); // delay showing the alert by 700ms
+ // clears alert after 3 seconds
 
-
+    //   setAlert({ message: "User saved successfully!", type: "success" });
     } else {
       setAlert({ message: "Unexpected server response.", type: "error" });
     }
@@ -573,12 +972,12 @@ const imgUrl =
                                         <label htmlFor="web">Website</label>
                                         <input id="WEBSITE" value={WEBSITE} type="text" placeholder="Enter URL" className="form-input" name="WEBSITE" onChange={(e) => setWEBSITE(e.target.value)} />
                                     </div>
-                                    <div>
+                                    {/* <div>
                                         <label className="inline-flex cursor-pointer">
                                             <input type="checkbox" className="form-checkbox" />
                                             <span className="text-white-dark relative checked:bg-none">Make this my default address</span>
                                         </label>
-                                    </div>
+                                    </div> */}
                                     <div className="sm:col-span-2 mt-3">
                                         <button type="submit" className="btn btn-primary">
                                             Save
