@@ -58,6 +58,7 @@ router.post("/addSalesMaster", salesmaster.addSalesMaster);
 router.put("/updateSalesMaster", salesmaster.updateSalesMaster);
 router.put("/update-order-status", salesmaster.updateOrderStatus);
 router.put("/cancelorder/:saleId", salesmaster.cancelOrder);
+router.post("/addSales", salesmaster.addSales);
 router.get("/getSalesDetail/:saleId?", salesdetail.getSalesDetail);
 router.post("/addSalesDetail", salesdetail.addSalesDetail);
 // :white_check_mark: Route to Get Invoices

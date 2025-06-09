@@ -9,6 +9,7 @@ interface Item {
     description: string | null;
     quantity: number;
     price: number;
+    image: string;
 }
 
 interface CustomerDetails {
@@ -37,6 +38,14 @@ interface SalesMasterData {
     BALANCE: number;
 }
 
+interface Product {
+    id: string;
+    name: string;
+    shortDescription: string;
+    price: number;
+    image: string;
+}
+
 const OrderEdit: React.FC = () => {
     const { saleId } = useParams<{ saleId: string }>();
     const [items, setItems] = useState<Item[]>([]);
@@ -46,6 +55,7 @@ const OrderEdit: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const printRef = useRef<HTMLDivElement>(null);
+    const [products, setProducts] = useState<Product[]>([]);
 
     const [customerDetails, setCustomerDetails] = useState<CustomerDetails>({
         name: '',
@@ -79,7 +89,26 @@ const OrderEdit: React.FC = () => {
         if (saleId) {
             fetchSalesData();
         }
+        fetchProducts();
     }, [saleId]);
+
+     const fetchProducts = async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}/getallitems`);
+            if (response.data?.success) {
+                const transformedProducts = response.data.data.map((product: any) => ({
+                    id: product.id,
+                    name: product.name,
+                    shortDescription: product.shortDescription,
+                    price: product.price,
+                    image:product.image[0]
+                }));
+                setProducts(transformedProducts);
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    };
 
     const fetchSalesData = async () => {
         try {
@@ -141,7 +170,7 @@ const OrderEdit: React.FC = () => {
     const grandTotal = subtotal + (subtotal * tax) / 100 - discount + shipping;
 
     const addItem = () => {
-        setItems([...items, { name: '', description: null, quantity: 1, price: 0 }]);
+        setItems([...items, { name: '', description: null, quantity: 1, price: 0,image:'' }]);
     };
 
     const removeItem = (index: number) => {
@@ -155,6 +184,22 @@ const OrderEdit: React.FC = () => {
             [field]: field === 'quantity' || field === 'price' ? Number(value) : value,
         };
         setItems(updatedItems);
+    };
+
+     const handleProductSelect = (index: number, productName: string) => {
+        const selectedProduct = products.find(p => p.name === productName);
+        if (selectedProduct) {
+            const updatedItems = [...items];
+            updatedItems[index] = {
+                ...updatedItems[index],
+                id: Number(selectedProduct.id),
+                name: selectedProduct.name,
+                description: selectedProduct.shortDescription,
+                price: selectedProduct.price,
+                image:selectedProduct.image
+            };
+            setItems(updatedItems);
+        }
     };
 
     const handleSaveOrder = async () => {
@@ -174,6 +219,7 @@ const OrderEdit: React.FC = () => {
                     DESCRIPTION: item.description,
                     QUANTITY: item.quantity,
                     AMOUNT: item.price,
+                    image: item.image
                 })),
                 tax: tax,
                 discount: discount,
@@ -186,6 +232,12 @@ const OrderEdit: React.FC = () => {
                     NETAMOUNT: netAmount,
                     AMOUNTPAID: customerDetails.paymentStatus === 'PAID' ? netAmount : 0,
                     BALANCE: customerDetails.paymentStatus === 'PAID' ? 0 : netAmount,
+                    paymentStatus: customerDetails.paymentStatus,
+                    payment_mode: customerDetails.payment_mode,
+                    ORDER_STATUS: customerDetails.ORDER_STATUS,
+                    coupon_code: customerDetails.coupon_code,
+                    name:customerDetails.name,
+                    email:customerDetails.email
                 },
             };
 
@@ -527,7 +579,19 @@ const OrderEdit: React.FC = () => {
                                     {/* Item Name */}
                                     <div className="md:col-span-5">
                                         <label className="md:hidden block text-xs text-start text-gray-500 mb-1">Item Name</label>
-                                        <input className="w-full border rounded p-2" value={item.name} onChange={(e) => handleItemChange(index, 'name', e.target.value)} />
+                                        {/* <input className="w-full border rounded p-2" value={item.name} onChange={(e) => handleItemChange(index, 'name', e.target.value)} /> */}
+                                        <select
+                                            className="w-full border rounded p-2"
+                                            value={item.name}
+                                            onChange={(e) => handleProductSelect(index, e.target.value)}
+                                        >
+                                            <option value="">Select a product</option>
+                                            {products.map((product) => (
+                                                <option key={product.id} value={product.name}>
+                                                    {product.name}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
 
                                     {/* Description */}

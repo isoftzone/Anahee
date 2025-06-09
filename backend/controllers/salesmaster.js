@@ -1,5 +1,5 @@
 const con = require("../config");
-// const { sendEmail } = require("../utils/emailService.js");
+const { sendEmail } = require("../utils/emailService.js");
 exports.getSalesMaster = (req, res) => {
   const { saleId } = req.params;
   let query = `
