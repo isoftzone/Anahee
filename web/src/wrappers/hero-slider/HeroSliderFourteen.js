@@ -49,7 +49,7 @@ const HeroSliderFourteen = () => {
             </SwiperSlide>  
           ))}  */}
           {banners.length >= 2 && (
-            banners.slice(35, 38).map((single, key) => (
+            banners.slice(31, 34).map((single, key) => (
               <SwiperSlide key={key}>  
                 <HeroSliderFourteenSingle data={single} />  
               </SwiperSlide>  
