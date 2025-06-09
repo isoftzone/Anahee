@@ -47,10 +47,9 @@ const FrmCodeType = () => {
         primename: '',
         sequence: '',
         status: '',
-        remark: ''
+        remark: '',
     });
-    const [user, setUser] = useState<{ name: string, email: string, companyid:string } | null>(null);
-
+    const [user, setUser] = useState<{ name: string; email: string; companyid: string } | null>(null);
 
     useEffect(() => {
         const userDataString = localStorage.getItem('userData');
@@ -60,18 +59,17 @@ const FrmCodeType = () => {
         }
     }, []);
     interface UserData {
-        primekeyid: number,
-        primename: string,
-        id: number,
-        sequence:number,
-        status:string,
-        remark:string
+        primekeyid: number;
+        primename: string;
+        id: number;
+        sequence: number;
+        status: string;
+        remark: string;
     }
-    interface UsersData{
-        PRIMENAME: string,
-        PRIMEKEYID: number
+    interface UsersData {
+        PRIMENAME: string;
+        PRIMEKEYID: number;
     }
-
 
     useEffect(() => {
         let pageTitle = '';
@@ -79,19 +77,21 @@ const FrmCodeType = () => {
             case 'brand':
                 pageTitle = 'Brand';
                 break;
-                case 'formName':
+            case 'formName':
                 pageTitle = 'FromName';
                 break;
-                case 'control':
-                    pageTitle = 'Control';
-                    break;
-                    case 'c_name':
-                        pageTitle = 'C_Name';
-                        break; case 'c_type':
-                        pageTitle = 'C_Type';
-                        break; case 'c_value':
-                        pageTitle = 'C_Value';
-                        break; 
+            case 'control':
+                pageTitle = 'Control';
+                break;
+            case 'c_name':
+                pageTitle = 'C_Name';
+                break;
+            case 'c_type':
+                pageTitle = 'C_Type';
+                break;
+            case 'c_value':
+                pageTitle = 'C_Value';
+                break;
             case 'product':
                 pageTitle = 'Product';
                 break;
@@ -143,7 +143,7 @@ const FrmCodeType = () => {
             case 'tag':
                 pageTitle = 'Tag';
                 break;
-                case 'seller':
+            case 'seller':
                 pageTitle = 'Seller';
                 break;
             default:
@@ -152,12 +152,11 @@ const FrmCodeType = () => {
         setCurrentPage(pageTitle);
         dispatch(setPageTitle(pageTitle));
         setPage(1); // Reset to the first page on category change
-    },  [category, dispatch]);
+    }, [category, dispatch]);
 
     useEffect(() => {
         fetchProductData();
     }, [category, page, pageSize, sortStatus]);
-
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -169,60 +168,63 @@ const FrmCodeType = () => {
         fetchProductData();
     }, [page, pageSize]);
 
-
-    useEffect(()=>{
+    useEffect(() => {
         const fetchAll = async () => {
             try {
-                const response = await axios.get(`${BASE_URL}/getCodeTypeAllData`,{ params: { codetype: category} });
-                console.log('dataaaaaaa',response.data.records)
-                setInitialRecords(response.data.records)
+                const response = await axios.get(`${BASE_URL}/getCodeTypeAllData`, { params: { codetype: category } });
+                console.log('dataaaaaaa', response.data.records);
+                setInitialRecords(response.data.records);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         };
-        fetchAll()
-    },[])
+        fetchAll();
+    }, []);
 
-        const findSequence = async (category:any) => {
-            try {
-                const response = await axios.get(`${BASE_URL}/getNextSequence`, { params: { codetype: category } });
-                if (!response.data || !response.data.nextSequence) {
-                    throw new Error('Failed to fetch data');
-                }
-                setSequence(response.data.nextSequence.toString());
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                // Handle error as needed
+    const findSequence = async (category: any) => {
+        try {
+            const response = await axios.get(`${BASE_URL}/getNextSequence`, { params: { codetype: category } });
+            if (!response.data || !response.data.nextSequence) {
+                throw new Error('Failed to fetch data');
             }
-        };
-    
-        // Fetch sequence number when component mounts or when category changes
-        useEffect(() => {
-            findSequence(category);
-        }, [category]);  
-
-        const handleSequenceChange = (e:any) => {
-            setSequence(e.target.value);
-        };
-
-        const changeStatus =(e:any) =>{
-            setStatus(e.target.value);
+            setSequence(response.data.nextSequence.toString());
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            // Handle error as needed
         }
+    };
+
+    // Fetch sequence number when component mounts or when category changes
+    useEffect(() => {
+        findSequence(category);
+    }, [category]);
+
+    const handleSequenceChange = (e: any) => {
+        setSequence(e.target.value);
+    };
+
+    const changeStatus = (e: any) => {
+        setStatus(e.target.value);
+    };
 
     useEffect(() => {
         const fetchData = async () => {
-            const api = await axios.post(`${BASE_URL}/postcmb`, { TblName: 'MASTER', FldName: 'PRIMENAME', FldCode: 'PRIMEKEYID', OrdBy: 'SEQUENCE', WhFldName: 'Status' }, {
-                headers: {
-                    "Content-Type": "application/json"
+            const api = await axios.post(
+                `${BASE_URL}/postcmb`,
+                { TblName: 'MASTER', FldName: 'PRIMENAME', FldCode: 'PRIMEKEYID', OrdBy: 'SEQUENCE', WhFldName: 'Status' },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                 }
-            });
+            );
             setMyStatus(api.data);
-        }
+        };
         fetchData();
     }, []);
 
-    const isPrimenameUnique = (primename:any) => {
-        return !initialRecords.some(record => record.primename === primename);
+    const isPrimenameUnique = (primename: any) => {
+        return !initialRecords.some((record) => record.primename === primename);
     };
 
     // const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -281,49 +283,49 @@ const FrmCodeType = () => {
     //         console.error('Error inserting/updating data:', error);
     //     }
     // };
-    
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-         if (!user) {
-        console.error('User is not set');
-        return;
-    }
-        if (!isPrimenameUnique(primename)) {
-            alert('Prime name already exists');
-            return;
-        }
-    
+            if (!user) {
+                console.error('User is not set');
+                return;
+            }
+            if (!isPrimenameUnique(primename)) {
+                alert('Prime name already exists');
+                return;
+            }
+
             let response;
             if (editingId) {
                 // If editingId is present, update existing product
                 response = await axios.put(`${BASE_URL}/editProducts/${editingId}`, {
                     codetype: `${category}`,
-                     updatedby: `${user.name}`, // Replace with actual codetype if needed
-                     primename,
-                     status,
-                     sequence,
-                     remark
-                });
-                alert('Data Updated')
-            } else {
-             if (!user) {
-        console.error('User is not set');
-        return;
-    }
-                // Otherwise, add new product
-                response = await axios.post(`${BASE_URL}/addProducts`, {
-                    codetype:`${category}`, // Replace with actual codetype if needed
-                    createdby: `${user.name}`,
-                    companyid:`${user.companyid}`,
+                    updatedby: `${user.name}`, // Replace with actual codetype if needed
                     primename,
                     status,
                     sequence,
                     remark,
                 });
-                alert('Data Submitted Successfully')
+                alert('Data Updated');
+            } else {
+                if (!user) {
+                    console.error('User is not set');
+                    return;
+                }
+                // Otherwise, add new product
+                response = await axios.post(`${BASE_URL}/addProducts`, {
+                    codetype: `${category}`, // Replace with actual codetype if needed
+                    createdby: `${user.name}`,
+                    companyid: `${user.companyid}`,
+                    primename,
+                    status,
+                    sequence,
+                    remark,
+                });
+                alert('Data Submitted Successfully');
             }
-    
+
             // Clear form fields after submission
             setPrimekeyid('');
             setPrimename('');
@@ -331,7 +333,7 @@ const FrmCodeType = () => {
             setSequence('');
             setRemark('');
             setEditingId(null); // Reset editingId after submit
-    
+
             // Refresh product list after update or add
             fetchProductData(); // Implement fetchProductData to update product list
             findSequence(category);
@@ -351,13 +353,13 @@ const FrmCodeType = () => {
             console.error('Error fetching data:', error);
         }
     };
-    
-    const handleDelete = async (primekeyid:number) => {
+
+    const handleDelete = async (primekeyid: number) => {
         try {
             const response = await axios.delete(`${BASE_URL}/deleteProducts/${primekeyid}`, {
                 data: {
-                    codetype: category // Pass the codetype in the request body
-                }
+                    codetype: category, // Pass the codetype in the request body
+                },
             });
             console.log('Delete response:', response.data);
             // Optionally, update UI or perform additional actions after successful deletion
@@ -367,24 +369,21 @@ const FrmCodeType = () => {
         }
     };
 
-    
-    const handleEdit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, record: { primekeyid: number; primename: string; status: string; sequence: number, remark: string },) => {
+    const handleEdit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, record: { primekeyid: number; primename: string; status: string; sequence: number; remark: string }) => {
         // let EditRecord = p0;
         setEditingId(record.primekeyid.toString());
         // setPrimekeyid(record.primekeyid.toString());
         setPrimename(record.primename);
         setStatus(record.status);
-        setSequence(record.sequence.toString()); 
+        setSequence(record.sequence.toString());
         setRemark(record.remark);
-         // Scroll to the top
-         window.scrollTo({
+        // Scroll to the top
+        window.scrollTo({
             top: 70,
-            behavior: 'smooth' // Use 'auto' if you don't want the smooth scrolling effect
-        })
+            behavior: 'smooth', // Use 'auto' if you don't want the smooth scrolling effect
+        });
     };
-    
-    
-    
+
     return (
         <div>
             <div className="absolute inset-0">
@@ -398,89 +397,83 @@ const FrmCodeType = () => {
                 <img src="/assets/images/auth/polygon-object.svg" alt="image" className="absolute bottom-0 end-[28%]" />
                 <div className="relative w-full max-w-[870px] rounded-md bg-[linear-gradient(45deg,#fff9f9_0%,rgba(255,255,255,0)_25%,rgba(255,255,255,0)_75%,_#fff9f9_100%)] p-2 dark:bg-[linear-gradient(52.22deg,#0E1726_0%,rgba(14,23,38,0)_18.66%,rgba(14,23,38,0)_51.04%,rgba(14,23,38,0)_80.07%,#0E1726_100%)]">
                     <div className="relative flex flex-col justify-center rounded-md bg-white/60 backdrop-blur-lg dark:bg-black/50 px-6 py-20">
-                        <div className="absolute top-6 end-6">
-                        </div>
+                        <div className="absolute top-6 end-6"></div>
                         <div className="mx-auto w-full max-w-[440px]">
                             <div className="mb-10">
                                 <h1 className="text-3xl font-extrabold !leading-snug text-primary md:text-4xl">{currentPage}</h1>
                             </div>
                             <form className="space-y-5" onSubmit={handleSubmit}>
-                                 
-                <div className="relative text-white-dark">
-               <label> Prime Name: <input
-                        type="text"
-                        placeholder="Primename"
-                        value={primename}
-                        onChange={(e) => setPrimename(e.target.value)}
-                        className="form-input ps-10 placeholder:text-white-dark"
-                        style={{textTransform:'uppercase'}}
-                    />
-                    </label>
-                    <span className="absolute start-4 top-1/2 -translate-y-1/2">
-                        <IconPhoneCall fill={true} />
-                    </span>
-                </div>
-                <div className="relative text-white-dark">
-                    <input
-                        type="text"
-                        placeholder="Sequence"
-                        value={sequence}
-                        onChange={handleSequenceChange}
-                        className="form-input ps-10 placeholder:text-white-dark"
-                    />
-                    <span className="absolute start-4 top-1/2 -translate-y-1/2">
-                        <IconPhoneCall fill={true} />
-                    </span>
-                </div>
-                                
+                                <div className="relative text-white-dark">
+                                    <label>
+                                        {' '}
+                                        Prime Name:{' '}
+                                        <input
+                                            type="text"
+                                            placeholder="Primename"
+                                            value={primename}
+                                            onChange={(e) => setPrimename(e.target.value)}
+                                            className="form-input ps-10 placeholder:text-white-dark"
+                                            style={{ textTransform: 'uppercase' }}
+                                        />
+                                    </label>
+                                    <span className="absolute start-4 top-1/2 -translate-y-1/2">
+                                        <IconPhoneCall fill={true} />
+                                    </span>
+                                </div>
+                                <div className="relative text-white-dark">
+                                    <input type="text" placeholder="Sequence" value={sequence} onChange={handleSequenceChange} className="form-input ps-10 placeholder:text-white-dark" />
+                                    <span className="absolute start-4 top-1/2 -translate-y-1/2">
+                                        <IconPhoneCall fill={true} />
+                                    </span>
+                                </div>
+
                                 <label htmlFor="">
-                                <select name="cmbStatus"
-                                    style={{
-                                        width: "144px",
-                                        marginLeft: "3px",
-                                        border: "1px solid #e5e7eb",
-                                        borderRadius: '5px'
-                                    }}
-                                    onChange={changeStatus}
-                                    value='Active'
-                                >
-                                    <option>Status</option>
-                                    {myStatus.map((record, index) => (
-                                        <option key={index} value={record.PRIMENAME}>{record.PRIMENAME}</option>
-                                    ))}
-                                </select>
-                            </label>
-                                  <div className="relative text-white-dark">
-                    <textarea
-                        rows={4}
-                        placeholder="Remark"
-                        value={remark}
-                        onChange={(e) => setRemark(e.target.value)}
-                        className="form-textarea resize-none ps-10 placeholder:text-white-dark"
-                        style={{textTransform:'uppercase'}}
-                    />
-                    <span className="absolute start-4 top-2.5">
-                        <IconMessageDots fill={true} />
-                    </span>
-                </div>
-                                <button
-                    type="submit"
-                    className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]"
-                >
-                    {editingId ? 'Update' : 'Submit'}
-                </button>
+                                    <select
+                                        name="cmbStatus"
+                                        style={{
+                                            width: '144px',
+                                            marginLeft: '3px',
+                                            border: '1px solid #e5e7eb',
+                                            borderRadius: '5px',
+                                        }}
+                                        onChange={changeStatus}
+                                        value="Active"
+                                    >
+                                        <option>Status</option>
+                                        {myStatus.map((record, index) => (
+                                            <option key={index} value={record.PRIMENAME}>
+                                                {record.PRIMENAME}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </label>
+                                <div className="relative text-white-dark">
+                                    <textarea
+                                        rows={4}
+                                        placeholder="Remark"
+                                        value={remark}
+                                        onChange={(e) => setRemark(e.target.value)}
+                                        className="form-textarea resize-none ps-10 placeholder:text-white-dark"
+                                        style={{ textTransform: 'uppercase' }}
+                                    />
+                                    <span className="absolute start-4 top-2.5">
+                                        <IconMessageDots fill={true} />
+                                    </span>
+                                </div>
+                                <button type="submit" className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
+                                    {editingId ? 'Update' : 'Submit'}
+                                </button>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
             <div className="mt-6">
-                                <div className="flex justify-between mb-4">
-                                    <h2 className="text-2xl font-bold text text-danger">{currentPage}</h2>
-                                </div>
-                               
-                            </div>
-                            <div className="datatables">
+                <div className="flex justify-between mb-4">
+                    <h2 className="text-2xl font-bold text text-danger">{currentPage}</h2>
+                </div>
+            </div>
+            <div className="datatables">
                 <DataTable
                     highlightOnHover
                     className="whitespace-nowrap table-hover"
@@ -496,18 +489,10 @@ const FrmCodeType = () => {
                             title: <div style={{ marginLeft: '40px' }}>Action</div>,
                             render: (record) => (
                                 <div className="flex space-x-2">
-                                    <button
-                                        className='btn btn-warning mr-2'
-                                        onClick={(e) => handleEdit(e, record)}
-                                        style={{ width: '57px' }}
-                                    >
+                                    <button className="btn btn-warning mr-2" onClick={(e) => handleEdit(e, record)} style={{ width: '57px' }}>
                                         Edit
                                     </button>
-                                    <button
-                                        className='btn btn-danger mr-2'
-                                        onClick={() => handleDelete(record.primekeyid)}
-                                        style={{ padding: '8px' }}
-                                    >
+                                    <button className="btn btn-danger mr-2" onClick={() => handleDelete(record.primekeyid)} style={{ padding: '8px' }}>
                                         Delete
                                     </button>
                                 </div>

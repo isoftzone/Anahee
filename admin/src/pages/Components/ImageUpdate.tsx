@@ -183,13 +183,18 @@ const ImageUpdates: React.FC = () => {
                                 <td className="border p-2 text-center">{image.des_l1}</td>
                                 <td className="border p-2 text-center">{image.des_l2}</td>
                                 <td className="border p-2 text-center">{image.des_l3}</td>
-                                <td className="border p-2 text-center cursor-pointer" onClick={() => handleEdit(image)}>
+                                {/* <td className="border p-2 text-center cursor-pointer" onClick={() => handleEdit(image)}>
                                     <IconPencil />
+                                </td> */}
+                                 <td className="border p-2 text-center cursor-pointer"  onClick={() => handleEdit(image)}>
+                                    <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm mt-4 font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" onClick={() => handleDelete(image.id)}>
+                                        Edit
+                                    </button>
                                 </td>
                                 <td className="border p-2 text-center cursor-pointer">
-                                                                  <button className="text-red-500 hover:text-red-700" onClick={() => handleDelete(image.id)}>
-                                    🗑
-                                </button>
+                                    <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm mt-4 font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onClick={() => handleDelete(image.id)}>
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))}
@@ -200,13 +205,3 @@ const ImageUpdates: React.FC = () => {
     );
 };
 export default ImageUpdates;
-
-
-
-
-
-
-
-
-
-

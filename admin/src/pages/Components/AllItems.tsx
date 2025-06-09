@@ -97,13 +97,13 @@ export default function ItemManager() {
                 <td className="border px-2 py-1 flex space-x-2">
                   <button
                     onClick={() => navigate(`/Components/item-master/${item.ITEMID}`)}
-                    className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(item.ITEMID)}
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                   >
                     Delete
                   </button>

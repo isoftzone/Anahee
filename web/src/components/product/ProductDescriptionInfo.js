@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { getProductCartQuantity } from "../../helpers/product";
 import Rating from "./sub-components/ProductRating";
-import { addToCart,deleteFromCart } from "../../store/slices/cart-slice";
+import { addToCart, deleteFromCart } from "../../store/slices/cart-slice";
 // import { addToWishlist } from "../../store/slices/wishlist-slice";
-import Modal from 'react-bootstrap/Modal';
+import Modal from "react-bootstrap/Modal";
 import SizeChartModal from "./SizeChart";
 import {
   addToWishlist,
@@ -18,7 +18,7 @@ import { addToCompare } from "../../store/slices/compare-slice";
 import axios from "axios";
 import { BASE_URL } from "../../config";
 // const URL = "http://localhost:3000"; // Adjust as needed
-const customerInfoSting= localStorage.getItem('customerinfo');
+const customerInfoSting = localStorage.getItem("customerinfo");
 const customerinfo = customerInfoSting ? JSON.parse(customerInfoSting) : null;
 console.log("this is id customer description", customerinfo?.id);
 const CUSTOMERID = customerinfo?.id;
@@ -43,15 +43,19 @@ const ProductDescriptionInfo = ({
   const [productStock, setProductStock] = useState(
     product.variation ? product.variation[0].size[0].stock : product.stock
   );
-  const [quantityCount, setQuantityCount] = useState(1);
+  const [quantity, setQuantityCount] = useState(1);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+
   const productCartQty = getProductCartQuantity(
     cartItems,
     product,
     selectedProductColor,
     selectedProductSize
   );
+  const isProductInCart = productCartQty > 0;
+
   const [openDropdown, setOpenDropdown] = useState(null);
-    const [show, setShow] = useState(false);
+  const [show, setShow] = useState(false);
   const toggleDropdown = (dropdown) => {
     setOpenDropdown(openDropdown === dropdown ? null : dropdown);
   };
@@ -97,38 +101,93 @@ const ProductDescriptionInfo = ({
   //   }
   // }
 
-const handleAddtocart = async () => {
-    // Create cart item object
-    const cartItem = {
-      ...product,
-      quantity: quantityCount,
+  const handleQuantityChange = (action) => {
+    if (action === "increment") {
+      const availableStock =
+        productStock - (isProductInCart ? productCartQty : 0);
+      if (productStock && quantity < availableStock) {
+        setQuantityCount((prev) => prev + 1);
+      }
+    } else if (action === "decrement") {
+      if (quantity > 1) {
+        setQuantityCount((prev) => prev - 1);
+      }
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (isAddingToCart) return;
+    setIsAddingToCart(true);
+    try {
+      // Prepare product for Redux update
+      const cartItem = {
+        ...product,
+        quantity,
+        selectedProductColor: selectedProductColor || null,
+        selectedProductSize: selectedProductSize || null,
       };
-      console.log("this is034", cartItem);
-    // Always add to Redux store (works for both logged-in and guest users)
-    dispatch(addToCart(cartItem));
-    // Only call API if user is logged in
-    if (CUSTOMERID) {
-      console.log("this is 05");
-      try {
+      // Always add to Redux store (guest or logged-in)
+      dispatch(addToCart(cartItem));
+      // Reset quantity for UI
+      setQuantityCount(1);
+      // If user is logged in, also send to server
+      if (CUSTOMERID) {
         const payload = {
           CUSTOMERID,
           ITEMID: product.id,
-          quantity: quantityCount,
+          quantity,
           type: "cart",
+          size: selectedProductSize,
+          color: selectedProductColor,
         };
-        const response = await axios.post(`${BASE_URL}/addtocartWishlist`, payload);
-        console.log("Item added to server cart:", response.data);
-      } catch (error) {
-        console.error("Failed to add to server cart:", error);
-        // Optional: Remove from Redux if server update fails
-        dispatch(deleteFromCart(cartItem.cartItemId));
+        try {
+          const response = await axios.post(
+            `${BASE_URL}/addtocartWishlist`,
+            payload
+          );
+          console.log("Item added to server cart:", response.data);
+        } catch (error) {
+          console.error("Server cart add failed:", error);
+          // Optional: You can dispatch rollback logic here
+        }
       }
+    } catch (error) {
+      console.error("Add to cart failed:", error);
+    } finally {
+      setIsAddingToCart(false);
     }
-    // Reset quantity after adding to cart
-    setQuantityCount(1);
   };
 
-
+  // const handleAddtocart = async () => {
+  //     // Create cart item object
+  //     const cartItem = {
+  //       ...product,
+  //       quantity: quantityCount,
+  //       };
+  //       console.log("this is034", cartItem);
+  //     // Always add to Redux store (works for both logged-in and guest users)
+  //     dispatch(addToCart(cartItem));
+  //     // Only call API if user is logged in
+  //     if (CUSTOMERID) {
+  //       console.log("this is 05");
+  //       try {
+  //         const payload = {
+  //           CUSTOMERID,
+  //           ITEMID: product.id,
+  //           quantity: quantityCount,
+  //           type: "cart",
+  //         };
+  //         const response = await axios.post(`${BASE_URL}/addtocartWishlist`, payload);
+  //         console.log("Item added to server cart:", response.data);
+  //       } catch (error) {
+  //         console.error("Failed to add to server cart:", error);
+  //         // Optional: Remove from Redux if server update fails
+  //         dispatch(deleteFromCart(cartItem.cartItemId));
+  //       }
+  //     }
+  //     // Reset quantity after adding to cart
+  //     setQuantityCount(1);
+  //   };
 
   // const handleWishlist = async () => {
   //   try {
@@ -157,49 +216,55 @@ const handleAddtocart = async () => {
   // }
 
   const handleWishlist = async () => {
-  // Always add to Redux store (works for both logged-in and guest users)
-  dispatch(addToWishlist(product));
-  // Only call API if user is logged in
-  if (CUSTOMERID) {
+    // Always add to Redux store (works for both logged-in and guest users)
+    dispatch(addToWishlist(product));
+    // Only call API if user is logged in
+    if (CUSTOMERID) {
+      try {
+        const payload = {
+          CUSTOMERID,
+          ITEMID: product.id,
+          type: "wishlist",
+        };
+        const response = await axios.post(
+          `${BASE_URL}/addtocartWishlist`,
+          payload
+        );
+        console.log("Item added to server wishlist:", response.data);
+      } catch (error) {
+        console.error("Failed to add to server wishlist:", error);
+        // Optional: Remove from Redux if server update fails
+        dispatch(deleteFromWishlist(product));
+      }
+    }
+  };
+
+  const handledeleteWishlist = async () => {
+    dispatch(deleteFromWishlist(product));
     try {
       const payload = {
         CUSTOMERID,
         ITEMID: product.id,
-        type: "wishlist"
-      };
-      const response = await axios.post(`${BASE_URL}/addtocartWishlist`, payload);
-      console.log("Item added to server wishlist:", response.data);
-    } catch (error) {
-      console.error("Failed to add to server wishlist:", error);
-      // Optional: Remove from Redux if server update fails
-      dispatch(deleteFromWishlist(product));
-    }
-  }
-};
-
-
-  const handledeleteWishlist = async () => {
-     dispatch(deleteFromWishlist(product))
-    try {
-       const payload = {
-        CUSTOMERID,
-        ITEMID: product.id,
         type: "wishlist",
-      }
+      };
       console.log("this is data handle delete wishlist", payload);
-       //   delete api
-      const response = await axios.delete(`${BASE_URL}/deletecartWishlist`, { data: payload })
-      console.log("this is delete data wishlist", response );
-    if (response.status === 200 || response.data.success) {
-     dispatch( removeColorFromWishlist(product))
-    // dispatch(deleteFromWishlist(product))
+      //   delete api
+      const response = await axios.delete(`${BASE_URL}/deletecartWishlist`, {
+        data: payload,
+      });
+      console.log("this is delete data wishlist", response);
+      if (response.status === 200 || response.data.success) {
+        dispatch(removeColorFromWishlist(product));
+        // dispatch(deleteFromWishlist(product))
+      }
+      // dispatch(deleteFromWishlist(product))
+    } catch (error) {
+      console.log("this is failed to wishlist data backend", error);
     }
-    // dispatch(deleteFromWishlist(product))
-    }
-    catch (error) {
-      console.log("this is failed to wishlist data backend", error)
-    }
-  }
+  };
+
+  const availableStock = productStock - (isProductInCart ? productCartQty : 0);
+
   return (
     <div className="product-details-content ml-0 md:ml-10 p-4 md:p-6 space-y-6">
       <div>
@@ -229,82 +294,91 @@ const handleAddtocart = async () => {
       </div>
       {product.variation && (
         <div className="pro-details-size-color">
-          <div className="pro-details-size">
-            <span>Size</span>
-            <div className="pro-details-size-content">
-              {product.variation.map((single) =>
-                single.color === selectedProductColor
-                  ? single.size.map((singleSize, key) => (
-                      <label
-                        className="pro-details-size-content--single"
-                        key={key}
-                      >
-                        <input
-                          type="radio"
-                          value={singleSize.name}
-                          checked={
-                            singleSize.name === selectedProductSize
-                              ? "checked"
-                              : ""
-                          }
-                          onChange={() => {
-                            setSelectedProductSize(singleSize.name);
-                            setProductStock(singleSize.stock);
-                            setQuantityCount(1);
-                          }}
-                        />
-                        <span className="size-name">{singleSize.name}</span>
-                      </label>
-                    ))
-                  : ""
-              )}
+          <div className="pro-details-color-wrap mt-3">
+            <span>Color</span>
+            <div className="pro-details-color-content">
+              {product.variation.map((single, key) => {
+                return (
+                  <label
+                    key={key}
+                    className={`pro-details-color-content--single ${single.color}`}
+                    style={{
+                      backgroundColor: single.color.toLowerCase(),
+                      border:"1px solid black",
+                      // borderColor: selectedProductColor === single.color ? "black" : "#ccc"
+                    }}
+                    title={single.color} // show color name on hover
+                  >
+                    <input
+                      type="radio"
+                      value={single.color}
+                      name="product-color"
+                      checked={single.color === selectedProductColor}
+                      onChange={() => {
+                        setSelectedProductColor(single.color);
+                        setSelectedProductSize(single.size[0].name);
+                        setProductStock(single.size[0].stock);
+                        setQuantityCount(1);
+                      }}
+                      className="absolute opacity-0 w-0 h-0"
+                    />
+                  </label>
+          
+                );
+              })}
             </div>
           </div>
           <div className="pro-details-size">
-            <div class="sizeheading  d-flex mb-2">
-                  <div className="sizechart d-flex align-items-center ms-2" onClick={() => setShow(true)}>
-                    | Size Chart
-                    <img
-                      src="/assets/img/icon-img/sizecharticon.webp"
-                      alt="Size Chart"
-                      className="ms-1"
-                      style={{ width: "20px", height: "20px" }}
-                    />
-                  </div>
-            </div> 
-            {/* size model */}
-            <Modal
-              show={show}
-              onHide={() => setShow(false)}
-              dialogClassName="modal-90w"
-              aria-labelledby="example-custom-modal-styling-title"
-            >
-              <Modal.Header className="d-flex justify-content-between align-items-center">
-                <div>
-                  <Modal.Title id="example-custom-modal-styling-title">
-                    Size Chart (inches)
-                  </Modal.Title>
-                </div>
-                <button
-                  onClick={() => setShow(false)}
-                  style={{
-                    border: "none",
-                    fontSize: "3.2rem",
-                    lineHeight: "1",
-                    padding: "0.25rem 0.5rem",
-                  }}
+            
+            <div className="pro-details-size">
+              <div class="sizeheading align-items-center justify-content-start d-flex mb-2">
+                <span className="mt-3">Size</span>
+                <div
+                  className="sizechart d-flex align-items-center ms-2"
+                  onClick={() => setShow(true)}
                 >
-                  &times;
-                </button>
-              </Modal.Header>
+                  <span className="mt-3">| Size Chart</span>
+                  <img
+                    src="/assets/img/icon-img/sizecharticon.webp"
+                    alt="Size Chart"
+                    className="ms-1"
+                    style={{ width: "20px", height: "20px" }}
+                  />
+                </div>
+              </div>
+              {/* size model */}
+              <Modal
+                show={show}
+                onHide={() => setShow(false)}
+                dialogClassName="modal-90w"
+                aria-labelledby="example-custom-modal-styling-title"
+              >
+                <Modal.Header className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <Modal.Title id="example-custom-modal-styling-title">
+                      Size Chart (inches)
+                    </Modal.Title>
+                  </div>
+                  <button
+                    onClick={() => setShow(false)}
+                    style={{
+                      border: "none",
+                      fontSize: "3.2rem",
+                      lineHeight: "1",
+                      padding: "0.25rem 0.5rem",
+                    }}
+                  >
+                    &times;
+                  </button>
+                </Modal.Header>
 
-              <Modal.Body>
-                <SizeChartModal />
-              </Modal.Body>
-            </Modal>
+                <Modal.Body>
+                  <SizeChartModal />
+                </Modal.Body>
+              </Modal>
 
-            {/* <span>Size</span> */}
-            {/* <div className="pro-details-size-content">
+              {/* <span>Size</span> */}
+              {/* <div className="pro-details-size-content">
               {product.variation &&
                 product.variation.map(single => {
                   return single.color === selectedProductColor
@@ -335,9 +409,37 @@ const handleAddtocart = async () => {
                     : "";
                 })}
             </div> */}
+            </div>
+            <div className="pro-details-size-content">
+              {product.variation.map((single) =>
+                single.color === selectedProductColor
+                  ? single.size.map((singleSize, key) => (
+                      <label
+                        className="pro-details-size-content--single"
+                        key={key}
+                      >
+                        <input
+                          type="radio"
+                          value={singleSize.name}
+                          checked={
+                            singleSize.name === selectedProductSize
+                              ? "checked"
+                              : ""
+                          }
+                          onChange={() => {
+                            setSelectedProductSize(singleSize.name);
+                            setProductStock(singleSize.stock);
+                            setQuantityCount(1);
+                          }}
+                        />
+                        <span className="size-name">{singleSize.name}</span>
+                      </label>
+                    ))
+                  : ""
+              )}
+            </div>
           </div>
         </div>
-        
       )}
       {product.affiliateLink ? (
         <div className="pro-details-quality">
@@ -354,6 +456,28 @@ const handleAddtocart = async () => {
       ) : (
         <div className="pro-details-quality flex flex-wrap gap-4">
           <div className="cart-plus-minus flex items-center">
+            <button
+              onClick={() => handleQuantityChange("decrement")}
+              className="dec qtybutton"
+              disabled={quantity <= 1}
+            >
+              -
+            </button>
+            <input
+              className="cart-plus-minus-box text-center"
+              type="text"
+              value={quantity}
+              readOnly
+            />
+            <button
+              onClick={() => handleQuantityChange("increment")}
+              className="inc qtybutton"
+              disabled={productStock && quantity >= availableStock}
+            >
+              +
+            </button>
+          </div>
+          {/* <div className="cart-plus-minus flex items-center">
             <button
               onClick={() =>
                 setQuantityCount(quantityCount > 1 ? quantityCount - 1 : 1)
@@ -380,32 +504,43 @@ const handleAddtocart = async () => {
             >
               +
             </button>
-          </div>
+          </div> */}
           <div className="pro-details-cart btn-hover">
             {productStock && productStock > 0 ? (
-              <button 
-              onClick={handleAddtocart}
-                // onClick={() =>
-                //   dispatch(
-                //     addToCart({
-                //       ...product,
-                //       quantity: quantityCount,
-                //       selectedProductColor:
-                //         selectedProductColor ??
-                //         product.selectedProductColor ??
-                //         null,
-                //       selectedProductSize:
-                //         selectedProductSize ??
-                //         product.selectedProductSize ??
-                //         null,
-                //     })
-                //   )
-                // }
-                disabled={productCartQty >= productStock}
+              <button
+                onClick={handleAddToCart}
+                disabled={quantity > availableStock || isAddingToCart}
               >
-                Add To Cart
+                {isAddingToCart
+                  ? "Adding..."
+                  : isProductInCart
+                  ? `Add To Cart`
+                  : `Add To Cart`}
               </button>
             ) : (
+              // <button
+
+              // onClick={handleAddtocart}
+              // onClick={() =>
+              //   dispatch(
+              //     addToCart({
+              //       ...product,
+              //       quantity: quantityCount,
+              //       selectedProductColor:
+              //         selectedProductColor ??
+              //         product.selectedProductColor ??
+              //         null,
+              //       selectedProductSize:
+              //         selectedProductSize ??
+              //         product.selectedProductSize ??
+              //         null,
+              //     })
+              //   )
+              // }
+              //   disabled={productCartQty >= productStock}
+              // >
+              //   Add To Cart
+              // </button>
               <button disabled>Out of Stock</button>
             )}
           </div>
@@ -425,21 +560,19 @@ const handleAddtocart = async () => {
           </div> */}
 
           <div className="pro-details-wishlist">
-           <button
+            <button
               className={`transition-all duration-300 text-2xl ${
                 wishlistItem ? "text-danger" : "text-gray-400"
               }`}
               title={wishlistItem ? "Remove from wishlist" : "Add to wishlist"}
-            //   onClick={() =>
-            //     wishlistItem
-            //       ? dispatch(deleteFromWishlist(product))
-            //       : dispatch(addToWishlist(product))
-            //   }
-            // >
-                onClick={() =>
-                wishlistItem
-                  ?  handledeleteWishlist()
-                  : handleWishlist()
+              //   onClick={() =>
+              //     wishlistItem
+              //       ? dispatch(deleteFromWishlist(product))
+              //       : dispatch(addToWishlist(product))
+              //   }
+              // >
+              onClick={() =>
+                wishlistItem ? handledeleteWishlist() : handleWishlist()
               }
             >
               {wishlistItem ? (
@@ -496,23 +629,26 @@ const handleAddtocart = async () => {
         </div>
       </div>
       <div>
-           {product.Product_Details ? (
-        <div className="product-details-dropdown">
-          <button onClick={() => toggleDropdown("productDetails")}>
-            Product Details
-          </button>
-          {openDropdown === "productDetails" && (
-            <div className="dropdown-content">
-             <div
-                className="prose mt-2"
-                dangerouslySetInnerHTML={{ __html: product.Product_Details || "<p>No details available.</p>" }}
-              />
-            </div>
-          )}
-        </div>
-      ) : (
-        ""
-      )}
+        {product.Product_Details ? (
+          <div className="product-details-dropdown">
+            <button onClick={() => toggleDropdown("productDetails")}>
+              Product Details
+            </button>
+            {openDropdown === "productDetails" && (
+              <div className="dropdown-content">
+                <div
+                  className="prose mt-2"
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      product.Product_Details || "<p>No details available.</p>",
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        ) : (
+          ""
+        )}
         {/* <div className="product-details-dropdown">
           <button onClick={() => toggleDropdown("productDetails")}>
             Product Details
@@ -564,35 +700,39 @@ const handleAddtocart = async () => {
             </div>
           )}
         </div> */}
-       <div className="product-details-dropdown">
-        <button onClick={() => toggleDropdown("shipping")}>
-          Shipping
-        </button>
-        {openDropdown === "shipping" && (
-          <div className="dropdown-content">
-            <ul>
-              <li>Fast & Reliable shipping.</li>
-              <li>Free shipping on orders above INR 1,500 in India.</li>
-              <li>Free shipping on orders above INR 1,500 in India.</li>
-              <li>Free shipping on orders above INR 1,500 in India.</li>
-            </ul>
-          </div>
-        )}
-      </div>
-       <div className="product-details-dropdown">
-        <button onClick={() => toggleDropdown("manufacturerDetails")}>
-          Manufacturer Details
-        </button>
-        {openDropdown === "manufacturerDetails" && (
-          <div className="dropdown-content">
-            <ul>
-              <li><strong>Name of Commodity:</strong> Shirt</li>
-              <li><strong>Country of Origin:</strong> India</li>
-              <li><strong>Net Qty:</strong> 1 N</li>
-            </ul>
-          </div>
-        )}
-      </div>
+        <div className="product-details-dropdown">
+          <button onClick={() => toggleDropdown("shipping")}>Shipping</button>
+          {openDropdown === "shipping" && (
+            <div className="dropdown-content">
+              <ul>
+                <li>Fast & Reliable shipping.</li>
+                <li>Free shipping on orders above INR 1,500 in India.</li>
+                <li>Free shipping on orders above INR 1,500 in India.</li>
+                <li>Free shipping on orders above INR 1,500 in India.</li>
+              </ul>
+            </div>
+          )}
+        </div>
+        <div className="product-details-dropdown">
+          <button onClick={() => toggleDropdown("manufacturerDetails")}>
+            Manufacturer Details
+          </button>
+          {openDropdown === "manufacturerDetails" && (
+            <div className="dropdown-content">
+              <ul>
+                <li>
+                  <strong>Name of Commodity:</strong> Shirt
+                </li>
+                <li>
+                  <strong>Country of Origin:</strong> India
+                </li>
+                <li>
+                  <strong>Net Qty:</strong> 1 N
+                </li>
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

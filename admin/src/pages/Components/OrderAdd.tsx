@@ -290,16 +290,16 @@ const OrderAdd: React.FC = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <h1 className="text-2xl font-bold">Add Order</h1>
                 <div className="flex flex-wrap gap-2 w-full md:w-auto">
-                    <button onClick={handleSaveOrder} className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors w-full md:w-auto" disabled={loading}>
+                    <button onClick={handleSaveOrder} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500o" disabled={loading}>
                         {loading ? 'Saving...' : 'Save'}
                     </button>
-                    <button onClick={handleSendInvoice} className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors w-full md:w-auto" disabled={loading}>
+                    <button onClick={handleSendInvoice} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" disabled={loading}>
                         Send Invoice
                     </button>
-                    <button onClick={handlePreview} className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-md transition-colors w-full md:w-auto">
+                    <button onClick={handlePreview} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                         Preview
                     </button>
-                    <button onClick={handleDownload} className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-md transition-colors w-full md:w-auto">
+                    <button onClick={handleDownload} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                         Download
                     </button>
                 </div>
@@ -446,7 +446,7 @@ const OrderAdd: React.FC = () => {
                             </div>
                         </div>
                     ))}
-                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md mt-2 transition-colors w-full md:w-auto" onClick={addItem}>
+                    <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onClick={addItem}>
                         Add Item
                     </button>
                 </div>

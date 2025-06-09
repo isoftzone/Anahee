@@ -47,12 +47,12 @@ const handledeleteCart = async (item) => {
       // No need to dispatch again — already deleted above
     } else {
       console.warn(":warning: Server deletion failed:", response.data?.message ?? response.data);
-      alert("Failed to delete item from server.");
+      // alert("Failed to delete item from server.");
       // Optional: Re-add to cart if needed (rollback optimistic update)
     }
   } catch (error) {
     console.error(":x: API error while deleting cart item:", error);
-    alert("An error occurred while deleting the item.");
+    // alert("An error occurred while deleting the item.");
     // Optional: Re-add to cart if needed
   }
 };

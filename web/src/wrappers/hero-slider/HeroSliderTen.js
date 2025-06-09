@@ -1,135 +1,3 @@
-// import PropTypes from "prop-types";
-// import { useEffect, useRef, useState } from "react";
-
-// const HeroSliderTen = ({ spaceTopClass, spaceBottomClass }) => {
-//   const [isPlaying, setIsPlaying] = useState(false);
-//   const [isMuted, setIsMuted] = useState(true);
-//   const [volume, setVolume] = useState(0.5); // Default volume
-//   const videoRef = useRef(null);
-
-//   const videoUrl = "/assets/img/team/Fashion_Film.mp4";
-
-//   const togglePlayPause = () => {
-//     if (!videoRef.current) return;
-
-//     if (isPlaying) {
-//       videoRef.current.pause();
-//     } else {
-//       videoRef.current.play();
-//     }
-
-//     setIsPlaying(!isPlaying);
-//   };
-
-//   const toggleMute = () => {
-//     if (!videoRef.current) return;
-
-//     const newMuted = !isMuted;
-//     setIsMuted(newMuted);
-//     videoRef.current.muted = newMuted;
-//   };
-
-//   const handleVolumeChange = (e) => {
-//     const newVolume = parseFloat(e.target.value);
-//     setVolume(newVolume);
-//     if (videoRef.current) {
-//       videoRef.current.volume = newVolume;
-//       videoRef.current.muted = newVolume === 0;
-//       setIsMuted(newVolume === 0);
-//     }
-//   };
-
-//   useEffect(() => {
-//     if (videoRef.current) {
-//       videoRef.current.volume = volume;
-//       videoRef.current.muted = isMuted;
-//     }
-//   }, [volume, isMuted]);
-
-//   return (
-//     <div className={`slider-area ${spaceTopClass} ${spaceBottomClass}`}>
-//       <div className="video-container position-relative overflow-hidden w-100">
-//         <video
-//           ref={videoRef}
-//           className="position-absolute top-0 start-0 w-100 h-100"
-//           style={{ objectFit: "cover" }}
-//           loop
-//           onClick={togglePlayPause}
-//           onPlay={() => setIsPlaying(true)}
-//           onPause={() => setIsPlaying(false)}
-//         >
-//           <source src={videoUrl} type="video/mp4" />
-//           Your browser does not support the video tag.
-//         </video>
-
-//         {/* Play/Pause Button */}
-//         <button
-//           onClick={togglePlayPause}
-//           className="position-absolute top-50 start-50 translate-middle rounded-circle border-0 d-flex justify-content-center align-items-center bg-white shadow-sm"
-//           style={{ width: "40px", height: "40px", zIndex: 2 }}
-//           aria-label={isPlaying ? "Pause" : "Play"}
-//         >
-//           {isPlaying ? (
-//             <svg width="30" height="30" fill="#dc3545" viewBox="0 0 24 24">
-//               <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-//             </svg>
-//           ) : (
-//             <svg width="30" height="30" fill="#dc3545" viewBox="0 0 24 24">
-//               <path d="M8 5v14l11-7z" />
-//             </svg>
-//           )}
-//         </button>
-
-//         {/* Mute/Unmute Toggle */}
-//         {/* <i
-//           onClick={toggleMute}
-//           className="position-absolute top-0 end-0 m-3"
-//           style={{ zIndex: 2 }}
-//         >
-//           {isMuted ? "🔇" : "🔊"}
-//         </i> */}
-//         {/* Volume Slider */}
-//         {/* <input
-//           type="range"
-//           min="0"
-//           max="1"
-//           step="0.05"
-//           value={volume}
-//           onChange={handleVolumeChange}
-//           className="position-absolute bottom-0 start-50 translate-middle-x w-25"
-//           style={{ zIndex: 2 }}
-//         /> */}
-//       </div>
-
-//       <style jsx>{`
-//         .video-container {
-//           height: 700px;
-//           background-color: #000;
-//         }
-
-//         @media (max-width: 1024px) {
-//           .video-container {
-//             height: 500px;
-//           }
-//         }
-
-//         @media (max-width: 767px) {
-//           .video-container {
-//             height: 300px;
-//           }
-//         }
-//       `}</style>
-//     </div>
-//   );
-// };
-
-// HeroSliderTen.propTypes = {
-//   spaceBottomClass: PropTypes.string,
-//   spaceTopClass: PropTypes.string,
-// };
-
-// export default HeroSliderTen;
-
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
 
@@ -202,8 +70,12 @@ const HeroSliderTen = ({ spaceTopClass, spaceBottomClass }) => {
         {/* Play/Pause Button */}
         <button
           onClick={togglePlayPause}
-          className="position-absolute top-50 start-50 translate-middle rounded-circle border-0 d-flex justify-content-center align-items-center bg-white shadow-sm"
-          style={{ width: "40px", height: "40px", zIndex: 2 }}
+          className="play-pause-button position-absolute top-50 start-50 translate-middle rounded-circle border-0 d-flex justify-content-center align-items-center bg-white shadow-sm"
+          style={{
+            width: "40px",
+            height: "40px",
+            zIndex: 2,
+          }}
           aria-label={isPlaying ? "Pause" : "Play"}
         >
           {isPlaying ? (
@@ -217,7 +89,7 @@ const HeroSliderTen = ({ spaceTopClass, spaceBottomClass }) => {
           )}
         </button>
 
-        {/* Controls Container - Bottom Right */}
+        {/* Controls: Volume + Mute */}
         <div
           className={`position-absolute bottom-0 end-0 m-3 d-flex align-items-center gap-2 ${
             showControls ? "opacity-100" : "opacity-0"
@@ -233,17 +105,16 @@ const HeroSliderTen = ({ spaceTopClass, spaceBottomClass }) => {
             value={volume}
             onChange={handleVolumeChange}
             className="volume-slider"
-            style={{ width: "80px" }}
           />
 
           {/* Mute/Unmute Button */}
           <button
             onClick={toggleMute}
-            className="rounded-circle border-0 d-flex justify-content-center align-items-center bg-white shadow-sm"
+            className="mute-button rounded-circle border-0 d-flex justify-content-center align-items-center bg-white shadow-sm"
             style={{
               width: "30px",
               height: "30px",
-              color: "#0d6efd", // Bootstrap primary blue
+              color: "#0d6efd", // Blue color for both icons
             }}
             aria-label={isMuted ? "Unmute" : "Mute"}
           >
@@ -270,14 +141,16 @@ const HeroSliderTen = ({ spaceTopClass, spaceBottomClass }) => {
         </div>
       </div>
 
+      {/* Component Styles */}
       <style jsx>{`
         .video-container {
-          height: 700px;
+          height: 100vh;
           background-color: #000;
         }
 
         .volume-slider {
           -webkit-appearance: none;
+          width: 80px;
           height: 4px;
           background: #ddd;
           border-radius: 2px;
@@ -306,6 +179,26 @@ const HeroSliderTen = ({ spaceTopClass, spaceBottomClass }) => {
         @media (max-width: 767px) {
           .video-container {
             height: 300px;
+          }
+
+          .volume-slider {
+            width: 60px;
+          }
+
+          .play-pause-button,
+          .mute-button {
+            width: 30px !important;
+            height: 30px !important;
+          }
+
+          .play-pause-button svg,
+          .mute-button svg {
+            width: 20px !important;
+            height: 20px !important;
+          }
+
+          .transition-opacity {
+            opacity: 1 !important; /* Always show controls on small screens */
           }
         }
       `}</style>
