@@ -45,7 +45,7 @@ const PaymentSetting = () => {
 
         <button
           onClick={handleBackClick}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mb-4"
+          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           ⬅ Payment Settings
         </button>
@@ -113,14 +113,14 @@ const PaymentSetting = () => {
           <div className="flex gap-2">
             <button
               type="submit"
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             >
               Save
             </button>
             <button
               type="button"
               onClick={handleReset}
-              className="bg-gray-200 hover:bg-gray-300 text-black px-4 py-2 rounded"
+              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
               Reset
             </button>

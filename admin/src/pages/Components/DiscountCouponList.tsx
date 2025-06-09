@@ -120,9 +120,9 @@ const DiscountCouponList: React.FC = () => {
 
       <button
         onClick={() => navigate('/Components/discountcoupon')}
-        className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
+        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
       >
-        ➕ Add Discount Coupon
+         Add Discount Coupon
       </button>
 
       <div className="flex justify-between mb-4">
@@ -201,9 +201,9 @@ const DiscountCouponList: React.FC = () => {
                 <td className="border p-2">
                   <button
                     onClick={() => handleEditCoupon(coupon.my_row_id)}
-                    className="text-blue-600 hover:underline"
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 mt-4 focus:ring-yellow-500"
                   >
-                    🖍 Edit
+                    Edit
                   </button>
                 </td>
               </tr>

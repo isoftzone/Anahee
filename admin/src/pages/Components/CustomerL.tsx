@@ -139,7 +139,7 @@ const CustomersL: React.FC = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="border border-gray-300 rounded px-3 py-2 w-full sm:w-auto"
                 />
-                <button onClick={handleClick} className="bg-primary sm:mt-4 mt-0 text-white rounded px-4 py-2 w-full sm:w-auto">
+                <button onClick={handleClick} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 mt-4 focus:ring-blue-500">
                     + Add Customer
                 </button>
             </div>
@@ -184,10 +184,10 @@ const CustomersL: React.FC = () => {
                                     <td className="p-2 border">{customer.email}</td>
                                     <td className="p-2 border">
                                         <div className="flex gap-2">
-                                            <button onClick={() => handleEdit(customer.CUSTOMERID)} className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm">
+                                            <button onClick={() => handleEdit(customer.CUSTOMERID)} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
                                                 Edit
                                             </button>
-                                            <button onClick={() => handleDelete(customer.CUSTOMERID)} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+                                            <button onClick={() => handleDelete(customer.CUSTOMERID)} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                                 Delete
                                             </button>
                                         </div>

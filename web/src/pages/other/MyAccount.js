@@ -258,7 +258,6 @@
 //         },
 //       }
 //     );
-  
 
 //     if (response.status === 200) {
 //       setSuccess(response.data.message || "Profile updated successfully");
@@ -276,8 +275,8 @@
 //   } catch (error) {
 //     console.error("Update error:", error);
 //     setError(
-//       error.response?.data?.message || 
-//       error.message || 
+//       error.response?.data?.message ||
+//       error.message ||
 //       "Failed to update profile"
 //     );
 //   }
@@ -466,7 +465,7 @@
 //           style={inputStyle}
 //         />
 //       </div>
-//       {/* 
+//       {/*
 //       <div className="col-md-6 mb-4">
 //         <label className="d-block mb-2">Address</label>
 //         <input
@@ -490,7 +489,7 @@
 //           style={inputStyle}
 //         />
 //       </div> */}
-//       {/* 
+//       {/*
 //       <div className="col-md-6 mb-4">
 //         <label className="d-block mb-2">State</label>
 //         <input
@@ -1094,9 +1093,9 @@
 //         {/* <button type="submit" className="px-3 py-2" style={buttonStyle}>
 //           Update
 //         </button> */}
-//         <button 
-//   type="submit" 
-//   className="px-3 py-2" 
+//         <button
+//   type="submit"
+//   className="px-3 py-2"
 //   style={buttonStyle}
 //   disabled={isSubmitting}
 // >
@@ -1908,8 +1907,8 @@ const MyAccount = () => {
   const [activeView, setActiveView] = useState("profile");
   const [successTimeout, setSuccessTimeout] = useState(null);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-   const [editIndex, setEditIndex] = useState(null);
-   const [editItem, setEditItem] = useState(null);
+  const [editIndex, setEditIndex] = useState(null);
+  const [editItem, setEditItem] = useState(null);
   const [activeProfileSection, setActiveProfileSection] =
     useState("personalDetails");
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -1918,21 +1917,20 @@ const MyAccount = () => {
   const [walletBalance, setWalletBalance] = useState(0);
   const [walletTransactions, setWalletTransactions] = useState([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [showAddForm, setShowAddForm] = useState(false);
-    const [addForm, setAddForm] = useState({
-      fname: "",
-      lname: "",
-      address: "",
-      city: "",
-      state: "",
-      country: "",
-      postal_code: "",
-      email: "",
-      mobile: "",
-      description: "",
-      primary_address: 0,
-    });
-    
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [addForm, setAddForm] = useState({
+    fname: "",
+    lname: "",
+    address: "",
+    city: "",
+    state: "",
+    country: "",
+    postal_code: "",
+    email: "",
+    mobile: "",
+    description: "",
+    primary_address: 0,
+  });
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -1943,51 +1941,51 @@ const MyAccount = () => {
     navigate("/login-register");
   }
 
-   useEffect(() => {
-      if (customerId) fetchAddresses();
-    }, [customerId]);
-  
-    const handleDelete = async (addressId) => {
-        if (!window.confirm("Are you sure you want to delete this address?"))
-          return;
-    
-        try {
-          await axios.delete(
-            `http://localhost:3000/deletecustomeraddress/${addressId}`
-          );
-          alert("Address deleted successfully");
-          fetchAddresses();
-        } catch (err) {
-          alert("Failed to delete address");
-        }
-      };
- const handleEditClick = (item, index) => {
+  useEffect(() => {
+    if (customerId) fetchAddresses();
+  }, [customerId]);
+
+  const handleDelete = async (addressId) => {
+    if (!window.confirm("Are you sure you want to delete this address?"))
+      return;
+
+    try {
+      await axios.delete(
+        `http://localhost:3000/deletecustomeraddress/${addressId}`
+      );
+      alert("Address deleted successfully");
+      fetchAddresses();
+    } catch (err) {
+      alert("Failed to delete address");
+    }
+  };
+  const handleEditClick = (item, index) => {
     setEditItem({ ...item });
     setEditIndex(index);
   };
-     const handleUpdate = async (e) => {
-        e.preventDefault();
-        try {
-          await axios.put("http://localhost:3000/updatecustomeraddress", {
-            ...editItem,
-            customer_id: customerId,
-            primary_address: editItem.primary_address || 0,
-          });
-          alert("Address updated successfully");
-          setEditItem(null);
-          setEditIndex(null);
-          fetchAddresses();
-        } catch (err) {
-          alert("Update failed: " + (err.response?.data?.msg || err.message));
-        }
-      };
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put("http://localhost:3000/updatecustomeraddress", {
+        ...editItem,
+        customer_id: customerId,
+        primary_address: editItem.primary_address || 0,
+      });
+      alert("Address updated successfully");
+      setEditItem(null);
+      setEditIndex(null);
+      fetchAddresses();
+    } catch (err) {
+      alert("Update failed: " + (err.response?.data?.msg || err.message));
+    }
+  };
 
-    const fetchAddresses = () => {
-      axios
-        .get(`http://localhost:3000/getcustomeraddress/${customerId}`)
-        .then((res) => setData(res.data))
-        .catch((err) => console.error("API Error:", err));
-    };
+  const fetchAddresses = () => {
+    axios
+      .get(`http://localhost:3000/getcustomeraddress/${customerId}`)
+      .then((res) => setData(res.data))
+      .catch((err) => console.error("API Error:", err));
+  };
   useEffect(() => {
     return () => {
       if (successTimeout) {
@@ -2029,33 +2027,35 @@ const MyAccount = () => {
         console.error("Failed to fetch customer data:", error);
       }
     };
- const handleAddSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("http://localhost:3000/addcustomeraddress", {
-        ...addForm,
-        customer_id: customerId,
-      });
-      alert("Address added successfully");
-      setAddForm({
-        fname: "",
-        lname: "",
-        address: "",
-        city: "",
-        state: "",
-        country: "",
-        postal_code: "",
-        email: "",
-        mobile: "",
-        description: "",
-        primary_address: 0,
-      });
-      setShowAddForm(false);
-      fetchAddresses();
-    } catch (err) {
-      alert("Failed to add address: " + (err.response?.data?.msg || err.message));
-    }
-  };
+    const handleAddSubmit = async (e) => {
+      e.preventDefault();
+      try {
+        await axios.post("http://localhost:3000/addcustomeraddress", {
+          ...addForm,
+          customer_id: customerId,
+        });
+        alert("Address added successfully");
+        setAddForm({
+          fname: "",
+          lname: "",
+          address: "",
+          city: "",
+          state: "",
+          country: "",
+          postal_code: "",
+          email: "",
+          mobile: "",
+          description: "",
+          primary_address: 0,
+        });
+        setShowAddForm(false);
+        fetchAddresses();
+      } catch (err) {
+        alert(
+          "Failed to add address: " + (err.response?.data?.msg || err.message)
+        );
+      }
+    };
 
     const fetchOrders = async () => {
       try {
@@ -2088,49 +2088,51 @@ const MyAccount = () => {
     fetchWalletData();
   }, [customerId]);
 
-   const handleMakePrimary = async (addressId) => {
-      const itemToUpdate = data.find((item) => item.id === addressId);
-      if (!itemToUpdate) return alert("Address not found");
-  
-      try {
-        await axios.put("http://localhost:3000/updatecustomeraddress", {
-          ...itemToUpdate,
-          customer_id: customerId,
-          primary_address: 1,
-        });
-        fetchAddresses();
-      } catch (err) {
-        alert("Failed to set primary address");
-      }
-    };
-   const handleAddSubmit = async (e) => {
-      e.preventDefault();
-      try {
-        await axios.post("http://localhost:3000/addcustomeraddress", {
-          ...addForm,
-          customer_id: customerId,
-        });
-        alert("Address added successfully");
-        setAddForm({
-          fname: "",
-          lname: "",
-          address: "",
-          city: "",
-          state: "",
-          country: "",
-          postal_code: "",
-          email: "",
-          mobile: "",
-          description: "",
-          primary_address: 0,
-        });
-        setShowAddForm(false);
-        fetchAddresses();
-      } catch (err) {
-        alert("Failed to add address: " + (err.response?.data?.msg || err.message));
-      }
-    };
-     const handleAddChange = (e) => {
+  const handleMakePrimary = async (addressId) => {
+    const itemToUpdate = data.find((item) => item.id === addressId);
+    if (!itemToUpdate) return alert("Address not found");
+
+    try {
+      await axios.put("http://localhost:3000/updatecustomeraddress", {
+        ...itemToUpdate,
+        customer_id: customerId,
+        primary_address: 1,
+      });
+      fetchAddresses();
+    } catch (err) {
+      alert("Failed to set primary address");
+    }
+  };
+  const handleAddSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:3000/addcustomeraddress", {
+        ...addForm,
+        customer_id: customerId,
+      });
+      alert("Address added successfully");
+      setAddForm({
+        fname: "",
+        lname: "",
+        address: "",
+        city: "",
+        state: "",
+        country: "",
+        postal_code: "",
+        email: "",
+        mobile: "",
+        description: "",
+        primary_address: 0,
+      });
+      setShowAddForm(false);
+      fetchAddresses();
+    } catch (err) {
+      alert(
+        "Failed to add address: " + (err.response?.data?.msg || err.message)
+      );
+    }
+  };
+  const handleAddChange = (e) => {
     const { name, value } = e.target;
     setAddForm((prev) => ({ ...prev, [name]: value }));
   };
@@ -2555,7 +2557,6 @@ const MyAccount = () => {
   );
 
   const renderRegisterPage = () => (
-    
     <div className="container py-4">
       {/* <div
         className="border rounded p-3 mb-4 d-flex align-items-center gap-2"
@@ -2585,12 +2586,14 @@ const MyAccount = () => {
               "description",
             ].map((field, i) => (
               <div
-                className={`col-md-${field === "address" || field === "description" ? 12 : 6}`}
+                className={`col-md-${
+                  field === "address" || field === "description" ? 12 : 6
+                }`}
                 key={i}
               >
                 <input
-                 className="w-100 p-4 ms-0"
-                 style={inputStyle}
+                  className="w-100 p-4 ms-0"
+                  style={inputStyle}
                   name={field}
                   value={addForm[field]}
                   onChange={handleAddChange}
@@ -2603,7 +2606,8 @@ const MyAccount = () => {
           <div className="mt-3 d-flex justify-content-end gap-2">
             <button
               type="button"
-             className="px-3 py-2" style={buttonStyle}
+              className="px-3 py-2"
+              style={buttonStyle}
               onClick={() => setShowAddForm(false)}
             >
               Cancel
@@ -2648,7 +2652,9 @@ const MyAccount = () => {
                     "description",
                   ].map((field, i) => (
                     <div
-                      className={`col-md-${field === "address" || field === "description" ? 12 : 6}`}
+                      className={`col-md-${
+                        field === "address" || field === "description" ? 12 : 6
+                      }`}
                       key={i}
                     >
                       <input
@@ -2665,12 +2671,17 @@ const MyAccount = () => {
                 <div className="mt-3 d-flex justify-content-end gap-2">
                   <button
                     type="button"
-                    className="px-3 py-2" style={buttonStyle}
+                    className="px-3 py-2"
+                    style={buttonStyle}
                     onClick={() => setEditIndex(null)}
                   >
                     Cancel
                   </button>
-                  <button type="submit" className="px-3 py-2" style={buttonStyle}>
+                  <button
+                    type="submit"
+                    className="px-3 py-2"
+                    style={buttonStyle}
+                  >
                     Save Changes
                   </button>
                 </div>
@@ -3205,102 +3216,98 @@ const MyAccount = () => {
       {activeProfileSection === "changePassword" && renderChangePassword()}
       {activeProfileSection === "registerPage" && renderRegisterPage()}
 
-        {activeProfileSection !== "registerPage" && (
-      <div className="mt-4">
-        <button type="submit" className="px-3 py-2" style={buttonStyle}>
-          Update
-        </button>
-      </div>
-    )}
+      {activeProfileSection !== "registerPage" && (
+        <div className="mt-4">
+          <button type="submit" className="px-3 py-2" style={buttonStyle}>
+            Update
+          </button>
+        </div>
+      )}
     </form>
   );
 
   const renderOrdersView = () => (
     <div className="container-fluid orders-container py-4">
-        <div className="page-header text-center mb-4">
-          <h1 className="page-title">My Orders</h1>
-          <p className="page-subtitle text-muted">
-            View and manage your order history
-          </p>
-        </div>
-
-        <Tabs
-          activeKey={activeTab}
-          onSelect={(k) => setActiveTab(k)}
-          className="mb-4 custom-tabs"
-          justify
-        >
-          {/* All Orders */}
-          <Tab eventKey="all_orders" title="All Orders">
-            <div className="orders-section">
-              {isLoading ? (
-                <div className="text-center py-5">
-                  <div className="spinner-border text-primary" role="status" />
-                  <p className="text-muted mt-2">Loading your orders...</p>
-                </div>
-              ) : orders.length === 0 ? (
-                <div className="text-center py-5">
-                  <i className="bi bi-box-seam fs-1 text-muted" />
-                  <h5 className="mt-2">No orders found</h5>
-                  <p className="text-muted">
-                    You haven't placed any orders yet.
-                  </p>
-                </div>
-              ) : (
-                <div className="orders-list">{orders.map(renderOrderCard)}</div>
-              )}
-            </div>
-          </Tab>
-
-          {/* Delivered Orders */}
-          <Tab eventKey="delivered" title="Delivered">
-            <div className="orders-section">
-              {isLoading ? (
-                <div className="text-center py-5">
-                  <div className="spinner-border text-primary" role="status" />
-                  <p className="text-muted mt-2">Loading delivered orders...</p>
-                </div>
-              ) : deliveredOrders.length === 0 ? (
-                <div className="text-center py-5">
-                  <i className="bi bi-truck fs-1 text-muted" />
-                  <h5 className="mt-2">No delivered orders</h5>
-                  <p className="text-muted">
-                    Your completed orders will appear here.
-                  </p>
-                </div>
-              ) : (
-                <div className="orders-list">
-                  {deliveredOrders.map(renderOrderCard)}
-                </div>
-              )}
-            </div>
-          </Tab>
-
-          {/* Cancelled Orders */}
-          <Tab eventKey="cancelled" title="Cancelled">
-            <div className="orders-section">
-              {isLoading ? (
-                <div className="text-center py-5">
-                  <div className="spinner-border text-primary" role="status" />
-                  <p className="text-muted mt-2">Loading cancelled orders...</p>
-                </div>
-              ) : cancelledOrders.length === 0 ? (
-                <div className="text-center py-5">
-                  <i className="bi bi-x-circle fs-1 text-muted" />
-                  <h5 className="mt-2">No cancelled orders</h5>
-                  <p className="text-muted">
-                    You haven't cancelled any orders.
-                  </p>
-                </div>
-              ) : (
-                <div className="orders-list">
-                  {cancelledOrders.map(renderOrderCard)}
-                </div>
-              )}
-            </div>
-          </Tab>
-        </Tabs>
+      <div className="page-header text-center mb-4">
+        <h1 className="page-title">My Orders</h1>
+        <p className="page-subtitle text-muted">
+          View and manage your order history
+        </p>
       </div>
+
+      <Tabs
+        activeKey={activeTab}
+        onSelect={(k) => setActiveTab(k)}
+        className="mb-4 custom-tabs"
+        justify
+      >
+        {/* All Orders */}
+        <Tab eventKey="all_orders" title="All Orders">
+          <div className="orders-section">
+            {isLoading ? (
+              <div className="text-center py-5">
+                <div className="spinner-border text-primary" role="status" />
+                <p className="text-muted mt-2">Loading your orders...</p>
+              </div>
+            ) : orders.length === 0 ? (
+              <div className="text-center py-5">
+                <i className="bi bi-box-seam fs-1 text-muted" />
+                <h5 className="mt-2">No orders found</h5>
+                <p className="text-muted">You haven't placed any orders yet.</p>
+              </div>
+            ) : (
+              <div className="orders-list">{orders.map(renderOrderCard)}</div>
+            )}
+          </div>
+        </Tab>
+
+        {/* Delivered Orders */}
+        <Tab eventKey="delivered" title="Delivered">
+          <div className="orders-section">
+            {isLoading ? (
+              <div className="text-center py-5">
+                <div className="spinner-border text-primary" role="status" />
+                <p className="text-muted mt-2">Loading delivered orders...</p>
+              </div>
+            ) : deliveredOrders.length === 0 ? (
+              <div className="text-center py-5">
+                <i className="bi bi-truck fs-1 text-muted" />
+                <h5 className="mt-2">No delivered orders</h5>
+                <p className="text-muted">
+                  Your completed orders will appear here.
+                </p>
+              </div>
+            ) : (
+              <div className="orders-list">
+                {deliveredOrders.map(renderOrderCard)}
+              </div>
+            )}
+          </div>
+        </Tab>
+
+        {/* Cancelled Orders */}
+        <Tab eventKey="cancelled" title="Cancelled">
+          <div className="orders-section">
+            {isLoading ? (
+              <div className="text-center py-5">
+                <div className="spinner-border text-primary" role="status" />
+                <p className="text-muted mt-2">Loading cancelled orders...</p>
+              </div>
+            ) : cancelledOrders.length === 0 ? (
+              <div className="text-center py-5">
+                <i className="bi bi-x-circle fs-1 text-muted" />
+                <h5 className="mt-2">No cancelled orders</h5>
+                <p className="text-muted">You haven't cancelled any orders.</p>
+              </div>
+            ) : (
+              <div className="orders-list">
+                {cancelledOrders.map(renderOrderCard)}
+              </div>
+            )}
+          </div>
+        </Tab>
+      </Tabs>
+    </div>
   );
 
   const LogoutConfirmation = () => (
@@ -3683,7 +3690,7 @@ const MyAccount = () => {
                           </button>
                         </div>
 
-                        {/* Success Message */}
+                        {/* //Success Message
                         {success && (
                           <div
                             style={{
@@ -3694,7 +3701,7 @@ const MyAccount = () => {
                           >
                             {success}
                           </div>
-                        )}
+                        )} */}
                       </div>
                     </li>
 

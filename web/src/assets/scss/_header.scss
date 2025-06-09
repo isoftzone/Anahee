@@ -144,7 +144,7 @@
     ul {
       display: block;
 
-      margin-top: -5px;
+      // margin-top: -5px;
 
       text-align: center;
       li {
@@ -2505,6 +2505,7 @@
 
 .header-area {
   transition: all 0.3s ease-in-out; /* Smooth transition for the header */
+  height: 80px;
 }
 
 .logo img {
@@ -2531,7 +2532,7 @@
 @media (max-width:321px){
 .same-style.header-search, .search-content, form, input{
   width: 93%;
-    margin-left: 15px;
+    // margin-left: 15px;
 }
 .header-right-wrap, .same-style.header-search .search-content{
           right: -120px !important;

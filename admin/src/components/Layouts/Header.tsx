@@ -35,6 +35,7 @@ import IconMenuMore from '../Icon/Menu/IconMenuMore';
 import { Button } from 'react-bootstrap';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
+import { setUsers } from '../../store/userSlice';
 
 const Header = () => {
     const location = useLocation();
@@ -66,29 +67,93 @@ const Header = () => {
     }
 
     const [user, setUser] = useState<any | null>(null);
-    const [imageUrl, setImageUrl] = useState<string>('/assets/images/profile-0350.png');
+    const [imageUrl, setImageUrl] = useState<string>();
 
     useEffect(() => {
-        const userDataString = localStorage.getItem('userData');
-        if (userDataString) {
-            const users = JSON.parse(userDataString);
-            setUser(users);
-        }
+        const fetchUser = async () => {
+            const userDataString = localStorage.getItem('userData');
+            if (userDataString) {
+                const localUser = JSON.parse(userDataString);
+                console.log('User from localStorage:', localUser);
+
+                try {
+                    const response = await axios.get(`${BASE_URL}/getid_userMaster/${localUser.id}`, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    const userData: User = response.data;
+                    setUser(userData);
+                    console.log('Fetched user data:', userData);
+                } catch (error) {
+                    console.error('Error fetching user:', error);
+                }
+            }
+        };
+
+        fetchUser();
     }, []);
+
+    //     const users = useSelector((state: IRootState) => state.user);
+    // console.log(`${BASE_URL}/images/banner/${users.profileImage}`);
+    //     useEffect(() => {
+    //         if (users?.profileImage) {
+    //             setImageUrl(`${BASE_URL}/images/banner/${user.profileImage}`);
+    //         } else if (user?.profileImage) {
+    //             setImageUrl(`${BASE_URL}/images/banner/${users.profileImage}`);
+    //         } else {
+    //             setImageUrl('/assets/images/profile-0350.png');
+    //         }
+    //     }, [users]);
 
     const users = useSelector((state: IRootState) => state.user);
 
     useEffect(() => {
-        if (users?.profileImage) {
-            setImageUrl(`${BASE_URL}/images/banner/${users.profileImage}`);
-        } else if (user?.profileImage) {
-            setImageUrl(`${BASE_URL}/images/banner/${user.profileImage}`);
-        }else{
-             setImageUrl('/assets/images/profile-0350.png');
+        if (user?.PROFILEIMAGE) {
+            const cleanedPath = user.PROFILEIMAGE.replace(/\\/g, '/');
+            setImageUrl(`${BASE_URL}/images/banner/${cleanedPath}`);
+        } else if (users?.profileImage) {
+            const cleanedPath = users.profileImage.replace(/\\/g, '/');
+            setImageUrl(`${BASE_URL}/images/banner/${cleanedPath}`);
+        } else {
+            setImageUrl('/assets/images/profile-0350.png');
         }
     }, [users, user]);
 
-    console.log('user.profileImage', user?.profileImage);
+    useEffect(() => {
+    const getSanitizedPath = (path?: string) =>
+        path && path !== 'null' ? path.replace(/\\/g, '/') : null;
+
+    const reduxImage = getSanitizedPath(users?.profileImage);
+
+    if (reduxImage) {
+        setImageUrl(`${BASE_URL}/images/banner/${reduxImage}`);
+    } else {
+        setImageUrl('/assets/images/profile-0350.png');
+    }
+}, [users.profileImage]);
+
+// useEffect(() => {
+//     const getSanitizedPath = (path?: string) =>
+//         path && path !== 'null' ? path.replace(/\\/g, '/') : null;
+
+//     const userImage = getSanitizedPath(user?.PROFILEIMAGE);
+//     const reduxImage = getSanitizedPath(users?.profileImage);
+
+//     if (userImage) {
+//         setImageUrl(`${BASE_URL}/images/banner/${userImage}`);
+//     } else if (reduxImage) {
+//         setImageUrl(`${BASE_URL}/images/banner/${reduxImage}`);
+//     } else {
+//         setImageUrl('/assets/images/profile-0350.png');
+//     }
+// }, [user?.PROFILEIMAGE, users?.profileImage]);
+
+
+    console.log(`${BASE_URL}/images/banner/${user?.PROFILEIMAGE}`);
+
+    // console.log('user.profileImage', user?.PROFILEIMAGE);
     console.log('imageUrl', imageUrl);
 
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
@@ -164,6 +229,8 @@ const Header = () => {
     const [search, setSearch] = useState(false);
 
     const setLocale = (flag: string) => {
+        const dispatch = useDispatch();
+
         setFlag(flag);
         if (flag.toLowerCase() === 'ae') {
             dispatch(toggleRTL('rtl'));
@@ -180,6 +247,7 @@ const Header = () => {
         // Then redirect to login page
         localStorage.removeItem('userData');
         localStorage.removeItem('userDatas');
+        dispatch(setUsers({})); // Reset user state in Redux
         navigate('/', { replace: true }); // Use replace option to prevent going back
     };
     console.log('username=', user);
@@ -471,7 +539,12 @@ const Header = () => {
                                         // src={user ? `${BASE_URL}/${user}` : '/assets/images/profile-0350.png'}
                                         // src={user ? `${BASE_URL}/images/banner/${user}` : '/assets/images/profile-0350.png'}
                                         //  src={user ? `${BASE_URL}/images/banner/${user.PROFILEIMAGE}` : '/assets/images/profile-0350.png'}
+                                        // src={imageUrl}
                                         src={imageUrl}
+                                        onError={(e) => {
+                                            e.currentTarget.onerror = null; // Prevent infinite loop
+                                            e.currentTarget.src = '/assets/images/profile-0350.png';
+                                        }}
                                         alt="userProfile"
                                     />
                                 }
@@ -479,10 +552,17 @@ const Header = () => {
                                 <ul className="text-dark dark:text-white-dark !py-0 w-[230px] font-semibold dark:text-white-light/90">
                                     <li>
                                         <div className="flex items-center px-4 py-4">
-                                            <img className="rounded-md w-10 h-10 object-cover" 
-                                            // src={user ? `${BASE_URL}/images/banner/${user}` : '/assets/images/profile-0350.png'}
-                                             src={imageUrl}
-                                             alt="userProfile" />
+                                            <img
+                                                className="rounded-md w-10 h-10 object-cover"
+                                                // src={user ? `${BASE_URL}/images/banner/${user}` : '/assets/images/profile-0350.png'}
+                                                // src={imageUrl}
+                                                src={imageUrl}
+                                                onError={(e) => {
+                                                    e.currentTarget.onerror = null; // Prevent infinite loop
+                                                    e.currentTarget.src = '/assets/images/profile-0350.png';
+                                                }}
+                                                alt="userProfile"
+                                            />
                                             <div className="ltr:pl-4 rtl:pr-4 truncate">
                                                 <div>
                                                     {user && (

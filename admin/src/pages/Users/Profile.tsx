@@ -19,52 +19,75 @@ import IconCreditCard from '../../components/Icon/IconCreditCard';
 import IconClock from '../../components/Icon/IconClock';
 import IconHorizontalDots from '../../components/Icon/IconHorizontalDots';
 import { BASE_URL } from '../../config';
+import axios from 'axios';
 
 const Profile = () => {
-    // const dispatch = useDispatch();
-    // useEffect(() => {
-    //     dispatch(setPageTitle('Profile'));
-    // });
-    // const [user, setUser] = useState<any | null>(null);
-    // useEffect(() => {
-    //     const userDataString = localStorage.getItem('userDatas');
-    //     if (userDataString) {
-    //         try {
-    //             const users = JSON.parse(userDataString);
-    //             // Ensure it has both name and email
-    //             console.log('Parsed user data:', users);
-    //             if (users.FNAME && users.EMAIL) {
-    //                 setUser(users);
-    //                 console.log('User data set:', users.PROFILEIMAGE);
-    //             } else {
-    //                 console.warn('Invalid user data in localStorage');
-    //             }
-    //         } catch (err) {
-    //             console.error('Failed to parse user data:', err);
-    //         }
-    //     }
-    // }, []);
+
+       interface User {
+        name: string;
+        email: string;
+        profileImage?: string;
+    }
        const [imageUrl, setImageUrl] = useState<string>('/assets/images/profile-0350.png');
        const [user, setUser] = useState<any | null>(null);
-        useEffect(() => {
-            const userDataString = localStorage.getItem('userData');
-            if (userDataString) {
-                const users = JSON.parse(userDataString);
-                setUser(users);
-            }
-        }, []);
+
+
+
+       
+           useEffect(() => {
+               const fetchUser = async () => {
+                   const userDataString = localStorage.getItem('userData');
+                   if (userDataString) {
+                       const localUser = JSON.parse(userDataString);
+                       console.log('User from localStorage:', localUser);
+       
+                       try {
+                           const response = await axios.get(`${BASE_URL}/getid_userMaster/${localUser.id}`, {
+                               headers: {
+                                   'Content-Type': 'application/json',
+                               },
+                           });
+       
+                           const userData: User = response.data;
+                           setUser(userData);
+                           console.log('Fetched user data:', userData);
+                       } catch (error) {
+                           console.error('Error fetching user:', error);
+                       }
+                   }
+               };
+       
+               fetchUser();
+           }, []);
+
+    
     
         const users = useSelector((state: IRootState) => state.user);
-    
-        useEffect(() => {
-            if (users?.profileImage) {
-                setImageUrl(`${BASE_URL}/images/banner/${users.profileImage}`);
-            } else if (user?.profileImage) {
-                setImageUrl(`${BASE_URL}/images/banner/${user.profileImage}`);
-            }else{
-                 setImageUrl('/assets/images/profile-0350.png');
+
+            useEffect(() => {
+                if (user?.PROFILEIMAGE) {
+                    const cleanedPath = user.PROFILEIMAGE.replace(/\\/g, '/');
+                    setImageUrl(`${BASE_URL}/images/banner/${cleanedPath}`);
+                } else if (users?.profileImage) {
+                    const cleanedPath = users.profileImage.replace(/\\/g, '/');
+                    setImageUrl(`${BASE_URL}/images/banner/${cleanedPath}`);
+                } else {
+                    setImageUrl('/assets/images/profile-035.png');
+                }
+            }, [users, user]);
+        
+            useEffect(() => {
+            const getSanitizedPath = (path?: string) =>
+                path && path !== 'null' ? path.replace(/\\/g, '/') : null;
+        
+            const reduxImage = getSanitizedPath(users?.profileImage);
+        
+            if (reduxImage) {
+                setImageUrl(`${BASE_URL}/images/banner/${reduxImage}`);
+            } else {
+                setImageUrl('/assets/images/profile-0350.png');
             }
-        }, [users, user]);
+        }, [users.profileImage]);
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     return (
         <div>
@@ -96,9 +119,13 @@ const Profile = () => {
                                     // src={user ? `${BASE_URL}/${user}` : '/assets/images/profile-0350.png'}
                                     // src={user ? `${BASE_URL}/images/banner/${user.PROFILEIMAGE}` : '/assets/images/profile-0350.png'}
                                     src={imageUrl}
+                                     onError={(e) => {
+                                            e.currentTarget.onerror = null; // Prevent infinite loop
+                                            e.currentTarget.src = '/assets/images/profile-035.png';
+                                        }}
                                     alt="userProfile"
                                 />
-                              {user && <p className="font-semibold text-primary text-xl">{user.FNAME}</p>}
+                              {/* {user && <p className="font-semibold text-primary text-xl">{user.FNAME}</p>} */}
 
                             </div>
                             <ul className="mt-5 flex flex-col max-w-[160px] m-auto space-y-4 font-semibold text-white-dark">
@@ -116,13 +143,13 @@ const Profile = () => {
                                 <li >
                                     <button className="flex items-center gap-2" style={{ padding: '0px 0px' }}>
                                         <IconMail className="w-5 h-5 shrink-0" />
-                                        <span className="text-primary truncate">{user && user.EMAIL}</span>
+                                        <span className="text-primary truncate">{user && user.email}</span>
                                     </button>
                                 </li>
                                 <li className="flex items-center gap-2">
                                     <IconPhone />
                                     <span className="whitespace-nowrap mr-3" dir="ltr">
-                                        {user && user.PHONE}
+                                        {user && user.MOBILE}
                                     </span>
                                 </li>
                             </ul>

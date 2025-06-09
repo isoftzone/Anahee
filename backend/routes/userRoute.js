@@ -39,6 +39,7 @@ router.put("/updateItemById/:id", upload.any(), itemmaster.updateItemById);
 router.post("/addItem", upload.any(), itemmaster.addItem);
 router.get("/items/:id", itemmaster.getItems);
 router.get("/getallitems", itemmaster.getallitems);
+router.get("/multiplesize", itemmaster.MultipleSizeitem);
 router.put("/update/:id", itemmaster.updateItem);
 // router.put('/update/:id', upload.single('image'), itemController.updateItem);
 router.delete("/delete/:id", itemmaster.deleteItem);
@@ -57,6 +58,7 @@ router.post("/addSalesMaster", salesmaster.addSalesMaster);
 router.put("/updateSalesMaster", salesmaster.updateSalesMaster);
 router.put("/update-order-status", salesmaster.updateOrderStatus);
 router.put("/cancelorder/:saleId", salesmaster.cancelOrder);
+router.post("/addSales", salesmaster.addSales);
 router.get("/getSalesDetail/:saleId?", salesdetail.getSalesDetail);
 router.post("/addSalesDetail", salesdetail.addSalesDetail);
 // :white_check_mark: Route to Get Invoices
@@ -111,6 +113,8 @@ router.get("/getcustomeraddress/:customer_id",customer.getAddressesByUserId);
 router.post("/addcustomeraddress", customer.addCustomerAddress);
 router.put("/updatecustomeraddress", customer.updateCustomerAddress);
 router.delete("/deletecustomeraddress/:address_id", customer.deleteCustomerAddress);
+//get only kurtas
+router.get("/getKurtas", itemmaster.getKurtas);
 // router.get("/getItem",itemmaster.getItem);
 router.get("/getLable", lablemaster.getLable);
 router.get("/getrfmaster", rfmaster.getrfmaster);

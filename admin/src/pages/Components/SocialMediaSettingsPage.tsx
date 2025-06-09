@@ -111,7 +111,7 @@ const SocialMediaSettingsPage: React.FC = () => {
                     </label>
                     {settings.linkedinEnabled && <input type="text" name="linkedin" placeholder="linkedin link" value={settings.links.linkedin} onChange={handleChangeLink} className="link-input" />}
                 </div> */}
-                <button onClick={handleSave} className="save-button">
+                <button onClick={handleSave} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm mt-4 font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                     Save
                 </button>
             </div>
