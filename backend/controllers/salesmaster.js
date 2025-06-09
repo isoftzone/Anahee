@@ -17,6 +17,7 @@ exports.getSalesMaster = (req, res) => {
       sm.payment_status,
       sm.ORDER_STATUS,
       sm.DISCAMOUNT,
+      sm.shipping_charge,
       sd.ITEMID,
       sd.QTY,
       sd.AMOUNT,
@@ -67,6 +68,7 @@ exports.getSalesMaster = (req, res) => {
           PAYMENTSTATUS: row.payment_status,
           ORDER_STATUS: row.ORDER_STATUS,
           DISCAMOUNT: row.DISCAMOUNT,
+          shipping_charge: row.shipping_charge,
           ITEMS: [],
         };
       }
@@ -430,6 +432,7 @@ exports.getAllOrders = (req, res) => {
       sm.CREATEDON,
       sm.payment_status,
       sm.ORDER_STATUS,
+      sm.shipping_charge,
       sd.ITEMID,
       sd.QTY,
       sd.AMOUNT,
@@ -473,6 +476,7 @@ exports.getAllOrders = (req, res) => {
           CREATEDON: row.CREATEDON,
           PAYMENTSTATUS: row.payment_status,
           ORDER_STATUS: row.ORDER_STATUS,
+          shipping_charge:row.shipping_charge,
           ITEMS: [],
         };
       }
