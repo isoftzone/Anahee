@@ -346,7 +346,7 @@ export default function AddCustomer() {
         <div className="p-4 bg-white rounded shadow max-w-7xl mx-auto">
             <div className="mb-4 flex justify-between items-center">
                 <h2 className="text-2xl font-semibold">Add Customer</h2>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={handleClick}>
+                <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onClick={handleClick}>
                     Customer List
                 </button>
             </div>
@@ -570,8 +570,8 @@ export default function AddCustomer() {
                                 <textarea name="CADDRESSLINE1" value={formData.CADDRESSLINE1} onChange={handleChange} className="w-full border p-2 rounded" rows={3}></textarea>
                             </div>
                             <div className="md:col-span-2 flex gap-2 mt-2">
-                                <button className="bg-green-600 text-white px-6 py-2 rounded">Save</button>
-                                <button className="border px-6 py-2 rounded">Reset</button>
+                                <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Save</button>
+                                <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">Reset</button>
                             </div>
                         </form>
                     </Tab.Panel>

@@ -460,13 +460,17 @@ const ItemMaster: React.FC = () => {
 
             formData.append('variations', JSON.stringify(variations));
 
-            variations.forEach((variation, varIndex) => {
-                variation.images.forEach((image, imgIndex) => {
-                    if (image.file) {
-                        formData.append(`variation_${varIndex}_image_${imgIndex}`, image.file);
-                    }
-                });
+             let hasNewImages = false;
+        variations.forEach((variation, varIndex) => {
+            variation.images.forEach((image, imgIndex) => {
+                if (image.file) {
+                    hasNewImages = true;
+                    formData.append(`variation_${varIndex}_image_${imgIndex}`, image.file);
+                }
             });
+        });
+
+                formData.append('updateImages', hasNewImages.toString());
 
             const endpoint = id ? `${BASE_URL}/updateItemById/${id}` : `${BASE_URL}/addItem`;
             const method = id ? 'put' : 'post';
@@ -496,7 +500,7 @@ const ItemMaster: React.FC = () => {
                 const response = await axios.delete(`${BASE_URL}/delete/${id}`);
                 if (response.data.success) {
                     alert('Item deleted successfully!');
-                    navigate('/Components/items')
+                    navigate('/Components/items');
                 }
             } catch (error) {
                 console.error('Error deleting item:', error);
@@ -659,7 +663,7 @@ const ItemMaster: React.FC = () => {
                                                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                                                                     {imageList.map((image, index) => (
                                                                         <div key={index} className="relative group">
-                                                                            <img src={image.dataURL} alt={`Variation ${varIndex + 1}`} className="w-full h-32 object-cover rounded-md shadow-sm" />
+                                                                            <img style={{height:"auto"}} src={image.dataURL} alt={`Variation ${varIndex + 1}`} className="w-full h-32 object-cover rounded-md shadow-sm" />
                                                                             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 flex items-center justify-center rounded-md transition-all duration-200">
                                                                                 <button
                                                                                     type="button"
@@ -700,39 +704,41 @@ const ItemMaster: React.FC = () => {
                                                 </div>
 
                                                 <div className="pt-4 border-t border-gray-200">
-                                                    <div className="flex justify-between items-center mb-4 flex-col md:flex-row md:items-center">
-                                                        <h4 className="text-sm font-medium text-gray-700 mb-2 md:mb-0">Sizes</h4>
-                                                        <div className="flex flex-col items-center md:flex-row md:space-x-4">
-                                                            <div className="flex flex-col items-center md:flex-row md:space-x-4 mb-2 md:mb-0">
-                                                                <label className="flex items-center space-x-2 text-sm">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        checked={sameSizeForAll}
-                                                                        onChange={(e) => setSameSizeForAll(e.target.checked)}
-                                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                                                    />
-                                                                    <span>Same Size</span>
-                                                                </label>
-                                                                <label className="flex items-center space-x-2 text-sm">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        checked={sameSlabForAll}
-                                                                        onChange={(e) => setSameSlabForAll(e.target.checked)}
-                                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                                                    />
-                                                                    <span>Same Slab</span>
-                                                                </label>
-                                                            </div>
-                                                            <button type="button" onClick={() => addSize(varIndex)} className=" btn btn-primary md:mt-0 mt-4">
-                                                                + Add Size
-                                                            </button>
-                                                        </div>
-                                                    </div>
+                                                   <div className="flex flex-wrap justify-center md:justify-between items-center text-xs md:text-sm mb-4 gap-2">
+    <h4 className="font-medium text-gray-700">Sizes</h4>
+    <div className="flex flex-wrap items-center justify-center gap-2">
+        <label className="flex items-center space-x-1">
+            <input
+                type="checkbox"
+                checked={sameSizeForAll}
+                onChange={(e) => setSameSizeForAll(e.target.checked)}
+                className="h-3.5 w-3.5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <span className="text-xs md:text-sm">Same Size</span>
+        </label>
+        <label className="flex items-center space-x-1">
+            <input
+                type="checkbox"
+                checked={sameSlabForAll}
+                onChange={(e) => setSameSlabForAll(e.target.checked)}
+                className="h-3.5 w-3.5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <span className="text-xs md:text-sm">Same Slab</span>
+        </label>
+        <button
+            type="button"
+            onClick={() => addSize(varIndex)}
+            className="btn btn-primary mt-2 px-2 py-1 text-xs md:text-sm"
+        >
+            + Add Size
+        </button>
+    </div>
+</div>
 
                                                     {variation.sizes.map((size, sizeIndex) => (
                                                         <div key={sizeIndex} className="mb-6 p-3 border border-gray-200 rounded-lg shadow-sm">
                                                             <div className="flex justify-end pt-2">
-                                                                <button type="button" onClick={() => removeSize(varIndex, sizeIndex)} className="btn btn-danger">
+                                                                <button type="button" onClick={() => removeSize(varIndex, sizeIndex)} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                                                     Remove Size
                                                                 </button>
                                                             </div>
@@ -793,7 +799,7 @@ const ItemMaster: React.FC = () => {
                                                                 <div className="mt-6">
                                                                     <div className="flex justify-end items-center mb-4">
                                                                         <div className="flex justify-end">
-                                                                            <button type="button" onClick={() => handleAddSlab(varIndex, sizeIndex)} className="btn btn-primary">
+                                                                            <button type="button" onClick={() => handleAddSlab(varIndex, sizeIndex)} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                                                                 + Add Slab Rate
                                                                             </button>
                                                                         </div>
@@ -809,7 +815,7 @@ const ItemMaster: React.FC = () => {
                                                                                         <button
                                                                                             type="button"
                                                                                             onClick={() => handleRemoveSlab(varIndex, sizeIndex, slab.id)}
-                                                                                            className="btn btn-danger text-xs"
+                                                                                            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                                                                                         >
                                                                                             Remove Slab
                                                                                         </button>
@@ -849,7 +855,7 @@ const ItemMaster: React.FC = () => {
                                                 </div>
 
                                                 <div className="flex justify-center pt-4 border-t border-gray-200">
-                                                    <button type="button" onClick={() => removeVariation(varIndex)} className="px-4 py-2 btn btn-danger">
+                                                    <button type="button" onClick={() => removeVariation(varIndex)} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                                         Remove Variation
                                                     </button>
                                                 </div>
@@ -877,7 +883,7 @@ const ItemMaster: React.FC = () => {
                             </div>
 
                             <div className="flex justify-center space-x-4 pt-6 border-t border-gray-200">
-                                <button type="button" onClick={() => navigate('/Components/item-manager')} className="px-4 py-2 btn btn-danger">
+                                <button type="button" onClick={() => navigate('/Components/item-manager')} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500r">
                                     Cancel
                                 </button>
                                 {id && (
@@ -889,7 +895,7 @@ const ItemMaster: React.FC = () => {
                                         Delete
                                     </button>
                                 )}
-                                <button type="button" onClick={handleSubmit} className="px-4 py-2 btn btn-primary">
+                                <button type="button" onClick={handleSubmit} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                     {id ? 'Update' : 'Save'}
                                 </button>
                             </div>

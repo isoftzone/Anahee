@@ -231,6 +231,32 @@ exports.getallitems = (req, res) => {
   });
 };
 
+//get only kurta items
+exports.getKurtas = (req, res) => {
+  console.log("Fetching all Kurta items...");
+  const query = `
+    SELECT * FROM itemmaster
+    WHERE CATEGORY = 'Kurta'
+    ORDER BY ITEMID ASC;
+  `;
+  con.query(query, (err, results) => {
+    if (err) {
+      console.error(" Error fetching kurta items:", err);
+      return res.status(500).json({
+        error: "Database error",
+        details: err.message,
+      });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ error: "No kurta products found" });
+    }
+    return res.json({
+      success: true,
+      data: results,
+    });
+  });
+};
+
 exports.items = (req, res) => {
   console.log("called all items");
   const query = `SELECT * FROM itemmaster ORDER BY ITEMID ASC;`;
@@ -451,16 +477,28 @@ exports.updateItemById = async (req, res) => {
         if (err) return res.status(500).json({ error: "Item update failed" });
 
         // 2. Delete old itemvariants, slab_rates, and itemimages
-        await new Promise((resolve, reject) => {
-          con.query(
-            `DELETE sr, iv, ii FROM itemvariants iv
-          LEFT JOIN slab_rates sr ON iv.variantid = sr.variantid
-          LEFT JOIN itemimages ii ON iv.variantid = ii.variantid
-          WHERE iv.itemid = ?`,
-            [id],
-            (err) => (err ? reject(err) : resolve())
-          );
-        });
+        // await new Promise((resolve, reject) => {
+        //   con.query(
+        //     `DELETE sr, iv, ii FROM itemvariants iv
+        //   LEFT JOIN slab_rates sr ON iv.variantid = sr.variantid
+        //   LEFT JOIN itemimages ii ON iv.variantid = ii.variantid
+        //   WHERE iv.itemid = ?`,
+        //     [id],
+        //     (err) => (err ? reject(err) : resolve())
+        //   );
+        // });
+
+        // 2. Delete old itemvariants, slab_rates, and itemimages
+await new Promise((resolve, reject) => {
+  con.query(
+    `DELETE sr, iv, ii FROM itemvariants iv
+    LEFT JOIN slab_rates sr ON iv.variantid = sr.variantid
+    LEFT JOIN itemimages ii ON iv.variantid = ii.variantid
+    WHERE iv.itemid = ?`,
+    [id],
+    (err) => (err ? reject(err) : resolve())
+  );
+});
 
         // 3. Map uploaded images per variation index
         const variationImages = {};
@@ -981,4 +1019,161 @@ exports.getcmbAW = (req, res) => {
       console.error(err);
       res.status(500).json({ error: "Database query failed" });
     });
+};
+exports.MultipleSizeitem = (req, res) => {
+  const query = `
+    SELECT
+      im.ITEMID, im.ITEMNAME, im.BARCODE,
+      im.PRODUCT, im.BRAND, im.DESCRIPTION,
+      im.CATEGORY, im.SUBCATEGORY, im.MATERIAL,
+      im.COMPANY, im.SUBGROUP, im.PACKING,
+      im.DISCOUNT, im.PRODUCT_DETAILS,
+      iv.variantid, iv.size, iv.color,
+      iv.RATE, iv.TAX, iv.PURPRICE, iv.MARKUP,
+      iv.MRP, iv.MARKDOWN, iv.SALEPRICE,
+      iv.SP1, iv.SP2, iv.SP3, iv.SP4,
+      iv.lengthcm, iv.widthcm, iv.heightcm,
+      iv.volumetricweight, iv.netweight,
+      iv.grossweight, iv.shippingweight,
+      img.image,
+      sr.quantity_from, sr.quantity_to,
+      sr.saleprice AS slab_saleprice,
+      sr.sp1 AS slab_sp1, sr.sp2 AS slab_sp2,
+      sr.sp3 AS slab_sp3, sr.sp4 AS slab_sp4
+    FROM itemmaster im
+    LEFT JOIN itemvariants iv ON im.ITEMID = iv.itemid
+    LEFT JOIN itemimages img ON iv.variantid = img.variantid AND im.ITEMID = img.itemid
+    LEFT JOIN slab_rates sr ON iv.variantid = sr.variantid
+    ORDER BY im.ITEMID;
+  `;
+  con.query(query, (err, results) => {
+    if (err) {
+      console.error(":x: Error fetching item details:", err);
+      return res.status(500).json({
+        success: false,
+        error: "Database error",
+        details: err.message,
+      });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "No items found",
+      });
+    }
+    const itemsMap = new Map();
+    const imageMap = new Map(); // To track unique images per variant
+    results.forEach((row) => {
+      // Initialize item if not exists
+      if (!itemsMap.has(row.ITEMID)) {
+        itemsMap.set(row.ITEMID, {
+          id: row.ITEMID,
+          sku: row.BARCODE || `SKU-${row.ITEMID}`,
+          name: row.ITEMNAME || "",
+          price: row.SALEPRICE, // Sale price
+          discount: row.DISCOUNT ? row.DISCOUNT : 0, // Default to 0 if DISCOUNT is null
+          mrp: row.MRP,
+          new: false, // Default
+          rating: 4, // Default
+          saleCount: 54, // Default
+          category: [
+            row.CATEGORY || "",
+            row.SUBCATEGORY || ""
+          ].filter(Boolean),
+          tag: [
+            row.PRODUCT || "",
+            row.BRAND || ""
+          ].filter(Boolean),
+          variation: [],
+          image: [],
+          shortDescription: row.DESCRIPTION || "",
+          fullDescription: row.PRODUCT_DETAILS || ""
+        });
+      }
+      const item = itemsMap.get(row.ITEMID);
+      // Skip if no variant data
+      if (!row.variantid) return;
+      const colorKey = `${row.ITEMID}-${row.color || "default"}`;
+      // Initialize variation if not exists
+      let variation = item.variation.find(v => v.color === (row.color || "default"));
+      if (!variation) {
+        variation = {
+          color: row.color || "default",
+          RATE: row.RATE,
+          TAX: row.TAX,
+          PURPRICE: row.PURPRICE,
+          MARKUP: row.MARKUP,
+          MRP: row.MRP,
+          MARKDOWN: row.MARKDOWN,
+          SALEPRICE: row.SALEPRICE,
+          SP1: row.SP1,
+          SP2: row.SP2,
+          SP3: row.SP3,
+          SP4: row.SP4,
+          lengthcm: row.lengthcm,
+          widthcm: row.widthcm,
+          heightcm: row.heightcm,
+          volumetricweight: row.volumetricweight,
+          netweight: row.netweight,
+          grossweight: row.grossweight,
+          shippingweight: row.shippingweight,
+          // image: [],
+          size: [],
+          // price: row.MRP
+        };
+        item.variation.push(variation);
+        // Initialize image tracking for this variant
+        imageMap.set(colorKey, new Set());
+      }
+      // Add unique images
+      if (row.image && !imageMap.get(colorKey).has(row.image)) {
+        imageMap.get(colorKey).add(row.image);
+        // variation.image.push(row.image);
+        item.image.unshift("/images/banner/" + row.image);
+      }
+      // Add size if not exists
+      if (row.size && !variation.size.some(s => s.name === row.size)) {
+        variation.size.unshift({
+          name: row.size,
+          stock: 500 // Stock not available in your tables - would need inventory table
+        });
+      }
+      // Add slab rates if exists (optional)
+      if (row.quantity_from !== null) {
+        if (!variation.slabs) variation.slabs = [];
+        variation.slabs.push({
+          QuantityFrom: row.quantity_from,
+          QuantityTo: row.quantity_to,
+          SALEPRICE: row.slab_saleprice,
+          sp1: row.slab_sp1,
+          sp2: row.slab_sp2,
+          sp3: row.slab_sp3,
+          sp4: row.slab_sp4,
+        });
+      }
+    });
+    // Convert map to array of items
+    const items = Array.from(itemsMap.values());
+    // Set default descriptions if missing
+    items.forEach(item => {
+      if (!item.shortDescription && item.variation.length > 0) {
+        const firstVariation = item.variation[0];
+        item.shortDescription = firstVariation.color
+          ? `${firstVariation.color} ${item.name}`
+          : item.name;
+      }
+      // Set default fullDescription if missing
+      if (!item.fullDescription) {
+        item.fullDescription = `
+          <p><strong>Product:</strong> ${item.name}</p>
+          <p><strong>Brand:</strong> ${item.tag[1] || ''}</p>
+          <p><strong>Material:</strong> ${results.find(r => r.ITEMID === item.id)?.MATERIAL || ''}</p>
+        `;
+      }
+    });
+    res.json({
+      success: true,
+      data: items
+    });
+  });
 };

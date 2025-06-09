@@ -39,6 +39,7 @@ router.put("/updateItemById/:id", upload.any(), itemmaster.updateItemById);
 router.post("/addItem", upload.any(), itemmaster.addItem);
 router.get("/items/:id", itemmaster.getItems);
 router.get("/getallitems", itemmaster.getallitems);
+router.get("/multiplesize", itemmaster.MultipleSizeitem);
 router.put("/update/:id", itemmaster.updateItem);
 // router.put('/update/:id', upload.single('image'), itemController.updateItem);
 router.delete("/delete/:id", itemmaster.deleteItem);
@@ -111,6 +112,8 @@ router.get("/getcustomeraddress/:customer_id",customer.getAddressesByUserId);
 router.post("/addcustomeraddress", customer.addCustomerAddress);
 router.put("/updatecustomeraddress", customer.updateCustomerAddress);
 router.delete("/deletecustomeraddress/:address_id", customer.deleteCustomerAddress);
+//get only kurtas
+router.get("/getKurtas", itemmaster.getKurtas);
 // router.get("/getItem",itemmaster.getItem);
 router.get("/getLable", lablemaster.getLable);
 router.get("/getrfmaster", rfmaster.getrfmaster);

@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { EffectFade, Thumbs, Pagination } from "swiper";
 import { Modal } from "react-bootstrap";
@@ -6,12 +6,17 @@ import { useDispatch, useSelector } from "react-redux";
 import Rating from "./sub-components/ProductRating";
 import Swiper, { SwiperSlide } from "../../components/swiper";
 import { getProductCartQuantity } from "../../helpers/product";
+// import { useEffect } from "react";
 import { addToCart, deleteFromCart } from "../../store/slices/cart-slice";
-import { addToWishlist, deleteFromWishlist, removeColorFromWishlist } from "../../store/slices/wishlist-slice";
+import {
+  addToWishlist,
+  deleteFromWishlist,
+  removeColorFromWishlist,
+} from "../../store/slices/wishlist-slice";
 import { addToCompare } from "../../store/slices/compare-slice";
 import axios from "axios";
 import { BASE_URL } from "../../config";
-const customerInfoSting= localStorage.getItem('customerinfo');
+const customerInfoSting = localStorage.getItem("customerinfo");
 const customerinfo = customerInfoSting ? JSON.parse(customerInfoSting) : null;
 console.log("this is id customer description", customerinfo?.id);
 const CUSTOMERID = customerinfo?.id;
@@ -38,13 +43,17 @@ function ProductModal({
   const [productStock, setProductStock] = useState(
     product.variation ? product.variation[0].size[0].stock : product.stock
   );
-  const [quantityCount, setQuantityCount] = useState(1);
+  const [quantity, setQuantityCount] = useState(1);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+
   const productCartQty = getProductCartQuantity(
     cartItems,
     product,
     selectedProductColor,
     selectedProductSize
   );
+  const isProductInCart = productCartQty > 0;
+
   console.log("this is saa", product);
   const gallerySwiperParams = {
     spaceBetween: 10,
@@ -70,89 +79,118 @@ function ProductModal({
       clickable: true,
       type: "bullets",
     },
-    modules: [Pagination], 
+    modules: [Pagination],
     // Add Pagination module
-    
   };
-  const handleAddtocart = async () => {
-    // Create cart item object
-    const cartItem = {
-      ...product,
-      quantity: quantityCount,
+  useEffect(() => {
+    setQuantityCount(1);
+  }, [product.id]);
+
+  const handleQuantityChange = (action) => {
+    if (action === "increment") {
+      const availableStock =
+        productStock - (isProductInCart ? productCartQty : 0);
+      if (productStock && quantity < availableStock) {
+        setQuantityCount((prev) => prev + 1);
+      }
+    } else if (action === "decrement") {
+      if (quantity > 1) {
+        setQuantityCount((prev) => prev - 1);
+      }
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (isAddingToCart) return;
+    setIsAddingToCart(true);
+    try {
+      // Prepare product for Redux update
+      const cartItem = {
+        ...product,
+        quantity,
+        selectedProductColor: selectedProductColor || null,
+        selectedProductSize: selectedProductSize || null,
       };
-      console.log("this is034", cartItem);
+      // Always add to Redux store (guest or logged-in)
+      dispatch(addToCart(cartItem));
+      // Reset quantity for UI
+      setQuantityCount(1);
+      // If user is logged in, also send to server
+      if (CUSTOMERID) {
+        const payload = {
+          CUSTOMERID,
+          ITEMID: product.id,
+          quantity,
+          type: "cart",
+        };
+        try {
+          const response = await axios.post(
+            `${BASE_URL}/addtocartWishlist`,
+            payload
+          );
+          console.log("Item added to server cart:", response.data);
+        } catch (error) {
+          console.error("Server cart add failed:", error);
+          // Optional: You can dispatch rollback logic here
+        }
+      }
+    } catch (error) {
+      console.error("Add to cart failed:", error);
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
+  const handleWishlist = async () => {
     // Always add to Redux store (works for both logged-in and guest users)
-    dispatch(addToCart(cartItem));
+    dispatch(addToWishlist(product));
     // Only call API if user is logged in
     if (CUSTOMERID) {
-      console.log("this is 05");
       try {
         const payload = {
           CUSTOMERID,
           ITEMID: product.id,
-          quantity: quantityCount,
-          type: "cart",
+          type: "wishlist",
         };
-        const response = await axios.post(`${BASE_URL}/addtocartWishlist`, payload);
-        console.log("Item added to server cart:", response.data);
+        const response = await axios.post(
+          `${BASE_URL}/addtocartWishlist`,
+          payload
+        );
+        console.log("Item added to server wishlist:", response.data);
       } catch (error) {
-        console.error("Failed to add to server cart:", error);
+        console.error("Failed to add to server wishlist:", error);
         // Optional: Remove from Redux if server update fails
-        dispatch(deleteFromCart(cartItem.cartItemId));
+        dispatch(deleteFromWishlist(product));
       }
     }
-    // Reset quantity after adding to cart
-    setQuantityCount(1);
   };
 
-  const handleWishlist = async () => {
-  // Always add to Redux store (works for both logged-in and guest users)
-  dispatch(addToWishlist(product));
-  // Only call API if user is logged in
-  if (CUSTOMERID) {
-    try {
-      const payload = {
-        CUSTOMERID,
-        ITEMID: product.id,
-        type: "wishlist"
-      };
-      const response = await axios.post(`${BASE_URL}/addtocartWishlist`, payload);
-      console.log("Item added to server wishlist:", response.data);
-    } catch (error) {
-      console.error("Failed to add to server wishlist:", error);
-      // Optional: Remove from Redux if server update fails
-      dispatch(deleteFromWishlist(product));
-    }
-  }
-};
-
-
-const handledeleteWishlist = async () => {
-  // Always remove from Redux store immediately (optimistic update)
-  dispatch(deleteFromWishlist(product));
-  // Only call API if user is logged in
-  if (CUSTOMERID) {
-    try {
-      const payload = {
-        CUSTOMERID,
-        ITEMID: product.id,
-        type: "wishlist"
-      };
-      const response = await axios.delete(`${BASE_URL}/deletecartWishlist`, {
-        data: payload
-      });
-      if (!response.data?.success) {
-        // If server deletion fails, re-add to Redux
+  const handledeleteWishlist = async () => {
+    // Always remove from Redux store immediately (optimistic update)
+    dispatch(deleteFromWishlist(product));
+    // Only call API if user is logged in
+    if (CUSTOMERID) {
+      try {
+        const payload = {
+          CUSTOMERID,
+          ITEMID: product.id,
+          type: "wishlist",
+        };
+        const response = await axios.delete(`${BASE_URL}/deletecartWishlist`, {
+          data: payload,
+        });
+        if (!response.data?.success) {
+          // If server deletion fails, re-add to Redux
+          dispatch(addToWishlist(product));
+          console.error("Failed to delete from server wishlist");
+        }
+      } catch (error) {
+        // If API call fails, re-add to Redux
         dispatch(addToWishlist(product));
-        console.error('Failed to delete from server wishlist');
+        console.error("Error deleting from wishlist:", error);
       }
-    } catch (error) {
-      // If API call fails, re-add to Redux
-      dispatch(addToWishlist(product));
-      console.error('Error deleting from wishlist:', error);
     }
-  }
-};
+  };
+  const availableStock = productStock - (isProductInCart ? productCartQty : 0);
 
   const onCloseModal = () => {
     setThumbsSwiper(null);
@@ -341,88 +379,91 @@ const handledeleteWishlist = async () => {
                 <div className="pro-details-quality">
                   <div className="cart-plus-minus">
                     <button
-                      onClick={() =>
-                        setQuantityCount(
-                          quantityCount > 1 ? quantityCount - 1 : 1
-                        )
-                      }
+                      onClick={() => handleQuantityChange("decrement")}
                       className="dec qtybutton"
+                      disabled={quantity <= 1}
                     >
                       -
                     </button>
                     <input
-                      className="cart-plus-minus-box"
+                      className="cart-plus-minus-box text-center"
                       type="text"
-                      value={quantityCount}
+                      value={quantity}
                       readOnly
                     />
                     <button
-                      onClick={() =>
-                        setQuantityCount(
-                          quantityCount < productStock - productCartQty
-                            ? quantityCount + 1
-                            : quantityCount
-                        )
-                      }
+                      onClick={() => handleQuantityChange("increment")}
                       className="inc qtybutton"
+                      disabled={productStock && quantity >= availableStock}
                     >
                       +
                     </button>
                   </div>
                   <div className="pro-details-cart btn-hover">
                     {productStock && productStock > 0 ? (
-                      <button
-                     onClick={handleAddtocart}
-                        // onClick={() =>
-                        //   dispatch(
-                        //     addToCart({
-                        //       ...product,
-                        //       quantity: quantityCount,
-                        //       selectedProductColor: selectedProductColor
-                        //         ? selectedProductColor
-                        //         : product.selectedProductColor
-                        //         ? product.selectedProductColor
-                        //         : null,
-                        //       selectedProductSize: selectedProductSize
-                        //         ? selectedProductSize
-                        //         : product.selectedProductSize
-                        //         ? product.selectedProductSize
-                        //         : null,
-                        //     })
-                        //   )
-                        // }
-                        disabled={productCartQty >= productStock}
-                      >
-                        {" "}
-                        Add To Cart{" "}
-                      </button>
+                     <button
+              onClick={handleAddToCart}
+              disabled={quantity > availableStock || isAddingToCart}
+            >
+              {isAddingToCart ? 'Adding...' : 
+               isProductInCart ? `Add To Cart` : 
+               `Add To Cart`}
+            </button>
                     ) : (
+                      // <button
+                      //   onClick={handleAddtocart}
+                      // onClick={() =>
+                      //   dispatch(
+                      //     addToCart({
+                      //       ...product,
+                      //       quantity: quantityCount,
+                      //       selectedProductColor: selectedProductColor
+                      //         ? selectedProductColor
+                      //         : product.selectedProductColor
+                      //         ? product.selectedProductColor
+                      //         : null,
+                      //       selectedProductSize: selectedProductSize
+                      //         ? selectedProductSize
+                      //         : product.selectedProductSize
+                      //         ? product.selectedProductSize
+                      //         : null,
+                      //     })
+                      //   )
+                      // }
+                      //   disabled={productCartQty >= productStock}
+                      // >
+                      //   {" "}
+                      //   Add To Cart{" "}
+                      // </button>
+
                       <button disabled>Out of Stock</button>
                     )}
                   </div>
                   <div className="pro-details-wishlist">
                     <button
-              className={`transition-all duration-300 text-2xl ${
-                wishlistItem ? "text-danger" : "text-gray-400"
-              }`}
-              title={wishlistItem ? "Remove from wishlist" : "Add to wishlist"}
-              // onClick={() =>
-              //   wishlistItem
-              //     ? dispatch(deleteFromWishlist(product))
-              //     : dispatch(addToWishlist(product))
-              // }
-              onClick={() =>
-                wishlistItem
-                  ?  handledeleteWishlist()
-                  : handleWishlist()
-              }
-            >
-              {wishlistItem ? (
-                <i className="fa fa-heart "></i>
-              ) : (
-                <i className="fa fa-heart-o"></i>
-              )}
-            </button>
+                      className={`transition-all duration-300 text-2xl ${
+                        wishlistItem ? "text-danger" : "text-gray-400"
+                      }`}
+                      title={
+                        wishlistItem
+                          ? "Remove from wishlist"
+                          : "Add to wishlist"
+                      }
+                      // onClick={() =>
+                      //   wishlistItem
+                      //     ? dispatch(deleteFromWishlist(product))
+                      //     : dispatch(addToWishlist(product))
+                      // }
+                      onClick={() =>
+                        wishlistItem ? handledeleteWishlist() : handleWishlist()
+                      }
+                    >
+                      {wishlistItem ? (
+                        <i className="fa fa-heart "></i>
+                      ) : (
+                        <i className="fa fa-heart-o"></i>
+                      )}
+                    </button>
                   </div>
                   {/* <div className="pro-details-compare">
                   <button

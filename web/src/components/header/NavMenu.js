@@ -37,6 +37,13 @@ const NavMenu = ({ menuWhiteClass, sidebarMenu }) => {
               {t("Western Wear")}
             </Link>
           </li> */}
+           <li>
+            <Link
+              to={`${process.env.PUBLIC_URL}/shop-grid-standard?category=Kurta`}
+            >
+              {t("Suits")}
+            </Link>
+          </li>
           <li>
             <Link
               to={`${process.env.PUBLIC_URL}/shop-grid-standard?category=westernwear`}

@@ -121,17 +121,15 @@ const SectionTitleHome= lazy(()=> import("./components/section-title/SectionTitl
 const OurOrders = lazy(() => import("./pages/other/OurOrders"));
 
 const App = () => {
-
 useEffect(() => {
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/getallitems`,{
+      const response = await axios.get(`${BASE_URL}/multiplesize`,{
         headers: {
           "Content-Type": "application/json"
         }
       });
-      //console.log("Combined API response 00011:", response.data.data);
-      
+      console.log("Combined API response 00011:", response.data.data);
       store.dispatch(setProducts(response.data.data));
     } catch (error) {
       console.error("Error fetching data", error);
@@ -139,6 +137,23 @@ useEffect(() => {
   };
   fetchData();
 }, []);
+// useEffect(() => {
+//   const fetchData = async () => {
+//     try {
+//       const response = await axios.get(`${BASE_URL}/getallitems`,{
+//         headers: {
+//           "Content-Type": "application/json"
+//         }
+//       });
+//       //console.log("Combined API response 00011:", response.data.data);
+      
+//       store.dispatch(setProducts(response.data.data));
+//     } catch (error) {
+//       console.error("Error fetching data", error);
+//     }
+//   };
+//   fetchData();
+// }, []);
 
   return (
       <Router>

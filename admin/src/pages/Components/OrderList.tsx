@@ -199,7 +199,7 @@ const OrderList: React.FC = () => {
                                         </select>
                                     </td>
                                     <td className="p-3">
-                                        <button className="text-blue-500 hover:text-blue-700" onClick={() => handleEdit(sale.SALEID)}>
+                                        <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium mt-4 text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" onClick={() => handleEdit(sale.SALEID)}>
                                             Edit
                                         </button>
                                     </td>
