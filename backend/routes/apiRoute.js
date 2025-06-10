@@ -20,6 +20,7 @@ const shiprocket = require("../controllers/shiprocket");
 const phonepeController = require("../controllers/phonepe");
 router.get("/authenticateShiprocket", shiprocket.authenticateShiprocket);
 router.post("/checkServiceability", shiprocket.checkServiceability);
+router.post("/create-shiprocket-order", shiprocket.createOrder);
 // router.post("/payment", phonepe.initiatePayment);
 // router.post("/verify", phonepe.verifyPayment);
 router.get("/token", phonepeController.getToken);
