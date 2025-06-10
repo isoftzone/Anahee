@@ -708,18 +708,32 @@ exports.getAddressesByUserId = (req, res) => {
   const { customer_id } = req.params;
   const { primary_address } = req.query; // use query string: ?primary_address=1
   console.log("Received request to get addresses for user ID:", customer_id);
-  let sql = 'SELECT * FROM customer_addresses WHERE customer_id = ?';
+
+  let sql = `
+    SELECT 
+      customer_addresses.*, 
+      customermaster.email 
+    FROM customer_addresses
+    JOIN customermaster ON customermaster.CUSTOMERID = customer_addresses.customer_id
+    WHERE customer_addresses.customer_id = ?
+  `;
+
   const values = [customer_id];
+
   if (primary_address !== undefined) {
-    sql += ' AND primary_address = ?';
+    sql += ' AND customer_addresses.primary_address = ?';
     values.push(primary_address);
   }
-  // sql += ' ORDER BY primary_address DESC';
+
+  // Optional: Add order if needed
+  // sql += ' ORDER BY customer_addresses.primary_address DESC';
+
   con.query(sql, values, (err, result) => {
     if (err) return res.status(500).json({ msg: "DB error", error: err });
     res.json(result);
   });
 };
+
 exports.deleteCustomerAddress = (req, res) => {
   const { address_id } = req.params;
   if (!address_id) return res.status(400).json({ msg: "Address ID is required" });
