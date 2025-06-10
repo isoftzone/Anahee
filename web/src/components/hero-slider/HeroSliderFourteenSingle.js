@@ -35,7 +35,7 @@ const HeroSliderFourteenSingle = ({ data }) => {
                 </h2> */}
                     <h2 className="">
                       <span className="unleash-text">
-                        {banners[35]?.des_l1}
+                        {banners[31]?.des_l1}
                       </span>
                     </h2>
                     {/* <h2>
@@ -43,10 +43,10 @@ const HeroSliderFourteenSingle = ({ data }) => {
                     </h2> */}
                     {/* <h1 className="text-pink signature-text">Signature</h1> */}
                     <h1 className="text-pink signature-text">
-                      {banners[35]?.des_l2}
+                      {banners[31]?.des_l2}
                     </h1>
                     {/* <p className="look-text">LOOK</p> */}
-                    <p className="look-text">{banners[35]?.des_l3}</p>
+                    <p className="look-text">{banners[31]?.des_l3}</p>
                   </div>
                   <div className="slider-btn-collection-5">
                     <Link

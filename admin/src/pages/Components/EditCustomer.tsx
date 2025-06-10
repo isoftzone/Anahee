@@ -1,8 +1,12 @@
+
 // npm install bootstrap bootstrap-icons
 import { Tab } from '@headlessui/react';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import axios from 'axios';      
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 // import 'bootstrap/dist/css/bootstrap.min.css';
 // import 'bootstrap-icons/font/bootstrap-icons.css';
 
@@ -202,12 +206,12 @@ export default function EditCustomer() {
         try {
             const response = await axios.put(`http://localhost:3000/updateCustomerInfo/${id}`, formData);
             console.log('Customer updated:', response.data);
-            alert('Customer updated successfully!');
-            navigate('/components/Customerl');
+            toast.success('Customer updated successfully!');
+            // navigate('/components/Customerl');
         } catch (error: any) {
             console.error('Error updating customer:', error);
             const errorMessage = error.response?.data?.msg || error.response?.data?.message || error.message || 'Failed to update customer';
-            alert(`Failed to update customer: ${errorMessage}`);
+            toast.error(`Failed to update customer: ${errorMessage}`);
         }
     };
 
@@ -230,6 +234,8 @@ export default function EditCustomer() {
 
     return (
         <div className="p-4 bg-white rounded shadow max-w-7xl mx-auto">
+            {/* ToastContainer MUST be rendered in your component tree for toasts to show */}
+            <ToastContainer position="top-right" autoClose={3000} />
             <div className="mb-4 flex justify-between items-center">
                 <h2 className="text-2xl font-semibold">Edit Customer</h2>
                 <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={handleClick}>
