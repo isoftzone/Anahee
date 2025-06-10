@@ -1087,7 +1087,8 @@ exports.MultipleSizeitem = (req, res) => {
           variation: [],
           image: [],
           shortDescription: row.DESCRIPTION || "",
-          fullDescription: row.PRODUCT_DETAILS || ""
+          fullDescription: row.PRODUCT_DETAILS || "",
+          Product_Details: row.PRODUCT_DETAILS || "",
         });
       }
       const item = itemsMap.get(row.ITEMID);

@@ -100,7 +100,63 @@ const ProductDescriptionInfo = ({
   //     console.log("this is failed to add item to cart backend", error)
   //   }
   // }
+  useEffect(() => {
+    if (product) {
+      // Reset color to first available color
+      const firstColor = product.variation ? product.variation[0]?.color : "";
+      setSelectedProductColor(firstColor);
 
+      // Reset size to first available size for the first color
+      const firstSize = product.variation
+        ? product.variation[0]?.size[0]?.name
+        : "";
+      setSelectedProductSize(firstSize);
+
+      // Reset stock based on first color and size
+      const firstStock = product.variation
+        ? product.variation[0]?.size[0]?.stock
+        : product.stock;
+      setProductStock(firstStock);
+
+      // Reset quantity
+      setQuantityCount(1);
+
+      // Reset dropdown state
+      setOpenDropdown(null);
+    }
+  }, [product.id]); // This triggers when product changes
+
+  const handleColorChange = (color) => {
+    setSelectedProductColor(color);
+
+    // Find the variation for this color
+    const colorVariation = product.variation?.find((v) => v.color === color);
+    if (colorVariation && colorVariation.size.length > 0) {
+      // Set first size for this color
+      setSelectedProductSize(colorVariation.size[0].name);
+      setProductStock(colorVariation.size[0].stock);
+    }
+
+    // Reset quantity when color changes
+    setQuantityCount(1);
+  };
+
+  const handleSizeChange = (sizeName) => {
+    setSelectedProductSize(sizeName);
+
+    // Find the stock for this size within the selected color
+    const colorVariation = product.variation?.find(
+      (v) => v.color === selectedProductColor
+    );
+    const sizeVariation = colorVariation?.size.find((s) => s.name === sizeName);
+
+    if (sizeVariation) {
+      setProductStock(sizeVariation.stock);
+    }
+
+    // Reset quantity when size changes
+    setQuantityCount(1);
+  };
   const handleQuantityChange = (action) => {
     if (action === "increment") {
       const availableStock =
@@ -304,7 +360,7 @@ const ProductDescriptionInfo = ({
                     className={`pro-details-color-content--single ${single.color}`}
                     style={{
                       backgroundColor: single.color.toLowerCase(),
-                      border:"1px solid black",
+                      border: "1px solid black",
                       // borderColor: selectedProductColor === single.color ? "black" : "#ccc"
                     }}
                     title={single.color} // show color name on hover
@@ -323,13 +379,11 @@ const ProductDescriptionInfo = ({
                       className="absolute opacity-0 w-0 h-0"
                     />
                   </label>
-          
                 );
               })}
             </div>
           </div>
           <div className="pro-details-size">
-            
             <div className="pro-details-size">
               <div class="sizeheading align-items-center justify-content-start d-flex mb-2">
                 <span className="mt-3">Size</span>
@@ -628,6 +682,7 @@ const ProductDescriptionInfo = ({
           </div>
         </div>
       </div>
+
       <div>
         {product.Product_Details ? (
           <div className="product-details-dropdown">
@@ -699,7 +754,9 @@ const ProductDescriptionInfo = ({
               </ul>
             </div>
           )}
+
         </div> */}
+
         <div className="product-details-dropdown">
           <button onClick={() => toggleDropdown("shipping")}>Shipping</button>
           {openDropdown === "shipping" && (
