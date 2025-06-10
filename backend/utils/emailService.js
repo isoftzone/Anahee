@@ -8,8 +8,8 @@ const testAccount = {
   user: process.env.EMAIL_SENDER,
   pass: process.env.EMAIL_APPPASS,
   smtp: {
-    // host: "smtp.gmail.com",
-    host: "smtp.ethereal.email", // this is for testing remove in production
+    host: "smtp.gmail.com",
+    // host: "smtp.ethereal.email", // this is for testing remove in production
     port: 587,
     secure: false,
   },
