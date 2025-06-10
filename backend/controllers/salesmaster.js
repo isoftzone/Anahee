@@ -684,11 +684,7 @@ function generateOrderUpdateEmail(
     <tr>
       <td>
         <div class="product-info">
-          <img src="${
-            item.image ||
-            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Crect width='50' height='50' fill='%23667eea'/%3E%3Cpath d='M15 20h20v2H15zm0 4h20v2H15zm0 4h15v2H15z' fill='white'/%3E%3C/svg%3E"
-          }" 
-               alt="${item.ITEMNAME || "Item"}" class="product-image">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Crect width='50' height='50' fill='%23667eea'/%3E%3Cpath d='M15 20h20v2H15zm0 4h20v2H15zm0 4h15v2H15z' fill='white'/%3E%3C/svg%3E" width="50" height="50" alt="Document icon">
           <div class="product-details">
             <div class="product-name">${item.ITEMNAME || "Item"}</div>
             <div class="product-description">${

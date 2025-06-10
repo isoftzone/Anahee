@@ -529,7 +529,7 @@ const OrderEdit: React.FC = () => {
                             <label className=" font-semibold">Payment Mode:</label>
                             <input
                                 className="border rounded w-full p-2"
-                                value={customerDetails.payment_mode || 'N/A'}
+                                value={customerDetails.payment_mode}
                                 onChange={(e) => setCustomerDetails({ ...customerDetails, payment_mode: e.target.value })}
                             />
                         </div>
@@ -537,7 +537,7 @@ const OrderEdit: React.FC = () => {
                             <label className="block text-sm font-medium">Payment Status:</label>
                             <input
                                 className="border rounded w-full p-2"
-                                value={customerDetails.paymentStatus || 'N/A'}
+                                value={customerDetails.paymentStatus}
                                 onChange={(e) => setCustomerDetails({ ...customerDetails, paymentStatus: e.target.value })}
                             />
                         </div>
