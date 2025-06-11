@@ -102,7 +102,7 @@ const Checkout = () => {
     const script = document.createElement("script");
     script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
     script.async = true;
-    script.crossOrigin = "anonymous";
+    // script.crossOrigin = "anonymous";
     document.body.appendChild(script);
 
     return () => {

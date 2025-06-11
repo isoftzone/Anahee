@@ -145,7 +145,7 @@ exports.createPickup = async (req, res) => {
 exports.checkServiceability = async (req, res) => {
   try {
     const { pickup_postcode, delivery_postcode, cod, weight } = req.body;
-console.log("req body", req.body);
+
     if (!shiprocketToken) {
       await exports.authenticateShiprocket();
     }
