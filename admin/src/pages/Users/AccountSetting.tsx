@@ -19,20 +19,19 @@ import axios from 'axios';
 import { BASE_URL } from '../../config';
 import { setUsers } from '../../store/userSlice';
 import { use } from 'i18next';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
+interface User {
+    id: number;
+    name: string;
+    email: string;
+    password: string;
+    companyid: number | null;
+    PROFILEIMAGE?: string; // add this field
+}
 
-
-    interface User {
-        id: number;
-        name: string;
-        email: string;
-        password: string;
-        companyid: number | null;
-        PROFILEIMAGE?: string;  // add this field
-    }
- 
 const AccountSetting = () => {
-  const [profileImg, setProfileImg] = useState<string>('');
+    const [profileImg, setProfileImg] = useState<string>('');
     const [previewImg, setPreviewImg] = useState(''); // for local preview
     // const profileImage = useSelector((state: IRootState) => state.user.user.profileImage);
     const [responseData, setresponseData] = useState([]);
@@ -50,6 +49,8 @@ const AccountSetting = () => {
     const [USERTYPE, setUSERTYPE] = useState('');
     const [USERNAME, setUSERNAME] = useState('');
     const [PASSWORD, setPASSWORD] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [CREATEDBY, setCREATEDBY] = useState('');
     const [CREATEDON, setCREATEDON] = useState('');
     const [UPDATEDBY, setUPDATEDBY] = useState('');
@@ -59,47 +60,56 @@ const AccountSetting = () => {
     const [FULLNAME, setFULLNAME] = useState('');
     const [COUNTRY, setCOUNTRY] = useState('');
     const [LOCATION, setLOCATION] = useState('');
-  const [LocalData, setLocalData] = useState<User | null>(() => {
-  const storedUser = localStorage.getItem("userData");
-  return storedUser ? JSON.parse(storedUser) as User : null;
-});
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+    const [countries, setCountries] = useState<string[]>([]);
+    const [LocalData, setLocalData] = useState<User | null>(() => {
+        const storedUser = localStorage.getItem('userData');
+        return storedUser ? (JSON.parse(storedUser) as User) : null;
+    });
     const [PROFESSION, setPROFESSION] = useState('');
     const [ADDRESS, setADDRESS] = useState('');
     const [WEBSITE, setWEBSITE] = useState('');
-   
+
     const [PROFILEIMAGE, setPROFILEIMAGE] = useState<File | null>(null);
     const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' | '' }>({ message: '', type: '' });
     const navigate = useNavigate();
 
     // let users = useSelector((state: IRootState) => state.user);
-     
-  
-    const storedUser = JSON.parse(localStorage.getItem('userData') || '{}') as User;
-    
-  useEffect(() => {
-    const storedUser = localStorage.getItem('userData');
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser) as User;
-      setLocalData(parsedUser);
-    }
-  }, [])
-   useEffect(() => {
-    if (LocalData) {
-      console.log('User Data:', LocalData.id);
-    }
-  }, [LocalData]);
-    // Define a type for your user data
-  
 
-      useEffect(() => {
-    if (!LocalData) {
-      const storedUser = localStorage.getItem("userData");
-      if (storedUser) {
-        setLocalData(JSON.parse(storedUser));
-        console.log(storedUser);
-      }
-    }
-  }, []);
+    const storedUser = JSON.parse(localStorage.getItem('userData') || '{}') as User;
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('userData');
+        if (storedUser) {
+            const parsedUser = JSON.parse(storedUser) as User;
+            setLocalData(parsedUser);
+        }
+    }, []);
+    useEffect(() => {
+        const fetchCountries = async () => {
+            try {
+                const res = await axios.get('https://countriesnow.space/api/v0.1/countries/positions');
+                if (res.data && res.data.data) {
+                    setCountries(res.data.data.map((c: any) => c.name));
+                }
+            } catch (err) {
+                console.error('Failed to fetch countries:', err);
+            }
+        };
+        fetchCountries();
+    }, []);
+
+    //       useEffect(() => {
+    //     if (!LocalData) {
+    //       const storedUser = localStorage.getItem("userData");
+    //       if (storedUser) {
+    //         setLocalData(JSON.parse(storedUser));
+    //         console.log(storedUser);
+    //       }
+    //     }
+    //   }, []);
 
     // // Get the item from localStorage
     // const userString = localStorage.getItem('userData');
@@ -149,7 +159,7 @@ const AccountSetting = () => {
     //             setFULLNAME(userData.FULLNAME || '');
     //             setPROFESSION(userData.PROFESSION || '');
     //             setCOUNTRY(userData.COUNTRY || '');
-               
+
     //             setEMAIL(userData.EMAIL || '');
 
     //             setProfileImg(userData.PROFILEIMAGE || '');
@@ -182,69 +192,67 @@ const AccountSetting = () => {
     //     fetchUserData();
     // }, []);
     useEffect(() => {
-  const fetchUserData = async () => {
-    if (!LocalData) return; // ⛔ Guard clause for null check
+        const fetchUserData = async () => {
+            if (!LocalData) return; // ⛔ Guard clause for null check
 
-    try {
-      const response = await axios.get(`${BASE_URL}/getid_userMaster/${LocalData.id}`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+            try {
+                const response = await axios.get(`${BASE_URL}/getid_userMaster/${LocalData.id}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
 
-      const userData = response.data;
-      setresponseData(userData);
-      
+                const userData = response.data;
+                setresponseData(userData);
 
-      // Now set individual field values
-      setTITLE(userData.TITLE || '');
-      setBUSINESSTITLE(userData.BUSINESSTITLE || '');
-      setFNAME(userData.FNAME || '');
-      setMNAME(userData.MNAME || '');
-      setLNAME(userData.LNAME || '');
-      setPHONE(userData.PHONE || '');
-      setMOBILE(userData.MOBILE || '');
-      setSTATUS(userData.STATUS || '');
-      setUSERNAME(userData.USERNAME || '');
-      setPASSWORD(userData.PASSWORD || '');
-      setCREATEDBY(userData.CREATEDBY || '');
-      setCREATEDON(userData.CREATEDON || '');
-      setUPDATEDBY(userData.UPDATEDBY || '');
-      setUPDATEDON(userData.UPDATEDON || '');
-      setDS_ON(userData.DS_ON || '');
-      setDS_OFF(userData.DS_OFF || '');
-      setFULLNAME(userData.FULLNAME || '');
-      setPROFESSION(userData.PROFESSION || '');
-      setCOUNTRY(userData.COUNTRY || '');
-      setEMAIL(userData.EMAIL || '');
-      setProfileImg(userData.PROFILEIMAGE || '');
-      setUSERTYPE(userData.USERTYPE || '');
-      setADDRESS(userData.ADDRESS || '');
-      setLOCATION(userData.LOCATION || '');
-      setWEBSITE(userData.WEBSITE || '');
+                // Now set individual field values
+                setTITLE(userData.TITLE || '');
+                setBUSINESSTITLE(userData.BUSINESSTITLE || '');
+                setFNAME(userData.FNAME || '');
+                setMNAME(userData.MNAME || '');
+                setLNAME(userData.LNAME || '');
+                setPHONE(userData.PHONE || '');
+                setMOBILE(userData.MOBILE || '');
+                setSTATUS(userData.STATUS || '');
+                setUSERNAME(userData.USERNAME || '');
+                setPASSWORD(userData.password || '');
+                setCREATEDBY(userData.CREATEDBY || '');
+                setCREATEDON(userData.CREATEDON || '');
+                setUPDATEDBY(userData.UPDATEDBY || '');
+                setUPDATEDON(userData.UPDATEDON || '');
+                setDS_ON(userData.DS_ON || '');
+                setDS_OFF(userData.DS_OFF || '');
+                setFULLNAME(userData.NAME || '');
+                setPROFESSION(userData.PROFESSION || '');
+                setCOUNTRY(userData.COUNTRY || '');
+                setEMAIL(userData.email || '');
+                setProfileImg(userData.PROFILEIMAGE || '');
+                setUSERTYPE(userData.USERTYPE || '');
+                setADDRESS(userData.ADDRESS || '');
+                setLOCATION(userData.LOCATION || '');
+                setWEBSITE(userData.WEBSITE || '');
 
-      dispatch(
-        setUsers({
-          id: userData.USERID,
-          name: `${userData.FNAME} ${userData.LNAME}`,
-          email: userData.EMAIL,
-          password: userData.PASSWORD,
-          companyid: userData.COMPANYID,
-          Profession: userData.PROFESSION,
-          mobile: userData.MOBILE,
-          createdon: userData.CREATEDON,
-          location: userData.LOCATION,
-          profileImage: userData.PROFILEIMAGE,
-        })
-      );
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
-  };
+                dispatch(
+                    setUsers({
+                        id: userData.id,
+                        name: `${userData.FNAME} ${userData.LNAME}`,
+                        email: userData.email,
+                        password: userData.password,
+                        companyid: userData.COMPANYID,
+                        Profession: userData.PROFESSION,
+                        mobile: userData.MOBILE,
+                        createdon: userData.CREATEDON,
+                        location: userData.LOCATION,
+                        profileImage: userData.PROFILEIMAGE,
+                    })
+                );
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
 
-  fetchUserData();
-}, [LocalData]); // ✅ Add LocalData to the dependency array
-
+        fetchUserData();
+    }, [LocalData]); // ✅ Add LocalData to the dependency array
 
     // Debounce effect: Update `debouncedData` only when user stops typing
 
@@ -382,323 +390,311 @@ const AccountSetting = () => {
     //     PROFILEIMAGE || // selected new image (base64)
     //     (PROFILEIMAGE ? `${BASE_URL}/${PROFILEIMAGE}`:`${BASE_URL}/${profileImg}` : '/assets/images/profile-035.png');
 
+    //     const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    //   e.preventDefault();
 
+    //   try {
+    //     const currentFormData = {
+    //       COMPANYID,
+    //       USERID,
+    //       TITLE,
+    //       BUSINESSTITLE,
+    //       FNAME,
+    //       MNAME,
+    //       LNAME,
+    //       PHONE,
+    //       MOBILE,
+    //       EMAIL,
+    //       STATUS,
+    //       USERTYPE,
+    //       USERNAME,
+    //       PASSWORD,
+    //       CREATEDBY,
+    //       CREATEDON,
+    //       UPDATEDBY,
+    //       UPDATEDON,
+    //       DS_ON,
+    //       DS_OFF,
+    //       FULLNAME,
+    //       COUNTRY,
+    //       LOCATION,
+    //       PROFESSION,
+    //       ADDRESS,
+    //       WEBSITE,
+    //     };
 
-//     const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
-//   e.preventDefault();
+    //     const data = new FormData();
+    //     for (const [key, value] of Object.entries(currentFormData)) {
+    //       if (value != null) {
+    //         data.append(key, String(value));
+    //       }
+    //     }
+    //     if (PROFILEIMAGE) {
+    //       data.append('PROFILEIMAGE', PROFILEIMAGE);
+    //     }
 
-//   try {
-//     const currentFormData = {
-//       COMPANYID,
-//       USERID,
-//       TITLE,
-//       BUSINESSTITLE,
-//       FNAME,
-//       MNAME,
-//       LNAME,
-//       PHONE,
-//       MOBILE,
-//       EMAIL,
-//       STATUS,
-//       USERTYPE,
-//       USERNAME,
-//       PASSWORD,
-//       CREATEDBY,
-//       CREATEDON,
-//       UPDATEDBY,
-//       UPDATEDON,
-//       DS_ON,
-//       DS_OFF,
-//       FULLNAME,
-//       COUNTRY,
-//       LOCATION,
-//       PROFESSION,
-//       ADDRESS,
-//       WEBSITE,
-//     };
+    //     const isUpdate = !!USERID;
+    //     const url = isUpdate
+    //       ? `${BASE_URL}/update_userMaster`
+    //       : `${BASE_URL}/upload_userMaster`;
 
-//     const data = new FormData();
-//     for (const [key, value] of Object.entries(currentFormData)) {
-//       if (value != null) {
-//         data.append(key, String(value));
-//       }
-//     }
-//     if (PROFILEIMAGE) {
-//       data.append('PROFILEIMAGE', PROFILEIMAGE);
-//     }
+    //     const response = await axios.post(url, data, {
+    //       withCredentials: true,
+    //       headers: { 'Content-Type': 'multipart/form-data' },
+    //     });
 
-//     const isUpdate = !!USERID;
-//     const url = isUpdate
-//       ? `${BASE_URL}/update_userMaster`
-//       : `${BASE_URL}/upload_userMaster`;
+    //     if (response.status === 200 || response.status === 201) {
+    //       const userData = response.data.user;
+    //       dispatch(
+    //         setUsers({
+    //           id: userData.USERID,
+    //           name: `${userData.FNAME} ${userData.LNAME}`,
+    //           email: userData.EMAIL,
+    //           password: userData.PASSWORD,
+    //           companyid: userData.COMPANYID,
+    //           Profession: userData.PROFESSION,
+    //           mobile: userData.MOBILE,
+    //           createdon: userData.CREATEDON,
+    //           location: userData.LOCATION,
+    //           profileImage: userData.PROFILEIMAGE,
+    //         })
+    //       );
+    //       setAlert({ message: 'User saved successfully!', type: 'success' });
+    //     } else {
+    //       setAlert({ message: 'Unexpected server response.', type: 'error' });
+    //     }
+    //   } catch (error) {
+    //     if (axios.isAxiosError(error)) {
+    //       setAlert({ message: error.response?.data?.msg || 'Server error.', type: 'error' });
+    //     } else {
+    //       console.error('Unexpected error:', error);
+    //       setAlert({ message: 'Unexpected error occurred.', type: 'error' });
+    //     }
+    //   }
+    // };
 
-//     const response = await axios.post(url, data, {
-//       withCredentials: true,
-//       headers: { 'Content-Type': 'multipart/form-data' },
-//     });
+    // const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    //   e.preventDefault();
+    //  if (!LocalData) {
+    //     setAlert({ message: "User data is missing. Please log in again.", type: "error" });
+    //     return;
+    //   }
+    //   try {
+    //     // Collect all current form field values
+    //     const currentFormData = {
+    //       COMPANYID,
+    //       USERID: LocalData.id,
+    //       TITLE,
+    //       BUSINESSTITLE,
+    //       FNAME,
+    //       MNAME,
+    //       LNAME,
+    //       PHONE,
+    //       MOBILE,
+    //       EMAIL,
+    //       STATUS,
+    //       USERTYPE,
+    //       USERNAME,
+    //       PASSWORD,
+    //       CREATEDBY,
+    //       CREATEDON,
+    //       UPDATEDBY,
+    //       UPDATEDON,
+    //       DS_ON,
+    //       DS_OFF,
+    //       FULLNAME,
+    //       COUNTRY,
+    //       LOCATION,
+    //       PROFESSION,
+    //       ADDRESS,
+    //       WEBSITE,
+    //     };
 
-//     if (response.status === 200 || response.status === 201) {
-//       const userData = response.data.user;
-//       dispatch(
-//         setUsers({
-//           id: userData.USERID,
-//           name: `${userData.FNAME} ${userData.LNAME}`,
-//           email: userData.EMAIL,
-//           password: userData.PASSWORD,
-//           companyid: userData.COMPANYID,
-//           Profession: userData.PROFESSION,
-//           mobile: userData.MOBILE,
-//           createdon: userData.CREATEDON,
-//           location: userData.LOCATION,
-//           profileImage: userData.PROFILEIMAGE,
-//         })
-//       );
-//       setAlert({ message: 'User saved successfully!', type: 'success' });
-//     } else {
-//       setAlert({ message: 'Unexpected server response.', type: 'error' });
-//     }
-//   } catch (error) {
-//     if (axios.isAxiosError(error)) {
-//       setAlert({ message: error.response?.data?.msg || 'Server error.', type: 'error' });
-//     } else {
-//       console.error('Unexpected error:', error);
-//       setAlert({ message: 'Unexpected error occurred.', type: 'error' });
-//     }
-//   }
-// };
+    //     const data = new FormData();
 
+    //     // Append only fields that are not null or undefined
+    //     for (const [key, value] of Object.entries(currentFormData)) {
+    //       if (value !== undefined && value !== null) {
+    //         data.append(key, String(value));
+    //       }
+    //     }
 
+    //     // ✅ Append the image file only if selected (matches backend logic)
+    //     if (PROFILEIMAGE) {
+    //       data.append('PROFILEIMAGE', PROFILEIMAGE);
+    //     }
 
+    //     // Determine if this is an update or insert
+    //     const isUpdate = !!USERID;
+    //     const url = isUpdate
+    //       ? `${BASE_URL}/update_userMaster`
+    //       : `${BASE_URL}/upload_userMaster`;
 
+    //     // Send the form data
+    //     const response = await axios.post(url, data, {
+    //       withCredentials: true,
+    //       headers: { 'Content-Type': 'multipart/form-data' },
+    //     });
 
-// const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
-//   e.preventDefault();
-//  if (!LocalData) {
-//     setAlert({ message: "User data is missing. Please log in again.", type: "error" });
-//     return;
-//   }
-//   try {
-//     // Collect all current form field values
-//     const currentFormData = {
-//       COMPANYID,
-//       USERID: LocalData.id,
-//       TITLE,
-//       BUSINESSTITLE,
-//       FNAME,
-//       MNAME,
-//       LNAME,
-//       PHONE,
-//       MOBILE,
-//       EMAIL,
-//       STATUS,
-//       USERTYPE,
-//       USERNAME,
-//       PASSWORD,
-//       CREATEDBY,
-//       CREATEDON,
-//       UPDATEDBY,
-//       UPDATEDON,
-//       DS_ON,
-//       DS_OFF,
-//       FULLNAME,
-//       COUNTRY,
-//       LOCATION,
-//       PROFESSION,
-//       ADDRESS,
-//       WEBSITE,
-//     };
+    //     if (response.status === 200 || response.status === 201) {
+    //       const userData = response.data.user;
 
-//     const data = new FormData();
+    //       dispatch(
+    //         setUsers({
+    //           id: userData.USERID,
+    //           name: `${userData.FNAME} ${userData.LNAME}`,
+    //           email: userData.EMAIL,
+    //           password: userData.PASSWORD,
+    //           companyid: userData.COMPANYID,
+    //           Profession: userData.PROFESSION,
+    //           mobile: userData.MOBILE,
+    //           createdon: userData.CREATEDON,
+    //           location: userData.LOCATION,
+    //           profileImage: userData.PROFILEIMAGE,
+    //         })
+    //       );
 
-//     // Append only fields that are not null or undefined
-//     for (const [key, value] of Object.entries(currentFormData)) {
-//       if (value !== undefined && value !== null) {
-//         data.append(key, String(value));
-//       }
-//     }
+    //       setAlert({ message: 'User saved successfully!', type: 'success' });
+    //     } else {
+    //       setAlert({ message: 'Unexpected server response.', type: 'error' });
+    //     }
+    //   } catch (error) {
+    //     if (axios.isAxiosError(error)) {
+    //       setAlert({
+    //         message: error.response?.data?.msg || 'Server error.',
+    //         type: 'error',
+    //       });
+    //     } else {
+    //       console.error('Unexpected error:', error);
+    //       setAlert({ message: 'Unexpected error occurred.', type: 'error' });
+    //     }
+    //   }
+    // };
 
-//     // ✅ Append the image file only if selected (matches backend logic)
-//     if (PROFILEIMAGE) {
-//       data.append('PROFILEIMAGE', PROFILEIMAGE);
-//     }
+    const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
 
-//     // Determine if this is an update or insert
-//     const isUpdate = !!USERID;
-//     const url = isUpdate
-//       ? `${BASE_URL}/update_userMaster`
-//       : `${BASE_URL}/upload_userMaster`;
+        if (!LocalData) {
+            setAlert({ message: 'User data is missing. Please log in again.', type: 'error' });
+            return;
+        }
 
-//     // Send the form data
-//     const response = await axios.post(url, data, {
-//       withCredentials: true,
-//       headers: { 'Content-Type': 'multipart/form-data' },
-//     });
+        try {
+            const currentFormData = {
+                COMPANYID,
+                USERID: LocalData.id,
+                TITLE,
+                BUSINESSTITLE,
+                FNAME,
+                MNAME,
+                LNAME,
+                PHONE,
+                MOBILE,
+                EMAIL,
+                STATUS,
+                USERTYPE,
+                USERNAME,
+                newPassword,
+                confirmPassword,
+                CREATEDBY,
+                CREATEDON,
+                UPDATEDBY,
+                UPDATEDON,
+                DS_ON,
+                DS_OFF,
+                FULLNAME,
+                COUNTRY,
+                LOCATION,
+                PROFESSION,
+                ADDRESS,
+                WEBSITE,
+            };
 
-//     if (response.status === 200 || response.status === 201) {
-//       const userData = response.data.user;
+            const data = new FormData();
 
-//       dispatch(
-//         setUsers({
-//           id: userData.USERID,
-//           name: `${userData.FNAME} ${userData.LNAME}`,
-//           email: userData.EMAIL,
-//           password: userData.PASSWORD,
-//           companyid: userData.COMPANYID,
-//           Profession: userData.PROFESSION,
-//           mobile: userData.MOBILE,
-//           createdon: userData.CREATEDON,
-//           location: userData.LOCATION,
-//           profileImage: userData.PROFILEIMAGE,
-//         })
-//       );
+            for (const [key, value] of Object.entries(currentFormData)) {
+                if (value !== undefined && value !== null) {
+                    data.append(key, String(value));
+                }
+            }
 
-//       setAlert({ message: 'User saved successfully!', type: 'success' });
-//     } else {
-//       setAlert({ message: 'Unexpected server response.', type: 'error' });
-//     }
-//   } catch (error) {
-//     if (axios.isAxiosError(error)) {
-//       setAlert({
-//         message: error.response?.data?.msg || 'Server error.',
-//         type: 'error',
-//       });
-//     } else {
-//       console.error('Unexpected error:', error);
-//       setAlert({ message: 'Unexpected error occurred.', type: 'error' });
-//     }
-//   }
-// };
+            if (PROFILEIMAGE) {
+                data.append('PROFILEIMAGE', PROFILEIMAGE);
+            }
 
+            const isUpdate = !!USERID;
+            const url = isUpdate ? `${BASE_URL}/update_userMaster` : `${BASE_URL}/upload_userMaster`;
 
-const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
+            const response = await axios.post(url, data, {
+                withCredentials: true,
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            console.log('name', response);
+            if (response.status === 200 || response.status === 201) {
+                const userData = response.data.user;
 
-  if (!LocalData) {
-    setAlert({ message: "User data is missing. Please log in again.", type: "error" });
-    return;
-  }
-
-  try {
-    const currentFormData = {
-      COMPANYID,
-      USERID: LocalData.id,
-      TITLE,
-      BUSINESSTITLE,
-      FNAME,
-      MNAME,
-      LNAME,
-      PHONE,
-      MOBILE,
-      EMAIL,
-      STATUS,
-      USERTYPE,
-      USERNAME,
-      PASSWORD,
-      CREATEDBY,
-      CREATEDON,
-      UPDATEDBY,
-      UPDATEDON,
-      DS_ON,
-      DS_OFF,
-      FULLNAME,
-      COUNTRY,
-      LOCATION,
-      PROFESSION,
-      ADDRESS,
-      WEBSITE,
-    };
-
-    const data = new FormData();
-
-    for (const [key, value] of Object.entries(currentFormData)) {
-      if (value !== undefined && value !== null) {
-        data.append(key, String(value));
-      }
-    }
-
-    if (PROFILEIMAGE) {
-      data.append("PROFILEIMAGE", PROFILEIMAGE);
-    }
-
-    const isUpdate = !!USERID;
-    const url = isUpdate
-      ? `${BASE_URL}/update_userMaster`
-      : `${BASE_URL}/upload_userMaster`;
-
-    const response = await axios.post(url, data, {
-      withCredentials: true,
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-console.log('name',response);
-    if (response.status === 200 || response.status === 201) {
-      const userData = response.data.user;
-
-         dispatch(
+                dispatch(
                     setUsers({
                         id: userData.USERID,
                         name: userData.FNAME,
                         email: userData.EMAIL,
                         password: userData.PASSWORD,
                         companyid: userData.COMPANYID,
-                          Profession: userData.PROFESSION,
-                         mobile:userData.MOBILE,
-                         createdon: userData.CREATEDON,
-                         location: userData.LOCATION,
+                        Profession: userData.PROFESSION,
+                        mobile: userData.MOBILE,
+                        createdon: userData.CREATEDON,
+                        location: userData.LOCATION,
                         profileImage: userData.PROFILEIMAGE,
                     })
                 );
-      // ✅ Save to localStorage
-      localStorage.setItem('userDatas', JSON.stringify({
-                    id: userData.USERID,
-                    name: userData.FNAME,
-                    email: userData.EMAIL,
-                    password: userData.PASSWORD,
-                    companyid: userData.COMPANYID,
-                    profession: userData.PROFESSION,
-                    mobile: userData.MOBILE,
-                    createdon: userData.CREATEDON,
-                    location: userData.LOCATION,
-                    profileImage: userData.PROFILEIMAGE,
-                }));
+                // ✅ Save to localStorage
+                localStorage.setItem(
+                    'userDatas',
+                    JSON.stringify({
+                        id: userData.USERID,
+                        name: userData.FNAME,
+                        email: userData.EMAIL,
+                        password: userData.PASSWORD,
+                        companyid: userData.COMPANYID,
+                        profession: userData.PROFESSION,
+                        mobile: userData.MOBILE,
+                        createdon: userData.CREATEDON,
+                        location: userData.LOCATION,
+                        profileImage: userData.PROFILEIMAGE,
+                    })
+                );
 
-      // ✅ Broadcast to update other components (like Header)
-      window.dispatchEvent(new Event("userDataUpdated"));
-// setAlert({ message: "User saved successfully!", type: "success" });
+                // ✅ Broadcast to update other components (like Header)
+                window.dispatchEvent(new Event('userDataUpdated'));
+                // setAlert({ message: "User saved successfully!", type: "success" });
 
-setTimeout(() => {
-  setAlert({ message: "User saved successfully!", type: "success" });
+                setTimeout(() => {
+                    setAlert({ message: 'User saved successfully!', type: 'success' });
 
-  setTimeout(() => {
-    setAlert({ message: "", type: "" });
-  }, 3000); // clear 3 seconds after showing
-}, 1000); // delay showing the alert by 700ms
- // clears alert after 3 seconds
+                    setTimeout(() => {
+                        setAlert({ message: '', type: '' });
+                    }, 3000); // clear 3 seconds after showing
+                }, 1000); // delay showing the alert by 700ms
+                // clears alert after 3 seconds
 
-    //   setAlert({ message: "User saved successfully!", type: "success" });
-    } else {
-      setAlert({ message: "Unexpected server response.", type: "error" });
-    }
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      setAlert({
-        message: error.response?.data?.msg || "Server error.",
-        type: "error",
-      });
-    } else {
-      console.error("Unexpected error:", error);
-      setAlert({ message: "Unexpected error occurred.", type: "error" });
-    }
-  }
-};
+                //   setAlert({ message: "User saved successfully!", type: "success" });
+            } else {
+                setAlert({ message: 'Unexpected server response.', type: 'error' });
+            }
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                setAlert({
+                    message: error.response?.data?.msg || 'Server error.',
+                    type: 'error',
+                });
+            } else {
+                console.error('Unexpected error:', error);
+                setAlert({ message: 'Unexpected error occurred.', type: 'error' });
+            }
+        }
+    };
 
-
-
-
-const imgUrl =
-  previewImg ? previewImg :
-  PROFILEIMAGE ? `${BASE_URL}/images/banner/${PROFILEIMAGE}` :
-  profileImg ? `${BASE_URL}/images/banner/${profileImg}` :
-  '/assets/images/profile-035.png';
+    const imgUrl = previewImg ? previewImg : PROFILEIMAGE ? `${BASE_URL}/images/banner/${PROFILEIMAGE}` : profileImg ? `${BASE_URL}/images/banner/${profileImg}` : '/assets/images/profile-035.png';
 
     return (
         <div>
@@ -775,7 +771,15 @@ const imgUrl =
                                     </div>
                                     {/* Updated image preview */}
                                     {/* {selectedImage && <img src={selectedImage} alt="Selected" className="w-20 h-20 md:w-32 md:h-32 rounded-full object-cover mx-auto" />} */}
-                                    <img src={imgUrl} alt="Selected" className="w-20 h-20 md:w-32 md:h-32 rounded-full object-cover mx-auto" />
+                                    <img
+                                        src={imgUrl}
+                                        onError={(e) => {
+                                            e.currentTarget.onerror = null; // Prevent infinite loop
+                                            e.currentTarget.src = '/assets/images/profile-035.png';
+                                        }}
+                                        alt="Selected"
+                                        className="w-20 h-20 md:w-32 md:h-32 rounded-full object-cover mx-auto"
+                                    />
                                 </div>
 
                                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -816,10 +820,6 @@ const imgUrl =
                                         <input id="LNAME" value={LNAME} type="text" placeholder="Last Name" name="LNAME" className="form-input" onChange={(e) => setLNAME(e.target.value)} />
                                     </div>
                                     <div>
-                                        <label htmlFor="phone">Phone</label>
-                                        <input id="PHONE" value={PHONE} type="number" placeholder="+1 (530) 555-12121" name="PHONE" className="form-input" onChange={(e) => setPHONE(e.target.value)} />
-                                    </div>
-                                    <div>
                                         <label htmlFor="name">Mobile</label>
                                         <input id="MOBILE" value={MOBILE} type="number" placeholder="+91-9111111111" name="MOBILE" className="form-input" onChange={(e) => setMOBILE(e.target.value)} />
                                     </div>
@@ -857,8 +857,100 @@ const imgUrl =
                                             name="PASSWORD"
                                             className="form-input"
                                             onChange={(e) => setPASSWORD(e.target.value)}
+                                        /> */}
+                                    {/* </div>{' '} */}
+                                    <div style={{ position: 'relative' }}>
+                                        <label htmlFor="name">Password</label>
+                                        <input
+                                            type={showPassword ? 'text' : 'password'}
+                                            name="password"
+                                            placeholder="Password"
+                                            value={PASSWORD}
+                                            className="form-input"
+                                            style={{ paddingRight: '40px' }}
                                         />
-                                    </div>{' '} */}
+                                        {/* <i
+                                            className={`bi ${showPassword ? 'bi-eye' : 'bi-eye-slash'}`}
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            style={{
+                                                position: 'absolute',
+                                                top: '70%',
+                                                right: '15px',
+                                                transform: 'translateY(-50%)',
+                                                cursor: 'pointer',
+                                                fontSize: '1.5rem',
+                                                color: '#777',
+                                                display:"block"
+                                            }}
+                                        ></i> */}
+                                         <span
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: 'absolute',
+                        top: '70%',
+                        right: '15px',
+                        transform: 'translateY(-50%)',
+                        cursor: 'pointer',
+                        fontSize: '1.5rem',
+                        color: '#777',
+                        display: 'block',
+                      }}
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </span>
+                                    </div>
+                                    <div style={{ position: 'relative' }}>
+                                        <label htmlFor="name">New Password</label>
+                                        <input
+                                            type={showNewPassword ? 'text' : 'password'}
+                                            name="password"
+                                            placeholder="Password"
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            className="form-input"
+                                            style={{ paddingRight: '40px' }}
+                                        />
+                                        {/* <i
+                                            className={`bi ${showNewPassword ? 'bi-eye' : 'bi-eye-slash'}`}
+                                            onClick={() => setShowNewPassword(!showNewPassword)}
+                                            style={{
+                                                position: 'absolute',
+                                                top: '70%',
+                                                right: '15px',
+                                                transform: 'translateY(-50%)',
+                                                cursor: 'pointer',
+                                                fontSize: '1.5rem',
+                                                color: '#777',
+                                                zIndex:"10"
+                                            }}
+                                        ></i> */}
+                                    </div>
+                                    {/* Confirm Password Field */}
+                                    <div style={{ position: 'relative' }}>
+                                        <label htmlFor="confirmPassword">Confirm Password</label>
+                                        <input
+                                            type={showConfirmPassword ? 'text' : 'password'}
+                                            name="confirmPassword"
+                                            placeholder="Confirm Password"
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            className="form-input"
+                                            style={{ paddingRight: '40px' }}
+                                        />
+                                        {/* <i
+                                            className={`bi ${showConfirmPassword ? 'bi-eye' : 'bi-eye-slash'}`}
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            style={{
+                                                position: 'absolute',
+                                                top: '70%',
+                                                right: '15px',
+                                                transform: 'translateY(-50%)',
+                                                cursor: 'pointer',
+                                                fontSize: '1.5rem',
+                                                color: '#777',
+                                            }}
+                                        ></i> */}
+                                    </div>
                                     {/* <div>
                                         <label htmlFor="name">Created By</label>
                                         <input
@@ -942,22 +1034,13 @@ const imgUrl =
                                     </div>
                                     <div>
                                         <label htmlFor="country">Country</label>
-                                        <select
-                                            defaultValue="United States"
-                                            value={COUNTRY}
-                                            id="COUNTRY"
-                                            className="form-select text-white-dark"
-                                            name="COUNTRY"
-                                            onChange={(e) => setCOUNTRY(e.target.value)}
-                                        >
-                                            <option value="All Countries">All Countries</option>
-                                            <option value="United States">United States</option>
-                                            <option value="India">India</option>
-                                            <option value="Japan">Japan</option>
-                                            <option value="China">China</option>
-                                            <option value="Brazil">Brazil</option>
-                                            <option value="Norway">Norway</option>
-                                            <option value="Canada">Canada</option>
+                                        <select value={COUNTRY} id="COUNTRY" className="form-select text-white-dark" name="COUNTRY" onChange={(e) => setCOUNTRY(e.target.value)}>
+                                            <option value="">-- Select country --</option>
+                                            {countries.map((c) => (
+                                                <option key={c} value={c}>
+                                                    {c}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                     <div>

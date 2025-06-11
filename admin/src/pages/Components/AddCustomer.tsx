@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
 // import "bootstrap/dist/css/bootstrap.min.css";
 // import "bootstrap-icons/font/bootstrap-icons.css";
 
@@ -198,7 +199,7 @@ export default function AddCustomer() {
 
     const handleSubmit = async () => {
         if (validate()) {
-            alert('Form submitted successfully!');
+            // alert('Form submitted successfully!');
             // Perform your form submission logic here
         }
         try {
@@ -220,7 +221,7 @@ export default function AddCustomer() {
 
             const res = await axios.post('http://localhost:3000/add_customer', customerData);
             console.log('Customer added:', res.data);
-            alert('Customer saved successfully!');
+            toast.success('Customer saved successfully!');
 
             // Reset form after successful save
             setFormData({
@@ -280,7 +281,7 @@ export default function AddCustomer() {
             // More detailed error message
             const errorMessage = error.response?.data?.msg || error.response?.data?.message || error.message || 'Failed to save customer';
 
-            alert(`Failed to save customer: ${errorMessage}`);
+            toast.error(`Failed to save customer: ${errorMessage}`);
         }
     };
 
@@ -346,7 +347,10 @@ export default function AddCustomer() {
         <div className="p-4 bg-white rounded shadow max-w-7xl mx-auto">
             <div className="mb-4 flex justify-between items-center">
                 <h2 className="text-2xl font-semibold">Add Customer</h2>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={handleClick}>
+                <button
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    onClick={handleClick}
+                >
                     Customer List
                 </button>
             </div>
@@ -560,7 +564,7 @@ export default function AddCustomer() {
                                         color: '#777',
                                     }}
                                 >
-                                    {showConfirmPassword  ? <FaEyeSlash /> : <FaEye />}
+                                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                                 </span>
                                 {errors.confirmPassword && <div style={{ color: 'red', marginTop: '0.25rem' }}>{errors.confirmPassword}</div>}
                             </div>
@@ -570,8 +574,12 @@ export default function AddCustomer() {
                                 <textarea name="CADDRESSLINE1" value={formData.CADDRESSLINE1} onChange={handleChange} className="w-full border p-2 rounded" rows={3}></textarea>
                             </div>
                             <div className="md:col-span-2 flex gap-2 mt-2">
-                                <button className="bg-green-600 text-white px-6 py-2 rounded">Save</button>
-                                <button className="border px-6 py-2 rounded">Reset</button>
+                                <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                    Save
+                                </button>
+                                <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                    Reset
+                                </button>
                             </div>
                         </form>
                     </Tab.Panel>
@@ -672,6 +680,7 @@ export default function AddCustomer() {
                     </Tab.Panel> */}
                 </Tab.Panels>
             </Tab.Group>
+            <ToastContainer position="top-right" autoClose={3000} />
         </div>
     );
 }

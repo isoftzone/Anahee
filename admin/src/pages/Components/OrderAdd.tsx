@@ -9,6 +9,7 @@ interface Item {
     description: string | null;
     quantity: number;
     price: number;
+    image: string;
 }
 
 interface CustomerDetails {
@@ -19,6 +20,7 @@ interface CustomerDetails {
     country: string;
     paymentStatus: string;
     payment_mode: string;
+    ORDER_STATUS: string;
 }
 
 interface SalesMasterData {
@@ -35,6 +37,14 @@ interface SalesMasterData {
     BALANCE: number;
 }
 
+interface Product {
+    id: string;
+    name: string;
+    shortDescription: string;
+    price: number;
+    image: string;
+}
+
 const OrderAdd: React.FC = () => {
     const [items, setItems] = useState<Item[]>([]);
     const [tax, setTax] = useState(0);
@@ -43,7 +53,7 @@ const OrderAdd: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const printRef = useRef<HTMLDivElement>(null);
-
+    const [products, setProducts] = useState<Product[]>([]);
     const [customerDetails, setCustomerDetails] = useState<CustomerDetails>({
         name: '',
         email: '',
@@ -52,6 +62,7 @@ const OrderAdd: React.FC = () => {
         country: '',
         paymentStatus: '',
         payment_mode: '',
+        ORDER_STATUS: '',
     });
 
     const [salesMasterData, setSalesMasterData] = useState<SalesMasterData>({
@@ -73,13 +84,48 @@ const OrderAdd: React.FC = () => {
     const calculateSubtotal = () => items.reduce((sum, item) => sum + item.quantity * item.price, 0);
     const subtotal = calculateSubtotal();
     const grandTotal = subtotal + (subtotal * tax) / 100 - discount + shipping;
-
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await axios.get(`${BASE_URL}/getallitems`);
+                if (response.data?.success) {
+                    const transformedProducts = response.data.data.map((product: any) => ({
+                        id: product.id,
+                        name: product.name,
+                        shortDescription: product.shortDescription,
+                        price: product.price,
+                        image: product.image[0],
+                    }));
+                    setProducts(transformedProducts);
+                }
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        };
+        fetchProducts();
+    }, []);
     const addItem = () => {
-        setItems([...items, { name: '', description: null, quantity: 1, price: 0 }]);
+        setItems([...items, { name: '', description: null, quantity: 1, price: 0, image: '' }]);
     };
 
     const removeItem = (index: number) => {
         setItems(items.filter((_, i) => i !== index));
+    };
+
+    const handleProductSelect = (index: number, productName: string) => {
+        const selectedProduct = products.find((p) => p.name === productName);
+        if (selectedProduct) {
+            const updatedItems = [...items];
+            updatedItems[index] = {
+                ...updatedItems[index],
+                id: Number(selectedProduct.id),
+                name: selectedProduct.name,
+                description: selectedProduct.shortDescription,
+                price: selectedProduct.price,
+                image: selectedProduct.image,
+            };
+            setItems(updatedItems);
+        }
     };
 
     const handleItemChange = (index: number, field: keyof Item, value: string | number | null) => {
@@ -108,6 +154,7 @@ const OrderAdd: React.FC = () => {
                     DESCRIPTION: item.description,
                     QUANTITY: item.quantity,
                     AMOUNT: item.price,
+                    image: BASE_URL + item.image,
                 })),
                 tax: tax,
                 discount: discount,
@@ -120,10 +167,18 @@ const OrderAdd: React.FC = () => {
                     NETAMOUNT: netAmount,
                     AMOUNTPAID: customerDetails.paymentStatus === 'PAID' ? netAmount : 0,
                     BALANCE: customerDetails.paymentStatus === 'PAID' ? 0 : netAmount,
+                    paymentStatus: customerDetails.paymentStatus,
+                    payment_mode: customerDetails.payment_mode,
+                    ORDER_STATUS: customerDetails.ORDER_STATUS,
+                    NAME: customerDetails.name,
+                    EMAIL: customerDetails.email,
+                    ADDRESS: customerDetails.address,
+                    NUMBER: customerDetails.phone,
+                    COUNTRY: customerDetails.country,
                 },
             };
 
-            await axios.put(`${BASE_URL}/addSales`, addData);
+            await axios.post(`${BASE_URL}/addSales`, addData);
             alert('Order addd successfully!');
         } catch (error) {
             console.error('Error saving order:', error);
@@ -387,21 +442,39 @@ const OrderAdd: React.FC = () => {
                     <div>
                         <div className="mb-2">
                             <label className="font-semibold">Payment Mode:</label>
-                            <input
-                                placeholder="Payment Mode"
-                                className="border rounded w-full p-2"
+                            <select
                                 value={customerDetails.payment_mode}
                                 onChange={(e) => setCustomerDetails({ ...customerDetails, payment_mode: e.target.value })}
-                            />
+                                className="border rounded w-full p-2"
+                            >
+                                <option value="COD">Cash On Delivery</option>
+                                <option value="PAID">Paid</option>
+                            </select>
                         </div>
                         <div className="mb-2">
                             <label className="block text-sm font-medium">Payment Status:</label>
-                            <input
-                                placeholder="Payment Status"
-                                className="border rounded w-full p-2"
+                            <select
                                 value={customerDetails.paymentStatus}
                                 onChange={(e) => setCustomerDetails({ ...customerDetails, paymentStatus: e.target.value })}
-                            />
+                                className="border rounded w-full p-2"
+                            >
+                                <option value="PENDING">Pending</option>
+                                <option value="COMPLETED">Completed</option>
+                            </select>
+                        </div>
+                        <div className="mb-2">
+                            <label className="block text-sm font-medium">Order Status:</label>
+                            <select
+                                value={customerDetails.ORDER_STATUS}
+                                onChange={(e) => setCustomerDetails({ ...customerDetails, ORDER_STATUS: e.target.value })}
+                                className="border rounded w-full p-2"
+                            >
+                                <option value="Placed">Placed</option>
+                                <option value="Progress">Progress</option>
+                                <option value="Dispatched">Dispatched</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Cancel">Cancel</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -421,11 +494,19 @@ const OrderAdd: React.FC = () => {
                         <div key={index} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center mb-4 p-2 border rounded">
                             <div className="md:col-span-4">
                                 <label className="md:hidden text-sm font-medium">Item Name</label>
-                                <input className="border rounded w-full p-2" value={item.name} onChange={(e) => handleItemChange(index, 'name', e.target.value)} />
+                                {/* <input className="border rounded w-full p-2" value={item.name} onChange={(e) => handleItemChange(index, 'name', e.target.value)} /> */}
+                                <select className="w-full border rounded p-2" value={item.name} onChange={(e) => handleProductSelect(index, e.target.value)}>
+                                    <option value="">Select a product</option>
+                                    {products.map((product) => (
+                                        <option key={product.id} value={product.name}>
+                                            {product.name}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="md:col-span-3">
                                 <label className="md:hidden text-sm font-medium">Description</label>
-                                <input className="border rounded w-full p-2" value={item.description || ''} onChange={(e) => handleItemChange(index, 'description', e.target.value)} />
+                                <input className="w-full border rounded p-2" value={item.description || ''} onChange={(e) => handleItemChange(index, 'description', e.target.value)} />
                             </div>
                             <div className="md:col-span-1">
                                 <label className="md:hidden text-sm font-medium">Quantity</label>

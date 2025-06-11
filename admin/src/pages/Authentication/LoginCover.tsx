@@ -14,13 +14,14 @@ import IconTwitter from '../../components/Icon/IconTwitter';
 import IconGoogle from '../../components/Icon/IconGoogle';
 import { BASE_URL } from '../../config';
 import axios from 'axios';
-
+import { setUsers } from '../../store/userSlice';
 const LoginCover = () => {
+    const users = useSelector((state:IRootState) => state.user);
     const dispatch = useDispatch();
-    useEffect(() => {
+    useEffect
+    (() => {
         dispatch(setPageTitle('Login Cover'));
     }, [dispatch]);
-
     const navigate = useNavigate();
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl';
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);
@@ -37,54 +38,81 @@ const LoginCover = () => {
     const [password, setPassword] = useState('');
     const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' | '' }>({ message: '', type: '' });
 
-   const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        console.log("name,email", email, password);
-    
-        try {
-            const response = await axios.post(`${BASE_URL}/login`, {
-                email, password
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            console.log('login Response:', response); // Debugging line
-    
-            if (response.status === 200) {
-                const userData = response.data.user;
-                // Redirect or perform any action after successful login
-                localStorage.setItem('userData', JSON.stringify(userData));
-                setAlert({ message: 'Login successful!', type: 'success' });
-                setTimeout(() => {
-                    navigate('/index', { replace: false }); // Use replace option to prevent going back
-                }, 1000); // Adjust delay as needed
-            } else if (response.status === 401) {
-                const { msg } = response.data;
-                setAlert({ message: msg, type: 'error' });
-            } else {
-                // Handle other unexpected responses
-                setAlert({ message: 'Unexpected response from server. Please try again.', type: 'error' });
-            }
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                if (error.response && error.response.data && error.response.data.msg) {
-                    // Handle specific error messages returned from server
-                    setAlert({ message: error.response.data.msg, type: 'error' });
-                } else {
-                    // Handle other Axios errors
-                    setAlert({ message: 'Login error occurred. Please try again.', type: 'error' });
+
+const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+        const response = await axios.post(`${BASE_URL}/login`, {
+            email,
+            password,
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            // withCredentials: true,
+        });
+
+        if (response.status === 200) {
+            console.log('login Response:', response.data.user.id); // Debugging line
+
+            const responses = await axios.get(
+                `${BASE_URL}/getid_userMaster/${response.data.user.id}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                 }
+            );
+
+            console.log('User Data Response:', responses); // Debugging line
+
+            if (responses.status === 200) {
+                const userData = responses.data;
+console.log('User Data:', userData); // Debugging line
+                // Save user data to localStorage
+                localStorage.setItem('userData', JSON.stringify({
+                    id: userData.id,
+                    name: userData.FNAME,
+                    email: userData.EMAIL,
+                    password: userData.PASSWORD,
+                    companyid: userData.COMPANYID,
+                    profession: userData.PROFESSION,
+                    mobile: userData.MOBILE,
+                    createdon: userData.CREATEDON,
+                    location: userData.LOCATION,
+                    profileImage: userData.PROFILEIMAGE,
+                }));
             } else {
-                // Handle non-Axios errors
-                console.error('Login error:', error);
-                setAlert({ message: 'An unexpected error occurred. Please try again.', type: 'error' });
+                setAlert({ message: 'Failed to fetch user data. Please try again.', type: 'error' });
+                return;
             }
+
+            setAlert({ message: 'Login successful!', type: 'success' });
+            setTimeout(() => {
+                navigate('/index', { replace: false }); // Use replace option to prevent going back
+            }, 1000);
+        } else if (response.status === 401) {
+            const { msg } = response.data;
+            setAlert({ message: msg, type: 'error' });
+        } else {
+            setAlert({ message: 'Unexpected response from server. Please try again.', type: 'error' });
         }
-    };
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            if (error.response && error.response.data && error.response.data.msg) {
+                setAlert({ message: error.response.data.msg, type: 'error' });
+            } else {
+                setAlert({ message: 'Login error occurred. Please try again.', type: 'error' });
+            }
+        } else {
+            console.error('Login error:', error);
+            setAlert({ message: 'An unexpected error occurred. Please try again.', type: 'error' });
+        }
+    }
+};
+
     
-
-
     return (
         <div>
             {alert.message && (
@@ -219,6 +247,4 @@ const LoginCover = () => {
         </div>
     );
 };
-
 export default LoginCover;
-

@@ -83,12 +83,14 @@ const Orders = () => {
   const renderOrderCard = (order) => {
     let totalAmount = 0;
     const tax = 0; // percent
-    const shipping = 0; // flat rate
+    const shipping = order.shipping_charge || 0; // flat rate
     let subtotal = 0;
 
     order.ITEMS?.forEach((item) => {
       const quantity = parseFloat(item.QUANTITY) || 0;
       const amount = parseFloat(item.AMOUNT) || 0;
+      const size = (item.selectedProductSize) || 0;
+      const color = (item.selectedProductColor) || 0;
       subtotal += quantity * amount;
     });
 
@@ -135,6 +137,8 @@ const Orders = () => {
         {/* Items */}
         {order.ITEMS?.map((item, index) => {
           const quantity = parseFloat(item.QUANTITY) || 0;
+          const size = (item.size) || 0;
+          const color = (item.color) || 0;
           const amount = parseFloat(item.AMOUNT) || 0;
           const lineTotal = amount * quantity;
           totalAmount += lineTotal;
@@ -174,6 +178,9 @@ const Orders = () => {
                 <div className="d-flex flex-wrap gap-3 small">
                   <span>
                     <strong>Qty:</strong> {quantity}
+                  </span>
+                   <span>
+                    <strong>Size:</strong> {size}
                   </span>
                   <span>
                     <strong>Amount:</strong> ₹{amount.toFixed(2)}

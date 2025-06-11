@@ -60,7 +60,7 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
        <div className="col-lg-3 col-sm-6 col-12 mb-4">
             <div className="lookbook1 " style={{cursor:"pointer"}} onClick={() => navigate("/shop-grid-standard", { state: { categoryname: "westernwear" } })}>
               <img
-                src="assets/img/banner/Maskgroup__22.png"
+                src="assets/img/banner/ShopbyCollection3.jpg"
                 alt="Blue Dress"
                 className="img-fluid object-fit-cover"
               />
@@ -69,7 +69,7 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
           <div className="col-lg-3 col-sm-6 col-12 mb-4">
             <div className="lookbook2"  style={{cursor:"pointer"}} onClick={() => navigate("/shop-grid-standard", { state: { categoryname: "kurta" } })}>
               <img
-                src="assets/img/banner/Maskgroup__33.png"
+                src="assets/img/banner/ShopbyCollection4.jpg"
                 alt="Yellow Dress"
                 className="img-fluid  object-fit-cover"
               />

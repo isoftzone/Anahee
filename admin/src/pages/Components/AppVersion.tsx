@@ -15,8 +15,8 @@ const AppVersion: React.FC = () => {
           <input type="text" className="w-full border px-3 py-2 rounded" placeholder="Enter Version Name" />
         </div>
         <div className="md:col-span-2 flex gap-4 justify-center md:justify-start">
-          <button className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Save</button>
-          <button className="bg-gray-300 px-6 py-2 rounded hover:bg-gray-400">Reset</button>
+          <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Save</button>
+          <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">Reset</button>
         </div>
       </form>
 
@@ -41,7 +41,7 @@ const AppVersion: React.FC = () => {
 
         <div className="overflow-auto">
           <table className="w-full text-left border border-gray-300">
-            <thead className="bg-blue-900 text-white">
+            <thead className="bg-blue-900 text-dark">
               <tr>
                 <th className="px-4 py-2 border">Sr.no</th>
                 <th className="px-4 py-2 border">Version Code</th>
@@ -58,7 +58,7 @@ const AppVersion: React.FC = () => {
                   <td className="border px-4 py-2">2.{index + 2}</td>
                   <td className="border px-4 py-2">2020-04-{10 + index} 00:00:00</td>
                   <td className="border px-4 py-2">
-                    <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
+                    <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 mt-4 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                       Delete
                     </button>
                   </td>

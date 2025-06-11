@@ -1,31 +1,64 @@
 const express = require("express");
 const con = require('../config')
 
+// exports.addProducts = (req, res) => {
+//     const { codetype, createdby, primename, status, sequence, remark, companyid } = req.body;
+
+//     // Validate input (optional)
+//     if (!codetype || !createdby || !primename || !sequence || !status || !companyid) {
+//         return res.status(400).json({ message: 'All fields are required' });
+//     }
+
+//     // SQL query to get the max primekeyid for the given codetype
+//     const getMaxPrimeKeyIdSql = `SELECT COALESCE(MAX(primekeyid), 0) AS maxPrimeKeyId FROM master WHERE codetype = ?`;
+    
+//     con.query(getMaxPrimeKeyIdSql, [codetype], (err, results) => {
+//         if (err) {
+//             console.error('Error fetching max primekeyid:', err);
+//             return res.status(500).json({ message: 'Error fetching data' });
+//         }
+      
+//         // Calculate the new primekeyid
+//         const newPrimeKeyId = results[0].maxPrimeKeyId + 1;
+
+//         // SQL query to insert into 'master' table
+//         const insertSql = `INSERT INTO master (codetype, createdby, primekeyid, primename, status, sequence, remark, companyid)
+//                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+//         const values = [codetype, createdby, newPrimeKeyId, primename, status, sequence, remark, companyid];
+
+//         // Execute the insert query
+//         con.query(insertSql, values, (err, results) => {
+//             if (err) {
+//                 console.error('Error inserting into database:', err);
+//                 return res.status(500).json({ message: 'Error inserting data' });
+//             }
+//             console.log('Inserted row id:', results.insertId);
+//             res.status(200).json({ message: 'Data inserted successfully' });
+//         });
+//     });
+
+// };
+
+
 exports.addProducts = (req, res) => {
     const { codetype, createdby, primename, status, sequence, remark, companyid } = req.body;
-
     // Validate input (optional)
     if (!codetype || !createdby || !primename || !sequence || !status || !companyid) {
         return res.status(400).json({ message: 'All fields are required' });
     }
-
     // SQL query to get the max primekeyid for the given codetype
     const getMaxPrimeKeyIdSql = `SELECT COALESCE(MAX(primekeyid), 0) AS maxPrimeKeyId FROM master WHERE codetype = ?`;
-    
     con.query(getMaxPrimeKeyIdSql, [codetype], (err, results) => {
         if (err) {
             console.error('Error fetching max primekeyid:', err);
             return res.status(500).json({ message: 'Error fetching data' });
         }
-      
         // Calculate the new primekeyid
         const newPrimeKeyId = results[0].maxPrimeKeyId + 1;
-
         // SQL query to insert into 'master' table
         const insertSql = `INSERT INTO master (codetype, createdby, primekeyid, primename, status, sequence, remark, companyid)
                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
         const values = [codetype, createdby, newPrimeKeyId, primename, status, sequence, remark, companyid];
-
         // Execute the insert query
         con.query(insertSql, values, (err, results) => {
             if (err) {
@@ -36,8 +69,8 @@ exports.addProducts = (req, res) => {
             res.status(200).json({ message: 'Data inserted successfully' });
         });
     });
-
 };
+
 
 
 exports.getCompanyId = async (req, res) => {

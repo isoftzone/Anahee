@@ -52,6 +52,39 @@ const Checkout = () => {
   const [discount, setDiscount] = useState(0);
   const [showPopup, setShowPopup] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [recommendedCourier, setRecommendedCourier] = useState(null);
+  const [primaryAddress, setPrimaryAddress] = useState(null);
+  const { totalWeight, maxLength, maxBreadth, maxHeight } = cartItems.reduce(
+    (acc, item) => {
+      const variation = item.variation?.[0] || {};
+
+      const weight =
+        variation.shippingweight ||
+        variation.grossweight ||
+        variation.netweight ||
+        0.3;
+      const length = variation.lengthcm || 10;
+      const breadth = variation.widthcm || 10;
+      const height = variation.heightcm || 10;
+
+      acc.totalWeight += weight * item.quantity;
+
+      acc.maxLength = Math.max(acc.maxLength, length);
+      acc.maxBreadth = Math.max(acc.maxBreadth, breadth);
+      acc.maxHeight = Math.max(acc.maxHeight, height);
+
+      return acc;
+    },
+    {
+      totalWeight: 0,
+      maxLength: 0,
+      maxBreadth: 0,
+      maxHeight: 0,
+    }
+  );
+
+  console.log("🚚 totalWeight", totalWeight);
+  console.log("📦 Dimensions (LxBxH)", maxLength, maxBreadth, maxHeight);
   // Show popup for 3 seconds
   useEffect(() => {
     if (showPopup) {
@@ -69,6 +102,7 @@ const Checkout = () => {
     const script = document.createElement("script");
     script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
     script.async = true;
+    script.crossOrigin = "anonymous";
     document.body.appendChild(script);
 
     return () => {
@@ -151,6 +185,104 @@ const Checkout = () => {
       fetchAddresses(customerId);
     }
   }, [customerId]);
+
+  useEffect(() => {
+    if (data && data.length > 0) {
+      const found = data.find((addr) => addr.primary_address === 1);
+      if (found) {
+        setPrimaryAddress(found);
+      }
+    }
+  }, [data]);
+  useEffect(() => {
+    console.log("first primaryAddress", primaryAddress);
+    checkServiceability();
+  }, [primaryAddress, formData.paymentMethod]);
+
+  const checkServiceability = async () => {
+    setIsLoading(true);
+    // setError(null);
+    try {
+      const serviceabilityResponse = await axios.post(
+        `${BASE_URL}/api/checkServiceability`,
+        {
+          pickup_postcode: "302016",
+          delivery_postcode: primaryAddress.postcode,
+          cod: formData.paymentMethod == "COD" ? 1 : 0,
+          weight: 1,
+        }
+      );
+
+      if (serviceabilityResponse.data.success) {
+        const availableCouriers =
+          serviceabilityResponse.data.data.data.available_courier_companies;
+
+        // Find the recommended courier
+        const recommendedId =
+          serviceabilityResponse.data.data.data.recommended_courier_company_id;
+        const recommended = availableCouriers.find(
+          (c) => c.courier_company_id === recommendedId
+        );
+        setRecommendedCourier(recommended);
+        setIsLoading(false);
+      } else {
+        // setError("No couriers available for this pincode combination");
+        setRecommendedCourier(null);
+        console.error(
+          "Error:",
+          "No couriers available for this pincode combination"
+        );
+      }
+    } catch (error) {
+      console.error("Error:", error.response?.data || error.message);
+      // setError("Failed to check serviceability. Please try again.");
+      setRecommendedCourier(null);
+    }
+  };
+
+  const createShipment = async (saleId) => {
+    const shiprocketOrder = {
+      order_id: saleId,
+      customer_fname: primaryAddress.firstName,
+      customer_lname: primaryAddress.lastName,
+      country: primaryAddress.country,
+      address: primaryAddress.address,
+      city: primaryAddress.city,
+      pincode: primaryAddress.postcode,
+      state: primaryAddress.state,
+      email: primaryAddress.email,
+      phone: primaryAddress.phone,
+      comment: primaryAddress.description || "",
+      items: cartItems.map((item) => ({
+        name: item.name,
+        sku: item.sku || `SKU-${item.id}`,
+        units: item.quantity,
+        selling_price: item.price,
+        discount: "",
+        tax: "",
+        hsn: 441122,
+      })),
+      payment_method: formData.paymentMethod === "PAID" ? "Prepaid" : "COD",
+      total: cartTotalPrice - discount,
+      shipping_charge: recommendedCourier.rate
+        ? recommendedCourier.rate.toFixed(2)
+        : "0.00",
+      length: maxLength || 0.5,
+      breadth: maxBreadth || 0.5,
+      height: maxHeight || 0.5,
+      weight: totalWeight || 0.1,
+    };
+
+    try {
+      const shiprocketRes = await axios.post(
+        `${BASE_URL}/api/create-shiprocket-order`,
+        shiprocketOrder
+      );
+      console.log("✅ Shiprocket order created:", shiprocketRes.data);
+    } catch (shiprocketErr) {
+      console.error("❌ Shiprocket order creation failed:", shiprocketErr);
+    }
+  };
 
   // Fetch states on country change
   useEffect(() => {
@@ -348,7 +480,8 @@ const Checkout = () => {
             "Content-Type": "application/json",
           },
         });
-
+        // 🚀 Create shipment after order
+        await createShipment(orderId);
         setIsSuccess(true);
         setShowPopup(true);
         resetForm();
@@ -463,13 +596,13 @@ const Checkout = () => {
     // Clear previous payment errors
     setPaymentError("");
 
-    // 🔍 Find the primary address from address list
-    const primaryAddress = data.find((addr) => addr.primary_address === 1);
+    // // 🔍 Find the primary address from address list
+    // const primaryAddress = data.find((addr) => addr.primary_address === 1);
 
-    if (!primaryAddress) {
-      alert("Please set a primary address before placing the order.");
-      return;
-    }
+    // if (!primaryAddress) {
+    //   alert("Please set a primary address before placing the order.");
+    //   return;
+    // }
 
     const orderData = {
       firstName: primaryAddress.firstName,
@@ -488,13 +621,19 @@ const Checkout = () => {
       payment_mode: "COD",
       payment_status: "PENDING",
       coupon_code: discount > 0 ? couponCode : "",
+      shipping_charge: recommendedCourier.rate
+        ? recommendedCourier.rate.toFixed(2)
+        : "0.00",
       items: cartItems.map((item) => ({
         productId: item.id,
         quantity: item.quantity,
         price: item.price,
+        size: item.selectedProductSize,
+        color: item.selectedProductColor,
       })),
     };
 
+    // console.log("size", size)
     try {
       setIsLoading(true);
       const response = await axios.post(
@@ -511,6 +650,8 @@ const Checkout = () => {
           await initiatePhonePePayment(saleId);
         } else {
           // For COD, show success popup
+          // 🚀 Create shipment after order
+          await createShipment(saleId);
           setIsSuccess(true);
           setShowPopup(true);
           setIsLoading(false);
@@ -1096,9 +1237,8 @@ const Checkout = () => {
                               type="button"
                               // className="btn btn-secondary"
                               onClick={handleCancelAdd}
-                               style={{ background: "#ffeaf1", border: "0" }}
+                              style={{ background: "#ffeaf1", border: "0" }}
                               className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded bg-pink-100 hover:bg-pink-200 transition d-flex align-items-center gap-2"
-                            
                             >
                               Cancel
                             </button>
@@ -1106,9 +1246,8 @@ const Checkout = () => {
                               type="button"
                               // className="btn btn-primary"
                               onClick={handleAddSubmit}
-                               style={{ background: "#ffeaf1", border: "0" }}
+                              style={{ background: "#ffeaf1", border: "0" }}
                               className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded bg-pink-100 hover:bg-pink-200 transition d-flex align-items-center gap-2"
-                            
                             >
                               Save Address
                             </button>
@@ -1284,7 +1423,7 @@ const Checkout = () => {
                                       </div>
                                     </div>
 
-                                    <div className="col-lg-12">
+                                    {/* <div className="col-lg-12">
                                       <div className="billing-select mb-20">
                                         <label>State *</label>
                                         <select
@@ -1343,6 +1482,92 @@ const Checkout = () => {
                                             }
                                           }}
                                           disabled={!cities.length}
+                                          className={`form-control ${
+                                            activeForm === "edit" &&
+                                            editErrors.city &&
+                                            editTouched.city
+                                              ? "is-invalid"
+                                              : ""
+                                          }`}
+                                        >
+                                          <option value="">
+                                            Select a city
+                                          </option>
+                                          {cities.map((city, i) => (
+                                            <option key={i} value={city}>
+                                              {city}
+                                            </option>
+                                          ))}
+                                        </select>
+                                        {activeForm === "edit" &&
+                                          editErrors.city &&
+                                          editTouched.city && (
+                                            <div className="invalid-feedback">
+                                              {editErrors.city}
+                                            </div>
+                                          )}
+                                      </div>
+                                    </div> */}
+
+                                    {/* State select in edit form */}
+                                    <div className="col-lg-12">
+                                      <div className="billing-select mb-20">
+                                        <label>State *</label>
+                                        <select
+                                          name="state"
+                                          value={editItem["state"]}
+                                          onChange={handleEditChange}
+                                          onBlur={(e) => {
+                                            if (!editTouched.state) {
+                                              setEditTouched((prev) => ({
+                                                ...prev,
+                                                state: true,
+                                              }));
+                                            }
+                                          }}
+                                          className={`form-control ${
+                                            activeForm === "edit" &&
+                                            editErrors.state &&
+                                            editTouched.state
+                                              ? "is-invalid"
+                                              : ""
+                                          }`}
+                                        >
+                                          <option value="">
+                                            Select a state
+                                          </option>
+                                          {states.map((s, i) => (
+                                            <option key={i} value={s.name}>
+                                              {s.name}
+                                            </option>
+                                          ))}
+                                        </select>
+                                        {activeForm === "edit" &&
+                                          editErrors.state &&
+                                          editTouched.state && (
+                                            <div className="invalid-feedback">
+                                              {editErrors.state}
+                                            </div>
+                                          )}
+                                      </div>
+                                    </div>
+
+                                    {/* City select in edit form */}
+                                    <div className="col-lg-12">
+                                      <div className="billing-select mb-20">
+                                        <label>City *</label>
+                                        <select
+                                          name="city"
+                                          value={editItem["city"]}
+                                          onChange={handleEditChange}
+                                          onBlur={(e) => {
+                                            if (!editTouched.city) {
+                                              setEditTouched((prev) => ({
+                                                ...prev,
+                                                city: true,
+                                              }));
+                                            }
+                                          }}
                                           className={`form-control ${
                                             activeForm === "edit" &&
                                             editErrors.city &&
@@ -1479,16 +1704,18 @@ const Checkout = () => {
                               </div>
                               <div className="mt-3 d-flex justify-content-end gap-2">
                                 <button
+                                  style={{background:"#FFEAF1"}}
                                   type="button"
-                                  className="btn btn-secondary"
+                                  className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded hover:bg-pink-400 transition d-flex align-items-center gap-2 border-0"
                                   onClick={handleCancelEdit}
                                 >
                                   Cancel
                                 </button>
                                 <button
+                                 style={{background:"#FFEAF1"}}
                                   type="button"
                                   onClick={handleUpdate}
-                                  className="btn btn-success"
+                                  className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded  hover:bg-pink-400 transition d-flex align-items-center gap-2 border-0"
                                 >
                                   Save Changes
                                 </button>
@@ -1546,6 +1773,29 @@ const Checkout = () => {
                   <div className="col-lg-5">
                     <div className="your-order-area">
                       <h3>Your order</h3>
+                      {data.length > 0 ? (
+                        recommendedCourier ? (
+                          <div className="card mb-4">
+                            <div className="card-body">
+                              <ul className="list-group list-group-flush">
+                                <li className="list-group-item">
+                                  <strong>Estimated Delivery:</strong>{" "}
+                                  {recommendedCourier.etd} (
+                                  {recommendedCourier.estimated_delivery_days}{" "}
+                                  days)
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="alert alert-warning">
+                            No delivery service available for this location.
+                          </div>
+                        )
+                      ) : (
+                        ""
+                      )}
+
                       <div className="your-order-wrap gray-bg-4">
                         <div className="your-order-product-info">
                           <div className="your-order-top">
@@ -1594,7 +1844,12 @@ const Checkout = () => {
                           <div className="your-order-bottom">
                             <ul>
                               <li className="your-order-shipping">Shipping</li>
-                              <li>Free shipping</li>
+                              <li>
+                                ₹
+                                {recommendedCourier
+                                  ? recommendedCourier.rate.toFixed(2)
+                                  : "0.00"}
+                              </li>
                             </ul>
                           </div>
                           <div className="your-order-bottom">
@@ -1610,7 +1865,13 @@ const Checkout = () => {
                               <li className="order-total">Total</li>
                               <li>
                                 {currency.currencySymbol +
-                                  (cartTotalPrice - discount).toFixed(2)}
+                                  (
+                                    cartTotalPrice -
+                                    discount +
+                                    (recommendedCourier
+                                      ? recommendedCourier.rate
+                                      : 0)
+                                  ).toFixed(2)}
                               </li>
                             </ul>
                           </div>
@@ -1786,7 +2047,7 @@ const Checkout = () => {
                         <button
                           type="submit"
                           className="btn-hover"
-                          disabled={isLoading}
+                          disabled={isLoading || !recommendedCourier}
                         >
                           {isLoading ? (
                             <>
@@ -1795,7 +2056,7 @@ const Checkout = () => {
                                 role="status"
                                 aria-hidden="true"
                               ></span>
-                              Processing...
+                              PLACE ORDER
                             </>
                           ) : orderPlaced && paymentError ? (
                             "Retry Order"

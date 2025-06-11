@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Customer {
     COMPANYID: number;
@@ -40,6 +42,10 @@ const CustomersL: React.FC = () => {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    
+    const [showModal, setShowModal] = useState(false);
+    const [selectedCustomerId, setSelectedCustomerId] = useState<number | string | null>(null);
+
 
     const headers = [
         { key: 'FNAME', label: 'First Name' },
@@ -86,19 +92,46 @@ const CustomersL: React.FC = () => {
         navigate(`/components/EditCustomer/${customerId}`);
     };
 
-    const handleDelete = async (customerId: string | number) => {
-        const confirmDelete = window.confirm('Are you sure you want to delete this customer?');
-        if (!confirmDelete) return;
+    // const handleDelete = async (customerId: string | number) => {
+    //     const confirmDelete = window.confirm('Are you sure you want to delete this customer?');
+    //     if (!confirmDelete) return;
+    //     try {
+    //         await axios.delete(`${BASE_URL}/deletecustomer/${customerId}`);
+    //         const updatedCustomers = customers.filter((c) => c.CUSTOMERID !== customerId);
+    //         setCustomers(updatedCustomers);
+    //         setFilteredCustomers(updatedCustomers);
+    //         toast.success('Customer deleted successfully');
+    //     } catch (error: any) {
+    //         console.error('Error deleting customer:', error);
+    //         toast.error('Failed to delete customer');
+    //     }
+    // };
+    const handleDelete = (customerId: string | number) => {
+        setSelectedCustomerId(customerId);
+        setShowModal(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!selectedCustomerId) return;
+
         try {
-            await axios.delete(`${BASE_URL}/deletecustomer/${customerId}`);
-            const updatedCustomers = customers.filter((c) => c.CUSTOMERID !== customerId);
+            await axios.delete(`${BASE_URL}/deletecustomer/${selectedCustomerId}`);
+            const updatedCustomers = customers.filter((c) => c.CUSTOMERID !== selectedCustomerId);
             setCustomers(updatedCustomers);
             setFilteredCustomers(updatedCustomers);
-            alert('Customer deleted successfully');
+            toast.success('Customer deleted successfully');
         } catch (error: any) {
             console.error('Error deleting customer:', error);
-            alert('Failed to delete customer');
+            toast.error('Failed to delete customer');
+        } finally {
+            setShowModal(false);
+            setSelectedCustomerId(null);
         }
+    };
+
+    const cancelDelete = () => {
+        setShowModal(false);
+        setSelectedCustomerId(null);
     };
 
     const handleSort = (key: string) => {
@@ -139,7 +172,10 @@ const CustomersL: React.FC = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="border border-gray-300 rounded px-3 py-2 w-full sm:w-auto"
                 />
-                <button onClick={handleClick} className="bg-primary sm:mt-4 mt-0 text-white rounded px-4 py-2 w-full sm:w-auto">
+                <button
+                    onClick={handleClick}
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 mt-4 focus:ring-blue-500"
+                >
                     + Add Customer
                 </button>
             </div>
@@ -184,10 +220,16 @@ const CustomersL: React.FC = () => {
                                     <td className="p-2 border">{customer.email}</td>
                                     <td className="p-2 border">
                                         <div className="flex gap-2">
-                                            <button onClick={() => handleEdit(customer.CUSTOMERID)} className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm">
+                                            <button
+                                                onClick={() => handleEdit(customer.CUSTOMERID)}
+                                                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+                                            >
                                                 Edit
                                             </button>
-                                            <button onClick={() => handleDelete(customer.CUSTOMERID)} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+                                            <button
+                                                onClick={() => handleDelete(customer.CUSTOMERID)}
+                                                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                            >
                                                 Delete
                                             </button>
                                         </div>
@@ -272,6 +314,25 @@ const CustomersL: React.FC = () => {
                     )}
                 </div>
             </div>
+            {/* Confirmation Modal */}
+            {showModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+                        <p className="mb-6 text-base font-medium">Are you sure you want to delete this customer?</p>
+                        <div className="flex justify-center gap-4">
+                            <button onClick={confirmDelete} className="px-4 py-2 bg-black text-white rounded-lg">
+                                Yes
+                            </button>
+                            <button onClick={cancelDelete} className="px-4 py-2 bg-gray-300 text-black rounded-lg">
+                                No
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Toast Container */}
+            <ToastContainer position="top-right" autoClose={3000} />
         </div>
     );
 };

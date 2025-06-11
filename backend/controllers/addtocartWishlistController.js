@@ -3,10 +3,35 @@ const con = require('../config');
 const util = require('util');
 // Promisify con.query to use async/await
 const query = util.promisify(con.query).bind(con);
+// exports.addtocartWishlistproduct = async (req, res) => {
+//   console.log("this is data");
+//   try {
+//     const { CUSTOMERID, ITEMID, quantity, type } = req.body;
+//     console.log("this is data");
+//     // Basic validation
+//     if (!CUSTOMERID || !ITEMID) {
+//       return res.status(400).json({ message: 'All fields are required' });
+//     }
+//     const allowedTypes = ['cart', 'wishlist'];
+//     if (!allowedTypes.includes(type.toLowerCase())) {
+//       return res.status(400).json({ message: 'Invalid type. Must be "cart" or "wishlist".' });
+//     }
+   
+//     const insertSql = `INSERT INTO customer_cart_wishlist (CUSTOMERID, ITEMID, quantity, type)
+//                        VALUES (?, ?, ?, ?)`;
+//     const values = [CUSTOMERID, ITEMID, quantity, type];
+//     const result = await query(insertSql, values);
+//     console.log('Inserted row id:', result.insertId);
+//     return res.status(201).json({ message: 'Data inserted successfully', id: result.insertId });
+//   } catch (err) {
+//     console.error('Error inserting into database:', err);
+//     return res.status(500).json({ message: 'Error inserting data' });
+//   }
+// };
 exports.addtocartWishlistproduct = async (req, res) => {
   console.log("this is data");
   try {
-    const { CUSTOMERID, ITEMID, quantity, type } = req.body;
+    const { CUSTOMERID, ITEMID, quantity, type, size, color } = req.body;
     console.log("this is data");
     // Basic validation
     if (!CUSTOMERID || !ITEMID) {
@@ -16,18 +41,36 @@ exports.addtocartWishlistproduct = async (req, res) => {
     if (!allowedTypes.includes(type.toLowerCase())) {
       return res.status(400).json({ message: 'Invalid type. Must be "cart" or "wishlist".' });
     }
-   
-    const insertSql = `INSERT INTO customer_cart_wishlist (CUSTOMERID, ITEMID, quantity, type)
-                       VALUES (?, ?, ?, ?)`;
-    const values = [CUSTOMERID, ITEMID, quantity, type];
-    const result = await query(insertSql, values);
-    console.log('Inserted row id:', result.insertId);
-    return res.status(201).json({ message: 'Data inserted successfully', id: result.insertId });
+    const selectSql = `SELECT * FROM customer_cart_wishlist WHERE CUSTOMERID = ? AND ITEMID = ? AND type = ?  AND size = ? AND  color = ?`;
+    const selectValues = [CUSTOMERID, ITEMID, type, size, color];
+    const existingItem = await query(selectSql, selectValues);
+    if (existingItem.length > 0) {
+      // Item exists, so update the quantity
+      const updateSql = `UPDATE customer_cart_wishlist
+                     SET quantity = quantity + ?
+                     WHERE CUSTOMERID = ? AND ITEMID = ? AND type = ? AND size = ? AND color = ?`;
+      const updateValues = [quantity, CUSTOMERID, ITEMID, type, size, color];
+      await query(updateSql, updateValues);
+      return res.status(200).json({ message: 'Quantity updated successfully' });
+    } else {
+      // Item does not exist, so insert it
+      const insertSql = `INSERT INTO customer_cart_wishlist (CUSTOMERID, ITEMID, quantity, type, size, color)
+                     VALUES (?, ?, ?, ?, ?, ?)`;
+      const insertValues = [CUSTOMERID, ITEMID, quantity, type, size, color];
+      const result = await query(insertSql, insertValues);
+      return res.status(201).json({ message: 'Item inserted successfully', id: result.insertId });
+    }
   } catch (err) {
     console.error('Error inserting into database:', err);
     return res.status(500).json({ message: 'Error inserting data' });
   }
 };
+
+
+
+
+
+
 exports.getCartWishlistProduct = async (req, res) => {
   try {
     const { CUSTOMERID } = req.params;

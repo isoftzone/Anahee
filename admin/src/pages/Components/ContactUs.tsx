@@ -82,14 +82,19 @@ const ContactUs: React.FC = () => {
                     <textarea name="address" value={address} onChange={(e) => setAddress(e.target.value)} rows={3} className="form-control w-full border border-gray-300 rounded px-3 py-2" />
                 </div>
             </div>
-            <div className="mt-4 flex gap-3">
+            {/* <div className="mt-4 flex gap-3">
                 <Button onClick={handleSave} className="bg-green-500 border-0">
                     Save
                 </Button>
                 <Button variant="outline" onClick={handleReset}>
                     Reset
                 </Button>
-            </div>
+            </div> */}
+
+             <div className="mt-4 flex gap-3">
+                          <Button onClick={handleSave} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm mt-4 font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Save</Button>
+                          <Button  variant="outline" onClick={handleReset} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm mt-4 font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">Reset</Button>
+                        </div>
         </div>
     );
 };

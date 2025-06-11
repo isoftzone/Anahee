@@ -8,8 +8,8 @@ const ShopTopAction = ({
  
 }) => {
   return (
-    <div className="shop-top-bar mb-35">
-      <div className="shop-tab">
+    <div className="shop-top-bar">
+      <div className="shop-tab mt-45">
         <button
           onClick={(e) => {
             getLayout("grid two-column");

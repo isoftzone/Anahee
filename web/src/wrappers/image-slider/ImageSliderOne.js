@@ -131,7 +131,7 @@ const handlePlayPause = async (index) => {
               onSlideChange={handleSlideChange}
             >
               {videos.map((video, index) => (
-                <SwiperSlide key={index}>
+                <SwiperSlide  className="swiper-videos" key={index}>
                   <div className="video-slide">
                     <VideoWithCustomPlayButton
                       src={video.src}
