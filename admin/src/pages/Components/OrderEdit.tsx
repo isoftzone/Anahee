@@ -232,7 +232,7 @@ const OrderEdit: React.FC = () => {
                     NETAMOUNT: netAmount,
                     AMOUNTPAID: customerDetails.paymentStatus === 'PAID' ? netAmount : 0,
                     BALANCE: customerDetails.paymentStatus === 'PAID' ? 0 : netAmount,
-                    paymentStatus: customerDetails.paymentStatus,
+                    payment_status: customerDetails.paymentStatus,
                     payment_mode: customerDetails.payment_mode,
                     ORDER_STATUS: customerDetails.ORDER_STATUS,
                     coupon_code: customerDetails.coupon_code,
