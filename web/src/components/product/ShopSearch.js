@@ -4,30 +4,28 @@ const ShopSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const handleSearch = (e) => {
-    e.preventDefault();
-    const trimmedQuery = searchQuery.trim();
-    if (trimmedQuery) {
-      navigate('/shop-grid-standard', {
-        state: { name: trimmedQuery }
-      });
-    } else {
-      alert("Please enter a valid search term.");
-    }
-  };
+  const trimmedQuery = e.target.value.trim();
+  if (trimmedQuery === "") {
+    navigate('/shop-grid-standard'); // no state passed, shows all products
+  } else {
+    navigate('/shop-grid-standard', {
+      state: { name: trimmedQuery }
+    });
+  }
+};
    return (
     <div className="sidebar-widget">
       <h4 className="pro-sidebar-title">Search </h4>
-      <div className="pro-sidebar-search mb-50 mt-25">
-        <form className="pro-sidebar-search-form" onSubmit={handleSearch}>
+      <div className="pro-sidebar-search my-4">
+        <div className="pro-sidebar-search-form">
           <input type="text"
           placeholder="Search here..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => handleSearch(e)}
          />
           <button type="submit">
             <i className="pe-7s-search" />
           </button>
-        </form>
+        </div>
       </div>
     </div>
    )

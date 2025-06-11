@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../store';
 import Dropdown from '../../components/Dropdown';
 import { setPageTitle } from '../../store/themeConfigSlice';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import IconPencilPaper from '../../components/Icon/IconPencilPaper';
 import IconCoffee from '../../components/Icon/IconCoffee';
 import IconCalendar from '../../components/Icon/IconCalendar';
@@ -18,12 +18,53 @@ import IconTag from '../../components/Icon/IconTag';
 import IconCreditCard from '../../components/Icon/IconCreditCard';
 import IconClock from '../../components/Icon/IconClock';
 import IconHorizontalDots from '../../components/Icon/IconHorizontalDots';
+import { BASE_URL } from '../../config';
 
 const Profile = () => {
-    const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(setPageTitle('Profile'));
-    });
+    // const dispatch = useDispatch();
+    // useEffect(() => {
+    //     dispatch(setPageTitle('Profile'));
+    // });
+    // const [user, setUser] = useState<any | null>(null);
+    // useEffect(() => {
+    //     const userDataString = localStorage.getItem('userDatas');
+    //     if (userDataString) {
+    //         try {
+    //             const users = JSON.parse(userDataString);
+    //             // Ensure it has both name and email
+    //             console.log('Parsed user data:', users);
+    //             if (users.FNAME && users.EMAIL) {
+    //                 setUser(users);
+    //                 console.log('User data set:', users.PROFILEIMAGE);
+    //             } else {
+    //                 console.warn('Invalid user data in localStorage');
+    //             }
+    //         } catch (err) {
+    //             console.error('Failed to parse user data:', err);
+    //         }
+    //     }
+    // }, []);
+       const [imageUrl, setImageUrl] = useState<string>('/assets/images/profile-0350.png');
+       const [user, setUser] = useState<any | null>(null);
+        useEffect(() => {
+            const userDataString = localStorage.getItem('userData');
+            if (userDataString) {
+                const users = JSON.parse(userDataString);
+                setUser(users);
+            }
+        }, []);
+    
+        const users = useSelector((state: IRootState) => state.user);
+    
+        useEffect(() => {
+            if (users?.profileImage) {
+                setImageUrl(`${BASE_URL}/images/banner/${users.profileImage}`);
+            } else if (user?.profileImage) {
+                setImageUrl(`${BASE_URL}/images/banner/${user.profileImage}`);
+            }else{
+                 setImageUrl('/assets/images/profile-0350.png');
+            }
+        }, [users, user]);
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     return (
         <div>
@@ -48,32 +89,40 @@ const Profile = () => {
                         </div>
                         <div className="mb-5">
                             <div className="flex flex-col justify-center items-center">
-                                <img src="/assets/images/profile-34.jpeg" alt="img" className="w-24 h-24 rounded-full object-cover  mb-5" />
-                                <p className="font-semibold text-primary text-xl">Jimmy Turner</p>
+                                {/* <img src="/assets/images/profile-34.jpeg" alt="img" className="w-24 h-24 rounded-full object-cover  mb-5" /> */}
+                                <img
+                                    className="w-24 h-24 rounded-full object-cover  mb-5"
+                                    //  src="/assets/images/user-profile.jpeg"
+                                    // src={user ? `${BASE_URL}/${user}` : '/assets/images/profile-0350.png'}
+                                    // src={user ? `${BASE_URL}/images/banner/${user.PROFILEIMAGE}` : '/assets/images/profile-0350.png'}
+                                    src={imageUrl}
+                                    alt="userProfile"
+                                />
+                              {user && <p className="font-semibold text-primary text-xl">{user.FNAME}</p>}
+
                             </div>
                             <ul className="mt-5 flex flex-col max-w-[160px] m-auto space-y-4 font-semibold text-white-dark">
                                 <li className="flex items-center gap-2">
                                     <IconCoffee className="shrink-0" />
-                                    Web Developer
+                                    {user && user.PROFESSION}
+                                    
                                 </li>
-                                <li className="flex items-center gap-2">
-                                    <IconCalendar className="shrink-0" />
-                                    Jan 20, 1989
-                                </li>
-                                <li className="flex items-center gap-2">
+                                 <li className="flex items-center gap-2">
                                     <IconMapPin className="shrink-0" />
-                                    New York, USA
+                                    {user && user.ADDRESS}
                                 </li>
-                                <li>
-                                    <button className="flex items-center gap-2">
+                            
+                               
+                                <li >
+                                    <button className="flex items-center gap-2" style={{ padding: '0px 0px' }}>
                                         <IconMail className="w-5 h-5 shrink-0" />
-                                        <span className="text-primary truncate">jimmy@gmail.com</span>
+                                        <span className="text-primary truncate">{user && user.EMAIL}</span>
                                     </button>
                                 </li>
                                 <li className="flex items-center gap-2">
                                     <IconPhone />
-                                    <span className="whitespace-nowrap" dir="ltr">
-                                        +1 (530) 555-12121
+                                    <span className="whitespace-nowrap mr-3" dir="ltr">
+                                        {user && user.PHONE}
                                     </span>
                                 </li>
                             </ul>

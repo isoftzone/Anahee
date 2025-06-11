@@ -3,12 +3,59 @@ import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { getDiscountPrice } from "../../../helpers/product";
 import { deleteFromCart } from "../../../store/slices/cart-slice"
+// import { axios } from 'axios';
+import { BASE_URL } from "../../../config";
+import axios from "axios";
+
+const customerInfoSting = localStorage.getItem('customerinfo');
+const customerinfo = customerInfoSting ? JSON.parse(customerInfoSting) : null;
+const CUSTOMERID = customerinfo?.id;
+console.log("this is customer id cart id data", CUSTOMERID);
 
 const MenuCart = () => {
   const dispatch = useDispatch();
   const currency = useSelector((state) => state.currency);
   const { cartItems } = useSelector((state) => state.cart);
   let cartTotalPrice = 0;
+
+  
+
+
+const handledeleteCart = async (item) => {
+  const ITEMID = item.id;
+   const cartItemId =item.cartItemId;
+  console.log(":wastebasket: Deleting item:", { ITEMID, cartItemId });
+  // Always remove from Redux immediately (optimistic UI)
+  dispatch(deleteFromCart(cartItemId));
+  // If no customer ID, stop here (guest user case)
+  if (!CUSTOMERID) {
+    console.log(":receipt: Guest user — deleted only from local Redux store.");
+    return;
+  }
+  console.log("this sdf");
+  // Logged-in user — proceed to delete from server
+  const payload = {
+    CUSTOMERID,
+    ITEMID,
+    type: "cart",
+  };
+  try {
+    const response = await axios.delete(`${BASE_URL}/deletecartWishlist`, { data: payload });
+    if (response.status === 200 && response.data?.success) {
+      console.log(":white_check_mark: Successfully deleted from server.");
+      //  dispatch(deleteFromCart(cartItemId));
+      // No need to dispatch again — already deleted above
+    } else {
+      console.warn(":warning: Server deletion failed:", response.data?.message ?? response.data);
+      alert("Failed to delete item from server.");
+      // Optional: Re-add to cart if needed (rollback optimistic update)
+    }
+  } catch (error) {
+    console.error(":x: API error while deleting cart item:", error);
+    alert("An error occurred while deleting the item.");
+    // Optional: Re-add to cart if needed
+  }
+};
 
   return (
     <div className="shopping-cart-content">
@@ -67,7 +114,10 @@ const MenuCart = () => {
                     )}
                   </div>
                   <div className="shopping-cart-delete">
-                    <button onClick={() => dispatch(deleteFromCart(item.cartItemId))}>
+                    {/* <button onClick={() => dispatch(deleteFromCart(item.cartItemId))}>
+                      <i className="fa fa-times-circle" />
+                    </button> */}
+                    <button onClick={() => handledeleteCart(item)}>
                       <i className="fa fa-times-circle" />
                     </button>
                   </div>

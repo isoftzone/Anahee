@@ -214,6 +214,8 @@
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 // import FooterCopyright from "../../components/footer/FooterCopyright";
 
 const FooterOne = ({
@@ -226,6 +228,27 @@ const FooterOne = ({
   extraFooterClass,
   sideMenu,
 }) => {
+  const [facebookUrl, setFacebookUrl] = useState("");
+  const [instagramUrl, setInstagramUrl] = useState("");
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  useEffect(() => {
+    axios
+      .get(`${process.env.REACT_APP_PUBLIC_URL}/social-links`)
+      .then((res) => {
+        const data = res.data;
+
+        data.forEach((item) => {
+          if (item.platform === "facebook" && item.status === 1) {
+            setFacebookUrl(item.url);
+          } else if (item.platform === "instagram" && item.status === 1) {
+            setInstagramUrl(item.url);
+          } else if (item.platform === "youtube" && item.status === 1) {
+            setYoutubeUrl(item.url);
+          }
+        });
+      })
+      .catch((err) => console.error("Error fetching social links:", err));
+  }, []);
   return (
     <footer
       className={clsx(
@@ -238,7 +261,7 @@ const FooterOne = ({
         spaceRightClass
       )}
     >
-      <div className={`${containerClass || "container-fluid"}`}>
+      <div className={`${containerClass || "container-fluid mb-5"}`}>
         <div className="row justify-content-center pt-5 gy-4">
           {/* Logo Section */}
           <div className="col-12 col-sm-6 col-md-6 col-lg-3">
@@ -258,7 +281,7 @@ const FooterOne = ({
               </p>
               <div className="d-flex justify-content-center gap-3 mt-2">
                 <a
-                  href="https://www.facebook.com/profile.php?id=61574025151970"
+                  href={facebookUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -270,7 +293,7 @@ const FooterOne = ({
                   />{" "}
                 </a>
                 <a
-                  href="https://www.instagram.com/anahee_india?igsh=cjRvZWVwcDk2ODNh"
+                  href={instagramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -282,7 +305,7 @@ const FooterOne = ({
                   />
                 </a>
                 <a
-                  href="//www.youtube.com"
+                  href={youtubeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -318,11 +341,7 @@ const FooterOne = ({
                     Contact Us
                   </Link>
                 </li>
-                <li>
-                  <Link style={{ fontSize: "15px" }} to="/terms-conditions">
-                    Terms & Condition
-                  </Link>
-                </li>
+               
               </ul>
             </div>
           </div>
@@ -334,21 +353,26 @@ const FooterOne = ({
                 Hidden
               </h4>
               <ul className="list-unstyled d-flex flex-column align-items-center align-items-md-center">
+                 <li>
+                  <Link style={{ fontSize: "15px" }} to="/terms-conditions">
+                    Terms & Condition
+                  </Link>
+                </li>
                 <li>
                   <Link style={{ fontSize: "15px" }} to="/shipping-locations">
                     Shipping Locations
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link style={{ fontSize: "15px" }} to="/terms-of-service">
                     Terms of Service
                   </Link>
-                </li>
-                <li>
+                </li> */}
+                {/* <li>
                   <Link style={{ fontSize: "15px" }} to="/exchange-process">
                     Exchange Process
                   </Link>
-                </li>
+                </li> */}
               </ul>
             </div>
           </div>
@@ -365,11 +389,11 @@ const FooterOne = ({
                     Cancellation Policy
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link style={{ fontSize: "15px" }} to="/refund-policy">
                     Refund Policy
                   </Link>
-                </li>
+                </li> */}
                 <li>
                   <Link style={{ fontSize: "15px" }} to="/privacy-policy">
                     Privacy Policy

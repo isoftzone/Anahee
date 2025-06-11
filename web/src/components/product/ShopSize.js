@@ -89,7 +89,7 @@ import { setActiveSort } from "../../helpers/product";
 import Accordion from 'react-bootstrap/Accordion';
 const ShopSize = ({ sizes, getSortParams }) => {
   return (
-    <div className="sidebar-widget mt-40">
+    <div className="sidebar-widget mb-4">
       <Accordion.Item eventKey="2">
        <Accordion.Header><h4 className="pro-sidebar-title">Size</h4></Accordion.Header>
        <Accordion.Body>

@@ -6,7 +6,8 @@ import { getDiscountPrice } from "../../helpers/product";
 import LayoutOne from "../../layouts/LayoutOne";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import {
-  addToCart,
+  addToCart, // You might need this for adding to cart initially
+  increaseQuantity,
   decreaseQuantity,
   deleteFromCart,
   deleteAllFromCart,
@@ -96,29 +97,63 @@ const Cart = () => {
       alert("There was an error processing your checkout.");
     }
   };
-const handledeleteCart = async (item) => {
-  const ITEMID = item?.id;
-  const cartItemId = item?.cartItemId;
-  console.log("🗑️ Attempting to delete cart item ID:", ITEMID);
-  const payload = {
-    CUSTOMERID,
-    ITEMID,
-    type: "cart",
-  };
-  try {
-    const response = await axios.delete(`${BASE_URL}/deletecartWishlist`, { data: payload });
-    if (response.status === 200 && response.data?.success) {
-      dispatch(deleteFromCart(cartItemId)); // Use the same key you used in payload
-    } else {
-      console.warn("⚠️ Failed to delete item from cart:", response.data?.message ?? response.data);
-      alert("Failed to delete item from cart.");
+// const handledeleteCart = async (item) => {
+//   const ITEMID = item?.id;
+//   const cartItemId = item?.cartItemId;
+//   console.log("🗑️ Attempting to delete cart item ID:", ITEMID);
+//   const payload = {
+//     CUSTOMERID,
+//     ITEMID,
+//     type: "cart",
+//   };
+//   try {
+//     const response = await axios.delete(`${BASE_URL}/deletecartWishlist`, { data: payload });
+//     if (response.status === 200 && response.data?.success) {
+//       dispatch(deleteFromCart(cartItemId)); // Use the same key you used in payload
+//     } else {
+//       console.warn("⚠️ Failed to delete item from cart:", response.data?.message ?? response.data);
+//       alert("Failed to delete item from cart.");
+//     }
+//   } catch (error) {
+//     console.error("❌ Error deleting item from cart:", error);
+//     alert("An error occurred while deleting the item.");
+//   }
+// };
+ 
+const handledeleteCart = async (cartItem) => {
+console.log("this is cart item", cartItem);
+dispatch(deleteFromCart(cartItem.cartItemId));
+    // Optimistically remove from UI immediately
+    // dispatch(deleteFromCart(cartItem.cartItemId));
+    // If no customer ID (guest user), we're done
+    if (!CUSTOMERID) {
+      console.log("Guest user - item removed from local cart");
+      return;
     }
-  } catch (error) {
-    console.error("❌ Error deleting item from cart:", error);
-    alert("An error occurred while deleting the item.");
-  }
-};
-  const handleAllclearAddtocart = async () => {
+    // For logged-in users, delete from server
+    try {
+      const payload = {
+        CUSTOMERID,
+        ITEMID: cartItem.id,
+        type: "cart"
+      };
+      const response = await axios.delete(`${BASE_URL}/deletecartWishlist`, {
+        data: payload,
+        timeout: 5000 // Add timeout
+      });
+      if (!response.data?.success) {
+        throw new Error(response.data?.message || "Server deletion failed");
+      }
+      console.log("Item successfully deleted from server");
+      // No need to dispatch again - already done optimistically
+    } catch (error) {
+      console.error("Deletion error:", error.message);
+      // Optional: Re-add to cart if needed (uncomment if you want strict consistency)
+      // dispatch(addToCart(cartItem));
+    }
+  };
+
+const handleAllclearAddtocart = async () => {
     try {
       dispatch(deleteAllFromCart())
       const payload = {
@@ -141,40 +176,101 @@ const handledeleteCart = async (item) => {
     }
   }
  
-  const handleQuantityChange = async(item, action) =>{
-     if(action === 'decrement' && item.quantity <= 1){
-        return ;
-      }
-    try{ 
+  // const handleQuantityChange = async(item, action) =>{
+  //    if(action === 'decrement' && item.quantity <= 1){
+  //       return ;
+  //     }
+  //   try{ 
      
+  //     const payload = {
+  //       CUSTOMERID,
+  //       ITEMID: item.id,
+  //       type: "cart",
+  //       action : action
+  //     }
+  //    console.log("this is responsive quantity change", payload);
+ 
+  //    const response = await axios.post(`${BASE_URL}/addtocartAction`, payload)
+  //    console.log("this is response data", response.data);
+  //    if(response.status === 200)
+  //    {
+  //      if(action === 'increment'){
+  //       dispatch(addToCart({...item, quantity : 1}));
+  //     }
+  //     else if(action === 'decrement'){
+  //       dispatch(decreaseQuantity(item))
+  //     }
+  //    }
+  //    else {
+  //     alert("failed to update cart item.")
+  //    }
+  //   }
+  //   catch(error){
+  //     console.error("Error fetching cart item", error);
+  //     alert("there was an error updating your cart")
+  //   }
+  // }
+
+const handleQuantityChange = async (item, action) => {
+    // Prevent quantity from going below 1 for decrement
+    if (action === 'decrement' && item.quantity <= 1) {
+      return;
+    }
+    // Prevent quantity from exceeding stock for increment
+    const stock = cartItemStock(
+      item,
+      item.selectedProductColor,
+      item.selectedProductSize
+    );
+    if (action === 'increment' && item.quantity >= stock) {
+      // cogoToast.error("No more stock available!", { position: "bottom-left" });
+      return;
+    }
+    // Update Redux state immediately (optimistic UI update)
+    if (action === 'increment') {
+      dispatch(increaseQuantity(item));
+    } else if (action === 'decrement') {
+      dispatch(decreaseQuantity(item));
+    }
+    // If no customer ID, we're done (guest user)
+    if (!CUSTOMERID) {
+      console.log(`Guest user - item quantity ${action}d locally.`);
+      return;
+    }
+    // For logged-in users, make API call
+    try {
       const payload = {
         CUSTOMERID,
         ITEMID: item.id,
         type: "cart",
-        action : action
+        action: action
+      };
+      const response = await axios.post(`${BASE_URL}/addtocartAction`, payload);
+      if (response.status === 200) {
+        console.log(`Server updated quantity for item ${item.id}: ${action}`);
+      } else {
+        console.error("Failed to update cart item quantity on server.");
+        // Revert Redux state if server update fails (optional, for strict consistency)
+        if (action === 'increment') {
+          dispatch(decreaseQuantity(item)); // Revert increment
+        } else if (action === 'decrement') {
+          dispatch(increaseQuantity(item)); // Revert decrement
+        }
+        alert("Failed to update cart item quantity on server.");
       }
-     console.log("this is responsive quantity change", payload);
- 
-     const response = await axios.post(`${BASE_URL}/addtocartAction`, payload)
-     console.log("this is response data", response.data);
-     if(response.status === 200)
-     {
-       if(action === 'increment'){
-        dispatch(addToCart({...item, quantity : 1}));
+    } catch (error) {
+      console.error("Error updating cart item quantity on server:", error);
+      // Revert Redux state if API call fails
+      if (action === 'increment') {
+        dispatch(decreaseQuantity(item)); // Revert increment
+      } else if (action === 'decrement') {
+        dispatch(increaseQuantity(item)); // Revert decrement
       }
-      else if(action === 'decrement'){
-        dispatch(decreaseQuantity(item))
-      }
-     }
-     else {
-      alert("failed to update cart item.")
-     }
+      alert("There was an error updating your cart quantity.");
     }
-    catch(error){
-      console.error("Error fetching cart item", error);
-      alert("there was an error updating your cart")
-    }
-  }
+  };
+
+
   return (
     <Fragment>
       <SEO
@@ -361,7 +457,12 @@ const handledeleteCart = async (item) => {
                                     </td>
 
                                     <td className="product-remove">
-                                       <button onClick={() => handledeleteCart(cartItem)}>
+                                       {/* <button onClick={() => handledeleteCart(cartItem)}> */}
+                                       <button
+                                        onClick={() => handledeleteCart(cartItem)}
+                                        aria-label="Remove item"
+                                      >
+
                                     <i className="fa fa-times"></i>
                                   </button>
                                       {/* <button

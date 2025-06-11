@@ -239,3 +239,47 @@ exports.getAllCartItems = (req, res) => {
     res.json({ success: true, data: transformedItems });
   });
 };
+
+
+exports.addtocartdata = async (req, res) => {
+  console.log("this is data");
+  try {
+    const { CUSTOMERID, ITEMID, quantity, type } = req.body;
+    console.log("this is data");
+    // Basic validation
+    if (!CUSTOMERID || !ITEMID) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+    const insertSql = `INSERT INTO customer_cart_wishlist (CUSTOMERID, ITEMID, quantity, type)
+                       VALUES (?, ?, ?, ?)`;
+    const values = [CUSTOMERID, ITEMID, quantity, type];
+    const result = await query(insertSql, values);
+    console.log('Inserted row id:', result.insertId);
+    return res.status(201).json({ message: 'Data inserted successfully', id: result.insertId });
+  } catch (err) {
+    console.error('Error inserting into database:', err);
+    return res.status(500).json({ message: 'Error inserting data' });
+  }
+};
+exports.wishlistData = async (req, res) => {
+  try {
+    const { CUSTOMERID, ITEMID, type } = req.body;
+    // Basic validation
+    if (!CUSTOMERID || !ITEMID || !type) {
+      return res.status(400).json({ message: 'CUSTOMERID, ITEMID, and type are required.' });
+    }
+    if (type.toLowerCase() !== 'wishlist') {
+      return res.status(400).json({ message: 'Invalid type. This endpoint only handles wishlist items.' });
+    }
+    // Insert with quantity = NULL
+    const insertSql = `
+      INSERT INTO customer_cart_wishlist (CUSTOMERID, ITEMID, quantity, type)
+      VALUES (?, ?, ?, ?)
+    `;
+    const values = [CUSTOMERID, ITEMID, null, type.toLowerCase()];
+    const result = await query(insertSql, values);
+    return res.status(201).json({ message: 'Wishlist item inserted successfully', id: result.insertId });
+  } catch (err) {
+    return res.status(500).json({ message: 'Internal server error', error: err.message });
+  }
+};

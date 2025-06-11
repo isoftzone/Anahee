@@ -4,6 +4,15 @@ const util = require("util");
 
 const query = util.promisify(con.query).bind(con);
 
+const mysql = require("mysql");
+const db = mysql.createConnection({
+  host: "4.213.43.18",
+  user: "isrbs",
+  password: "isoft@1209ISZ",
+  database: "anahee",
+  port: 3306,
+});
+
 // Add New Record
 exports.add_data = async (req, res) => {
   try {
@@ -25,7 +34,7 @@ exports.add_data = async (req, res) => {
 // Get All Records
 exports.get_data = async (req, res) => {
   try {
-    const hometable = await query("SELECT * FROM hometable");
+    const hometable = await query("SELECT * FROM hometable ORDER BY sequence ASC");
     res.status(200).json(hometable);
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -70,3 +79,79 @@ exports.update_data = async (req, res) => {
 //     res.status(500).json({ msg: "Error deleting data", error: error.message });
 //   }
 // };
+
+exports.update_hometable_positions = (req, res) => {
+  const updates = req.body;
+  console.log("Incoming updates:", updates);
+  // Validate input format - expecting direct array
+  if (!Array.isArray(updates)) {
+    return res.status(400).json({
+      error: "Invalid input format. Expected an array of updates.",
+      received: typeof updates,
+    });
+  }
+  // Validate each update object
+  for (const update of updates) {
+    if (!update.id || !update.sequence) {
+      return res.status(400).json({
+        error: "Each update must have 'id' and 'sequence' fields",
+        received: update,
+      });
+    }
+  }
+  // Begin transaction
+  db.beginTransaction((err) => {
+    if (err) {
+      console.error("Transaction start error:", err);
+      return res.status(500).json({ error: "Failed to start transaction" });
+    }
+    const updatePromises = updates.map(({ id, sequence }) => {
+      return new Promise((resolve, reject) => {
+        db.query(
+          "UPDATE hometable SET sequence = ? WHERE id = ?",
+          [sequence, id],
+          (error, results) => {
+            if (error) {
+              console.error(
+                `Error updating id ${id} with sequence ${sequence}:`,
+                error
+              );
+              return reject(error);
+            }
+            if (results.affectedRows === 0) {
+              console.warn(`No rows affected for id ${id}`);
+            }
+            resolve(results);
+          }
+        );
+      });
+    });
+    Promise.all(updatePromises)
+      .then((results) => {
+        db.commit((err) => {
+          if (err) {
+            console.error("Commit error:", err);
+            db.rollback(() => {
+              res.status(500).json({ error: "Failed to commit transaction" });
+            });
+          } else {
+            console.log(`Successfully updated ${updates.length} records`);
+            res.json({
+              message: "Sequence updated successfully",
+              updatedCount: updates.length,
+              updates: updates,
+            });
+          }
+        });
+      })
+      .catch((err) => {
+        console.error("Update error:", err);
+        db.rollback(() => {
+          res.status(500).json({
+            error: "Failed to update sequence",
+            details: err.message,
+          });
+        });
+      });
+  });
+};

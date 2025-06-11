@@ -723,7 +723,7 @@ const ItemMaster: React.FC = () => {
                                                                     <span>Same Slab</span>
                                                                 </label>
                                                             </div>
-                                                            <button type="button" onClick={() => addSize(varIndex)} className="mt-2 btn btn-primary md:mt-0">
+                                                            <button type="button" onClick={() => addSize(varIndex)} className=" btn btn-primary md:mt-0 mt-4">
                                                                 + Add Size
                                                             </button>
                                                         </div>

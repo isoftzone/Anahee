@@ -70,7 +70,11 @@ const Orders = () => {
       Cancel: "danger",
     };
     return (
-      <Badge pill bg={variantMap[status]} className="status-badge">
+      <Badge
+        pill
+        bg={variantMap[status] || "secondary"}
+        className="status-badge"
+      >
         {status}
       </Badge>
     );
@@ -78,6 +82,26 @@ const Orders = () => {
 
   const renderOrderCard = (order) => {
     let totalAmount = 0;
+    const tax = 0; // percent
+    const shipping = 0; // flat rate
+    let subtotal = 0;
+
+    order.ITEMS?.forEach((item) => {
+      const quantity = parseFloat(item.QUANTITY) || 0;
+      const amount = parseFloat(item.AMOUNT) || 0;
+      subtotal += quantity * amount;
+    });
+
+    const discount = parseFloat(order.DISCAMOUNT) || 0;
+    const taxAmount = (subtotal * tax) / 100;
+    const grandTotal = subtotal + taxAmount + shipping - discount;
+
+    const formatDate = (dateString) => {
+      if (!dateString) return "N/A";
+      const d = new Date(dateString);
+      return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+    };
+
     return (
       <div
         key={order.SALEID}
@@ -98,21 +122,20 @@ const Orders = () => {
         {/* Payment Info */}
         <div className="mb-3">
           <span className="text-muted small">
-            <i className="bi bi-calendar"></i>{" "}
-            {new Date(order.CREATEDON).toLocaleDateString()}
+            <strong>Date:</strong> {formatDate(order.CREATEDON)}
           </span>
           <div className="small text-muted">
-            <strong>Payment Method:</strong> {order.PAYMENTMETHOD}
+            <strong>Payment Method:</strong> {order.PAYMENTMETHOD || "N/A"}
           </div>
           <div className="small text-muted">
-            <strong>Payment Status:</strong> {order.PAYMENTSTATUS}
+            <strong>Payment Status:</strong> {order.PAYMENTSTATUS || "N/A"}
           </div>
         </div>
 
         {/* Items */}
         {order.ITEMS?.map((item, index) => {
-          const quantity = parseFloat(item.QUANTITY || 0);
-          const amount = parseFloat(item.AMOUNT || 0);
+          const quantity = parseFloat(item.QUANTITY) || 0;
+          const amount = parseFloat(item.AMOUNT) || 0;
           const lineTotal = amount * quantity;
           totalAmount += lineTotal;
           const imageArray = item.PHOTO?.split(",") || [];
@@ -125,10 +148,10 @@ const Orders = () => {
             >
               {/* Image */}
               <div className="col-4 col-md-2 mb-2 mb-md-0">
-                {item.PHOTO && (
+                {firstImage && (
                   <img
                     src={process.env.REACT_APP_PUBLIC_URL + firstImage}
-                    alt={item.ITEMNAME}
+                    alt={item.ITEMNAME || "Product Image"}
                     className="img-fluid"
                     style={{
                       maxHeight: "120px",
@@ -162,9 +185,9 @@ const Orders = () => {
         })}
 
         {/* Total + Cancel */}
-        <div className="d-flex justify-content-between align-items-center border-top pt-3">
-          <strong>Total: ₹{totalAmount.toFixed(2)}</strong>
-          {["Placed", "Progress"].includes(order.ORDER_STATUS) && (
+        {["Placed", "Progress"].includes(order.ORDER_STATUS) && (
+          <div className="d-flex justify-content-between align-items-center border-top pt-3">
+            <strong></strong>
             <button
               className="py-1"
               onClick={() => cancelOrder(order.SALEID)}
@@ -175,12 +198,37 @@ const Orders = () => {
                 backgroundColor: "#DC3545",
                 borderRadius: "5px",
                 color: "#fff",
-                fontWeight: "boLD",
+                fontWeight: "bold",
+                cursor: "pointer",
               }}
+              aria-label={`Cancel Order ${order.SALEID}`}
             >
               Cancel Order
             </button>
-          )}
+          </div>
+        )}
+        {/* Summary */}
+        <div className="mt-3 p-4 bg-light rounded">
+          <div className="d-flex justify-content-between mb-2">
+            <span>Subtotal:</span>
+            <span className="fw-medium">₹{subtotal.toFixed(2)}</span>
+          </div>
+          <div className="d-flex justify-content-between mb-2">
+            <span>Tax ({tax}%):</span>
+            <span>₹{taxAmount.toFixed(2)}</span>
+          </div>
+          <div className="d-flex justify-content-between mb-2">
+            <span>Discount:</span>
+            <span>-₹{discount.toFixed(2)}</span>
+          </div>
+          <div className="d-flex justify-content-between mb-2">
+            <span>Shipping:</span>
+            <span>₹{shipping.toFixed(2)}</span>
+          </div>
+          <div className="d-flex justify-content-between pt-2 border-top border-secondary">
+            <span className="fw-bold">Grand Total:</span>
+            <span className="text-dark fw-bold">₹{grandTotal.toFixed(2)}</span>
+          </div>
         </div>
       </div>
     );
@@ -188,7 +236,7 @@ const Orders = () => {
 
   return (
     <LayoutOne headerTop="visible">
-      <div className="container orders-container py-4">
+      <div className="container-fluid orders-container py-4">
         <div className="page-header text-center mb-4">
           <h1 className="page-title">My Orders</h1>
           <p className="page-subtitle text-muted">

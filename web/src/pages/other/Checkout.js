@@ -8,6 +8,8 @@ import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import axios from "axios";
 import { BASE_URL } from "./../../config";
 import { deleteAllFromCart } from "../../store/slices/cart-slice";
+import { FaEdit, FaTrash } from "react-icons/fa";
+
 const Checkout = () => {
   let cartTotalPrice = 0;
   const dispatch = useDispatch();
@@ -17,6 +19,7 @@ const Checkout = () => {
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
+  const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -27,8 +30,8 @@ const Checkout = () => {
     state: "",
     postcode: "",
     phone: "",
-    email: "",
-    paymentMethod: "Cod",
+    // email: "",
+    paymentMethod: "COD",
   });
   const [data, setData] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
@@ -40,16 +43,28 @@ const Checkout = () => {
   const [customerId, setCustomerId] = useState(null);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+  const [editErrors, setEditErrors] = useState({});
+  const [activeForm, setActiveForm] = useState(null);
+  const [editTouched, setEditTouched] = useState({});
   const [paymentError, setPaymentError] = useState("");
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(true);
   const [discount, setDiscount] = useState(0);
-
-  // let discountedTotal = cartTotalPrice - discount;
+  const [showPopup, setShowPopup] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  // Show popup for 3 seconds
   useEffect(() => {
-    // Validate all fields when component mounts or when formData changes
-    validateForm();
-  }, [formData]);
+    if (showPopup) {
+      const timer = setTimeout(() => {
+        setShowPopup(false);
+        if (isSuccess) {
+          navigate("/orders");
+        }
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showPopup, isSuccess, navigate]);
+
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
@@ -64,6 +79,7 @@ const Checkout = () => {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const couponCode = params.get("couponCode");
+
   useEffect(() => {
     if (couponCode) {
       const applyCoupon = async () => {
@@ -82,12 +98,11 @@ const Checkout = () => {
       applyCoupon();
     }
   }, [couponCode, cartTotalPrice]);
-  // Fetch countries on mount
+
   useEffect(() => {
     const customerData = JSON.parse(localStorage.getItem("customerinfo"));
-
     if (!customerData || !customerData.id) {
-      navigate("/login-register");
+      setShowModal(true); // Show the modal
     } else {
       setCustomerId(customerData.id);
     }
@@ -105,24 +120,46 @@ const Checkout = () => {
     };
     fetchCountries();
   }, []);
+
   useEffect(() => {
     const fetchAddresses = (customerId) => {
       axios
         .get(`${BASE_URL}/getcustomeraddress/${customerId}`)
-        .then((res) => setData(res.data))
+        .then((res) => {
+          const mappedData = res.data.map((addr) => ({
+            firstName: addr.fname,
+            lastName: addr.lname,
+            companyName: addr.companyName || "",
+            country: addr.country,
+            address: addr.address,
+            city: addr.city,
+            state: addr.state,
+            postcode: addr.postal_code,
+            phone: addr.mobile,
+            email: addr.email,
+            description: addr.description,
+            primary_address: addr.primary_address,
+            id: addr.id,
+            customer_id: addr.customer_id,
+          }));
+          setData(mappedData);
+        })
         .catch((err) => console.error("API Error:", err));
     };
-    fetchAddresses(customerId);
+
+    if (customerId) {
+      fetchAddresses(customerId);
+    }
   }, [customerId]);
 
   // Fetch states on country change
   useEffect(() => {
-    if (formData.country) {
+    if (formData.country || editItem?.country) {
       const fetchStates = async () => {
         try {
           const res = await axios.post(
             "https://countriesnow.space/api/v0.1/countries/states",
-            { country: formData.country }
+            { country: formData.country || editItem?.country }
           );
           setStates(res.data.data.states || []);
           setFormData((prev) => ({ ...prev, state: "", city: "" }));
@@ -133,18 +170,21 @@ const Checkout = () => {
       };
       fetchStates();
     }
-  }, [formData.country]);
+  }, [formData.country, editItem?.country]);
 
   // Fetch cities on state change
   useEffect(() => {
-    if (formData.country && formData.state) {
+    if (
+      (formData.country && formData.state) ||
+      (editItem?.country && editItem?.state)
+    ) {
       const fetchCities = async () => {
         try {
           const res = await axios.post(
             "https://countriesnow.space/api/v0.1/countries/state/cities",
             {
-              country: formData.country,
-              state: formData.state,
+              country: formData.country || editItem?.country,
+              state: formData.state || editItem?.state,
             }
           );
           setCities(res.data.data || []);
@@ -155,17 +195,43 @@ const Checkout = () => {
       };
       fetchCities();
     }
-  }, [formData.state]);
+  }, [formData.state, editItem?.state]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
-    setTouched((prev) => ({ ...prev, [name]: true }));
-    validateField(name, value);
+    // Only validate if we're in add mode
+    if (activeForm === "add") {
+      setTouched((prev) => ({ ...prev, [name]: true }));
+      setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
+    }
+  };
+
+  // Update handleValidation to be more concise:
+
+  const handleValidation = (formValues, formType = activeForm) => {
+    const newErrors = {};
+    let isValid = true;
+
+    Object.keys(formValues).forEach((key) => {
+      if (["companyName", "description", "paymentMethod", "id"].includes(key))
+        return;
+
+      const error = validateField(key, formValues[key]);
+      if (error) {
+        newErrors[key] = error;
+        isValid = false;
+      }
+    });
+
+    if (formType === "add") {
+      setErrors(newErrors);
+    } else {
+      setEditErrors(newErrors);
+    }
+
+    return isValid;
   };
 
   const handleBlur = (e) => {
@@ -177,70 +243,52 @@ const Checkout = () => {
   };
 
   const validateField = (name, value) => {
-    let error = "";
+    if (["companyName", "description", "paymentMethod", "id"].includes(name)) {
+      return ""; // No validation for optional fields
+    }
+
+    const trimmedValue = value ? value.toString().trim() : "";
 
     switch (name) {
       case "firstName":
-        if (!value.trim()) error = "First name is required";
-        else if (value.length < 2)
-          error = "First name must be at least 2 characters";
+        if (!trimmedValue) return "First name is required";
+        if (trimmedValue.length < 2)
+          return "First name must be at least 2 characters";
         break;
       case "lastName":
-        if (!value.trim()) error = "Last name is required";
-        else if (value.length < 2)
-          error = "Last name must be at least 2 characters";
+        if (!trimmedValue) return "Last name is required";
+        if (trimmedValue.length < 2)
+          return "Last name must be at least 2 characters";
         break;
       case "address":
-        if (!value.trim()) error = "Address is required";
-        else if (value.length < 5)
-          error = "Address must be at least 5 characters";
+        if (!trimmedValue) return "Address is required";
+        if (trimmedValue.length < 5)
+          return "Address must be at least 5 characters";
         break;
       case "city":
-        if (!value.trim()) error = "City is required";
+        if (!trimmedValue) return "City is required";
         break;
       case "country":
-        if (!value.trim()) error = "Country is required";
+        if (!trimmedValue) return "Country is required";
         break;
       case "state":
-        if (!value.trim()) error = "State is required";
+        if (!trimmedValue) return "State is required";
         break;
       case "postcode":
-        if (!value.trim()) error = "Postal code is required";
-        else if (!/^[0-9]{6}$/.test(value))
-          error = "Postal code must be 6 digits";
+        if (!trimmedValue) return "Postal code is required";
+        if (!/^[0-9]{6}$/.test(trimmedValue))
+          return "Postal code must be 6 digits";
         break;
       case "phone":
-        if (!value.trim()) error = "Phone is required";
-        else if (!/^[0-9]{10,15}$/.test(value))
-          error = "Phone number must be 10-15 digits";
-        break;
-      case "email":
-        if (!value.trim()) {
-          error = "Email is required";
-        } else if (!/^\S+@\S+\.\S+$/.test(value)) {
-          error = "Email is invalid";
-        }
+        if (!trimmedValue) return "Phone is required";
+        if (!/^[0-9]{10,15}$/.test(trimmedValue))
+          return "Phone number must be 10-15 digits";
         break;
       default:
         break;
     }
 
-    setErrors((prev) => ({ ...prev, [name]: error }));
-    return !error;
-  };
-
-  const validateForm = () => {
-    let isValid = true;
-    const newErrors = {};
-
-    Object.keys(formData).forEach((key) => {
-      if (key !== "companyName" && key !== "paymentMethod") {
-        const fieldValid = validateField(key, formData[key]);
-        if (!fieldValid) isValid = false;
-      }
-    });
-
-    return isValid;
+    return "";
   };
 
   const togglePayment = () => {
@@ -287,7 +335,7 @@ const Checkout = () => {
 
         const updateData = {
           merchant_order_id: response?.data?.data?.orderId,
-          payment_mode: "Paid",
+          payment_mode: "PAID",
           provider_reference_id: splitInstrument?.rail?.utr,
           phonepe_status: response?.data?.data?.state,
           payment_status: paymentDetail?.state,
@@ -301,14 +349,19 @@ const Checkout = () => {
           },
         });
 
+        setIsSuccess(true);
+        setShowPopup(true);
         resetForm();
-        window.location.href = "/success";
       } else {
+        setIsSuccess(false);
+        setShowPopup(true);
         setPaymentError("Payment verification failed. Please contact support.");
         setOrderPlaced(false);
       }
     } catch (error) {
       console.error("Error verifying payment:", error);
+      setIsSuccess(false);
+      setShowPopup(true);
       setPaymentError(
         "There was an error verifying your payment. Please contact support."
       );
@@ -323,7 +376,7 @@ const Checkout = () => {
         orderId: orderId,
         amountInPaisa: (cartTotalPrice - discount) * 100,
         customerPhone: formData.phone || "0000000000",
-        redirectUrl: window.location.origin + "/success",
+        redirectUrl: window.location.origin + "/orders",
         expireAfter: 1200,
         metaInfo: {
           udf1: "Additional Info 1",
@@ -360,7 +413,7 @@ const Checkout = () => {
     }
   };
 
-  const resetForm = () => {
+  const resetForm = async () => {
     setFormData({
       firstName: "",
       lastName: "",
@@ -373,13 +426,35 @@ const Checkout = () => {
       state: "",
       postcode: "",
       phone: "",
-      email: "",
-      paymentMethod: "Cod",
+      // email: "",
+      paymentMethod: "COD",
     });
     setErrors({});
     setTouched({});
     setOrderId("");
     dispatch(deleteAllFromCart()); // Clear cart items
+    try {
+      const payload = {
+        CUSTOMERID: customerId,
+        type: "cart",
+      };
+      const response = await axios.delete(`${BASE_URL}/clearAllcartWishlist`, {
+        data: payload,
+      });
+      if (response.status === 200 && response.data?.success) {
+        console.log("Successfully cleared all cart items from server.");
+        // No need to dispatch again, already cleared optimistically
+      } else {
+        console.warn(
+          "Server clear all cart failed:",
+          response.data?.message ?? response.data
+        );
+        // Optional: Re-fetch cart or show error if server clear failed and you want strict consistency
+      }
+    } catch (error) {
+      console.error("Error clearing all cart items from backend:", error);
+      // Optional: Re-fetch cart or show error
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -388,30 +463,31 @@ const Checkout = () => {
     // Clear previous payment errors
     setPaymentError("");
 
-  
-  // 🔍 Find the primary address from address list
-  const primaryAddress = data.find((addr) => addr.primary_address === 1);
+    // 🔍 Find the primary address from address list
+    const primaryAddress = data.find((addr) => addr.primary_address === 1);
 
-  if (!primaryAddress) {
-    alert("Please set a primary address before placing the order.");
-    return;
-  }
+    if (!primaryAddress) {
+      alert("Please set a primary address before placing the order.");
+      return;
+    }
 
     const orderData = {
-      firstName: primaryAddress.fname,
-      lastName: primaryAddress.lname,
-      email: primaryAddress.email,
-      phone: primaryAddress.mobile,
+      firstName: primaryAddress.firstName,
+      lastName: primaryAddress.lastName,
+      email: "",
+      phone: primaryAddress.phone,
       address: primaryAddress.address,
       city: primaryAddress.city,
       state: primaryAddress.state,
       country: primaryAddress.country,
-      postcode: primaryAddress.postal_code,
+      postcode: primaryAddress.postcode,
       description: primaryAddress.description,
       discount,
       customerId,
       amount: cartTotalPrice - discount,
-      payment_mode:"Cod",
+      payment_mode: "COD",
+      payment_status: "PENDING",
+      coupon_code: discount > 0 ? couponCode : "",
       items: cartItems.map((item) => ({
         productId: item.id,
         quantity: item.quantity,
@@ -431,27 +507,27 @@ const Checkout = () => {
         setOrderId(saleId);
         setOrderPlaced(true);
 
-        if (formData.paymentMethod === "Paid") {
+        if (formData.paymentMethod === "PAID") {
           await initiatePhonePePayment(saleId);
         } else {
-          // For COD, complete the order
+          // For COD, show success popup
+          setIsSuccess(true);
+          setShowPopup(true);
           setIsLoading(false);
-          alert("Order placed successfully!");
           resetForm();
-          // Optionally redirect to success page
-          window.location.href = "/success";
         }
       }
     } catch (error) {
       console.error("Error placing order:", error);
-      alert("There was an error placing your order.");
+      setIsSuccess(false);
+      setShowPopup(true);
       setIsLoading(false);
       setOrderPlaced(false);
     }
   };
 
   const retryPayment = () => {
-    if (orderId && formData.paymentMethod === "Paid") {
+    if (orderId && formData.paymentMethod === "PAID") {
       setPaymentError("");
       initiatePhonePePayment(orderId);
     }
@@ -472,6 +548,18 @@ const Checkout = () => {
   });
   const handleUpdate = async (e) => {
     e.preventDefault();
+    e.preventDefault();
+    setActiveForm("edit"); // Ensure we're validating the edit form
+
+    // Mark all fields as touched
+    const allTouched = {};
+    Object.keys(editItem).forEach((key) => {
+      allTouched[key] = true;
+    });
+    setEditTouched(allTouched);
+
+    if (!handleValidation(editItem, "edit")) return;
+
     try {
       await axios.put(`${BASE_URL}/updatecustomeraddress`, {
         ...editItem,
@@ -479,31 +567,31 @@ const Checkout = () => {
         primary_address: editItem.primary_address || 0,
       });
       alert("Address updated successfully");
-      setData(prevData =>
-      prevData.map(item =>
-        item.id === editItem.id ? editItem : item
-      )
-    );
+      setData((prevData) =>
+        prevData.map((item) => (item.id === editItem.id ? editItem : item))
+      );
+      setEditIndex(null);
     } catch (err) {
       alert("Update failed: " + (err.response?.data?.msg || err.message));
     }
   };
+
   const handleMakePrimary = async (addressId) => {
     const itemToUpdate = data.find((item) => item.id === addressId);
     if (!itemToUpdate) return alert("Address not found");
     try {
       await axios.put(`${BASE_URL}/updatecustomeraddress`, {
         ...itemToUpdate,
-        id:addressId,
+        id: addressId,
         customer_id: customerId,
         primary_address: 1,
       });
-       setData(prevData =>
-      prevData.map(item => ({
-        ...item,
-        primary_address: item.id === addressId ? 1 : 0
-      }))
-    );
+      setData((prevData) =>
+        prevData.map((item) => ({
+          ...item,
+          primary_address: item.id === addressId ? 1 : 0,
+        }))
+      );
     } catch (err) {
       alert("Failed to set primary address");
     }
@@ -515,28 +603,75 @@ const Checkout = () => {
     try {
       await axios.delete(`${BASE_URL}/deletecustomeraddress/${addressId}`);
       alert("Address deleted successfully");
-      setData((prevData) => prevData.filter((address) => address.id !== addressId));
+      setData((prevData) =>
+        prevData.filter((address) => address.id !== addressId)
+      );
     } catch (err) {
       alert("Failed to delete address");
       console.error(err);
     }
   };
 
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditItem((prev) => ({ ...prev, [name]: value }));
+
+    // Only validate if we're in edit mode
+    if (activeForm === "edit") {
+      setEditTouched((prev) => ({ ...prev, [name]: true }));
+      setEditErrors((prev) => ({
+        ...prev,
+        [name]: validateField(name, value),
+      }));
+    }
+  };
+
   const handleEditClick = (item, index) => {
     setEditItem({ ...item });
     setEditIndex(index);
+    setActiveForm("edit");
+    setShowAddForm(false); // Hide add form if open
+
+    // Initialize touched state
+    const initialTouched = Object.keys(item).reduce((acc, key) => {
+      acc[key] = false;
+      return acc;
+    }, {});
+    setEditTouched(initialTouched);
+    setEditErrors({});
   };
+
+  const handleAddClick = () => {
+    setShowAddForm(!showAddForm);
+    setActiveForm("add");
+    setEditIndex(null); // Clear any edit state
+  };
+  const handleCancelAdd = () => {
+    setShowAddForm(false);
+    setActiveForm(null);
+    setErrors({});
+    setTouched({});
+  };
+
+  const handleCancelEdit = () => {
+    setEditIndex(null);
+    setActiveForm(null);
+    setEditErrors({});
+    setEditTouched({});
+  };
+
   const handleAddSubmit = async (e) => {
     e.preventDefault();
-  const allFieldsTouched = {};
+    setActiveForm("add");
+    // Mark all fields as touched
+    const allTouched = {};
     Object.keys(formData).forEach((key) => {
-      allFieldsTouched[key] = true;
+      allTouched[key] = true;
     });
-    setTouched(allFieldsTouched);
+    setTouched(allTouched);
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!handleValidation(formData, "add")) return;
+
     try {
       console.log("formData 001", formData);
       await axios.post(`${BASE_URL}/addcustomeraddress`, {
@@ -545,6 +680,19 @@ const Checkout = () => {
       });
       setData((prevData) => [...prevData, formData]);
       alert("Address added successfully");
+      setFormData({
+        firstName: "",
+        lastName: "",
+        companyName: "",
+        country: "",
+        address: "",
+        city: "",
+        state: "",
+        postcode: "",
+        phone: "",
+      });
+      setErrors({});
+      setTouched({});
       setShowAddForm(false);
     } catch (err) {
       alert(
@@ -552,7 +700,7 @@ const Checkout = () => {
       );
     }
   };
-  console.log("addres data", data);
+
   return (
     <Fragment>
       <SEO
@@ -560,11 +708,87 @@ const Checkout = () => {
         description="Checkout page of Anahee react minimalist eCommerce template."
       />
       <LayoutOne headerTop="visible">
+        {/* Success/Failure Popup */}
+        {showPopup && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0,0,0,0.7)",
+              zIndex: 9999,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <div
+              className="container py-5"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <div
+                className="row justify-content-center"
+                style={{ width: "800px" }}
+              >
+                <div className="col-12 col-sm-10 col-md-8 col-lg-6">
+                  <div
+                    className="text-center p-4"
+                    style={{
+                      backgroundColor: "white",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                    }}
+                  >
+                    <div
+                      className="icon-circle mb-3"
+                      style={{
+                        width: "80px",
+                        height: "80px",
+                        borderRadius: "50%",
+                        backgroundColor: isSuccess ? "#28a745" : "#dc3545",
+                        display: "inline-flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        fontSize: "40px",
+                        color: "white",
+                      }}
+                    >
+                      <i
+                        className={`fa ${isSuccess ? "fa-check" : "fa-close"}`}
+                        aria-hidden="true"
+                      ></i>
+                    </div>
+                    <h2
+                      className="fs-2"
+                      style={{ color: isSuccess ? "#28a745" : "#dc3545" }}
+                    >
+                      {isSuccess
+                        ? "Your order was successful"
+                        : "Your order failed"}
+                    </h2>
+                    <p className="fs-4 mb-0">
+                      {isSuccess
+                        ? "Thank you for your order. We will be in contact with more details shortly."
+                        : "Please try again later or contact support."}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="checkout-area pt-10 pb-30">
           <div className="container">
             {cartItems && cartItems.length >= 1 ? (
               <form onSubmit={handleSubmit}>
-                <div className="row">
+                <div className="row pb-5">
                   <div className="col-lg-7">
                     <div className="billing-info-wrap">
                       <div className="accordion-item">
@@ -578,7 +802,7 @@ const Checkout = () => {
                       className="border rounded p-3 mb-4 mt-4 d-flex align-items-center gap-2"
                       role="button"
                       style={{ cursor: "pointer" }}
-                      onClick={() => setShowAddForm(!showAddForm)}
+                      onClick={handleAddClick}
                     >
                       <i className="bi bi-plus-lg text-primary"></i>
                       <span className="text-primary fw-semibold">
@@ -602,16 +826,20 @@ const Checkout = () => {
                                   onChange={handleInputChange}
                                   onBlur={handleBlur}
                                   className={`form-control ${
-                                    errors.firstName && touched.firstName
+                                    activeForm === "add" &&
+                                    errors.firstName &&
+                                    touched.firstName
                                       ? "is-invalid"
                                       : ""
                                   }`}
                                 />
-                                {errors.firstName && touched.firstName && (
-                                  <div className="invalid-feedback">
-                                    {errors.firstName}
-                                  </div>
-                                )}
+                                {activeForm === "add" &&
+                                  errors.firstName &&
+                                  touched.firstName && (
+                                    <div className="invalid-feedback">
+                                      {errors.firstName}
+                                    </div>
+                                  )}
                               </div>
                             </div>
                             <div className="col-lg-6 col-md-6">
@@ -624,16 +852,20 @@ const Checkout = () => {
                                   onChange={handleInputChange}
                                   onBlur={handleBlur}
                                   className={`form-control ${
-                                    errors.lastName && touched.lastName
+                                    activeForm === "add" &&
+                                    errors.lastName &&
+                                    touched.lastName
                                       ? "is-invalid"
                                       : ""
                                   }`}
                                 />
-                                {errors.lastName && touched.lastName && (
-                                  <div className="invalid-feedback">
-                                    {errors.lastName}
-                                  </div>
-                                )}
+                                {activeForm === "add" &&
+                                  errors.lastName &&
+                                  touched.lastName && (
+                                    <div className="invalid-feedback">
+                                      {errors.lastName}
+                                    </div>
+                                  )}
                               </div>
                             </div>
 
@@ -642,7 +874,9 @@ const Checkout = () => {
                                 <label>Street Address *</label>
                                 <textarea
                                   className={`form-control ${
-                                    errors.address && touched.address
+                                    activeForm === "add" &&
+                                    errors.address &&
+                                    touched.address
                                       ? "is-invalid"
                                       : ""
                                   }`}
@@ -654,11 +888,13 @@ const Checkout = () => {
                                   onBlur={handleBlur}
                                   rows="4"
                                 />
-                                {errors.address && touched.address && (
-                                  <div className="invalid-feedback">
-                                    {errors.address}
-                                  </div>
-                                )}
+                                {activeForm === "add" &&
+                                  errors.address &&
+                                  touched.address && (
+                                    <div className="invalid-feedback">
+                                      {errors.address}
+                                    </div>
+                                  )}
                               </div>
                             </div>
 
@@ -671,7 +907,9 @@ const Checkout = () => {
                                   onChange={handleInputChange}
                                   onBlur={handleBlur}
                                   className={`form-control ${
-                                    errors.country && touched.country
+                                    activeForm === "add" &&
+                                    errors.country &&
+                                    touched.country
                                       ? "is-invalid"
                                       : ""
                                   }`}
@@ -683,11 +921,13 @@ const Checkout = () => {
                                     </option>
                                   ))}
                                 </select>
-                                {errors.country && touched.country && (
-                                  <div className="invalid-feedback">
-                                    {errors.country}
-                                  </div>
-                                )}
+                                {activeForm === "add" &&
+                                  errors.country &&
+                                  touched.country && (
+                                    <div className="invalid-feedback">
+                                      {errors.country}
+                                    </div>
+                                  )}
                               </div>
                             </div>
 
@@ -701,7 +941,9 @@ const Checkout = () => {
                                   onBlur={handleBlur}
                                   disabled={!states.length}
                                   className={`form-control ${
-                                    errors.state && touched.state
+                                    activeForm === "add" &&
+                                    errors.state &&
+                                    touched.state
                                       ? "is-invalid"
                                       : ""
                                   }`}
@@ -713,11 +955,13 @@ const Checkout = () => {
                                     </option>
                                   ))}
                                 </select>
-                                {errors.state && touched.state && (
-                                  <div className="invalid-feedback">
-                                    {errors.state}
-                                  </div>
-                                )}
+                                {activeForm === "add" &&
+                                  errors.state &&
+                                  touched.state && (
+                                    <div className="invalid-feedback">
+                                      {errors.state}
+                                    </div>
+                                  )}
                               </div>
                             </div>
 
@@ -731,7 +975,9 @@ const Checkout = () => {
                                   onBlur={handleBlur}
                                   disabled={!cities.length}
                                   className={`form-control ${
-                                    errors.city && touched.city
+                                    activeForm === "add" &&
+                                    errors.city &&
+                                    touched.city
                                       ? "is-invalid"
                                       : ""
                                   }`}
@@ -743,11 +989,13 @@ const Checkout = () => {
                                     </option>
                                   ))}
                                 </select>
-                                {errors.city && touched.city && (
-                                  <div className="invalid-feedback">
-                                    {errors.city}
-                                  </div>
-                                )}
+                                {activeForm === "add" &&
+                                  errors.city &&
+                                  touched.city && (
+                                    <div className="invalid-feedback">
+                                      {errors.city}
+                                    </div>
+                                  )}
                               </div>
                             </div>
 
@@ -761,16 +1009,20 @@ const Checkout = () => {
                                   onChange={handleInputChange}
                                   onBlur={handleBlur}
                                   className={`form-control ${
-                                    errors.postcode && touched.postcode
+                                    activeForm === "add" &&
+                                    errors.postcode &&
+                                    touched.postcode
                                       ? "is-invalid"
                                       : ""
                                   }`}
                                 />
-                                {errors.postcode && touched.postcode && (
-                                  <div className="invalid-feedback">
-                                    {errors.postcode}
-                                  </div>
-                                )}
+                                {activeForm === "add" &&
+                                  errors.postcode &&
+                                  touched.postcode && (
+                                    <div className="invalid-feedback">
+                                      {errors.postcode}
+                                    </div>
+                                  )}
                               </div>
                             </div>
                             <div className="col-lg-6 col-md-6">
@@ -783,19 +1035,23 @@ const Checkout = () => {
                                   onChange={handleInputChange}
                                   onBlur={handleBlur}
                                   className={`form-control ${
-                                    errors.phone && touched.phone
+                                    activeForm === "add" &&
+                                    errors.phone &&
+                                    touched.phone
                                       ? "is-invalid"
                                       : ""
                                   }`}
                                 />
-                                {errors.phone && touched.phone && (
-                                  <div className="invalid-feedback">
-                                    {errors.phone}
-                                  </div>
-                                )}
+                                {activeForm === "add" &&
+                                  errors.phone &&
+                                  touched.phone && (
+                                    <div className="invalid-feedback">
+                                      {errors.phone}
+                                    </div>
+                                  )}
                               </div>
                             </div>
-                            <div className="col-lg-6 col-md-6">
+                            {/* <div className="col-lg-6 col-md-6">
                               <div className="billing-info mb-20">
                                 <label>Email Address *</label>
                                 <input
@@ -816,7 +1072,7 @@ const Checkout = () => {
                                   </div>
                                 )}
                               </div>
-                            </div>
+                            </div> */}
                             <div className="col-md-12">
                               <div className="additional-info-wrap">
                                 <h4>Additional Information</h4>
@@ -838,15 +1094,21 @@ const Checkout = () => {
                           <div className="mt-3 d-flex justify-content-end gap-2">
                             <button
                               type="button"
-                              className="btn btn-secondary"
-                              onClick={() => setShowAddForm(false)}
+                              // className="btn btn-secondary"
+                              onClick={handleCancelAdd}
+                               style={{ background: "#ffeaf1", border: "0" }}
+                              className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded bg-pink-100 hover:bg-pink-200 transition d-flex align-items-center gap-2"
+                            
                             >
                               Cancel
                             </button>
                             <button
                               type="button"
-                              className="btn btn-primary"
+                              // className="btn btn-primary"
                               onClick={handleAddSubmit}
+                               style={{ background: "#ffeaf1", border: "0" }}
+                              className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded bg-pink-100 hover:bg-pink-200 transition d-flex align-items-center gap-2"
+                            
                             >
                               Save Address
                             </button>
@@ -855,144 +1117,430 @@ const Checkout = () => {
                       </div>
                     )}
 
-                     {data.map((item, index) => (
-                        <div
-                          className="border rounded p-3 mb-3 d-flex align-items-start position-relative"
-                          key={index}
-                        >
-                          <div className="form-check mt-1 me-3">
-                            <input
-                              className="form-check-input"
-                              type="radio"
-                              name="primaryAddress"
-                              checked={item.primary_address === 1}
-                              onChange={() => handleMakePrimary(item.id)}
-                              id={`primary-${item.id}`}
-                            />
-                          </div>
+                    {data.map((item, index) => (
+                      <div
+                        className="border rounded p-3 mb-3 d-flex align-items-start position-relative"
+                        key={index}
+                      >
+                        <div className="form-check mt-1 me-3">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="primaryAddress"
+                            checked={item.primary_address === 1}
+                            onChange={() => handleMakePrimary(item.id)}
+                            id={`primary-${item.id}`}
+                          />
+                        </div>
 
-                          <div className="flex-grow-1">
-                            {editIndex === index || null ? (
-                              <div>
-                                <div className="row g-2">
-                                  {[
-                                    "fname",
-                                    "lname",
-                                    "address",
-                                    "city",
-                                    "state",
-                                    "country",
-                                    "postal_code",
-                                    "email",
-                                    "mobile",
-                                    "description",
-                                  ].map((field, i) => (
-                                    <div
-                                      className={`col-md-${
-                                        field === "address" ||
-                                        field === "description"
-                                          ? 12
-                                          : 6
-                                      }`}
-                                      key={i}
-                                    >
-                                      <input
-                                        className="form-control"
-                                        name={field}
-                                        value={editItem[field]}
-                                        onChange={(e) =>
-                                          setEditItem({
-                                            ...editItem,
-                                            [field]: e.target.value,
-                                          })
-                                        }
-                                        required
-                                      />
+                        <div className="flex-grow-1">
+                          {editIndex === index || null ? (
+                            <div>
+                              <div className="border rounded p-3 mb-4 w-100">
+                                <div className="billing-info-wrap">
+                                  <div className="row">
+                                    <div className="col-lg-6 col-md-6">
+                                      <div className="billing-info mb-20">
+                                        <label>First Name *</label>
+                                        <input
+                                          type="text"
+                                          name="firstName"
+                                          value={editItem["firstName"]}
+                                          onChange={handleEditChange}
+                                          onBlur={(e) => {
+                                            if (!editTouched.firstName) {
+                                              setEditTouched((prev) => ({
+                                                ...prev,
+                                                firstName: true,
+                                              }));
+                                            }
+                                          }}
+                                          className={`form-control ${
+                                            activeForm === "edit" &&
+                                            editErrors.firstName &&
+                                            editTouched.firstName
+                                              ? "is-invalid"
+                                              : ""
+                                          }`}
+                                        />
+                                        {activeForm === "edit" &&
+                                          editErrors.firstName &&
+                                          editTouched.firstName && (
+                                            <div className="invalid-feedback">
+                                              {editErrors.firstName}
+                                            </div>
+                                          )}
+                                      </div>
                                     </div>
-                                  ))}
-                                </div>
-                                <div className="mt-3 d-flex justify-content-end gap-2">
-                                  <button
-                                    type="button"
-                                    className="btn btn-secondary"
-                                    onClick={() => setEditIndex(null)}
-                                  >
-                                    Cancel
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={handleUpdate}
-                                    className="btn btn-success"
-                                  >
-                                    Save Changes
-                                  </button>
+                                    <div className="col-lg-6 col-md-6">
+                                      <div className="billing-info mb-20">
+                                        <label>Last Name *</label>
+                                        <input
+                                          type="text"
+                                          name="lastName"
+                                          value={editItem["lastName"]}
+                                          onChange={handleEditChange}
+                                          onBlur={(e) => {
+                                            if (!editTouched.lastName) {
+                                              setEditTouched((prev) => ({
+                                                ...prev,
+                                                lastName: true,
+                                              }));
+                                            }
+                                          }}
+                                          className={`form-control ${
+                                            activeForm === "edit" &&
+                                            editErrors.lastName &&
+                                            editTouched.lastName
+                                              ? "is-invalid"
+                                              : ""
+                                          }`}
+                                        />
+                                        {activeForm === "edit" &&
+                                          editErrors.lastName &&
+                                          editTouched.lastName && (
+                                            <div className="invalid-feedback">
+                                              {editErrors.lastName}
+                                            </div>
+                                          )}
+                                      </div>
+                                    </div>
+
+                                    <div className="col-lg-12">
+                                      <div className="billing-info mb-20">
+                                        <label>Street Address *</label>
+                                        <textarea
+                                          className={`form-control ${
+                                            activeForm === "edit" &&
+                                            editErrors.address &&
+                                            editTouched.address
+                                              ? "is-invalid"
+                                              : ""
+                                          }`}
+                                          placeholder="House number and street name"
+                                          type="text"
+                                          name="address"
+                                          value={editItem["address"]}
+                                          onChange={handleEditChange}
+                                          onBlur={(e) => {
+                                            if (!editTouched.address) {
+                                              setEditTouched((prev) => ({
+                                                ...prev,
+                                                address: true,
+                                              }));
+                                            }
+                                          }}
+                                          rows="4"
+                                        />
+                                        {activeForm === "edit" &&
+                                          editErrors.address &&
+                                          editTouched.address && (
+                                            <div className="invalid-feedback">
+                                              {editErrors.address}
+                                            </div>
+                                          )}
+                                      </div>
+                                    </div>
+
+                                    <div className="col-lg-12">
+                                      <div className="billing-select mb-20">
+                                        <label>Country *</label>
+                                        <select
+                                          name="country"
+                                          value={editItem["country"]}
+                                          onChange={handleEditChange}
+                                          onBlur={(e) => {
+                                            if (!editTouched.country) {
+                                              setEditTouched((prev) => ({
+                                                ...prev,
+                                                country: true,
+                                              }));
+                                            }
+                                          }}
+                                          className={`form-control ${
+                                            activeForm === "edit" &&
+                                            editErrors.country &&
+                                            editTouched.country
+                                              ? "is-invalid"
+                                              : ""
+                                          }`}
+                                        >
+                                          <option value="">
+                                            Select a country
+                                          </option>
+                                          {countries.map((country, i) => (
+                                            <option key={i} value={country}>
+                                              {country}
+                                            </option>
+                                          ))}
+                                        </select>
+                                        {activeForm === "edit" &&
+                                          editErrors.country &&
+                                          editTouched.country && (
+                                            <div className="invalid-feedback">
+                                              {editErrors.country}
+                                            </div>
+                                          )}
+                                      </div>
+                                    </div>
+
+                                    <div className="col-lg-12">
+                                      <div className="billing-select mb-20">
+                                        <label>State *</label>
+                                        <select
+                                          name="state"
+                                          value={editItem["state"]}
+                                          onChange={handleEditChange}
+                                          onBlur={(e) => {
+                                            if (!editTouched.state) {
+                                              setEditTouched((prev) => ({
+                                                ...prev,
+                                                state: true,
+                                              }));
+                                            }
+                                          }}
+                                          disabled={!states.length}
+                                          className={`form-control ${
+                                            activeForm === "edit" &&
+                                            editErrors.state &&
+                                            editTouched.state
+                                              ? "is-invalid"
+                                              : ""
+                                          }`}
+                                        >
+                                          <option value="">
+                                            Select a state
+                                          </option>
+                                          {states.map((s, i) => (
+                                            <option key={i} value={s.name}>
+                                              {s.name}
+                                            </option>
+                                          ))}
+                                        </select>
+                                        {activeForm === "edit" &&
+                                          editErrors.state &&
+                                          editTouched.state && (
+                                            <div className="invalid-feedback">
+                                              {editErrors.state}
+                                            </div>
+                                          )}
+                                      </div>
+                                    </div>
+
+                                    <div className="col-lg-12">
+                                      <div className="billing-select mb-20">
+                                        <label>City *</label>
+                                        <select
+                                          name="city"
+                                          value={editItem["city"]}
+                                          onChange={handleEditChange}
+                                          onBlur={(e) => {
+                                            if (!editTouched.city) {
+                                              setEditTouched((prev) => ({
+                                                ...prev,
+                                                city: true,
+                                              }));
+                                            }
+                                          }}
+                                          disabled={!cities.length}
+                                          className={`form-control ${
+                                            activeForm === "edit" &&
+                                            editErrors.city &&
+                                            editTouched.city
+                                              ? "is-invalid"
+                                              : ""
+                                          }`}
+                                        >
+                                          <option value="">
+                                            Select a city
+                                          </option>
+                                          {cities.map((city, i) => (
+                                            <option key={i} value={city}>
+                                              {city}
+                                            </option>
+                                          ))}
+                                        </select>
+                                        {activeForm === "edit" &&
+                                          editErrors.city &&
+                                          editTouched.city && (
+                                            <div className="invalid-feedback">
+                                              {editErrors.city}
+                                            </div>
+                                          )}
+                                      </div>
+                                    </div>
+
+                                    <div className="col-lg-6 col-md-6">
+                                      <div className="billing-info mb-20">
+                                        <label>Postcode / ZIP *</label>
+                                        <input
+                                          type="text"
+                                          name="postcode"
+                                          value={editItem["postcode"]}
+                                          onChange={handleEditChange}
+                                          onBlur={(e) => {
+                                            if (!editTouched.postcode) {
+                                              setEditTouched((prev) => ({
+                                                ...prev,
+                                                postcode: true,
+                                              }));
+                                            }
+                                          }}
+                                          className={`form-control ${
+                                            activeForm === "edit" &&
+                                            editErrors.postcode &&
+                                            editTouched.postcode
+                                              ? "is-invalid"
+                                              : ""
+                                          }`}
+                                        />
+                                        {activeForm === "edit" &&
+                                          editErrors.postcode &&
+                                          editTouched.postcode && (
+                                            <div className="invalid-feedback">
+                                              {editErrors.postcode}
+                                            </div>
+                                          )}
+                                      </div>
+                                    </div>
+                                    <div className="col-lg-6 col-md-6">
+                                      <div className="billing-info mb-20">
+                                        <label>Phone *</label>
+                                        <input
+                                          type="text"
+                                          name="phone"
+                                          value={editItem["phone"]}
+                                          onChange={handleEditChange}
+                                          onBlur={(e) => {
+                                            if (!editTouched.phone) {
+                                              setEditTouched((prev) => ({
+                                                ...prev,
+                                                phone: true,
+                                              }));
+                                            }
+                                          }}
+                                          className={`form-control ${
+                                            activeForm === "edit" &&
+                                            editErrors.phone &&
+                                            editTouched.phone
+                                              ? "is-invalid"
+                                              : ""
+                                          }`}
+                                        />
+                                        {activeForm === "edit" &&
+                                          editErrors.phone &&
+                                          editTouched.phone && (
+                                            <div className="invalid-feedback">
+                                              {editErrors.phone}
+                                            </div>
+                                          )}
+                                      </div>
+                                    </div>
+                                    {/* <div className="col-lg-6 col-md-6">
+                              <div className="billing-info mb-20">
+                                <label>Email Address *</label>
+                                <input
+                                  type="email"
+                                  name="email"
+                                  value={formData.email}
+                                  onChange={handleInputChange}
+                                  onBlur={handleBlur}
+                                  className={`form-control ${
+                                    errors.email && editTouched.email
+                                      ? "is-invalid"
+                                      : ""
+                                  }`}
+                                />
+                                {errors.email && editTouched.email && (
+                                  <div className="invalid-feedback">
+                                    {errors.email}
+                                  </div>
+                                )}
+                              </div>
+                            </div> */}
+                                    <div className="col-md-12">
+                                      <div className="additional-info-wrap">
+                                        <h4>Additional Information</h4>
+                                        <div className="additional-info">
+                                          <label>Order Notes</label>
+                                          <textarea
+                                            name="description"
+                                            value={editItem["description"]}
+                                            onChange={handleEditChange}
+                                            // onBlur={handleBlur}
+                                            className="form-control"
+                                            placeholder="Notes about your order, e.g. special notes for delivery."
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
-                            ) : (
-                              <>
-                                <div className="fw-bold mb-1">
-                                  {item.fname} {item.lname}, {item.postal_code}
-                                  {item.primary_address === 1 && (
-                                    <span className="badge bg-success ms-2">
-                                      Primary
-                                    </span>
-                                  )}
-                                </div>
-                                <div style={{ fontSize: "14px" }}>
-                                  {item.address}, {item.city}, {item.state}
-                                </div>
-                                <div style={{ fontSize: "14px" }}>
-                                  {item.description}
-                                </div>
-
-                                <div className="position-absolute top-0 end-0 d-flex gap-1 p-2">
-                                 <button
-    onClick={() => handleEditClick(item, index)}
-    title="Edit"
-    style={{
-      backgroundColor: "#ffffff",
-      color: "#0D6EFD",
-      fontSize: "22px",
-      minWidth: "57px",
-      marginTop: "16%",
-      minHeight: "10px",
-      lineHeight: "55px",
-      marginBottom: "6px",
-      padding: "0",
-      border: "none",
-      borderRadius: "0",
-    }}
-  >
-    Edit
-    <i className="fa-solid fa-pen-to-square"></i>
-  </button>
-
-  <button
-    onClick={() => handleDelete(item.id)}
-    title="Delete"
-    style={{
-      backgroundColor: "#ffffff",
-      color: "#c2080f",
-      fontSize: "22px",
-      marginTop: "16%",
-      minWidth: "57px",
-      minHeight: "10px",
-      lineHeight: "55px",
-      marginBottom: "6px",
-      padding: "0",
-      border: "none",
-      borderRadius: "0",
-    }}
-  >
-    <i className="fa-solid fa-trash-can"></i>
-    Delete
-  </button>
-                                </div>
-                              </>
-                            )}
-                          </div>
+                              <div className="mt-3 d-flex justify-content-end gap-2">
+                                <button
+                                  type="button"
+                                  className="btn btn-secondary"
+                                  onClick={handleCancelEdit}
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={handleUpdate}
+                                  className="btn btn-success"
+                                >
+                                  Save Changes
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="fw-bold mb-1">
+                                {item.firstName} {item.lastName},{" "}
+                                {item.postalcode}
+                                {item.primary_address === 1 && (
+                                  <span className="badge bg-success ms-2">
+                                    Primary
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{ fontSize: "14px" }}>
+                                {item.address}, {item.city}, {item.state}
+                              </div>
+                              <div style={{ fontSize: "14px" }}>
+                                {item.description}
+                              </div>
+                            </>
+                          )}
                         </div>
-                      ))}
+                        {editIndex !== index ? (
+                          <div className="form-check d-flex gap-4 mt-4 me-3">
+                            <button
+                              type="button"
+                              onClick={() => handleEditClick(item, index)}
+                              title="Edit"
+                              style={{ background: "#ffeaf1", border: "0" }}
+                              className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded bg-pink-100 hover:bg-pink-200 transition d-flex align-items-center gap-2"
+                            >
+                              <FaEdit className="fs-3" />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleDelete(item.id)}
+                              title="Delete"
+                              style={{ background: "#ffeaf1", border: "0" }}
+                              className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded bg-pink-100 hover:bg-pink-200 transition d-flex align-items-center gap-2"
+                            >
+                              <FaTrash className="fs-3" />
+                            </button>
+                          </div>
+                        ) : (
+                          ""
+                        )}
+                      </div>
+                    ))}
                   </div>
 
                   <div className="col-lg-5">
@@ -1082,7 +1630,7 @@ const Checkout = () => {
                           >
                             <strong>Payment Error:</strong> {paymentError}
                             {orderPlaced &&
-                              formData.paymentMethod === "Paid" && (
+                              formData.paymentMethod === "PAID" && (
                                 <div style={{ marginTop: "10px" }}>
                                   <button
                                     type="button"
@@ -1121,6 +1669,7 @@ const Checkout = () => {
                                 border: "1px solid #dee2e6",
                                 borderRadius: "4px",
                                 marginBottom: "10px",
+                                fontSize: "15px",
                               }}
                             >
                               Payment Method
@@ -1156,12 +1705,12 @@ const Checkout = () => {
                                       type="radio"
                                       id="phonepe"
                                       name="paymentMethod"
-                                      value="Paid"
+                                      value="PAID"
                                       checked={
-                                        formData.paymentMethod === "Paid"
+                                        formData.paymentMethod === "PAID"
                                       }
                                       onChange={() =>
-                                        handlePaymentMethodChange("Paid")
+                                        handlePaymentMethodChange("PAID")
                                       }
                                       style={{
                                         margin: "0",
@@ -1201,12 +1750,12 @@ const Checkout = () => {
                                   >
                                     <input
                                       type="radio"
-                                      id="cod"
+                                      id="COD"
                                       name="paymentMethod"
-                                      value="Cod"
-                                      checked={formData.paymentMethod === "Cod"}
+                                      value="COD"
+                                      checked={formData.paymentMethod === "COD"}
                                       onChange={() =>
-                                        handlePaymentMethodChange("Cod")
+                                        handlePaymentMethodChange("COD")
                                       }
                                       style={{
                                         margin: "0",
@@ -1216,7 +1765,7 @@ const Checkout = () => {
                                       }}
                                     />
                                     <label
-                                      htmlFor="cod"
+                                      htmlFor="COD"
                                       style={{
                                         marginLeft: "10px",
                                         fontSize: "14px",
@@ -1277,10 +1826,56 @@ const Checkout = () => {
               </div>
             )}
           </div>
+          {showModal && (
+            <div style={modalBackdropStyle}>
+              <div style={modalStyle}>
+                <p className="fs-2 text-dark">You are not logged in</p>
+                <p>Please login or register to continue.</p>
+                <div className="d-flex gap-4 justify-content-center">
+                  <button
+                    style={stylebutton}
+                    onClick={() => navigate("/login-register")}
+                  >
+                    Login
+                  </button>
+                  <button
+                    style={stylebutton}
+                    onClick={() => navigate("/register")}
+                  >
+                    Register
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </LayoutOne>
     </Fragment>
   );
 };
-
+const modalBackdropStyle = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100vw",
+  height: "100vh",
+  backgroundColor: "rgba(0,0,0,0.5)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 1000,
+};
+const modalStyle = {
+  backgroundColor: "#fff",
+  padding: "30px",
+  borderRadius: "8px",
+  textAlign: "center",
+  width: "300px",
+};
+const stylebutton = {
+  color: "#fff",
+  backgroundColor: "#000",
+  borderRadius: "10px",
+  padding: "10px",
+};
 export default Checkout;

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { getProductCartQuantity } from "../../helpers/product";
 import Rating from "./sub-components/ProductRating";
-import { addToCart } from "../../store/slices/cart-slice";
+import { addToCart,deleteFromCart } from "../../store/slices/cart-slice";
 // import { addToWishlist } from "../../store/slices/wishlist-slice";
 import Modal from 'react-bootstrap/Modal';
 import SizeChartModal from "./SizeChart";
@@ -58,69 +58,126 @@ const ProductDescriptionInfo = ({
   useEffect(() => {
     setQuantityCount(1);
   }, [product.id]);
-  const handleAddtocart = async () => {
-    try {
-      //  dispatch(
-      //   addToCart({
-      //     ...product,
-      //     quantity : quantityCount,
-      //     // selectedProductColor: selectedProductColor
-      //   })
-      //    )
-      dispatch(
-        addToCart({
-          ...product,
+  // const handleAddtocart = async () => {
+  //   try {
+  //     //  dispatch(
+  //     //   addToCart({
+  //     //     ...product,
+  //     //     quantity : quantityCount,
+  //     //     // selectedProductColor: selectedProductColor
+  //     //   })
+  //     //    )
+  //     dispatch(
+  //       addToCart({
+  //         ...product,
+  //         quantity: quantityCount,
+  //         selectedProductColor:
+  //           selectedProductColor ??
+  //           product.selectedProductColor ??
+  //           null,
+  //         selectedProductSize:
+  //           selectedProductSize ??
+  //           product.selectedProductSize ??
+  //           null,
+  //       })
+  //     )
+  //     const payload = {
+  //       CUSTOMERID,
+  //       ITEMID: product.id,
+  //       quantity: quantityCount,
+  //       type: "cart",
+  //     }
+  //     console.log("this is data add to cart", payload);
+  //     //  addto cart api
+  //     const response = await axios.post(`${BASE_URL}/addtocartWishlist`, payload)
+  //     console.log("this is fetch data", response.data);
+  //   }
+  //   catch (error) {
+  //     console.log("this is failed to add item to cart backend", error)
+  //   }
+  // }
+
+const handleAddtocart = async () => {
+    // Create cart item object
+    const cartItem = {
+      ...product,
+      quantity: quantityCount,
+      };
+      console.log("this is034", cartItem);
+    // Always add to Redux store (works for both logged-in and guest users)
+    dispatch(addToCart(cartItem));
+    // Only call API if user is logged in
+    if (CUSTOMERID) {
+      console.log("this is 05");
+      try {
+        const payload = {
+          CUSTOMERID,
+          ITEMID: product.id,
           quantity: quantityCount,
-          selectedProductColor:
-            selectedProductColor ??
-            product.selectedProductColor ??
-            null,
-          selectedProductSize:
-            selectedProductSize ??
-            product.selectedProductSize ??
-            null,
-        })
-      )
-      const payload = {
-        CUSTOMERID,
-        ITEMID: product.id,
-        quantity: quantityCount,
-        type: "cart",
+          type: "cart",
+        };
+        const response = await axios.post(`${BASE_URL}/addtocartWishlist`, payload);
+        console.log("Item added to server cart:", response.data);
+      } catch (error) {
+        console.error("Failed to add to server cart:", error);
+        // Optional: Remove from Redux if server update fails
+        dispatch(deleteFromCart(cartItem.cartItemId));
       }
-      console.log("this is data add to cart", payload);
-      //  addto cart api
-      const response = await axios.post(`${BASE_URL}/addtocartWishlist`, payload)
-      console.log("this is fetch data", response.data);
     }
-    catch (error) {
-      console.log("this is failed to add item to cart backend", error)
-    }
-  }
+    // Reset quantity after adding to cart
+    setQuantityCount(1);
+  };
+
+
+
+  // const handleWishlist = async () => {
+  //   try {
+  //     dispatch(addToWishlist(product))
+  //     // dispatch(
+  //     //   addToWishlist({
+  //     //     ...product,
+  //     //     quantity: quantityCount,
+  //     //     // selectedProductColor: selectedProductColor
+  //     //   })
+  //     // )
+  //     const payload = {
+  //       CUSTOMERID,
+  //       ITEMID: product.id,
+  //       // quantity: quantityCount,
+  //       type: "wishlist",
+  //     }
+  //     console.log("this is data add to cart", payload);
+  //     //  addto cart api
+  //     const response = await axios.post(`${BASE_URL}/addtocartWishlist`, payload)
+  //     console.log("this is fetch data", response.data);
+  //   }
+  //   catch (error) {
+  //     console.log("this is failed to add item to cart backend", error)
+  //   }
+  // }
+
   const handleWishlist = async () => {
+  // Always add to Redux store (works for both logged-in and guest users)
+  dispatch(addToWishlist(product));
+  // Only call API if user is logged in
+  if (CUSTOMERID) {
     try {
-      dispatch(addToWishlist(product))
-      // dispatch(
-      //   addToWishlist({
-      //     ...product,
-      //     quantity: quantityCount,
-      //     // selectedProductColor: selectedProductColor
-      //   })
-      // )
       const payload = {
         CUSTOMERID,
         ITEMID: product.id,
-        // quantity: quantityCount,
-        type: "wishlist",
-      }
-      console.log("this is data add to cart", payload);
-      //  addto cart api
-      const response = await axios.post(`${BASE_URL}/addtocartWishlist`, payload)
-      console.log("this is fetch data", response.data);
-    }
-    catch (error) {
-      console.log("this is failed to add item to cart backend", error)
+        type: "wishlist"
+      };
+      const response = await axios.post(`${BASE_URL}/addtocartWishlist`, payload);
+      console.log("Item added to server wishlist:", response.data);
+    } catch (error) {
+      console.error("Failed to add to server wishlist:", error);
+      // Optional: Remove from Redux if server update fails
+      dispatch(deleteFromWishlist(product));
     }
   }
+};
+
+
   const handledeleteWishlist = async () => {
      dispatch(deleteFromWishlist(product))
     try {
@@ -411,8 +468,8 @@ const ProductDescriptionInfo = ({
       <div className="delivery-check">
         <h3>Check Delivery Pincode</h3>
         <div className="pincode-form flex gap-2">
-          <input type="text" placeholder="ENTER ZIP CODE" />
-          <button>CHECK</button>
+          <input type="text" placeholder="Enter Zip Code Here" />
+          <button>Check</button>
         </div>
         <div className="delivery-info flex flex-wrap gap-4 mt-4">
           <div className="free-shipping flex items-center gap-2">

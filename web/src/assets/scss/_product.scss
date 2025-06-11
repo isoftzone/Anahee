@@ -600,6 +600,7 @@
     }
   }
   .pro-details-size-color {
+    cursor: pointer;
     display: flex;
     @media #{$xs-layout} {
       display: block;
