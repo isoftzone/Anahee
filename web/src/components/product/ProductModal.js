@@ -292,6 +292,40 @@ function ProductModal({
               </div>
               {product.variation ? (
                 <div className="pro-details-size-color">
+                  <div className="pro-details-color-wrap">
+            <span>Color</span>
+            <div className="pro-details-color-content">
+              {product.variation.map((single, key) => {
+                return (
+                  <label
+                    key={key}
+                    className={`pro-details-color-content--single ${single.color}`}
+                    style={{
+                      backgroundColor: single.code,
+                      border: "1px solid black",
+                      // borderColor: selectedProductColor === single.color ? "black" : "#ccc"
+                    }}
+                    title={single.color} // show color name on hover
+                  >
+                    <input
+                      type="radio"
+                      value={single.color}
+                      name="product-color"
+                      checked={single.color === selectedProductColor}
+                      onChange={() => {
+                        setSelectedProductColor(single.color);
+                        setSelectedProductSize(single.size[0].name);
+                        setProductStock(single.size[0].stock);
+                        setQuantityCount(1);
+                      }}
+                      className="absolute opacity-0 w-0 h-0"
+                    />
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
                   {/* <div className="pro-details-color-wrap">
                   <span>Color</span>
                   <div className="pro-details-color-content">

@@ -1301,7 +1301,8 @@ const ShopGridStandard = () => {
                         Active Filters ({getActiveFilterCount()})
                       </h6>
                       <button
-                        className="btn btn-sm btn-outline-secondary"
+                      style={{background:"#ffeaf1"}}
+                        className="text-black border-0 fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded bg-pink-100 hover:bg-pink-200 transition d-flex align-items-center gap-2"
                         onClick={clearAllFilters}
                       >
                         Clear All
@@ -2025,7 +2026,7 @@ export default ShopGridStandard;
 //                         className="btn btn-sm btn-outline-danger"
 //                         onClick={clearAllFilters}
 //                       >
-//                         Clear All
+//                         
 //                       </button>
 //                     </div>
 

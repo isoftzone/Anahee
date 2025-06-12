@@ -213,7 +213,7 @@ exports.updateCustomerInfo = (req, res) => {
     }
     return res
       .status(200)
-      // .json({ message: "Account Information updated successfully" });
+      .json({ message: "Account Information updated successfully" });
   });
 };
 

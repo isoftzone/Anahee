@@ -8,10 +8,10 @@ import { Link, useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 const Register = () => {
   const [formData, setFormData] = useState({
-    fname: "",
-    lname: "",
+    FNAME: "",
+    LNAME: "",
     email: "",
-    mobile: "",
+    MOBILE: "",
     password: "",
     confirmPassword: "",
   });
@@ -22,10 +22,10 @@ const Register = () => {
   const navigate = useNavigate();
   useEffect(() => {
     setFormData({
-      fname: "",
-      lname: "",
+      FNAME: "",
+      LNAME: "",
       email: "",
-      mobile: "",
+      MOBILE: "",
       password: "",
       confirmPassword: "",
     });
@@ -41,16 +41,16 @@ const Register = () => {
   };
 
   const validateForm = () => {
-    const { fname, lname, email, mobile, password, confirmPassword } = formData;
-    if (!fname.trim() || fname.length < 2)
+    const { FNAME, LNAME, email, MOBILE, password, confirmPassword } = formData;
+    if (!FNAME.trim() || FNAME.length < 2)
       return "First name must be at least 2 characters.";
-    if (!lname.trim() || lname.length < 2)
+    if (!LNAME.trim() || LNAME.length < 2)
       return "Last name must be at least 2 characters.";
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) return "Enter a valid email address.";
 
-    const mobileRegex = /^[0-9]{10}$/;
-    if (!mobileRegex.test(mobile)) return "Mobile number must be 10 digits.";
+    const MOBILERegex = /^[0-9]{10}$/;
+    if (!MOBILERegex.test(MOBILE)) return "Mobile number must be 10 digits.";
 
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
     if (!passwordRegex.test(password)) {
@@ -78,10 +78,10 @@ const Register = () => {
       if (response.ok) {
         setSuccess("Registration successful!");
         setFormData({
-          fname: "",
-          lname: "",
+          FNAME: "",
+          LNAME: "",
           email: "",
-          mobile: "",
+          MOBILE: "",
           password: "",
           confirmPassword: "",
         });
@@ -125,16 +125,16 @@ const Register = () => {
                             <form onSubmit={handleSubmit} autoComplete="off">
                               <input
                                 type="text"
-                                name="fname"
+                                name="FNAME"
                                 placeholder="First Name"
-                                value={formData.fname}
+                                value={formData.FNAME}
                                 onChange={handleChange}
                               />
                               <input
                                 type="text"
-                                name="lname"
+                                name="LNAME"
                                 placeholder="Last Name"
-                                value={formData.lname}
+                                value={formData.LNAME}
                                 onChange={handleChange}
                               />
                               <input
@@ -146,16 +146,16 @@ const Register = () => {
                               />
                               <input
                                 type="tel"
-                                name="mobile"
-                                placeholder="Mobile"
-                                value={formData.mobile}
+                                name="MOBILE"
+                                placeholder="MOBILE"
+                                value={formData.MOBILE}
                                 onChange={(e) => {
                                   const value = e.target.value;
                                   // Allow only digits
                                   if (/^\d*$/.test(value)) {
                                     setFormData((prev) => ({
                                       ...prev,
-                                      mobile: value,
+                                      MOBILE: value,
                                     }));
                                   }
                                 }}
