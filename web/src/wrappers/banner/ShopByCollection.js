@@ -16,11 +16,11 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
               Western Wear
             </a>
             <span className="divider">|</span>
-            <a href="/shop-grid-standard" className="mx-2">
+            <a href="/shop-grid-standard?category=Suits" className="mx-2">
               Suit Sets
             </a>
             <span className="divider">|</span>
-            <a href="/shop-grid-standard" className="mx-2">
+            <a href="/shop-grid-standard?category=Coordset" className="mx-2">
               Cord Sets
             </a>
           </div>
