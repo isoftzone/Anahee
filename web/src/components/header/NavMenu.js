@@ -39,7 +39,7 @@ const NavMenu = ({ menuWhiteClass, sidebarMenu }) => {
           </li> */}
            <li>
             <Link
-              to={`${process.env.PUBLIC_URL}/shop-grid-standard?category=Kurta`}
+              to={`${process.env.PUBLIC_URL}/shop-grid-standard?category=Suits`}
             >
               {t("Suits")}
             </Link>

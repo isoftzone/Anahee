@@ -1295,7 +1295,7 @@ const ShopGridStandard = () => {
 
                 {/* Active Filters Display */}
                 {getActiveFilterCount() > 0 && (
-                  <div className="active-filters mt-4 p-3 border rounded">
+                  <div className="active-filters mt-4 p-3 mr-30 border rounded">
                     <div className="d-flex justify-content-between align-items-center mb-2">
                       <h6 className="mb-0">
                         Active Filters ({getActiveFilterCount()})
