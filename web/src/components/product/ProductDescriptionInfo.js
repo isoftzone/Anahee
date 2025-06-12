@@ -359,7 +359,8 @@ const ProductDescriptionInfo = ({
                     key={key}
                     className={`pro-details-color-content--single ${single.color}`}
                     style={{
-                      backgroundColor: single.color.toLowerCase(),
+                    backgroundColor: single.code,
+
                       border: "1px solid black",
                       // borderColor: selectedProductColor === single.color ? "black" : "#ccc"
                     }}

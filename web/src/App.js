@@ -179,7 +179,7 @@ useEffect(() => {
                 path={process.env.PUBLIC_URL + "/home-fashion"}
                 element={<HomeFashion/>}
               />
-              <Route
+              {/* <Route
                 path={process.env.PUBLIC_URL + "/home-fashion-two"}
                 element={<HomeFashionTwo/>}
               />
@@ -194,12 +194,12 @@ useEffect(() => {
               <Route
                 path={process.env.PUBLIC_URL + "/home-fashion-five"}
                 element={<HomeFashionFive/>}
-              />
+              /> */}
               <Route
                 path={process.env.PUBLIC_URL + "/home-fashion-six"}
                 element={<HomeFashionSix/>}
               />
-              <Route
+              {/* <Route
                 path={process.env.PUBLIC_URL + "/home-fashion-seven"}
                 element={<HomeFashionSeven/>}
               />
@@ -326,7 +326,7 @@ useEffect(() => {
               <Route
                 path={process.env.PUBLIC_URL + "/home-valentines-day"}
                 element={<HomeValentinesDay/>}
-              />
+              /> */}
 
               {/* Shop pages */}
               <Route
@@ -393,7 +393,7 @@ useEffect(() => {
               /> 
 
               {/* Blog pages */}
-              <Route
+              {/* <Route
                 path={process.env.PUBLIC_URL + "/blog-standard"}
                 element={<BlogStandard/>}
               />
@@ -408,7 +408,7 @@ useEffect(() => {
               <Route
                 path={process.env.PUBLIC_URL + "/blog-details-standard"}
                 element={<BlogDetailsStandard/>}
-              /> 
+              />  */}
 
               {/* Other pages */}
               <Route
