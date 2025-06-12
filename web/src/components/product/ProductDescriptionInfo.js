@@ -394,7 +394,7 @@ const ProductDescriptionInfo = ({
                 >
                   <span className="mt-3">| Size Chart</span>
                   <img
-                    src="/assets/img/icon-img/sizecharticon.webp"
+                    src="/assets/img/icon-img/sizecharticon2.webp"
                     alt="Size Chart"
                     className="ms-1"
                     style={{ width: "20px", height: "20px" }}
