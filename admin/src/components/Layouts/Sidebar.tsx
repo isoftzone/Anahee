@@ -2272,6 +2272,9 @@ const Sidebar = () => {
                                         <li>
                                             <NavLink to="/Components/Customerl">Customer Master</NavLink>
                                         </li>
+                                          <li>
+                                            <NavLink to="/Components/promotionNumber">Promotion Number</NavLink>
+                                        </li>
                                     </ul>
                                 </AnimateHeight>
                             </li>

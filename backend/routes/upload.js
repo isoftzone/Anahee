@@ -129,7 +129,7 @@ router.put("/images/:id", (req, res) => {
 
 
 // 🛠️ Delete Image API
-router.delete("/images/:id", (req, res) => {
+router.delete("/imagesDelete/:id", (req, res) => {
   const { id } = req.params;
 
   db.query("SELECT images, sequence FROM HP_Images WHERE id = ?", [id], (err, result) => {

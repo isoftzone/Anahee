@@ -24,6 +24,7 @@ const salesdetail = require("../controllers/salesdetail");
 const rfmaster = require("../controllers/rfmaster");
 const upload = require("../middlewares/imageupload");
 const userMaster = require("../controllers/userMaster");
+const {promotionNumber, getpromotionNumber} = require("../controllers/promotionNumber")
 router.post("/addProducts", addProductData.addProducts);
 router.get("/getCodeTypeData", addProductData.getCodeTypeData);
 router.get("/getCodeTypeAllData", addProductData.getCodeTypeAllData);
@@ -130,7 +131,8 @@ router.put("/updatecoupons/:id", discountController.updateDiscountCoupon);
 router.post("/applycoupon", discountController.applyCoupon);
 
 
-
+router.post("/promotionNumber", promotionNumber);
+router.get("/getpromotionNumber", getpromotionNumber)
 
 router.post("/addtocartWishlist",addtocartWishlistproduct)
 router.post("/addtocartAction",addtocartwishlistAction)

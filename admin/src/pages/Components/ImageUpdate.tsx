@@ -78,7 +78,7 @@ const ImageUpdates: React.FC = () => {
     };
     const handleDelete = async (id: number) => {
         try {
-            await axios.delete(`${BASE_URL}/images/${id}`);
+            await axios.delete(`${BASE_URL}/imagesDelete/${id}`);
             setImages(images.filter((image) => image.id !== id));
         } catch (error) {
             setError('Delete failed');
@@ -186,8 +186,8 @@ const ImageUpdates: React.FC = () => {
                                 {/* <td className="border p-2 text-center cursor-pointer" onClick={() => handleEdit(image)}>
                                     <IconPencil />
                                 </td> */}
-                                 <td className="border p-2 text-center cursor-pointer"  onClick={() => handleEdit(image)}>
-                                    <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm mt-4 font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" onClick={() => handleDelete(image.id)}>
+                                 <td className="border p-2 text-center cursor-pointer">
+                                    <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm mt-4 font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" onClick={() => handleEdit(image)}>
                                         Edit
                                     </button>
                                 </td>
