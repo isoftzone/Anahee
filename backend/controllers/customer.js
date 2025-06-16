@@ -162,12 +162,33 @@ exports.updateCustomerInfo = (req, res) => {
     CCOUNTRY,
     CDISTRICT,
     CPINCODE,
-    password,
+    newPassword,
+    confirmPassword
   } = req.body;
  
   if (!customerId) {
     return res.status(400).json({ error: "Customer ID is missing" });
   }
+  
+   // Password validation
+    const errors = {};
+    if (newPassword || confirmPassword) {
+        if (!newPassword) {
+            errors.newPassword = 'New password is required';
+        } else if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(newPassword)) {
+            errors.newPassword = 'Password must be at least 8 characters with one letter, number, and special character';
+        }
+
+        if (newPassword !== confirmPassword) {
+            errors.confirmPassword = 'Passwords do not match';
+        }
+    }
+
+    if (Object.keys(errors).length > 0) {
+        return res.status(400).json({ errors });
+    }
+
+
   // Build query
   const fields = [
     "FNAME = ?",
@@ -193,10 +214,11 @@ exports.updateCustomerInfo = (req, res) => {
     CDISTRICT,
     CPINCODE,
   ];
-  if (password) {
-    fields.push("password = ?");
-    values.push(password); // plain text password
-  }
+     if (newPassword) {
+        fields.push("password = ?");
+        // In production, you should hash the password here
+        values.push(newPassword);
+    }
   values.push(customerId); // for WHERE condition
   const sql = `UPDATE customermaster SET ${fields.join(
     ", "
@@ -213,7 +235,7 @@ exports.updateCustomerInfo = (req, res) => {
     }
     return res
       .status(200)
-      // .json({ message: "Account Information updated successfully" });
+      .json({ message: "Account Information updated successfully" });
   });
 };
 
