@@ -3,10 +3,12 @@
 import { Tab } from '@headlessui/react';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';      
+import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { BASE_URL } from '../../config';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 // import 'bootstrap-icons/font/bootstrap-icons.css';
 
@@ -28,6 +30,7 @@ interface Customer {
 
 interface FormErrors {
     password?: string;
+    newPassword?: string;
     confirmPassword?: string;
 }
 export default function EditCustomer() {
@@ -36,6 +39,7 @@ export default function EditCustomer() {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [errors, setErrors] = useState<FormErrors>({});
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [NewPassword, setNewPassword] = useState<boolean>(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
     const [formData, setFormData] = useState<Customer>({
         email: '',
@@ -84,6 +88,7 @@ export default function EditCustomer() {
         MICRCODE: '',
         TPNOBANK: '',
         CCOUNTRY: '',
+        NewPassword: '',
         password: '',
         confirmPassword: '',
     });
@@ -96,7 +101,7 @@ export default function EditCustomer() {
     useEffect(() => {
         const fetchCustomer = async () => {
             try {
-                const response = await axios.get(`http://localhost:3000/getcustomerbyid/${id}`);
+                const response = await axios.get(`${BASE_URL}/getcustomerbyid/${id}`);
                 setFormData(response.data);
                 setLoading(false);
             } catch (error) {
@@ -167,21 +172,16 @@ export default function EditCustomer() {
         fetchCities();
     }, [formData.CSTATE]);
     const validate = () => {
-        const newErrors: FormErrors = {};
+         const newErrors: FormErrors = {};
+    
+    if (formData.newPassword && !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(formData.newPassword)) {
+        newErrors.newPassword = 'Password must be at least 8 characters with one letter, number, and special character';
+    }
 
-        // Password validation
-        if (!formData.password) {
-            newErrors.password = 'Password is required';
-        } else if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(formData.password)) {
-            newErrors.password = 'Incorrect password. Please try again.';
-        }
+    if (formData.newPassword !== formData.confirmPassword) {
+        newErrors.confirmPassword = 'Passwords do not match';
+    }
 
-        // Confirm password validation
-        if (!formData.confirmPassword) {
-            newErrors.confirmPassword = 'Confirm password is required';
-        } else if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = 'Passwords do not match';
-        }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -193,20 +193,24 @@ export default function EditCustomer() {
             ...prev,
             [name]: value,
         }));
+        console.log("this is data", name);
     };
 
-    const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData((prev) => ({
-            ...prev,
-            STATUS: e.target.value,
-        }));
-    };
+    // const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     setFormData((prev) => ({
+    //         ...prev,
+    //         STATUS: e.target.value,
+    //     }));
+    // };
 
     const handleSubmit = async () => {
         try {
-            const response = await axios.put(`http://localhost:3000/updateCustomerInfo/${id}`, formData);
+            validate()
+            const response = await axios.put(`${BASE_URL}/updateCustomerInfo/${id}`, formData);
             console.log('Customer updated:', response.data);
-            toast.success('Customer updated successfully!');
+            toast.success(response.data.message);
+         
+            // toast.success('Customer updated successfully!');
             // navigate('/components/Customerl');
         } catch (error: any) {
             console.error('Error updating customer:', error);
@@ -223,7 +227,9 @@ export default function EditCustomer() {
         // Reset form to original fetched data
         if (id) {
             axios
-                .get(`http://localhost:3000/getcustomerbyid/${id}`)
+                  .get(`${BASE_URL}/getcustomerbyid/${id}`)
+          
+                // .get(`http://localhost:3000/getcustomerbyid/${id}`)
                 .then((response) => setFormData(response.data))
                 .catch((error) => console.error('Error resetting form:', error));
         }
@@ -392,37 +398,66 @@ export default function EditCustomer() {
                                 <label className="block font-medium">Pincode</label>
                                 <input type="text" name="CPINCODE" value={formData.CPINCODE || ''} onChange={handleChange} className="w-full border p-2 rounded" />
                             </div>
-                            <div className="mb-3" style={{ position: 'relative' }}>
-                                <label className="block font-medium">Password</label>
-
+                            <div className="mb-3" style={{ position: 'relative' }} >
+                                <label className="block font-medium">Old Password</label>
                                 <input
                                     type={showPassword ? 'text' : 'password'}
                                     name="password"
                                     placeholder="Password"
                                     value={formData.password}
-                                    onChange={handleChange}
+                                    // onChange={handleChange}
                                     className={`w-full border p-2 rounded ${errors.password ? 'is-invalid' : ''}`}
                                     style={{ paddingRight: '40px' }}
                                 />
-                                <i
-                                    className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}
+                                <span
                                     onClick={() => setShowPassword(!showPassword)}
                                     style={{
                                         position: 'absolute',
-                                        top: '47%',
+                                        top: '70%',
                                         right: '15px',
                                         transform: 'translateY(-50%)',
                                         cursor: 'pointer',
-                                        fontSize: '1.5rem',
+                                        fontSize: '1.3rem',
                                         color: '#777',
                                     }}
-                                ></i>
-                                {errors.password && <div style={{ color: 'red', marginTop: '0.25rem' }}>{errors.password}</div>}
+                                >
+                                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                                </span>
                             </div>
 
+
+                            <div className="mb-3" style={{ position: 'relative' }}>
+                                <label className="block font-medium"> New Password</label>
+                                <input
+                                    type={NewPassword ? 'text' : 'password'}
+                                    name="newPassword"
+                                    placeholder="New Password"
+                                    value={formData.newPassword}
+                                    onChange={handleChange}
+                                    className={`w-full border p-2 rounded ${errors.newPassword ? 'is-invalid' : ''}`}
+                                    style={{ paddingRight: '40px' }}
+                                />
+                                <span
+                                    onClick={() => setNewPassword(!NewPassword)}
+                                    style={{
+                                        position: 'absolute',
+                                        top: '70%',
+                                        right: '15px',
+                                        transform: 'translateY(-50%)',
+                                        cursor: 'pointer',
+                                        fontSize: '1.3rem',
+                                        color: '#777',
+                                    }}
+                                >
+                                    {NewPassword ? <FaEye /> : <FaEyeSlash />}
+                                    {/* {showPassword ? <FaEye /> : <FaEyeSlash />} */}
+                                </span>
+                                {errors.newPassword && <div style={{ color: 'red', marginTop: '0.25rem' }}>{errors.newPassword}</div>}
+                            </div>
+
+                            {/* Confirm Password Field */}
                             <div className="mb-3" style={{ position: 'relative' }}>
                                 <label className="block font-medium">Confirm Password</label>
-
                                 <input
                                     type={showConfirmPassword ? 'text' : 'password'}
                                     name="confirmPassword"
@@ -432,22 +467,22 @@ export default function EditCustomer() {
                                     className={`w-full border p-2 rounded ${errors.confirmPassword ? 'is-invalid' : ''}`}
                                     style={{ paddingRight: '40px' }}
                                 />
-                                <i
-                                    className={`bi ${showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'}`}
+                                <span
                                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                     style={{
                                         position: 'absolute',
-                                        top: '47%',
+                                        top: '70%',
                                         right: '15px',
                                         transform: 'translateY(-50%)',
                                         cursor: 'pointer',
-                                        fontSize: '1.5rem',
+                                        fontSize: '1.3rem',
                                         color: '#777',
                                     }}
-                                ></i>
+                                >
+                                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                                </span>
                                 {errors.confirmPassword && <div style={{ color: 'red', marginTop: '0.25rem' }}>{errors.confirmPassword}</div>}
                             </div>
-
                             <div className="md:col-span-2">
                                 <label className="block font-medium">Address</label>
                                 <textarea name="CADDRESSLINE1" value={formData.CADDRESSLINE1 || ''} onChange={handleChange} className="w-full border p-2 rounded" rows={3}></textarea>
@@ -463,222 +498,6 @@ export default function EditCustomer() {
                         </form>
                     </Tab.Panel>
 
-                    {/* AGENT TAB */}
-                    {/* <Tab.Panel>
-                        <form className="grid md:grid-cols-2 gap-4" onSubmit={(e) => e.preventDefault()}>
-                            <div>
-                                <label className="block font-medium">Agent Name</label>
-                                <input 
-                                    type="text" 
-                                    name="AGENT" 
-                                    value={formData.AGENT || ''} 
-                                    onChange={handleChange} 
-                                    className="w-full border p-2 rounded" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium">Agent Email</label>
-                                <input 
-                                    type="email" 
-                                    name="EMAILID" 
-                                    value={formData.EMAILID || ''} 
-                                    onChange={handleChange} 
-                                    className="w-full border p-2 rounded" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium">Agent Firm</label>
-                                <input 
-                                    type="text" 
-                                    name="agentFirm" 
-                                    value={formData.agentFirm || ''} 
-                                    onChange={handleChange} 
-                                    className="w-full border p-2 rounded" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium">Agent Commission</label>
-                                <input 
-                                    type="text" 
-                                    name="AGENTCOMISSION" 
-                                    value={formData.AGENTCOMISSION || ''} 
-                                    onChange={handleChange} 
-                                    className="w-full border p-2 rounded" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium">Agent Phone</label>
-                                <input 
-                                    type="tel" 
-                                    name="TELEPHONE2" 
-                                    value={formData.TELEPHONE2 || ''} 
-                                    onChange={handleChange} 
-                                    className="w-full border p-2 rounded" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium">State</label>
-                                <select 
-                                    name="CSTATE" 
-                                    value={formData.CSTATE || ''} 
-                                    onChange={handleChange} 
-                                    className="w-full border p-2 rounded"
-                                >
-                                    <option value="">-- Select state --</option>
-                                    <option value="Delhi">Delhi</option>
-                                    <option value="Maharashtra">Maharashtra</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block font-medium">City</label>
-                                <input
-                                    type="text"
-                                    name="CCITY"
-                                    value={formData.CCITY || ''}
-                                    onChange={handleChange}
-                                    className="w-full border p-2 rounded"
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium">Pincode</label>
-                                <input 
-                                    type="text" 
-                                    name="CPINCODE" 
-                                    value={formData.CPINCODE || ''} 
-                                    onChange={handleChange} 
-                                    className="w-full border p-2 rounded" 
-                                />
-                            </div>
-                            <div className="md:col-span-2">
-                                <label className="block font-medium">Agent Address</label>
-                                <textarea 
-                                    name="CADDRESSLINE2" 
-                                    value={formData.CADDRESSLINE2 || ''} 
-                                    onChange={handleChange} 
-                                    className="w-full border p-2 rounded" 
-                                    rows={3}
-                                ></textarea>
-                            </div>
-                            <div className="md:col-span-2 flex gap-2 mt-2">
-                                <button 
-                                    type="button" 
-                                    onClick={handleSubmit} 
-                                    className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
-                                >
-                                    Save
-                                </button>
-                                <button 
-                                    type="button" 
-                                    onClick={handleReset}
-                                    className="border px-6 py-2 rounded hover:bg-gray-50"
-                                >
-                                    Reset
-                                </button>
-                            </div>
-                        </form>
-                    </Tab.Panel> */}
-
-                    {/* BANK DETAILS TAB */}
-                    {/* <Tab.Panel>
-                        <form className="grid md:grid-cols-2 gap-4" onSubmit={(e) => e.preventDefault()}>
-                            <div>
-                                <label className="block font-medium">Bank Name</label>
-                                <input 
-                                    type="text" 
-                                    name="BANKNAME" 
-                                    value={formData.BANKNAME || ''} 
-                                    onChange={handleChange} 
-                                    className="w-full border p-2 rounded" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium">Account Type</label>
-                                <input 
-                                    type="text" 
-                                    name="ACCOUNTTYPE" 
-                                    value={formData.ACCOUNTTYPE || ''} 
-                                    onChange={handleChange} 
-                                    className="w-full border p-2 rounded" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium">Account Number</label>
-                                <input 
-                                    type="text" 
-                                    name="ACCOUNTNO" 
-                                    value={formData.ACCOUNTNO || ''} 
-                                    onChange={handleChange} 
-                                    className="w-full border p-2 rounded" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium">IFSC Code</label>
-                                <input 
-                                    type="text" 
-                                    name="IFSCCODE" 
-                                    value={formData.IFSCCODE || ''} 
-                                    onChange={handleChange} 
-                                    className="w-full border p-2 rounded" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium">Cheque No</label>
-                                <input 
-                                    type="text" 
-                                    name="CHEQUENO" 
-                                    value={formData.CHEQUENO || ''} 
-                                    onChange={handleChange} 
-                                    className="w-full border p-2 rounded" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium">Cheque Remarks</label>
-                                <input 
-                                    type="text" 
-                                    name="CHEQUEREMARK" 
-                                    value={formData.CHEQUEREMARK || ''} 
-                                    onChange={handleChange} 
-                                    className="w-full border p-2 rounded" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium">MICR Code</label>
-                                <input 
-                                    type="text" 
-                                    name="MICRCODE" 
-                                    value={formData.MICRCODE || ''} 
-                                    onChange={handleChange} 
-                                    className="w-full border p-2 rounded" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium">Bank Phone</label>
-                                <input 
-                                    type="tel" 
-                                    name="TPNOBANK" 
-                                    value={formData.TPNOBANK || ''} 
-                                    onChange={handleChange} 
-                                    className="w-full border p-2 rounded" 
-                                />
-                            </div>
-                            <div className="md:col-span-2 flex gap-2 mt-2">
-                                <button 
-                                    type="button" 
-                                    onClick={handleSubmit} 
-                                    className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
-                                >
-                                    Save
-                                </button>
-                                <button 
-                                    type="button" 
-                                    onClick={handleReset}
-                                    className="border px-6 py-2 rounded hover:bg-gray-50"
-                                >
-                                    Reset
-                                </button>
-                            </div>
-                        </form>
-                    </Tab.Panel> */}
                 </Tab.Panels>
             </Tab.Group>
         </div>
