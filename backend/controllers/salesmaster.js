@@ -24,9 +24,9 @@ exports.getSalesMaster = (req, res) => {
       im.ITEMNAME,
       im.DESCRIPTION
     FROM salesmaster sm
-    JOIN salesdetail sd ON sm.SALEID = sd.SALEID
-    JOIN itemmaster im ON sd.ITEMID = im.ITEMID
-    JOIN customermaster cm ON sm.CUSTOMERID = cm.CUSTOMERID
+    LEFT JOIN salesdetail sd ON sm.SALEID = sd.SALEID
+    LEFT JOIN itemmaster im ON sd.ITEMID = im.ITEMID
+    LEFT JOIN customermaster cm ON sm.CUSTOMERID = cm.CUSTOMERID
   `;
 
   const params = [];
