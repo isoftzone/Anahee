@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { BASE_URL } from "../../config";
 
 interface SalesDetail {
   ITEMDESC: string;
@@ -19,7 +20,7 @@ const OrderPreview: React.FC = () => {
   const fetchSalesDetail = async () => {
     try {
       // const response = await axios.get(`http://localhost:3000/getSalesDetail}`);
-      const response = await axios.get("http://localhost:3000/getSalesDetail"); // ✅ Fixed URL
+      const response = await axios.get(`${BASE_URL}/getSalesDetail`); // ✅ Fixed URL
       console.log("API Response:", response.data);
 
       if (response.data.salesDetailData) {
