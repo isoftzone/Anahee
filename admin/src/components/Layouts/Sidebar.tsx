@@ -1976,7 +1976,7 @@ const Sidebar = () => {
                                         <IconCaretDown />
                                     </div>
                                 </button>
-                                <AnimateHeight duration={300} height={currentMenu === '' || basicSubMenuOpen ? 'auto' : 0}>
+                                <AnimateHeight duration={300} height={currentMenu === 'datalabels' || basicSubMenuOpen ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
                                         {/* <li> */}
                                             {/* <button type="button" className={`${basicSubMenuOpen ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('basic')}>
@@ -2272,7 +2272,7 @@ const Sidebar = () => {
                                         <li>
                                             <NavLink to="/Components/Customerl">Customer Master</NavLink>
                                         </li>
-                                          <li>
+                                            <li>
                                             <NavLink to="/Components/promotionNumber">Promotion Number</NavLink>
                                         </li>
                                     </ul>
