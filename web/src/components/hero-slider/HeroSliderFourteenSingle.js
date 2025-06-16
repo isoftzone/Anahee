@@ -48,7 +48,7 @@ const HeroSliderFourteenSingle = ({ data }) => {
                     {/* <p className="look-text">LOOK</p> */}
                     <p className="look-text">{banners[31]?.des_l3}</p>
                   </div>
-                  <div className="slider-btn-collection-5">
+                  <div className="slider-btn-collection-5 slider-animated-1">
                     <Link
                       className="see-collection-btn"
                       to={process.env.PUBLIC_URL + "/shop-grid-standard"}

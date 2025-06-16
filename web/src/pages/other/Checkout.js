@@ -98,17 +98,45 @@ const Checkout = () => {
     }
   }, [showPopup, isSuccess, navigate]);
 
+  // useEffect(() => {
+  //   const script = document.createElement("script");
+  //   console.log("this is script", script)
+  //   script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
+  //   script.async = true;
+  //   // script.crossOrigin = "anonymous";
+  //   document.body.appendChild(script);
+
+  //   // return () => {
+  //   //   document.body.removeChild(script);
+  //   // };
+  // }, []);
+
+
   useEffect(() => {
-    const script = document.createElement("script");
+  const loadPhonePeScript = () => {
+    if (window.PhonePeCheckout) return; // Already loaded
+    const script = document.createElement('script');
     script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
     script.async = true;
-    script.crossOrigin = "anonymous";
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
+    script.onload = () => {
+      console.log('PhonePe script loaded successfully');
     };
-  }, []);
+    script.onerror = () => {
+      console.error('Failed to load PhonePe script');
+      setPaymentError('Payment service is currently unavailable. Please try another method.');
+    };
+    document.body.appendChild(script);
+    return () => {
+      // Only remove if payment isn't in progress
+      if (!orderPlaced) {
+        document.body.removeChild(script);
+      }
+    };
+  };
+  if (formData.paymentMethod === "PAID") {
+    loadPhonePeScript();
+  }
+}, [formData.paymentMethod, orderPlaced]);
 
   const { search } = useLocation();
   const params = new URLSearchParams(search);

@@ -140,8 +140,11 @@ const MobileNavMenu = () => {
         <li>
           <Link to={process.env.PUBLIC_URL + "/about"}>{t("About")}</Link>
         </li>
+         <li>
+          <Link to={process.env.PUBLIC_URL + "/shop-grid-standard?category=Suits"}>{t("Suits")}</Link>
+        </li>
         <li>
-          <Link to={process.env.PUBLIC_URL + "/"}>{t("Western Wear")}</Link>
+          <Link to={process.env.PUBLIC_URL + "/shop-grid-standard?category=westernwear"}>{t("Western Wear")}</Link>
         </li>
         <li>
           <Link to={process.env.PUBLIC_URL + "/contact"}>

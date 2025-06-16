@@ -41,9 +41,9 @@ const con = require('../config')
 
 
 exports.addProducts = (req, res) => {
-    const { codetype, createdby, primename, status, sequence, remark, companyid } = req.body;
+    const { codetype, primename, status, sequence, remark } = req.body;
     // Validate input (optional)
-    if (!codetype || !createdby || !primename || !sequence || !status || !companyid) {
+    if (!codetype || !primename || !sequence || !status ) {
         return res.status(400).json({ message: 'All fields are required' });
     }
     // SQL query to get the max primekeyid for the given codetype
@@ -56,9 +56,9 @@ exports.addProducts = (req, res) => {
         // Calculate the new primekeyid
         const newPrimeKeyId = results[0].maxPrimeKeyId + 1;
         // SQL query to insert into 'master' table
-        const insertSql = `INSERT INTO master (codetype, createdby, primekeyid, primename, status, sequence, remark, companyid)
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-        const values = [codetype, createdby, newPrimeKeyId, primename, status, sequence, remark, companyid];
+        const insertSql = `INSERT INTO master (codetype, primekeyid, primename, status, sequence, remark)
+                           VALUES (?, ?, ?, ?, ?, ?)`;
+        const values = [codetype,  newPrimeKeyId, primename, status, sequence, remark];
         // Execute the insert query
         con.query(insertSql, values, (err, results) => {
             if (err) {
@@ -139,21 +139,21 @@ exports.getCodeTypeAllData = (req, res) => {
 
 exports.editProduct = (req, res) => {
     
-    const { codetype, updatedby, primename, status, sequence, remark } = req.body;
+    const { codetype,  primename, status, sequence, remark } = req.body;
     const primekeyid = req.params.primekeyid; // Extract primekeyid from request parameters
 
     // Validate input
-    if (!codetype || !updatedby || !primekeyid || !primename || !status || !sequence) {
+    if (!codetype || !primekeyid || !primename || !status || !sequence) {
         return res.status(400).json({ message: 'All fields are required' });
     }
 
     // SQL query to update 'master' table based on primekeyid and codetype
     const sql = `
         UPDATE master
-        SET codetype = ?, updatedby = ?, primename = ?, status = ?, sequence = ?, remark = ?
+        SET codetype = ?, primename = ?, status = ?, sequence = ?, remark = ?
         WHERE primekeyid = ? AND codetype = ?`;
 
-    const values = [codetype, updatedby, primename, status, sequence, remark, primekeyid, codetype];
+    const values = [codetype,  primename, status, sequence, remark, primekeyid, codetype];
 
     // Execute the query
     con.query(sql, values, (err, results) => {

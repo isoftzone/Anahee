@@ -49,6 +49,7 @@ import SocialMediaSettingsPage from '../pages/Components/SocialMediaSettingsPage
 import AboutUs from '../pages/Components/AboutUs';
 import ContactUs from '../pages/Components/ContactUs';
 import EditCustomer from '../pages/Components/EditCustomer';
+import PromotionNumber from '../pages/Components/PromotionNumber';
 
 // import ExchangePolicy from /ExchangePolicy';
 const Index = lazy(() => import('../pages/Index'));
@@ -476,6 +477,10 @@ const routes = [
     {
         path: '/Components/Customerl',
         element: <CustomersL/>
+    },
+      {
+        path: '/Components/promotionNumber',
+        element: <PromotionNumber/>
     },
     {
         path: '/components/AddCustomers',

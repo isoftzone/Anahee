@@ -226,6 +226,21 @@
       font-size: 6rem !important;
     }
   }
+
+  @media (max-width: 412px) {
+    .lookbook-main-container {
+      .lookbook-text-content {
+        left: 44% !important;
+      }
+    }
+    .lookbook1,
+    .lookbook2 {
+      // height: 250px;
+      img {
+        width: 58% !important;
+      }
+    }
+  }
 }
 
 // @media (max-width: 2560px) {

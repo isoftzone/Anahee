@@ -388,4 +388,16 @@
       }
     }
   }
+  @media (max-width: 412px) {
+    .promo-banner {
+      &__section {
+        &--middle{
+          padding-left: 227px !important;
+        }
+         &--top{
+          padding-left: 227px !important;
+        }
+      }
+    }
+  }
 }

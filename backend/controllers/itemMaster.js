@@ -1036,6 +1036,7 @@ exports.MultipleSizeitem = (req, res) => {
       iv.volumetricweight, iv.netweight,
       iv.grossweight, iv.shippingweight,
       img.image,
+      mr.REMARK,
       sr.quantity_from, sr.quantity_to,
       sr.saleprice AS slab_saleprice,
       sr.sp1 AS slab_sp1, sr.sp2 AS slab_sp2,
@@ -1044,6 +1045,7 @@ exports.MultipleSizeitem = (req, res) => {
     LEFT JOIN itemvariants iv ON im.ITEMID = iv.itemid
     LEFT JOIN itemimages img ON iv.variantid = img.variantid AND im.ITEMID = img.itemid
     LEFT JOIN slab_rates sr ON iv.variantid = sr.variantid
+    LEFT JOIN master mr ON iv.color = mr.PRIMENAME
     ORDER BY im.ITEMID;
   `;
   con.query(query, (err, results) => {
@@ -1100,6 +1102,7 @@ exports.MultipleSizeitem = (req, res) => {
       if (!variation) {
         variation = {
           color: row.color || "default",
+          code: row.REMARK,
           RATE: row.RATE,
           TAX: row.TAX,
           PURPRICE: row.PURPRICE,

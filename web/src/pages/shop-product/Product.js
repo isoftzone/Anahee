@@ -61,6 +61,7 @@ const Product = () => {
         <RelatedProductSlider
           spaceBottomClass="pb-20"
           category={product.category[0]}
+          product_id={id}
         />
       </LayoutOne>
     </Fragment>
