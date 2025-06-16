@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 // import '../tailwind.css'; // Optional: For more specific styling
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../../config';
 
 interface User {
   srNo: number;
@@ -39,7 +40,7 @@ const Users: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`http://localhost:3000/get_userMaster`); // Your API endpoint
+        const response = await axios.get(`${BASE_URL}/get_userMaster`); // Your API endpoint
         console.log("response",response)
         setUsers(response.data);
         setLoading(false);

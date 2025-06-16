@@ -1951,7 +1951,7 @@ const MyAccount = () => {
 
     try {
       await axios.delete(
-        `http://localhost:3000/deletecustomeraddress/${addressId}`
+        `${BASE_URL}/deletecustomeraddress/${addressId}`
       );
       alert("Address deleted successfully");
       fetchAddresses();
@@ -1966,7 +1966,7 @@ const MyAccount = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put("http://localhost:3000/updatecustomeraddress", {
+      await axios.put(`${BASE_URL}/updatecustomeraddress`, {
         ...editItem,
         customer_id: customerId,
         primary_address: editItem.primary_address || 0,
@@ -1982,7 +1982,7 @@ const MyAccount = () => {
 
   const fetchAddresses = () => {
     axios
-      .get(`http://localhost:3000/getcustomeraddress/${customerId}`)
+      .get(`${BASE_URL}/getcustomeraddress/${customerId}`)
       .then((res) => setData(res.data))
       .catch((err) => console.error("API Error:", err));
   };
@@ -2030,7 +2030,7 @@ const MyAccount = () => {
     const handleAddSubmit = async (e) => {
       e.preventDefault();
       try {
-        await axios.post("http://localhost:3000/addcustomeraddress", {
+        await axios.post(`${BASE_URL}/addcustomeraddress`, {
           ...addForm,
           customer_id: customerId,
         });
@@ -2093,7 +2093,7 @@ const MyAccount = () => {
     if (!itemToUpdate) return alert("Address not found");
 
     try {
-      await axios.put("http://localhost:3000/updatecustomeraddress", {
+      await axios.put(`${BASE_URL}/updatecustomeraddress`, {
         ...itemToUpdate,
         customer_id: customerId,
         primary_address: 1,
@@ -2106,7 +2106,7 @@ const MyAccount = () => {
   const handleAddSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:3000/addcustomeraddress", {
+      await axios.post(`${BASE_URL}/addcustomeraddress`, {
         ...addForm,
         customer_id: customerId,
       });

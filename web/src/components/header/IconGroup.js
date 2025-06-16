@@ -156,9 +156,9 @@ const IconGroup = ({ iconWhiteClass }) => {
         setName(customer.name); // assuming `customerinfo` has a `name` field
         console.log("setName", name);
          try{
-         const response = await axios.get(`http://localhost:3000/getalladdtocart/${customer.id}`);
+         const response = await axios.get(`${BASE_URL}/getalladdtocart/${customer.id}`);
           const allCartItems = response.data.data;
-          const wishlistdata = await axios.get(`http://localhost:3000/getwishlist/${customer.id}`);
+          const wishlistdata = await axios.get(`${BASE_URL}/getwishlist/${customer.id}`);
           const allwishlistitem = wishlistdata.data.data;
           
           console.log("this is long time login cart data ", allCartItems);
