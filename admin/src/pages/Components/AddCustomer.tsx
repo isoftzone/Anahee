@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
+import { BASE_URL } from '../../config';
 // import "bootstrap/dist/css/bootstrap.min.css";
 // import "bootstrap-icons/font/bootstrap-icons.css";
 
@@ -219,7 +220,9 @@ export default function AddCustomer() {
 
             console.log('Sending customer data:', customerData); // Debug log
 
-            const res = await axios.post('http://localhost:3000/add_customer', customerData);
+            // const res = await axios.post('http://localhost:3000/add_customer', customerData);
+              const res = await axios.post(`${BASE_URL}/add_customer`, customerData);
+      
             console.log('Customer added:', res.data);
             toast.success('Customer saved successfully!');
 
