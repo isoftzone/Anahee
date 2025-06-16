@@ -110,26 +110,49 @@ router.get("/images", (req, res) => {
 
 
 // 🛠️ Update Image API
-router.put("/images/:id", (req, res) => {
-  const { id } = req.params;
-  const { sec_name, des_l1, des_l2, des_l3 } = req.body;
+// router.put("/images/:id", (req, res) => {
+//   const { id } = req.params;
+//   const { sec_name, des_l1, des_l2, des_l3, images } = req.body;
 
-  const sql = "UPDATE HP_Images SET sec_name = ?, des_l1 = ?, des_l2 = ?, des_l3 = ? WHERE id = ?";
-  db.query(sql, [sec_name, des_l1, des_l2, des_l3, id], (err) => {
-      if (err) {
-          console.error("Database Error:", err);
-          return res.status(500).json({ error: "Failed to update image data" });
-      }
-      res.json({ message: "Image updated successfully" });
-  });
-});
+//   const sql = "UPDATE HP_Images SET sec_name = ?, des_l1 = ?, des_l2 = ?, des_l3 = ?, images = ? WHERE id = ?";
+//   db.query(sql, [sec_name, des_l1, des_l2, des_l3, id, images], (err) => {
+//       if (err) {
+//           console.error("Database Error:", err);
+//           return res.status(500).json({ error: "Failed to update image data" });
+//       }
+//       res.json({ message: "Image updated successfully" });
+//   });
+// });
+router.put("/images/:id", upload.single('image'), (req, res) => {
+    const { id } = req.params;
+    const { sec_name, des_l1, des_l2, des_l3 } = req.body;
+    const image = req.file ? req.file.filename : null;
+    let sql, values;
+    if (image) {
+        sql = "UPDATE HP_Images SET sec_name = ?, des_l1 = ?, des_l2 = ?, des_l3 = ?, images = ? WHERE id = ?";
+        values = [sec_name, des_l1, des_l2, des_l3, image, id];
+    } else {
+        sql = "UPDATE HP_Images SET sec_name = ?, des_l1 = ?, des_l2 = ?, des_l3 = ? WHERE id = ?";
+        values = [sec_name, des_l1, des_l2, des_l3, id];
+    }
+    db.query(sql, values, (err) => {
+        if (err) {
+            console.error("Database Error:", err);
+            return res.status(500).json({ error: "Failed to update image data" });
+        }
+ res.json({
+            message: 'Image updated successfully',
+            image: image ? { filename: image, id } : null
+        });
+    });
+   });
 
 
 
 
 
 // 🛠️ Delete Image API
-router.delete("/images/:id", (req, res) => {
+router.delete("/imagesDelete/:id", (req, res) => {
   const { id } = req.params;
 
   db.query("SELECT images, sequence FROM HP_Images WHERE id = ?", [id], (err, result) => {
