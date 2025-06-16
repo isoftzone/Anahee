@@ -93,7 +93,6 @@ const NavMenu = ({ menuWhiteClass, sidebarMenu }) => {
                 <Link to={process.env.PUBLIC_URL + "/login-register"}>
                   {t("Shorts")}
                 </Link>
-                
               </li>
             </ul>
           </li>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
 import ImageUploading, { ImageListType } from 'react-images-uploading';
@@ -13,6 +13,7 @@ const ImageUpdates: React.FC = () => {
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editingImageUrl, setEditingImageUrl] = useState<string>(''); // Store original image URL for editing
     const [error, setError] = useState('');
+   const formRef = useRef<HTMLFormElement>(null); 
     const maxNumber = 1;
     useEffect(() => {
         const fetchImages = async () => {
@@ -78,7 +79,7 @@ const ImageUpdates: React.FC = () => {
     };
     const handleDelete = async (id: number) => {
         try {
-            await axios.delete(`${BASE_URL}/images/${id}`);
+            await axios.delete(`${BASE_URL}/imagesDelete/${id}`);
             setImages(images.filter((image) => image.id !== id));
         } catch (error) {
             setError('Delete failed');
@@ -92,6 +93,10 @@ const ImageUpdates: React.FC = () => {
         setDesL3(image.des_l3);
         setEditingImageUrl(image.images); // Store the original image URL
         setUploadImages([]); // Clear upload images to show original image
+
+        setTimeout(()=>{
+            formRef.current?.scrollIntoView({behavior: 'smooth', block:'start'})
+        }, 100)
     };
     const resetForm = () => {
         setSecName('');
@@ -116,7 +121,9 @@ const ImageUpdates: React.FC = () => {
     return (
         <div className="p-4 border rounded shadow bg-white w-full">
             <h2 className="text-xl font-bold mb-4 text-center sm:text-left">Banners</h2>
-            <form className="flex flex-col gap-4 w-full max-w-3xl mx-auto mt-6 p-4 bg-gray-100 rounded shadow-md" onSubmit={handleSave}>
+            <form  ref={formRef}
+            className="flex flex-col gap-4 w-full max-w-3xl mx-auto mt-6 p-4 bg-gray-100 rounded shadow-md"
+             onSubmit={handleSave}>
                 <ImageUploading value={uploadImages} onChange={setUploadImages} maxNumber={maxNumber}>
                     {({ imageList, onImageUpload, onImageRemove }) => (
                         <div className="w-full">
@@ -187,7 +194,7 @@ const ImageUpdates: React.FC = () => {
                                     <IconPencil />
                                 </td> */}
                                  <td className="border p-2 text-center cursor-pointer"  onClick={() => handleEdit(image)}>
-                                    <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm mt-4 font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" onClick={() => handleDelete(image.id)}>
+                                    <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm mt-4 font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" onClick={() => handleEdit(image)}>
                                         Edit
                                     </button>
                                 </td>

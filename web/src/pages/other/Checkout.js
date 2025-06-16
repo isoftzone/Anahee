@@ -58,8 +58,8 @@ const Checkout = () => {
   const totalWeight = cartItems.reduce((sum, item) => {
     return sum + item.weight * item.quantity;
   }, 0);
-  console.log('first 1 totalWeight', totalWeight);
-   console.log('first 1 cartItems', cartItems);
+  console.log("first 1 totalWeight", totalWeight);
+  console.log("first 1 cartItems", cartItems);
   // Show popup for 3 seconds
   useEffect(() => {
     if (showPopup) {
@@ -72,17 +72,62 @@ const Checkout = () => {
       return () => clearTimeout(timer);
     }
   }, [showPopup, isSuccess, navigate]);
-
-  useEffect(() => {
-    const script = document.createElement("script");
+useEffect(() => {
+  const loadPhonePeScript = () => {
+    if (window.PhonePeCheckout) return; // Already loaded
+    const script = document.createElement('script');
     script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
     script.async = true;
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
+    script.onload = () => {
+      console.log('PhonePe script loaded successfully');
     };
-  }, []);
+    script.onerror = () => {
+      console.error('Failed to load PhonePe script');
+      setPaymentError('Payment service is currently unavailable. Please try another method.');
+    };
+    document.body.appendChild(script);
+    return () => {
+      // Only remove if payment isn't in progress
+      if (!orderPlaced) {
+        document.body.removeChild(script);
+      }
+    };
+  };
+  if (formData.paymentMethod === "PAID") {
+    loadPhonePeScript();
+  }
+}, [formData.paymentMethod, orderPlaced]);
+
+
+  // useEffect(() => {
+  //   const script = document.createElement("script");
+  //   script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
+  //   script.async = true;
+  //   script.crossOrigin = "anonymous";
+
+  //   // Add error handling for script loading
+  //   script.onload = () => {
+  //     console.log("PhonePe script loaded successfully");
+  //   };
+
+  //   script.onerror = (error) => {
+  //     console.error("Failed to load PhonePe script:", error);
+  //     // setPaymentError(
+  //     //   "Failed to load payment service. Please refresh and try again."
+  //     // );
+  //   };
+  //   document.body.appendChild(script);
+
+  //   // return () => {
+  //   //   document.body.removeChild(script);
+  //   // };
+  //   return () => {
+  //     // Check if script exists before removing
+  //     if (document.body.contains(script)) {
+  //       document.body.removeChild(script);
+  //     }
+  //   };
+  // }, []);
 
   const { search } = useLocation();
   const params = new URLSearchParams(search);
@@ -183,7 +228,7 @@ const Checkout = () => {
           pickup_postcode: "302016",
           delivery_postcode: primaryAddress.postcode,
           cod: formData.paymentMethod == "COD" ? 1 : 0,
-          weight:1,
+          weight: 1,
         }
       );
 
@@ -367,74 +412,227 @@ const Checkout = () => {
     setPaymentError("");
   };
 
-  const phonePeCallback = (response, orderId) => {
-    setIsLoading(false);
+  // const phonePeCallback = (response, orderId) => {
+  //   setIsLoading(false);
 
-    if (response === "USER_CANCEL") {
-      setPaymentError(
-        "Payment was cancelled. Please choose a payment method to continue."
-      );
-      // Reset order state so user can try again
+  //   if (response === "USER_CANCEL") {
+  //     setPaymentError(
+  //       "Payment was cancelled. Please choose a payment method to continue."
+  //     );
+  //     // Reset order state so user can try again
+  //     setOrderPlaced(false);
+  //   } else if (response === "CONCLUDED") {
+  //     verifyPaymentStatus(orderId);
+  //   } else {
+  //     setPaymentError(
+  //       "Payment failed. Please try again or choose a different payment method."
+  //     );
+  //     setOrderPlaced(false);
+  //   }
+  // };
+
+  const phonePeCallback = (response, orderId) => {
+    try {
+      console.log("PhonePe callback received:", { response, orderId });
+
+      setIsLoading(false);
+
+      if (!orderId) {
+        throw new Error("Order ID is missing in callback");
+      }
+
+      if (response === "USER_CANCEL") {
+        setPaymentError(
+          "Payment was cancelled. Please choose a payment method to continue."
+        );
+        setOrderPlaced(false);
+      } else if (response === "CONCLUDED") {
+        // Add a small delay to ensure state is updated
+        setTimeout(() => {
+          verifyPaymentStatus(orderId);
+        }, 100);
+      } else {
+        console.warn("Unexpected PhonePe response:", response);
+        setPaymentError(
+          "Payment failed. Please try again or choose a different payment method."
+        );
+        setOrderPlaced(false);
+      }
+    } catch (error) {
+      console.error("Error in PhonePe callback:", {
+        message: error.message,
+        stack: error.stack,
+        response,
+        orderId,
+      });
+
+      setPaymentError("Payment processing error. Please contact support.");
       setOrderPlaced(false);
-    } else if (response === "CONCLUDED") {
-      verifyPaymentStatus(orderId);
-    } else {
-      setPaymentError(
-        "Payment failed. Please try again or choose a different payment method."
-      );
-      setOrderPlaced(false);
+      setIsLoading(false);
     }
   };
-
   const verifyPaymentStatus = async (orderId) => {
     try {
       const response = await axios.get(
         `${BASE_URL}/api/order-status/${orderId}`
       );
       if (response.data.success) {
-        const paymentDetail = response.data.data.paymentDetails[0];
+        const paymentDetail = response.data.data.paymentDetails?.[0];
 
-        const splitInstrument = paymentDetail?.splitInstruments[0];
+        if (!paymentDetail) {
+          throw new Error("Payment details not found in response");
+        }
+
+        const splitInstrument = paymentDetail?.splitInstruments?.[0];
 
         const updateData = {
           merchant_order_id: response?.data?.data?.orderId,
           payment_mode: "PAID",
-          provider_reference_id: splitInstrument?.rail?.utr,
+          provider_reference_id: splitInstrument?.rail?.utr || "",
           phonepe_status: response?.data?.data?.state,
           payment_status: paymentDetail?.state,
           transaction_id: paymentDetail?.transactionId,
-          saleId: orderId, // Assuming you have orderId in state
+          saleId: orderId,
         };
-        console.log("updateData,updateData", updateData);
-        await axios.put(`${BASE_URL}/updateSalesMaster`, updateData, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+
+        console.log("Updating with data:", updateData);
+
+        const updateResponse = await axios.put(
+          `${BASE_URL}/updateSalesMaster`,
+          updateData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("Update response:", updateResponse.data);
 
         setIsSuccess(true);
         setShowPopup(true);
         resetForm();
       } else {
-        setIsSuccess(false);
-        setShowPopup(true);
-        setPaymentError("Payment verification failed. Please contact support.");
-        setOrderPlaced(false);
+        throw new Error(response.data.message || "Payment verification failed");
       }
     } catch (error) {
-      console.error("Error verifying payment:", error);
+      console.error("Detailed error in verifyPaymentStatus:", {
+        message: error.message,
+        stack: error.stack,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+
       setIsSuccess(false);
       setShowPopup(true);
       setPaymentError(
-        "There was an error verifying your payment. Please contact support."
+        error.response?.data?.message ||
+          "There was an error verifying your payment. Please contact support."
       );
       setOrderPlaced(false);
     }
   };
 
+  // const initiatePhonePePayment = async (orderId) => {
+  //   try {
+  //     setIsLoading(true);
+  //     const response = await axios.post(`${BASE_URL}/api/create-order`, {
+  //       orderId: orderId,
+  //       amountInPaisa: (cartTotalPrice - discount) * 100,
+  //       customerPhone: formData.phone || "0000000000",
+  //       redirectUrl: window.location.origin + "/orders",
+  //       expireAfter: 1200,
+  //       metaInfo: {
+  //         udf1: "Additional Info 1",
+  //         udf2: "Additional Info 2",
+  //       },
+  //     });
+
+  //     if (response.data.success && response.data.data.redirectUrl) {
+  //       if (window.PhonePeCheckout && window.PhonePeCheckout.transact) {
+  //         window.PhonePeCheckout.transact({
+  //           tokenUrl: response.data.data.redirectUrl,
+  //           callback: (resp) => phonePeCallback(resp, orderId),
+  //           type: "IFRAME",
+  //         });
+  //       } else {
+  //         setPaymentError("PhonePe checkout is not ready. Please try again.");
+  //         setIsLoading(false);
+  //         setOrderPlaced(false);
+  //       }
+  //     } else {
+  //       setPaymentError(
+  //         "Failed to initiate PhonePe payment. Please try again."
+  //       );
+  //       setIsLoading(false);
+  //       setOrderPlaced(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error initiating PhonePe payment:", error);
+  //     setPaymentError(
+  //       "There was an error initiating PhonePe payment. Please try again."
+  //     );
+  //     setIsLoading(false);
+  //     setOrderPlaced(false);
+  //   }
+
+  // };
+
+  const loadPhonePeScript = () => {
+    return new Promise((resolve, reject) => {
+      if (window.PhonePeCheckout) {
+        resolve();
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
+      script.async = true;
+
+      script.onload = () => {
+        // Give it a moment to initialize
+        setTimeout(() => {
+          if (window.PhonePeCheckout) {
+            resolve();
+          } else {
+            reject(new Error("PhonePe not available after load"));
+          }
+        }, 100);
+      };
+
+      script.onerror = () => reject(new Error("Failed to load PhonePe script"));
+
+      document.head.appendChild(script);
+    });
+  };
+
   const initiatePhonePePayment = async (orderId) => {
     try {
       setIsLoading(true);
+
+      // Wait for PhonePe script to be ready
+      const waitForPhonePe = () => {
+        return new Promise((resolve, reject) => {
+          let attempts = 0;
+          const maxAttempts = 50; // 5 seconds max wait
+
+          const checkPhonePe = () => {
+            if (window.PhonePeCheckout && window.PhonePeCheckout.transact) {
+              resolve();
+            } else if (attempts < maxAttempts) {
+              attempts++;
+              setTimeout(checkPhonePe, 100);
+            } else {
+              reject(new Error("PhonePe script not loaded"));
+            }
+          };
+
+          checkPhonePe();
+        });
+      };
+      await loadPhonePeScript();
+      await waitForPhonePe();
+
       const response = await axios.post(`${BASE_URL}/api/create-order`, {
         orderId: orderId,
         amountInPaisa: (cartTotalPrice - discount) * 100,
@@ -448,23 +646,13 @@ const Checkout = () => {
       });
 
       if (response.data.success && response.data.data.redirectUrl) {
-        if (window.PhonePeCheckout && window.PhonePeCheckout.transact) {
-          window.PhonePeCheckout.transact({
-            tokenUrl: response.data.data.redirectUrl,
-            callback: (resp) => phonePeCallback(resp, orderId),
-            type: "IFRAME",
-          });
-        } else {
-          setPaymentError("PhonePe checkout is not ready. Please try again.");
-          setIsLoading(false);
-          setOrderPlaced(false);
-        }
+        window.PhonePeCheckout.transact({
+          tokenUrl: response.data.data.redirectUrl,
+          callback: (resp) => phonePeCallback(resp, orderId),
+          type: "IFRAME",
+        });
       } else {
-        setPaymentError(
-          "Failed to initiate PhonePe payment. Please try again."
-        );
-        setIsLoading(false);
-        setOrderPlaced(false);
+        throw new Error("Failed to get redirect URL");
       }
     } catch (error) {
       console.error("Error initiating PhonePe payment:", error);
@@ -476,6 +664,43 @@ const Checkout = () => {
     }
   };
 
+  useEffect(() => {
+    const handleGlobalError = (event) => {
+      if (event.message === "Script error.") {
+        console.error("Cross-origin script error detected");
+        // Handle the error gracefully
+      }
+    };
+
+    window.addEventListener("error", handleGlobalError);
+
+    return () => {
+      window.removeEventListener("error", handleGlobalError);
+    };
+  }, []);
+  useEffect(() => {
+    // Enhanced error handling
+    const handleError = (event) => {
+      console.error("Global error caught:", event.error);
+      console.error("Error message:", event.message);
+      console.error("Error stack:", event.error?.stack);
+    };
+
+    const handleUnhandledRejection = (event) => {
+      console.error("Unhandled promise rejection:", event.reason);
+    };
+
+    window.addEventListener("error", handleError);
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener("error", handleError);
+      window.removeEventListener(
+        "unhandledrejection",
+        handleUnhandledRejection
+      );
+    };
+  }, []);
   const resetForm = async () => {
     setFormData({
       firstName: "",
@@ -1632,16 +1857,18 @@ const Checkout = () => {
                               </div>
                               <div className="mt-3 d-flex justify-content-end gap-2">
                                 <button
+                                  style={{ background: "#FFEAF1" }}
                                   type="button"
-                                  className="btn btn-secondary"
+                                  className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded hover:bg-pink-400 transition d-flex align-items-center gap-2 border-0"
                                   onClick={handleCancelEdit}
                                 >
                                   Cancel
                                 </button>
                                 <button
+                                  style={{ background: "#FFEAF1" }}
                                   type="button"
                                   onClick={handleUpdate}
-                                  className="btn btn-success"
+                                  className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded  hover:bg-pink-400 transition d-flex align-items-center gap-2 border-0"
                                 >
                                   Save Changes
                                 </button>

@@ -1,14 +1,16 @@
-
 // npm install bootstrap bootstrap-icons
 import { Tab } from '@headlessui/react';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';      
+import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { BASE_URL } from '../../config';
 
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 // import 'bootstrap-icons/font/bootstrap-icons.css';
+// import { BASE_URL } from './../../config';
 
 const tabs = ['Personal Details'];
 
@@ -28,6 +30,7 @@ interface Customer {
 
 interface FormErrors {
     password?: string;
+    newPassword?: string;
     confirmPassword?: string;
 }
 export default function EditCustomer() {
@@ -36,6 +39,8 @@ export default function EditCustomer() {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [errors, setErrors] = useState<FormErrors>({});
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [NewPassword, setNewPassword] = useState<boolean>(false);
+
     const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
     const [formData, setFormData] = useState<Customer>({
         email: '',
@@ -85,6 +90,7 @@ export default function EditCustomer() {
         TPNOBANK: '',
         CCOUNTRY: '',
         password: '',
+        NewPassword: '',
         confirmPassword: '',
     });
     const [loading, setLoading] = useState(true);
@@ -96,7 +102,7 @@ export default function EditCustomer() {
     useEffect(() => {
         const fetchCustomer = async () => {
             try {
-                const response = await axios.get(`http://localhost:3000/getcustomerbyid/${id}`);
+                const response = await axios.get(`${BASE_URL}/getcustomerbyid/${id}`);
                 setFormData(response.data);
                 setLoading(false);
             } catch (error) {
@@ -167,26 +173,20 @@ export default function EditCustomer() {
         fetchCities();
     }, [formData.CSTATE]);
     const validate = () => {
-        const newErrors: FormErrors = {};
+         const newErrors: FormErrors = {};
+    
+    if (formData.newPassword && !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(formData.newPassword)) {
+        newErrors.newPassword = 'Password must be at least 8 characters with one letter, number, and special character';
+    }
 
-        // Password validation
-        if (!formData.password) {
-            newErrors.password = 'Password is required';
-        } else if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(formData.password)) {
-            newErrors.password = 'Incorrect password. Please try again.';
-        }
+    if (formData.newPassword !== formData.confirmPassword) {
+        newErrors.confirmPassword = 'Passwords do not match';
+    }
 
-        // Confirm password validation
-        if (!formData.confirmPassword) {
-            newErrors.confirmPassword = 'Confirm password is required';
-        } else if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = 'Passwords do not match';
-        }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -204,9 +204,10 @@ export default function EditCustomer() {
 
     const handleSubmit = async () => {
         try {
-            const response = await axios.put(`http://localhost:3000/updateCustomerInfo/${id}`, formData);
+            validate();
+            const response = await axios.put(`${BASE_URL}/updateCustomerInfo/${id}`, formData);
             console.log('Customer updated:', response.data);
-            toast.success('Customer updated successfully!');
+            toast.success(response.data.message);
             // navigate('/components/Customerl');
         } catch (error: any) {
             console.error('Error updating customer:', error);
@@ -223,7 +224,7 @@ export default function EditCustomer() {
         // Reset form to original fetched data
         if (id) {
             axios
-                .get(`http://localhost:3000/getcustomerbyid/${id}`)
+                .get(`${BASE_URL}/getcustomerbyid/${id}`)
                 .then((response) => setFormData(response.data))
                 .catch((error) => console.error('Error resetting form:', error));
         }
@@ -392,37 +393,66 @@ export default function EditCustomer() {
                                 <label className="block font-medium">Pincode</label>
                                 <input type="text" name="CPINCODE" value={formData.CPINCODE || ''} onChange={handleChange} className="w-full border p-2 rounded" />
                             </div>
-                            <div className="mb-3" style={{ position: 'relative' }}>
-                                <label className="block font-medium">Password</label>
-
+                              <div className="mb-3" style={{ position: 'relative' }} >
+                                <label className="block font-medium">Old Password</label>
                                 <input
                                     type={showPassword ? 'text' : 'password'}
                                     name="password"
                                     placeholder="Password"
                                     value={formData.password}
-                                    onChange={handleChange}
+                                    // onChange={handleChange}
                                     className={`w-full border p-2 rounded ${errors.password ? 'is-invalid' : ''}`}
                                     style={{ paddingRight: '40px' }}
                                 />
-                                <i
-                                    className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}
+                                <span
                                     onClick={() => setShowPassword(!showPassword)}
                                     style={{
                                         position: 'absolute',
-                                        top: '47%',
+                                        top: '70%',
                                         right: '15px',
                                         transform: 'translateY(-50%)',
                                         cursor: 'pointer',
-                                        fontSize: '1.5rem',
+                                        fontSize: '1.3rem',
                                         color: '#777',
                                     }}
-                                ></i>
-                                {errors.password && <div style={{ color: 'red', marginTop: '0.25rem' }}>{errors.password}</div>}
+                                >
+                                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                                </span>
                             </div>
 
+
+                            <div className="mb-3" style={{ position: 'relative' }}>
+                                <label className="block font-medium"> New Password</label>
+                                <input
+                                    type={NewPassword ? 'text' : 'password'}
+                                    name="newPassword"
+                                    placeholder="New Password"
+                                    value={formData.newPassword}
+                                    onChange={handleChange}
+                                    className={`w-full border p-2 rounded ${errors.newPassword ? 'is-invalid' : ''}`}
+                                    style={{ paddingRight: '40px' }}
+                                />
+                                <span
+                                    onClick={() => setNewPassword(!NewPassword)}
+                                    style={{
+                                        position: 'absolute',
+                                        top: '70%',
+                                        right: '15px',
+                                        transform: 'translateY(-50%)',
+                                        cursor: 'pointer',
+                                        fontSize: '1.3rem',
+                                        color: '#777',
+                                    }}
+                                >
+                                    {NewPassword ? <FaEye /> : <FaEyeSlash />}
+                                    {/* {showPassword ? <FaEye /> : <FaEyeSlash />} */}
+                                </span>
+                                {errors.newPassword && <div style={{ color: 'red', marginTop: '0.25rem' }}>{errors.newPassword}</div>}
+                            </div>
+
+                            {/* Confirm Password Field */}
                             <div className="mb-3" style={{ position: 'relative' }}>
                                 <label className="block font-medium">Confirm Password</label>
-
                                 <input
                                     type={showConfirmPassword ? 'text' : 'password'}
                                     name="confirmPassword"
@@ -432,19 +462,20 @@ export default function EditCustomer() {
                                     className={`w-full border p-2 rounded ${errors.confirmPassword ? 'is-invalid' : ''}`}
                                     style={{ paddingRight: '40px' }}
                                 />
-                                <i
-                                    className={`bi ${showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'}`}
+                                <span
                                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                     style={{
                                         position: 'absolute',
-                                        top: '47%',
+                                        top: '70%',
                                         right: '15px',
                                         transform: 'translateY(-50%)',
                                         cursor: 'pointer',
-                                        fontSize: '1.5rem',
+                                        fontSize: '1.3rem',
                                         color: '#777',
                                     }}
-                                ></i>
+                                >
+                                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                                </span>
                                 {errors.confirmPassword && <div style={{ color: 'red', marginTop: '0.25rem' }}>{errors.confirmPassword}</div>}
                             </div>
 

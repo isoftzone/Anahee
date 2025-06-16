@@ -162,12 +162,29 @@ exports.updateCustomerInfo = (req, res) => {
     CCOUNTRY,
     CDISTRICT,
     CPINCODE,
-    password,
+     newPassword,
+    confirmPassword,
+    // password,
   } = req.body;
  
   if (!customerId) {
     return res.status(400).json({ error: "Customer ID is missing" });
   }
+    // Password validation
+    const errors = {};
+    if (newPassword || confirmPassword) {
+        if (!newPassword) {
+            errors.newPassword = 'New password is required';
+        } else if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(newPassword)) {
+            errors.newPassword = 'Password must be at least 8 characters with one letter, number, and special character';
+        }
+        if (newPassword !== confirmPassword) {
+            errors.confirmPassword = 'Passwords do not match';
+        }
+    }
+    if (Object.keys(errors).length > 0) {
+        return res.status(400).json({ errors });
+    }
   // Build query
   const fields = [
     "FNAME = ?",
@@ -193,10 +210,11 @@ exports.updateCustomerInfo = (req, res) => {
     CDISTRICT,
     CPINCODE,
   ];
-  if (password) {
-    fields.push("password = ?");
-    values.push(password); // plain text password
-  }
+      if (newPassword) {
+        fields.push("password = ?");
+        // In production, you should hash the password here
+        values.push(newPassword);
+    }
   values.push(customerId); // for WHERE condition
   const sql = `UPDATE customermaster SET ${fields.join(
     ", "
@@ -452,50 +470,121 @@ exports.deletecustomer = (req, res) => {
 // };
 
 
+
+
 exports.addcustomer = (req, res) => {
-  const { FNAME, LNAME,  email , MOBILE, CSTATE, CCITY,CCOUNTRY, CPINCODE,password,CADDRESSLINE1} = req.body;
+  const {
+    FNAME, LNAME, email, MOBILE, CSTATE, CCITY, CCOUNTRY, CPINCODE, password, CADDRESSLINE1
+  } = req.body;
+
   console.log("addcustomer", req.body);
-  // if (!FNAME || !LNAME || !MOBILE || !email || !CADDRESSLINE1 || PEMAILID || MOBILE2|| PSTATE|| PCITY|| PPINCODE|| PADDRESSLINE1) {
-  //   return res.status(400).json({
-  //     success: false,
-  //     msg: "All fields are required",
-  //   });
-  // }
+
+  // First, check if email already exists
   const checkEmailQuery = "SELECT * FROM customermaster WHERE email = ?";
-  con.query(checkEmailQuery, [email], (err, results) => {
-    if (err) {
-      console.error(":x: Email check error:", err);
+  con.query(checkEmailQuery, [email], (emailErr, emailResults) => {
+    if (emailErr) {
+      console.error("Email check error:", emailErr);
       return res.status(500).json({
         success: false,
         msg: "Internal server error",
-        error: err.message,
+        error: emailErr.message,
       });
     }
-    if (results.length > 0) {
+    if (emailResults.length > 0) {
       return res.status(400).json({
         success: false,
         msg: "Email already exists",
       });
     }
-    const newCustomer = { FNAME, LNAME,password,email, MOBILE, CSTATE ,CCOUNTRY, CCITY, CPINCODE, CADDRESSLINE1};
-    const insertQuery = "INSERT INTO customermaster SET ?";
-    con.query(insertQuery, newCustomer, (insertErr, insertResults) => {
-      if (insertErr) {
-        console.error(":x: Insert error:", insertErr);
+
+    // Now check if mobile number already exists
+    const checkMobileQuery = "SELECT * FROM customermaster WHERE MOBILE = ?";
+    con.query(checkMobileQuery, [MOBILE], (mobileErr, mobileResults) => {
+      if (mobileErr) {
+        console.error("Mobile check error:", mobileErr);
         return res.status(500).json({
           success: false,
           msg: "Internal server error",
-          error: insertErr.message,
+          error: mobileErr.message,
         });
       }
-      return res.status(201).json({
-        success: true,
-        msg: "New customer created successfully",
-        newCustomer,
+      if (mobileResults.length > 0) {
+        return res.status(400).json({
+          success: false,
+          msg: "Mobile number already exists",
+        });
+      }
+
+      // If both checks pass, insert the customer
+      const newCustomer = {
+        FNAME, LNAME, password, email, MOBILE, CSTATE, CCOUNTRY, CCITY, CPINCODE, CADDRESSLINE1
+      };
+      const insertQuery = "INSERT INTO customermaster SET ?";
+      con.query(insertQuery, newCustomer, (insertErr, insertResults) => {
+        if (insertErr) {
+          console.error("Insert error:", insertErr);
+          return res.status(500).json({
+            success: false,
+            msg: "Internal server error",
+            error: insertErr.message,
+          });
+        }
+        return res.status(201).json({
+          success: true,
+          msg: "New customer created successfully",
+          newCustomer,
+        });
       });
     });
   });
 };
+
+
+
+// exports.addcustomer = (req, res) => {
+//   const { FNAME, LNAME,  email , MOBILE, CSTATE, CCITY,CCOUNTRY, CPINCODE,password,CADDRESSLINE1} = req.body;
+//   console.log("addcustomer", req.body);
+//   // if (!FNAME || !LNAME || !MOBILE || !email || !CADDRESSLINE1 || PEMAILID || MOBILE2|| PSTATE|| PCITY|| PPINCODE|| PADDRESSLINE1) {
+//   //   return res.status(400).json({
+//   //     success: false,
+//   //     msg: "All fields are required",
+//   //   });
+//   // }
+//   const checkEmailQuery = "SELECT * FROM customermaster WHERE email = ?";
+//   con.query(checkEmailQuery, [email], (err, results) => {
+//     if (err) {
+//       console.error(":x: Email check error:", err);
+//       return res.status(500).json({
+//         success: false,
+//         msg: "Internal server error",
+//         error: err.message,
+//       });
+//     }
+//     if (results.length > 0) {
+//       return res.status(400).json({
+//         success: false,
+//         msg: "Email already exists",
+//       });
+//     }
+//     const newCustomer = { FNAME, LNAME,password,email, MOBILE, CSTATE ,CCOUNTRY, CCITY, CPINCODE, CADDRESSLINE1};
+//     const insertQuery = "INSERT INTO customermaster SET ?";
+//     con.query(insertQuery, newCustomer, (insertErr, insertResults) => {
+//       if (insertErr) {
+//         console.error(":x: Insert error:", insertErr);
+//         return res.status(500).json({
+//           success: false,
+//           msg: "Internal server error",
+//           error: insertErr.message,
+//         });
+//       }
+//       return res.status(201).json({
+//         success: true,
+//         msg: "New customer created successfully",
+//         newCustomer,
+//       });
+//     });
+//   });
+// };
 
 
 exports.getAll = async (req, res) => {
