@@ -4,6 +4,7 @@ import axios from 'axios';
 import { BASE_URL } from '../../config';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 interface PromotionNumber {
     id: number;
     phonenumber: string;
@@ -12,11 +13,14 @@ interface PromotionNumber {
      last_name : string;
      email : string;
      mobile : number;
+    
 }
+
 interface SortConfig {
     key: string | null;
     direction: 'asc' | 'desc' | null;
 }
+
 const PromotionNumber: React.FC = () => {
     const navigate = useNavigate();
      const [numbers, setNumbers] = useState<PromotionNumber[]>([]);
@@ -25,15 +29,19 @@ const PromotionNumber: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: null });
     const [searchTerm, setSearchTerm] = useState<string>('');
+
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    
     const [showModal, setShowModal] = useState(false);
     const [selectedId, setSelectedId] = useState<number | null>(null);
+
     const headers = [
         { key: 'id', label: 'Sr. No' },
         { key: 'phonenumber', label: 'Phone Number' },
          { key: 'created_at', label: 'Created At' },
     ];
+    
     // useEffect(() => {
     //     const fetchNumbers = async () => {
     //         try {
@@ -54,8 +62,10 @@ const PromotionNumber: React.FC = () => {
             try {
                 const response = await axios.get(`${BASE_URL}/getpromotionNumber`);
                 console.log("Promotion numbers data", response.data);
+                
                 // Ensure the data is an array
                 const data = Array.isArray(response.data) ? response.data : [];
+                
                 setNumbers(data);
                 setFilteredNumbers(data);
                 setLoading(false);
@@ -69,25 +79,33 @@ const PromotionNumber: React.FC = () => {
         };
         fetchNumbers();
     }, []);
+
     useEffect(() => {
         const lowerSearch = searchTerm.toLowerCase();
-      const filtered = numbers.filter((number) =>
+      const filtered = numbers.filter((number) => 
             number.phonenumber.toLowerCase().includes(lowerSearch) ||
             number.created_at.toLowerCase().includes(lowerSearch) ||
             number.id.toString().includes(lowerSearch)
-        );
+        );   
          setFilteredNumbers(filtered);
         setCurrentPage(1);
     }, [searchTerm, numbers]);
+
        const indexOfLast = currentPage * rowsPerPage;
     const indexOfFirst = indexOfLast - rowsPerPage;
+
      const currentRows = filteredNumbers.slice(indexOfFirst, indexOfLast);
     const totalPages = Math.ceil(filteredNumbers.length / rowsPerPage);
+
        if (loading) return <div>Loading customers...</div>;
     if (error) return <div>Error loading customers: {error}</div>;
+
     return (
         <div className="customer-list-container px-4 py-6">
             <h1 className="text-2xl font-bold mb-4">Promotion Number</h1>
+
+       
+
             <div className="overflow-auto">
                 <table className="min-w-full border border-gray-300">
                     <thead>
@@ -99,6 +117,7 @@ const PromotionNumber: React.FC = () => {
                            <th className="p-2 border">First Name</th>
                             <th className="p-2 border">last Name</th>
                            <th className="p-2 border">Mobile</th>
+                       
                             {/* {headers.map((header) => (
                                 <th key={header.key} onClick={() => handleSort(header.key)} className="p-2 border cursor-pointer text-left">
                                     <div className="flex items-center">
@@ -127,6 +146,8 @@ const PromotionNumber: React.FC = () => {
                                      <td className="p-2 border">{customer.first_name}</td>
                                     <td className="p-2 border">{customer.last_name}</td>
                                      <td className="p-2 border">{customer.mobile}</td>
+                                   
+                                   
                                 </tr>
                             ))
                         )}
@@ -163,6 +184,7 @@ const PromotionNumber: React.FC = () => {
                             >
                                 Previous
                             </button>
+
                             {/* Page Numbers with Ellipsis */}
                             {Array.from({ length: totalPages }, (_, i) => i + 1)
                                 .filter((page) => {
@@ -194,6 +216,7 @@ const PromotionNumber: React.FC = () => {
                                         </button>
                                     )
                                 )}
+
                             <button
                                 onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                                 disabled={currentPage === totalPages}
@@ -221,9 +244,11 @@ const PromotionNumber: React.FC = () => {
                     </div>
                 </div>
             )}
+
             {/* Toast Container */}
             <ToastContainer position="top-right" autoClose={3000} />
         </div>
     );
 };
+
 export default PromotionNumber;

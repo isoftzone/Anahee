@@ -78,6 +78,9 @@ router.put("/updateCustomerInfo/:id", customer.updateCustomerInfo);
 router.put("/updateCustomerInfo", customer.updateCustomerInfo);
 router.get("/getAllcustomer", customer.getAll);
 router.delete("/deletecustomer/:id",customer.deletecustomer);
+router.post("/sendotp", customer.sendotp);
+router.post("/verifyotp", customer.verifyotp);
+router.post("/forgetpassword", customer.forgetpassword);
 
 const { addtocartWishlistproduct, getCartWishlistProduct, deletefromcartWishlist, clearALlcartwishlist, addtocartwishlistAction, getAllWishlistItems, getAllCartItems, addtocartdata, wishlistData } = require("../controllers/addtocartWishlistController");
 

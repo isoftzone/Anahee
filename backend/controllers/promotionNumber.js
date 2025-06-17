@@ -2,6 +2,7 @@ const express = require('express');
 const con = require("../config");
 const util = require('util');
 const query = util.promisify(con.query).bind(con);
+
 exports.promotionNumber = async (req, res) => {
     try {
         const { phonenumber,customer_id } = req.body;
@@ -18,9 +19,12 @@ exports.promotionNumber = async (req, res) => {
         return res.status(500).json({ message: "internal server error" })
     }
 }
+
+
 exports.getpromotionNumber = async (req, res) => {
   try {
-    const querySql = `
+  
+    const querySql = `    
      SELECT pn.id,
         pn.phonenumber,
         pn.created_at,
@@ -37,5 +41,5 @@ exports.getpromotionNumber = async (req, res) => {
     return res.status(500).json({ message: 'Error retrieving data' });
   }
 }
-// http://localhost:3000/promotionNumbers
 
+// http://localhost:3000/promotionNumbers

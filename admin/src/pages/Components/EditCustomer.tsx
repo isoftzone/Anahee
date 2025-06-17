@@ -172,15 +172,15 @@ export default function EditCustomer() {
         fetchCities();
     }, [formData.CSTATE]);
     const validate = () => {
-         const newErrors: FormErrors = {};
-    
-    if (formData.newPassword && !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(formData.newPassword)) {
-        newErrors.newPassword = 'Password must be at least 8 characters with one letter, number, and special character';
-    }
+        const newErrors: FormErrors = {};
 
-    if (formData.newPassword !== formData.confirmPassword) {
-        newErrors.confirmPassword = 'Passwords do not match';
-    }
+        if (formData.newPassword && !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(formData.newPassword)) {
+            newErrors.newPassword = 'Password must be at least 8 characters with one letter, number, and special character';
+        }
+
+        if (formData.newPassword !== formData.confirmPassword) {
+            newErrors.confirmPassword = ' confirm Passwords do not match';
+        }
 
 
         setErrors(newErrors);
@@ -202,14 +202,20 @@ export default function EditCustomer() {
     //         STATUS: e.target.value,
     //     }));
     // };
+    const [formSubmitted, setFormSubmitted] = useState(false);
 
     const handleSubmit = async () => {
+
+        setFormSubmitted(true); // Set form as submitted
+        if (!validate()) return;
+
+      
         try {
             validate()
             const response = await axios.put(`${BASE_URL}/updateCustomerInfo/${id}`, formData);
             console.log('Customer updated:', response.data);
             toast.success(response.data.message);
-         
+
             // toast.success('Customer updated successfully!');
             // navigate('/components/Customerl');
         } catch (error: any) {
@@ -227,9 +233,8 @@ export default function EditCustomer() {
         // Reset form to original fetched data
         if (id) {
             axios
-                  .get(`${BASE_URL}/getcustomerbyid/${id}`)
-          
-                // .get(`http://localhost:3000/getcustomerbyid/${id}`)
+                .get(`${BASE_URL}/getcustomerbyid/${id}`)
+
                 .then((response) => setFormData(response.data))
                 .catch((error) => console.error('Error resetting form:', error));
         }
@@ -398,91 +403,76 @@ export default function EditCustomer() {
                                 <label className="block font-medium">Pincode</label>
                                 <input type="text" name="CPINCODE" value={formData.CPINCODE || ''} onChange={handleChange} className="w-full border p-2 rounded" />
                             </div>
-                            <div className="mb-3" style={{ position: 'relative' }} >
-                                <label className="block font-medium">Old Password</label>
-                                <input
-                                    type={showPassword ? 'text' : 'password'}
-                                    name="password"
-                                    placeholder="Password"
-                                    value={formData.password}
-                                    // onChange={handleChange}
-                                    className={`w-full border p-2 rounded ${errors.password ? 'is-invalid' : ''}`}
-                                    style={{ paddingRight: '40px' }}
-                                />
-                                <span
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    style={{
-                                        position: 'absolute',
-                                        top: '70%',
-                                        right: '15px',
-                                        transform: 'translateY(-50%)',
-                                        cursor: 'pointer',
-                                        fontSize: '1.3rem',
-                                        color: '#777',
-                                    }}
-                                >
-                                    {showPassword ? <FaEye /> : <FaEyeSlash />}
-                                </span>
-                            </div>
+                         {/* Old Password Field */}
+<div className="mb-3 relative">
+  <label className="block font-medium">Old Password</label>
+  <div className="relative">
+    <input
+      type={showPassword ? 'text' : 'password'}
+      name="password"
+      placeholder="Password"
+      value={formData.password}
+      className="w-full border p-2 rounded pr-10"
+    />
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"
+    >
+      {showPassword ? <FaEye /> : <FaEyeSlash />}
+    </button>
+  </div>
+</div>
 
+{/* New Password Field */}
+<div className="mb-3">
+  <label className="block font-medium">New Password</label>
+  <div className="relative">
+    <input
+      type={NewPassword ? 'text' : 'password'}
+      name="newPassword"
+      placeholder="New Password"
+      value={formData.newPassword}
+      onChange={handleChange}
+      className={`w-full border p-2 rounded pr-10 ${errors.newPassword ? 'border-red-500' : ''}`}
+    />
+    <button
+      type="button"
+      onClick={() => setNewPassword(!NewPassword)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"
+    >
+      {NewPassword ? <FaEye /> : <FaEyeSlash />}
+    </button>
+  </div>
+  {errors.newPassword && (
+    <div className="text-red-500 text-sm mt-1">{errors.newPassword}</div>
+  )}
+</div>
 
-                            <div className="mb-3" style={{ position: 'relative' }}>
-                                <label className="block font-medium"> New Password</label>
-                                <input
-                                    type={NewPassword ? 'text' : 'password'}
-                                    name="newPassword"
-                                    placeholder="New Password"
-                                    value={formData.newPassword}
-                                    onChange={handleChange}
-                                    className={`w-full border p-2 rounded ${errors.newPassword ? 'is-invalid' : ''}`}
-                                    style={{ paddingRight: '40px' }}
-                                />
-                                <span
-                                    onClick={() => setNewPassword(!NewPassword)}
-                                    style={{
-                                        position: 'absolute',
-                                        top: '70%',
-                                        right: '15px',
-                                        transform: 'translateY(-50%)',
-                                        cursor: 'pointer',
-                                        fontSize: '1.3rem',
-                                        color: '#777',
-                                    }}
-                                >
-                                    {NewPassword ? <FaEye /> : <FaEyeSlash />}
-                                    {/* {showPassword ? <FaEye /> : <FaEyeSlash />} */}
-                                </span>
-                                {errors.newPassword && <div style={{ color: 'red', marginTop: '0.25rem' }}>{errors.newPassword}</div>}
-                            </div>
-
-                            {/* Confirm Password Field */}
-                            <div className="mb-3" style={{ position: 'relative' }}>
-                                <label className="block font-medium">Confirm Password</label>
-                                <input
-                                    type={showConfirmPassword ? 'text' : 'password'}
-                                    name="confirmPassword"
-                                    placeholder="Confirm Password"
-                                    value={formData.confirmPassword}
-                                    onChange={handleChange}
-                                    className={`w-full border p-2 rounded ${errors.confirmPassword ? 'is-invalid' : ''}`}
-                                    style={{ paddingRight: '40px' }}
-                                />
-                                <span
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    style={{
-                                        position: 'absolute',
-                                        top: '70%',
-                                        right: '15px',
-                                        transform: 'translateY(-50%)',
-                                        cursor: 'pointer',
-                                        fontSize: '1.3rem',
-                                        color: '#777',
-                                    }}
-                                >
-                                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                                </span>
-                                {errors.confirmPassword && <div style={{ color: 'red', marginTop: '0.25rem' }}>{errors.confirmPassword}</div>}
-                            </div>
+{/* Confirm Password Field */}
+<div className="mb-3">
+  <label className="block font-medium">Confirm Password</label>
+  <div className="relative">
+    <input
+      type={showConfirmPassword ? 'text' : 'password'}
+      name="confirmPassword"
+      placeholder="Confirm Password"
+      value={formData.confirmPassword}
+      onChange={handleChange}
+      className={`w-full border p-2 rounded pr-10 ${errors.confirmPassword ? 'border-red-500' : ''}`}
+    />
+    <button
+      type="button"
+      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"
+    >
+      {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
+    </button>
+  </div>
+  {errors.confirmPassword && (
+    <div className="text-red-500 text-sm mt-1">{errors.confirmPassword}</div>
+  )}
+</div>
                             <div className="md:col-span-2">
                                 <label className="block font-medium">Address</label>
                                 <textarea name="CADDRESSLINE1" value={formData.CADDRESSLINE1 || ''} onChange={handleChange} className="w-full border p-2 rounded" rows={3}></textarea>

@@ -7,6 +7,7 @@ import LayoutOne from "../../layouts/LayoutOne";
 import { BASE_URL } from "../../config";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import axios from 'axios'
+import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setCartItems } from "../../store/slices/cart-slice"; 
 import { setwishlistItems } from "../../store/slices/wishlist-slice";
@@ -20,8 +21,12 @@ const Login = () => {
   const dispatch = useDispatch();
   const { wishlistItems } = useSelector((state) => state.wishlist);
   const { cartItems } = useSelector((state) => state.cart);
+  const location = useLocation();
+// const from = location.state?.from?.pathname || "/";
+const redirectAfterLogin = localStorage.getItem("redirectAfterLogin") || "/";
   const validate = () => {
     const newErrors = {};
+    
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -157,7 +162,9 @@ const Login = () => {
             }
             dispatch(setCartItems(updatedCartRes.data.data || []));
             dispatch(setwishlistItems(updatedWishlistRes.data.data || []));
-            navigate("/");
+            // navigate("/");
+            navigate(redirectAfterLogin);
+            localStorage.removeItem("redirectAfterLogin");
         } else {
             setApiError(data.msg || "Login failed");
         }
@@ -232,7 +239,14 @@ const Login = () => {
                                     {errors.password}
                                   </div>
                                 )}
+
                               </div>
+                              <Link
+                                to="/forget-password"
+                                style={{ color: "#2874F0" }}
+                              >
+                                Forgot password
+                              </Link>
                               <div className="button-box mt-4">
                                 <button type="submit">
                                   <span>Login</span>
@@ -260,12 +274,3 @@ const Login = () => {
   );
 };
 export default Login;
-
-
-
-
-
-
-
-
-
