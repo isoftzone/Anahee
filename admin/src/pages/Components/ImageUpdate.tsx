@@ -26,57 +26,142 @@ const ImageUpdates: React.FC = () => {
         };
         fetchImages();
     }, []);
-    const handleSave = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!secName.trim()) {
-            setError('Please enter section name.');
-            return;
-        }
-        if (editingId) {
-            try {
-                await axios.put(`${BASE_URL}/images/${editingId}`, {
-                    sec_name: secName,
-                    des_l1: desL1,
-                    des_l2: desL2,
-                    des_l3: desL3,
-                });
-                setImages((prevImages) => prevImages.map((img) => (img.id === editingId ? { ...img, sec_name: secName, des_l1: desL1, des_l2: desL2, des_l3: desL3 } : img)));
-                setEditingId(null);
-                setEditingImageUrl(''); // Clear editing image URL
-                resetForm();
-            } catch (error) {
-                setError('Update failed');
-            }
-        } else if (uploadImages.length) {
-            const formData = new FormData();
+    // const handleSave = async (e: React.FormEvent) => {
+    //     e.preventDefault();
+    //     if (!secName.trim()) {
+    //         setError('Please enter section name.');
+    //         return;
+    //     }
+    //     if (editingId) {
+    //         try {
+    //             await axios.put(`${BASE_URL}/images/${editingId}`, {
+    //                 sec_name: secName,
+    //                 des_l1: desL1,
+    //                 des_l2: desL2,
+    //                 des_l3: desL3,
+    //             });
+    //             setImages((prevImages) => prevImages.map((img) => (img.id === editingId ? { ...img, sec_name: secName, des_l1: desL1, des_l2: desL2, des_l3: desL3 } : img)));
+    //             setEditingId(null);
+    //             setEditingImageUrl(''); // Clear editing image URL
+    //             resetForm();
+    //         } catch (error) {
+    //             setError('Update failed');
+    //         }
+    //     } else if (uploadImages.length) {
+    //         const formData = new FormData();
+    //         formData.append('image', uploadImages[0].file as File);
+    //         formData.append('sec_name', secName);
+    //         formData.append('des_l1', desL1);
+    //         formData.append('des_l2', desL2);
+    //         formData.append('des_l3', desL3);
+    //         try {
+    //             const response = await axios.post(`${BASE_URL}/upload`, formData, {
+    //                 headers: { 'Content-Type': 'multipart/form-data' },
+    //             });
+    //             if (response.data.image) {
+    //                 const newImage = {
+    //                     id: response.data.image.id,
+    //                     images: `${BASE_URL}/public/images/banner/${response.data.image.filename}`,
+    //                     sequence: response.data.image.sequence,
+    //                     status: response.data.image.status,
+    //                     sec_name: response.data.image.sec_name,
+    //                     des_l1: response.data.image.des_l1,
+    //                     des_l2: response.data.image.des_l2,
+    //                     des_l3: response.data.image.des_l3,
+    //                 };
+    //                 setImages((prevImages) => [...prevImages, newImage]);
+    //             }
+    //             resetForm();
+    //         } catch (error) {
+    //             setError('Upload failed');
+    //         }
+    //     }
+    // };
+   
+   const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!secName.trim()) {
+        setError('Please enter section name.');
+        return;
+    }
+
+    try {
+        const formData = new FormData();
+        if (uploadImages.length > 0) {
             formData.append('image', uploadImages[0].file as File);
-            formData.append('sec_name', secName);
-            formData.append('des_l1', desL1);
-            formData.append('des_l2', desL2);
-            formData.append('des_l3', desL3);
-            try {
-                const response = await axios.post(`${BASE_URL}/upload`, formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                });
-                if (response.data.image) {
-                    const newImage = {
-                        id: response.data.image.id,
-                        images: `${BASE_URL}/public/images/banner/${response.data.image.filename}`,
-                        sequence: response.data.image.sequence,
-                        status: response.data.image.status,
-                        sec_name: response.data.image.sec_name,
-                        des_l1: response.data.image.des_l1,
-                        des_l2: response.data.image.des_l2,
-                        des_l3: response.data.image.des_l3,
-                    };
-                    setImages((prevImages) => [...prevImages, newImage]);
-                }
-                resetForm();
-            } catch (error) {
-                setError('Upload failed');
-            }
         }
-    };
+        formData.append('sec_name', secName);
+        formData.append('des_l1', desL1);
+        formData.append('des_l2', desL2);
+        formData.append('des_l3', desL3);
+
+        if (editingId) {
+            const response = await axios.put(`${BASE_URL}/images/${editingId}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            if (response.data.image) {
+                // Update the image in the list with new data
+                setImages((prevImages) =>
+                    prevImages.map((img) =>
+                        img.id === editingId
+                            ? {
+                                  ...img,
+                                  images: `${BASE_URL}/public/images/banner/${response.data.image.filename}`,
+                                  sec_name: secName,
+                  des_l1: desL1,
+                  des_l2: desL2,
+                  des_l3: desL3,
+                              }
+                            : img
+                    )
+                );
+            } else {
+                // If image not updated, just update text fields
+                setImages((prevImages) =>
+                    prevImages.map((img) =>
+                        img.id === editingId
+                            ? { ...img, 
+                                secName, 
+                                desL1,
+                                 desL2, 
+                                 desL3 }
+                            : img
+                    )
+                );
+            }
+
+            setEditingId(null);
+            setEditingImageUrl('');
+            resetForm();
+        } else {
+            const response = await axios.post(`${BASE_URL}/upload`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            if (response.data.image) {
+                const newImage = {
+                    id: response.data.image.id,
+                    images: `${BASE_URL}/public/images/banner/${response.data.image.filename}`,
+                    sequence: response.data.image.sequence,
+                    status: response.data.image.status,
+                    sec_name: response.data.image.sec_name,
+                    des_l1: response.data.image.des_l1,
+                    des_l2: response.data.image.des_l2,
+                    des_l3: response.data.image.des_l3,
+                };
+                setImages((prevImages) => [...prevImages, newImage]);
+            }
+
+            resetForm();
+        }
+    } catch (error) {
+        setError('Upload/update failed');
+        console.error(error);
+    }
+};
+
     const handleDelete = async (id: number) => {
         try {
             await axios.delete(`${BASE_URL}/imagesDelete/${id}`);

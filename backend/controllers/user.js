@@ -49,7 +49,7 @@ exports.loginUser = async (req, res) => {
   
       if (results.length === 0) {
         console.log('User not found:', email);
-        return res.status(401).json({ msg: "User does not exist" });
+        return res.status(401).json({ msg: "Email does not exist" });
       }
   
       const user = results[0];

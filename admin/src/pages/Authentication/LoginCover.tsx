@@ -39,8 +39,87 @@ const LoginCover = () => {
     const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' | '' }>({ message: '', type: '' });
 
 
+// const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+//     e.preventDefault();
+
+//     try {
+//         const response = await axios.post(`${BASE_URL}/login`, {
+//             email,
+//             password,
+//         }, {
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             // withCredentials: true,
+//         });
+
+//         if (response.status === 200) {
+//             console.log('login Response:', response.data.user.id); // Debugging line
+
+//             const responses = await axios.get(
+//                 `${BASE_URL}/getid_userMaster/${response.data.user.id}`,
+//                 {
+//                     headers: {
+//                         'Content-Type': 'application/json',
+//                     },
+//                 }
+//             );
+
+//             console.log('User Data Response:', responses); // Debugging line
+
+//             if (responses.status === 200) {
+//                 const userData = responses.data;
+// console.log('User Data:', userData); // Debugging line
+//                 // Save user data to localStorage
+//                 localStorage.setItem('userData', JSON.stringify({
+//                     id: userData.id,
+//                     name: userData.FNAME,
+//                     email: userData.EMAIL,
+//                     password: userData.PASSWORD,
+//                     companyid: userData.COMPANYID,
+//                     profession: userData.PROFESSION,
+//                     mobile: userData.MOBILE,
+//                     createdon: userData.CREATEDON,
+//                     location: userData.LOCATION,
+//                     profileImage: userData.PROFILEIMAGE,
+//                 }));
+//             } else {
+//                 setAlert({ message: 'Failed to fetch user data. Please try again.', type: 'error' });
+//                 return;
+//             }
+
+//             setAlert({ message: 'Login successful!', type: 'success' });
+//             setTimeout(() => {
+//                 navigate('/index', { replace: false }); // Use replace option to prevent going back
+//             }, 1000);
+//         } else if (response.status === 401) {
+//             const { msg } = response.data;
+//             setAlert({ message: msg, type: 'error' });
+//         } else {
+//             setAlert({ message: 'Unexpected response from server. Please try again.', type: 'error' });
+//         }
+//     } catch (error) {
+//         if (axios.isAxiosError(error)) {
+//             if (error.response && error.response.data && error.response.data.msg) {
+//                 setAlert({ message: error.response.data.msg, type: 'error' });
+//             } else {
+//                 setAlert({ message: 'Login error occurred. Please try again.', type: 'error' });
+//             }
+//         } else {
+//             console.error('Login error:', error);
+//             setAlert({ message: 'An unexpected error occurred. Please try again.', type: 'error' });
+//         }
+//     }
+// };
+
 const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Basic validation
+    if (!email || !password) {
+        setAlert({ message: 'Email and password are required', type: 'error' });
+        return;
+    }
 
     try {
         const response = await axios.post(`${BASE_URL}/login`, {
@@ -50,13 +129,13 @@ const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            // withCredentials: true,
         });
 
         if (response.status === 200) {
-            console.log('login Response:', response.data.user.id); // Debugging line
-
-            const responses = await axios.get(
+            console.log('Login successful:', response.data.user.id);
+            
+            // Fetch additional user data
+            const userResponse = await axios.get(
                 `${BASE_URL}/getid_userMaster/${response.data.user.id}`,
                 {
                     headers: {
@@ -65,17 +144,14 @@ const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
                 }
             );
 
-            console.log('User Data Response:', responses); // Debugging line
-
-            if (responses.status === 200) {
-                const userData = responses.data;
-console.log('User Data:', userData); // Debugging line
-                // Save user data to localStorage
+            if (userResponse.status === 200) {
+                const userData = userResponse.data;
+                
+                // Save only necessary data to localStorage
                 localStorage.setItem('userData', JSON.stringify({
                     id: userData.id,
                     name: userData.FNAME,
                     email: userData.EMAIL,
-                    password: userData.PASSWORD,
                     companyid: userData.COMPANYID,
                     profession: userData.PROFESSION,
                     mobile: userData.MOBILE,
@@ -83,35 +159,25 @@ console.log('User Data:', userData); // Debugging line
                     location: userData.LOCATION,
                     profileImage: userData.PROFILEIMAGE,
                 }));
-            } else {
-                setAlert({ message: 'Failed to fetch user data. Please try again.', type: 'error' });
-                return;
-            }
 
-            setAlert({ message: 'Login successful!', type: 'success' });
-            setTimeout(() => {
-                navigate('/index', { replace: false }); // Use replace option to prevent going back
-            }, 1000);
-        } else if (response.status === 401) {
-            const { msg } = response.data;
-            setAlert({ message: msg, type: 'error' });
-        } else {
-            setAlert({ message: 'Unexpected response from server. Please try again.', type: 'error' });
+                setAlert({ message: 'Login successful! Redirecting...', type: 'success' });
+                setTimeout(() => {
+                    navigate('/index');
+                }, 1000);
+            } else {
+                setAlert({ message: 'Failed to fetch user profile. Please try again.', type: 'error' });
+            }
         }
     } catch (error) {
         if (axios.isAxiosError(error)) {
-            if (error.response && error.response.data && error.response.data.msg) {
-                setAlert({ message: error.response.data.msg, type: 'error' });
-            } else {
-                setAlert({ message: 'Login error occurred. Please try again.', type: 'error' });
-            }
+            const errorMsg = error.response?.data?.msg || 'Login failed. Please try again.';
+            setAlert({ message: errorMsg, type: 'error' });
         } else {
             console.error('Login error:', error);
-            setAlert({ message: 'An unexpected error occurred. Please try again.', type: 'error' });
+            setAlert({ message: 'An unexpected error occurred.', type: 'error' });
         }
     }
 };
-
     
     return (
         <div>
