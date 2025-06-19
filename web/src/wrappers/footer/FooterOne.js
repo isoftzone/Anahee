@@ -262,7 +262,7 @@ const FooterOne = ({
       )}
     >
       <div className={`${containerClass || "container-fluid mb-5"}`}>
-        <div className="row justify-content-center pt-5 gy-4">
+        <div className="row justify-content-center gy-4">
           {/* Logo Section */}
           <div className="col-12 col-sm-6 col-md-6 col-lg-3">
             <div className="footer-widget pt-4 text-center text-md-center">
