@@ -185,7 +185,7 @@ const Contact = () => {
                       <i className="fa fa-map-marker" />
                     </div>
                     <div className="contact-info-dec">
-                      <label className="fw-bold">Main Address</label>
+                      <label className="fw-bold">Office Address</label>
                       <a
                         href={`https://www.google.com/maps/search/?q=58, ${address}`}
                         target="_blank"

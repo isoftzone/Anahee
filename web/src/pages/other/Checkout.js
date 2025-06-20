@@ -31,7 +31,7 @@ const Checkout = () => {
     postcode: "",
     phone: "",
     // email: "",
-    paymentMethod: "COD",
+    paymentMethod: "paynow",
   });
   const [data, setData] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
@@ -1977,7 +1977,7 @@ const Checkout = () => {
                               >
                                 <div
                                   style={{
-                                    marginBottom: "16px",
+                                    // marginBottom: "16px",
                                     display: "block",
                                   }}
                                 >
@@ -1985,14 +1985,14 @@ const Checkout = () => {
                                     style={{
                                       display: "flex",
                                       alignItems: "center",
-                                      marginBottom: "10px",
+                                      // marginBottom: "10px",
                                       height: "24px",
                                       position: "relative",
                                     }}
                                   >
                                     <input
                                       type="radio"
-                                      id="phonepe"
+                                      id="paynow"
                                       name="paymentMethod"
                                       value="PAID"
                                       checked={
@@ -2009,7 +2009,7 @@ const Checkout = () => {
                                       }}
                                     />
                                     <label
-                                      htmlFor="phonepe"
+                                      htmlFor="paynow"
                                       style={{
                                         marginLeft: "10px",
                                         fontSize: "14px",
@@ -2024,11 +2024,11 @@ const Checkout = () => {
 
                                 <div
                                   style={{
-                                    marginBottom: "16px",
+                                    // marginBottom: "16px",
                                     display: "block",
                                   }}
                                 >
-                                  <div
+                                  {/* <div
                                     style={{
                                       display: "flex",
                                       alignItems: "center",
@@ -2051,7 +2051,7 @@ const Checkout = () => {
                                         width: "18px",
                                         height: "18px",
                                         cursor: "pointer",
-                                      }}
+                                      }} 
                                     />
                                     <label
                                       htmlFor="COD"
@@ -2064,7 +2064,7 @@ const Checkout = () => {
                                     >
                                       Cash on Delivery
                                     </label>
-                                  </div>
+                                  </div> */}
                                 </div>
                               </div>
                             )}
