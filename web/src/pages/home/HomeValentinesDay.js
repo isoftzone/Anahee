@@ -14,7 +14,7 @@ const HomeValentinesDay = () => {
     <Fragment>
       <SEO
         titleTemplate="Valentines Day Home"
-        description="Valentines day home of Anahee react minimalist eCommerce template."
+        description="Valentines day home of Anahee Anahee."
       />
       <LayoutOne headerTop="visible">
         {/* hero slider */}

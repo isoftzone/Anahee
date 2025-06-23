@@ -52,7 +52,7 @@ const db = mysql.createConnection({
   host: "4.213.43.18",
   user: "isrbs",
   password: "isoft@1209ISZ",
-  database: "madhuban",
+  database: "anahee",
   port: 3306,
 });
 
@@ -695,30 +695,460 @@ exports.addUser_Master = (req, res) => {
 // };
 
 // Check if user exists
-exports.checkid_userMaster = (req, res) => {
-  const { userid } = req.params;
-  console.log("bkd", userid);
-  con.query(
-    "SELECT USERID FROM usermaster WHERE USERID = ?",
-    [userid],
-    (err, results) => {
-      if (err) return res.status(500).json({ error: "DB error" });
-      res.json({ exists: results.length > 0 });
-    }
-  );
-};
+// exports.checkid_userMaster = (req, res) => {
+//   const { userid } = req.params;
+//   console.log("bkd", userid);
+//   con.query(
+//     "SELECT USERID FROM usermaster WHERE USERID = ?",
+//     [userid],
+//     (err, results) => {
+//       if (err) return res.status(500).json({ error: "DB error" });
+//       res.json({ exists: results.length > 0 });
+//     }
+//   );
+// };
 
 // Get max USERID
-exports.getMax_userMaster = (req, res) => {
-  con.query("SELECT MAX(USERID) as maxId FROM usermaster", (err, results) => {
-    if (err) return res.status(500).json({ error: "DB error" });
-    const maxId = results[0]?.maxId || 0;
-    res.json({ maxId });
-  });
-};
+// exports.getMax_userMaster = (req, res) => {
+//   con.query("SELECT MAX(USERID) as maxId FROM usermaster", (err, results) => {
+//     if (err) return res.status(500).json({ error: "DB error" });
+//     const maxId = results[0]?.maxId || 0;
+//     res.json({ maxId });
+//   });
+// };
+
+// exports.add_data = async (req, res) => {
+//   console.log(req.body);
+//   try {
+//     const {
+//       COMPANYID,
+//       USERID,
+//       TITLE,
+//       BUSINESSTITLE,
+//       FNAME,
+//       MNAME,
+//       LNAME,
+//       PHONE,
+//       MOBILE,
+//       EMAIL,
+//       STATUS,
+//       USERTYPE,
+//       USERNAME,
+//       PASSWORD,
+//       CREATEDBY,
+//       CREATEDON,
+//       UPDATEDBY,
+//       UPDATEDON,
+//       DS_ON,
+//       DS_OFF,
+//       FULLNAME,
+//       COUNTRY,
+//       LOCATION,
+//       PROFESSION,
+//       ADDRESS,
+//       WEBSITE,
+//       PROFILEIMAGE,
+//     } = req.body;
+
+//     // Required fields validation
+//     const requiredFields = {
+//       COMPANYID,
+//       USERID,
+//       TITLE,
+//       BUSINESSTITLE,
+//       FNAME,
+//       MNAME,
+//       LNAME,
+//       PHONE,
+//       MOBILE,
+//       EMAIL,
+//       STATUS,
+//       USERTYPE,
+//       USERNAME,
+//       PASSWORD,
+//       CREATEDBY,
+//       CREATEDON,
+//       UPDATEDBY,
+//       UPDATEDON,
+//       DS_ON,
+//       DS_OFF,
+//       FULLNAME,
+//       COUNTRY,
+//       LOCATION,
+//       PROFESSION,
+//       ADDRESS,
+//       WEBSITE,
+//       PROFILEIMAGE,
+//     };
+
+//     for (const [key, value] of Object.entries(requiredFields)) {
+//       if (!value) {
+//         return res.status(400).json({ msg: `${key} is required` });
+//       }
+//     }
+
+//     // Optional: Hash the password before saving
+//     // const hashedPassword = await bcrypt.hash(password, 10);
+
+//     const newRecord = {
+//       COMPANYID,
+//       USERID,
+//       TITLE,
+//       BUSINESSTITLE,
+//       FNAME,
+//       MNAME,
+//       LNAME,
+//       PHONE,
+//       MOBILE,
+//       EMAIL,
+//       STATUS,
+//       USERTYPE,
+//       USERNAME,
+//       PASSWORD,
+//       CREATEDBY,
+//       CREATEDON,
+//       UPDATEDBY,
+//       UPDATEDON,
+//       DS_ON,
+//       DS_OFF,
+//       FULLNAME,
+//       COUNTRY,
+//       LOCATION,
+//       PROFESSION,
+//       ADDRESS,
+//       WEBSITE,
+//       PROFILEIMAGE,
+//     };
+
+//     const result = await query(
+//       `INSERT INTO usermaster ( 
+//       COMPANYID,
+//       USERID,
+//       TITLE,
+//       BUSINESSTITLE,
+//       FNAME,
+//       MNAME,
+//       LNAME,
+//       PHONE,
+//       MOBILE,
+//       EMAIL,
+//       STATUS,
+//       USERTYPE,
+//       USERNAME,
+//       PASSWORD,
+//       CREATEDBY,
+//       CREATEDON,
+//       UPDATEDBY,
+//       UPDATEDON,
+//       DS_ON,
+//       DS_OFF,
+//       FULLNAME,
+//       COUNTRY,
+//       LOCATION,
+//       PROFESSION,
+//       ADDRESS,
+//       WEBSITE,
+//       PROFILEIMAGE 
+//     ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+//       [
+//         COMPANYID,
+//         USERID,
+//         TITLE,
+//         BUSINESSTITLE,
+//         FNAME,
+//         MNAME,
+//         LNAME,
+//         PHONE,
+//         MOBILE,
+//         EMAIL,
+//         STATUS,
+//         USERTYPE,
+//         USERNAME,
+//         PASSWORD,
+//         CREATEDBY,
+//         CREATEDON,
+//         UPDATEDBY,
+//         UPDATEDON,
+//         DS_ON,
+//         DS_OFF,
+//         FULLNAME,
+//         COUNTRY,
+//         LOCATION,
+//         PROFESSION,
+//         ADDRESS,
+//         WEBSITE,
+//         PROFILEIMAGE,
+//       ]
+//     );
+
+//     res.status(201).json({ msg: "New data added successfully", result });
+//   } catch (error) {
+//     console.error("Error inserting data:", error);
+//     res
+//       .status(500)
+//       .json({ msg: "Internal Server Error", error: error.message });
+//   }
+// };
+
+// exports.getOneMaster = async (req, res) => {
+//   const userId = req.params.id;
+//   await con.query(
+//     "SELECT * FROM usermaster WHERE USERID = ?",
+//     userId,
+//     (err, result) => {
+//       if (err) {
+//         throw err;
+//       }
+//       res.json(result[0]);
+//     }
+//   );
+// };
+
+// exports.get_data = async (req, res) => {
+//   try {
+//     const usermaster = await query("SELECT * FROM usermaster");
+//     res.status(200).json(usermaster);
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     res
+//       .status(500)
+//       .json({ msg: "Error retrieving data", error: error.message });
+//   }
+// };
+
+
+// exports.upload_userMaster = (req, res) => {
+//   const filepath = req.file?.filename || ""; // Uploaded image filename or empty string
+
+//   // Helper: safely parse int or return null
+//   const safeInt = (val) => {
+//     const num = parseInt(val);
+//     return isNaN(num) ? null : num;
+//   };
+
+//   // Helper: fallback if input is undefined or null
+//   const safeFallback = (input, fallback) => {
+//     return input !== undefined && input !== null ? input : fallback;
+//   };
+
+//   const USERID = safeInt(req.body.USERID);
+//   const COMPANYID = safeInt(req.body.COMPANYID);
+
+//   if (!USERID) return res.status(400).json({ error: "USERID is required" });
+
+//   const getUserQuery = "SELECT * FROM usermaster WHERE USERID = ?";
+//   con.query(getUserQuery, [USERID], (err, results) => {
+//     if (err) return res.status(500).json({ error: "Database error" });
+
+//     if (results.length > 0) {
+//       // User exists, update user
+//       const existingUser = results[0];
+//       const mergedData = {
+//         COMPANYID: COMPANYID ?? existingUser.COMPANYID,
+//         TITLE: safeFallback(req.body.TITLE, existingUser.TITLE),
+//         BUSINESSTITLE: safeFallback(req.body.BUSINESSTITLE, existingUser.BUSINESSTITLE),
+//         FNAME: safeFallback(req.body.FNAME, existingUser.FNAME),
+//         MNAME: safeFallback(req.body.MNAME, existingUser.MNAME),
+//         LNAME: safeFallback(req.body.LNAME, existingUser.LNAME),
+//         PHONE: safeFallback(req.body.PHONE, existingUser.PHONE),
+//         MOBILE: safeFallback(req.body.MOBILE, existingUser.MOBILE),
+//         EMAIL: safeFallback(req.body.EMAIL, existingUser.EMAIL),
+//         STATUS: safeFallback(req.body.STATUS, existingUser.STATUS),
+//         USERTYPE: safeFallback(req.body.USERTYPE, existingUser.USERTYPE),
+//         USERNAME: safeFallback(req.body.USERNAME, existingUser.USERNAME),
+//         PASSWORD: safeFallback(req.body.PASSWORD, existingUser.PASSWORD),
+//         CREATEDBY: safeFallback(req.body.CREATEDBY, existingUser.CREATEDBY),
+//         CREATEDON: safeFallback(req.body.CREATEDON, existingUser.CREATEDON),
+//         UPDATEDBY: safeFallback(req.body.UPDATEDBY, existingUser.UPDATEDBY),
+//         UPDATEDON: safeFallback(req.body.UPDATEDON, existingUser.UPDATEDON),
+//         DS_ON: safeFallback(req.body.DS_ON, existingUser.DS_ON),
+//         DS_OFF: safeFallback(req.body.DS_OFF, existingUser.DS_OFF),
+//         FULLNAME: safeFallback(req.body.FULLNAME, existingUser.FULLNAME),
+//         COUNTRY: safeFallback(req.body.COUNTRY, existingUser.COUNTRY),
+//         LOCATION: safeFallback(req.body.LOCATION, existingUser.LOCATION),
+//         PROFESSION: safeFallback(req.body.PROFESSION, existingUser.PROFESSION),
+//         ADDRESS: safeFallback(req.body.ADDRESS, existingUser.ADDRESS),
+//         WEBSITE: safeFallback(req.body.WEBSITE, existingUser.WEBSITE),
+//         PROFILEIMAGE: filepath !== "" ? filepath : existingUser.PROFILEIMAGE,
+//       };
+
+//       const updateQuery = `
+//         UPDATE usermaster SET 
+//           COMPANYID=?, TITLE=?, BUSINESSTITLE=?, FNAME=?, MNAME=?, LNAME=?, 
+//           PHONE=?, MOBILE=?, EMAIL=?, STATUS=?, USERTYPE=?, USERNAME=?, 
+//           PASSWORD=?, CREATEDBY=?, CREATEDON=?, UPDATEDBY=?, UPDATEDON=?, 
+//           DS_ON=?, DS_OFF=?, FULLNAME=?, COUNTRY=?, LOCATION=?, PROFESSION=?, 
+//           ADDRESS=?, WEBSITE=?, PROFILEIMAGE=?
+//         WHERE USERID=?
+//       `;
+
+//       const updateValues = [...Object.values(mergedData), USERID];
+
+//       con.query(updateQuery, updateValues, (err) => {
+//         if (err) return res.status(500).json({ error: "Update failed" });
+//         res.status(200).json({ message: "User updated", user: mergedData });
+//       });
+//     } else {
+//       // User does not exist, insert new
+//       const insertQuery = `
+//         INSERT INTO usermaster (
+//           COMPANYID, USERID, TITLE, BUSINESSTITLE, FNAME, MNAME, LNAME, PHONE, MOBILE,
+//           EMAIL, STATUS, USERTYPE, USERNAME, PASSWORD, CREATEDBY, CREATEDON,
+//           UPDATEDBY, UPDATEDON, DS_ON, DS_OFF, FULLNAME, COUNTRY, LOCATION,
+//           PROFESSION, ADDRESS, WEBSITE, PROFILEIMAGE
+//         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+//       `;
+
+//       const insertValues = [
+//         COMPANYID,
+//         USERID,
+//         req.body.TITLE,
+//         req.body.BUSINESSTITLE,
+//         req.body.FNAME,
+//         req.body.MNAME,
+//         req.body.LNAME,
+//         req.body.PHONE,
+//         req.body.MOBILE,
+//         req.body.EMAIL,
+//         req.body.STATUS,
+//         req.body.USERTYPE,
+//         req.body.USERNAME,
+//         req.body.PASSWORD,
+//         req.body.CREATEDBY,
+//         req.body.CREATEDON,
+//         req.body.UPDATEDBY,
+//         req.body.UPDATEDON,
+//         req.body.DS_ON,
+//         req.body.DS_OFF,
+//         req.body.FULLNAME,
+//         req.body.COUNTRY,
+//         req.body.LOCATION,
+//         req.body.PROFESSION,
+//         req.body.ADDRESS,
+//         req.body.WEBSITE,
+//         filepath,
+//       ];
+
+//       con.query(insertQuery, insertValues, (err) => {
+//         if (err) return res.status(500).json({ error: "Insert failed" });
+//         res.status(201).json({ message: "User inserted", user: { ...req.body, PROFILEIMAGE: filepath } });
+//       });
+//     }
+//   });
+// };
+
+// exports.update_data = async (req, res) => {
+//   try {
+//     const {
+//       COMPANYID,
+//       USERID,
+//       TITLE,
+//       BUSINESSTITLE,
+//       FNAME,
+//       MNAME,
+//       LNAME,
+//       PHONE,
+//       MOBILE,
+//       EMAIL,
+//       STATUS,
+//       USERTYPE,
+//       USERNAME,
+//       PASSWORD,
+//       CREATEDBY,
+//       CREATEDON,
+//       UPDATEDBY,
+//       UPDATEDON,
+//       DS_ON,
+//       DS_OFF,
+//       FULLNAME,
+//       COUNTRY,
+//       LOCATION,
+//       PROFESSION,
+//       ADDRESS,
+//       WEBSITE,
+//     } = req.body;
+
+//     const PROFILEIMAGE = req.file?.filename || null;
+
+//     if (!USERID) {
+//       return res.status(400).json({ msg: "USERID is required for update" });
+//     }
+
+//     // Dynamically construct fields to update
+//     const fieldsToUpdate = {
+//       COMPANYID,
+//       TITLE,
+//       BUSINESSTITLE,
+//       FNAME,
+//       MNAME,
+//       LNAME,
+//       PHONE,
+//       MOBILE,
+//       EMAIL,
+//       STATUS,
+//       USERTYPE,
+//       USERNAME,
+//       PASSWORD,
+//       CREATEDBY,
+//       CREATEDON,
+//       UPDATEDBY,
+//       UPDATEDON,
+//       DS_ON,
+//       DS_OFF,
+//       FULLNAME,
+//       COUNTRY,
+//       LOCATION,
+//       PROFESSION,
+//       ADDRESS,
+//       WEBSITE,
+//     };
+
+//     // Only include PROFILEIMAGE if a new file was uploaded
+//     if (PROFILEIMAGE) {
+//       fieldsToUpdate.PROFILEIMAGE = PROFILEIMAGE;
+//     }
+
+//     const updates = [];
+//     const values = [];
+
+//     for (const [key, value] of Object.entries(fieldsToUpdate)) {
+//       if (value !== undefined && value !== null) {
+//         updates.push(`${key} = ?`);
+//         values.push(value);
+//       }
+//     }
+
+//     if (updates.length === 0) {
+//       return res.status(400).json({ msg: "No data provided for update" });
+//     }
+
+//     values.push(USERID); // For WHERE clause
+
+//     const sql = `UPDATE usermaster SET ${updates.join(", ")} WHERE USERID = ?`;
+
+//     await query(sql, values);
+
+//     res.status(200).json({
+//       msg: "User data updated successfully",
+//       user: { USERID, ...fieldsToUpdate },
+//     });
+//   } catch (error) {
+//     console.error("Error updating data:", error);
+//     res.status(500).json({ msg: "Internal Server Error", error: error.message });
+//   }
+// };
+
+
+
+
+
+
+
+
+
+
 
 exports.add_data = async (req, res) => {
-  console.log(req.body);
   try {
     const {
       COMPANYID,
@@ -747,13 +1177,11 @@ exports.add_data = async (req, res) => {
       PROFESSION,
       ADDRESS,
       WEBSITE,
-      PROFILEIMAGE,
     } = req.body;
-
-    // Required fields validation
+    const PROFILEIMAGE = req.file?.filename || null;
     const requiredFields = {
-      COMPANYID,
-      USERID,
+      // COMPANYID,
+      // USERID,
       TITLE,
       BUSINESSTITLE,
       FNAME,
@@ -780,76 +1208,17 @@ exports.add_data = async (req, res) => {
       WEBSITE,
       PROFILEIMAGE,
     };
-
     for (const [key, value] of Object.entries(requiredFields)) {
-      if (!value) {
-        return res.status(400).json({ msg: `${key} is required` });
-      }
+      if (!value) return res.status(400).json({ msg: `${key} is required` });
     }
-
-    // Optional: Hash the password before saving
-    // const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newRecord = {
-      COMPANYID,
-      USERID,
-      TITLE,
-      BUSINESSTITLE,
-      FNAME,
-      MNAME,
-      LNAME,
-      PHONE,
-      MOBILE,
-      EMAIL,
-      STATUS,
-      USERTYPE,
-      USERNAME,
-      PASSWORD,
-      CREATEDBY,
-      CREATEDON,
-      UPDATEDBY,
-      UPDATEDON,
-      DS_ON,
-      DS_OFF,
-      FULLNAME,
-      COUNTRY,
-      LOCATION,
-      PROFESSION,
-      ADDRESS,
-      WEBSITE,
-      PROFILEIMAGE,
-    };
-
     const result = await query(
-      `INSERT INTO usermaster ( 
-      COMPANYID,
-      USERID,
-      TITLE,
-      BUSINESSTITLE,
-      FNAME,
-      MNAME,
-      LNAME,
-      PHONE,
-      MOBILE,
-      EMAIL,
-      STATUS,
-      USERTYPE,
-      USERNAME,
-      PASSWORD,
-      CREATEDBY,
-      CREATEDON,
-      UPDATEDBY,
-      UPDATEDON,
-      DS_ON,
-      DS_OFF,
-      FULLNAME,
-      COUNTRY,
-      LOCATION,
-      PROFESSION,
-      ADDRESS,
-      WEBSITE,
-      PROFILEIMAGE 
-    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      `INSERT INTO usermaster (
+        COMPANYID, USERID, TITLE, BUSINESSTITLE, FNAME, MNAME, LNAME,
+        PHONE, MOBILE, EMAIL, STATUS, USERTYPE, USERNAME, PASSWORD,
+        CREATEDBY, CREATEDON, UPDATEDBY, UPDATEDON,
+        DS_ON, DS_OFF, FULLNAME, COUNTRY, LOCATION,
+        PROFESSION, ADDRESS, WEBSITE, PROFILEIMAGE
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
       [
         COMPANYID,
         USERID,
@@ -880,30 +1249,136 @@ exports.add_data = async (req, res) => {
         PROFILEIMAGE,
       ]
     );
-
-    res.status(201).json({ msg: "New data added successfully", result });
+    res.status(201).json({ msg: "New data added successfully", user: req.body });
   } catch (error) {
     console.error("Error inserting data:", error);
-    res
-      .status(500)
-      .json({ msg: "Internal Server Error", error: error.message });
+    res.status(500).json({ msg: "Internal Server Error", error: error.message });
   }
 };
-
+exports.update_data = async (req, res) => {
+  try {
+    const {
+      COMPANYID,
+      USERID,
+      TITLE,
+      BUSINESSTITLE,
+      FNAME,
+      MNAME,
+      LNAME,
+      PHONE,
+      MOBILE,
+      EMAIL,
+      STATUS,
+      USERTYPE,
+      USERNAME,
+      PASSWORD,
+      CREATEDBY,
+      CREATEDON,
+      UPDATEDBY,
+      UPDATEDON,
+      DS_ON,
+      DS_OFF,
+      FULLNAME,
+      COUNTRY,
+      LOCATION,
+      PROFESSION,
+      ADDRESS,
+      WEBSITE,
+    } = req.body;
+    const PROFILEIMAGE = req.file?.filename || null;
+    if (!USERID) {
+      return res.status(400).json({ msg: "USERID is required for update" });
+    }
+    // Dynamically construct fields to update
+    const fieldsToUpdate = {
+      COMPANYID,
+      TITLE,
+      BUSINESSTITLE,
+      FNAME,
+      MNAME,
+      LNAME,
+      PHONE,
+      MOBILE,
+      EMAIL,
+      STATUS,
+      USERTYPE,
+      USERNAME,
+      PASSWORD,
+      CREATEDBY,
+      CREATEDON,
+      UPDATEDBY,
+      UPDATEDON,
+      DS_ON,
+      DS_OFF,
+      FULLNAME,
+      COUNTRY,
+      LOCATION,
+      PROFESSION,
+      ADDRESS,
+      WEBSITE,
+    };
+    // Only include PROFILEIMAGE if a new file was uploaded
+    if (PROFILEIMAGE) {
+      fieldsToUpdate.PROFILEIMAGE = PROFILEIMAGE;
+    }
+    const updates = [];
+    const values = [];
+    for (const [key, value] of Object.entries(fieldsToUpdate)) {
+      if (value !== undefined && value !== null) {
+        updates.push(`${key} = ?`);
+        values.push(value);
+      }
+    }
+    if (updates.length === 0) {
+      return res.status(400).json({ msg: "No data provided for update" });
+    }
+    values.push(USERID); // For WHERE clause
+    const sql = `UPDATE usermaster SET ${updates.join(", ")} WHERE USERID = ?`;
+    await query(sql, values);
+    res.status(200).json({
+      msg: "User data updated successfully",
+      user: { USERID, ...fieldsToUpdate },
+    });
+  } catch (error) {
+    console.error("Error updating data:", error);
+    res.status(500).json({ msg: "Internal Server Error", error: error.message });
+  }
+};
 exports.getOneMaster = async (req, res) => {
+  console.log("Fetching user with ID:", req.params.id);
   const userId = req.params.id;
-  await con.query(
-    "SELECT * FROM usermaster WHERE USERID = ?",
-    userId,
+  con.query(
+    `SELECT
+      u.*,
+      um.MOBILE,
+      um.MNAME,
+      um.FNAME,
+      um.LNAME,
+      um.EMAIL,
+      um.PROFESSION,
+      um.ADDRESS,
+      um.LOCATION,
+      um.WEBSITE,
+      um.BUSINESSTITLE,
+      um.TITLE,
+      um.COUNTRY,
+      um.PROFILEIMAGE
+    FROM
+      users AS u
+    LEFT JOIN
+      usermaster AS um ON u.id = um.USERID
+    WHERE
+      u.id = ?`,
+    [userId],
     (err, result) => {
       if (err) {
-        throw err;
+        console.error("Error fetching user:", err);
+        return res.status(500).json({ error: "Database error" });
       }
       res.json(result[0]);
     }
   );
 };
-
 exports.get_data = async (req, res) => {
   try {
     const usermaster = await query("SELECT * FROM usermaster");
@@ -915,3 +1390,8 @@ exports.get_data = async (req, res) => {
       .json({ msg: "Error retrieving data", error: error.message });
   }
 };
+
+
+
+
+

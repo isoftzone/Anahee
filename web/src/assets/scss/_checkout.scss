@@ -26,6 +26,16 @@
       border: 1px solid #e6e6e6;
       background: transparent none repeat scroll 0 0;
     }
+     textarea {
+      font-size: 14px;
+
+      padding-right: 10px;
+      padding-left: 20px;
+
+      color: #333;
+      border: 1px solid #e6e6e6;
+      background: transparent none repeat scroll 0 0;
+    }
     input.billing-address {
       margin-bottom: 10px;
     }
@@ -145,7 +155,7 @@
     color: #000;
   }
   .your-order-wrap {
-    padding: 38px 45px 44px;
+    padding: 21px;
 
     background: #f6f6f6;
     @media #{$lg-layout} {
@@ -168,17 +178,10 @@
         }
       }
       .your-order-middle {
-        margin: 29px 0;
-        padding: 19px 0 18px;
-
-        border-top: 1px solid #dee0e4;
-        border-bottom: 1px solid #dee0e4;
         ul {
           li {
             display: flex;
             justify-content: space-between;
-
-            margin: 0 0 10px;
           }
         }
       }
@@ -202,11 +205,6 @@
         }
       }
       .your-order-total {
-        margin: 18px 0 33px;
-        padding: 17px 0 19px;
-
-        border-top: 1px solid #dee0e4;
-        border-bottom: 1px solid #dee0e4;
         ul {
           display: flex;
           align-items: center;

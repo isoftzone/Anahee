@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, NavLink, useLocation,useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { IRootState } from '../../store';
 import { toggleRTL, toggleTheme, toggleSidebar } from '../../store/themeConfigSlice';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +34,8 @@ import IconMenuPages from '../Icon/Menu/IconMenuPages';
 import IconMenuMore from '../Icon/Menu/IconMenuMore';
 import { Button } from 'react-bootstrap';
 import axios from 'axios';
-import {BASE_URL} from '../../config'
+import { BASE_URL } from '../../config';
+import { setUsers } from '../../store/userSlice';
 
 const Header = () => {
     const location = useLocation();
@@ -59,48 +60,107 @@ const Header = () => {
         }
     }, [location]);
 
-    // const [user, setUser] = useState(null); // State to hold user information
-    const [user, setUser] = useState<{ name: string, email: string } | null>(null);
+    interface User {
+        name: string;
+        email: string;
+        profileImage?: string;
+    }
 
+    const [user, setUser] = useState<any | null>(null);
+    const [imageUrl, setImageUrl] = useState<string>();
 
     useEffect(() => {
-        const userDataString = localStorage.getItem('userData');
-        if (userDataString) {
-            const user = JSON.parse(userDataString);
-            setUser(user);
-        }
+        const fetchUser = async () => {
+            const userDataString = localStorage.getItem('userData');
+            if (userDataString) {
+                const localUser = JSON.parse(userDataString);
+                console.log('User from localStorage:', localUser);
+
+                try {
+                    const response = await axios.get(`${BASE_URL}/getid_userMaster/${localUser.id}`, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    const userData: User = response.data;
+                    setUser(userData);
+                    console.log('Fetched user data:', userData);
+                } catch (error) {
+                    console.error('Error fetching user:', error);
+                }
+            }
+        };
+
+        fetchUser();
     }, []);
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-          try {
-            const email = 'user@example.com'; // Replace with actual email
-            const password = 'password123';   // Replace with actual password
-    
-            console.log('Request body:', { email, password });
-    
-            const response = await axios.post(`${BASE_URL}/login`, { email, password }, {
-              headers: {
-                'Content-Type': 'application/json'
-              }
-            });
-    
-            const userData = response.data;
-            setUser(userData);
-          } catch (error) {
-            console.error('Error fetching user data:', error);
-            // setError(error.response?.data?.msg || 'An error occurred during login.');
-          }
-        };
-    
-        fetchUserData();
-      }, []);
-  
+    //     const users = useSelector((state: IRootState) => state.user);
+    // console.log(`${BASE_URL}/images/banner/${users.profileImage}`);
+    //     useEffect(() => {
+    //         if (users?.profileImage) {
+    //             setImageUrl(`${BASE_URL}/images/banner/${user.profileImage}`);
+    //         } else if (user?.profileImage) {
+    //             setImageUrl(`${BASE_URL}/images/banner/${users.profileImage}`);
+    //         } else {
+    //             setImageUrl('/assets/images/profile-0350.png');
+    //         }
+    //     }, [users]);
 
+    const users = useSelector((state: IRootState) => state.user);
+
+    useEffect(() => {
+        if (user?.PROFILEIMAGE) {
+            const cleanedPath = user.PROFILEIMAGE.replace(/\\/g, '/');
+            setImageUrl(`${BASE_URL}/images/banner/${cleanedPath}`);
+        } else if (users?.profileImage) {
+            const cleanedPath = users.profileImage.replace(/\\/g, '/');
+            setImageUrl(`${BASE_URL}/images/banner/${cleanedPath}`);
+        } else {
+            setImageUrl('/assets/images/profile-0350.png');
+        }
+    }, [users, user]);
+
+    useEffect(() => {
+    const getSanitizedPath = (path?: string) =>
+        path && path !== 'null' ? path.replace(/\\/g, '/') : null;
+
+    const reduxImage = getSanitizedPath(users?.profileImage);
+
+    if (reduxImage) {
+        setImageUrl(`${BASE_URL}/images/banner/${reduxImage}`);
+    } else {
+        setImageUrl('/assets/images/profile-0350.png');
+    }
+}, [users.profileImage]);
+
+// useEffect(() => {
+//     const getSanitizedPath = (path?: string) =>
+//         path && path !== 'null' ? path.replace(/\\/g, '/') : null;
+
+//     const userImage = getSanitizedPath(user?.PROFILEIMAGE);
+//     const reduxImage = getSanitizedPath(users?.profileImage);
+
+//     if (userImage) {
+//         setImageUrl(`${BASE_URL}/images/banner/${userImage}`);
+//     } else if (reduxImage) {
+//         setImageUrl(`${BASE_URL}/images/banner/${reduxImage}`);
+//     } else {
+//         setImageUrl('/assets/images/profile-0350.png');
+//     }
+// }, [user?.PROFILEIMAGE, users?.profileImage]);
+
+
+    console.log(`${BASE_URL}/images/banner/${user?.PROFILEIMAGE}`);
+
+    // console.log('user.profileImage', user?.PROFILEIMAGE);
+    console.log('imageUrl', imageUrl);
 
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
 
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);
+
+    console.log('users=-', users);
     const dispatch = useDispatch();
 
     function createMarkup(messages: any) {
@@ -167,8 +227,10 @@ const Header = () => {
     };
 
     const [search, setSearch] = useState(false);
-   
+
     const setLocale = (flag: string) => {
+        const dispatch = useDispatch();
+
         setFlag(flag);
         if (flag.toLowerCase() === 'ae') {
             dispatch(toggleRTL('rtl'));
@@ -182,10 +244,13 @@ const Header = () => {
     const navigate = useNavigate();
     const handleLogout = () => {
         // Perform logout actions here (e.g., clearing authentication token, resetting state)
-       // Then redirect to login page
-       navigate('/', { replace: true }); // Use replace option to prevent going back
-   };
-
+        // Then redirect to login page
+        localStorage.removeItem('userData');
+        localStorage.removeItem('userDatas');
+        dispatch(setUsers({})); // Reset user state in Redux
+        navigate('/', { replace: true }); // Use replace option to prevent going back
+    };
+    console.log('username=', user);
     return (
         <header className={`z-40 ${themeConfig.semidark && themeConfig.menu === 'horizontal' ? 'dark' : ''}`}>
             <div className="shadow-sm">
@@ -467,26 +532,51 @@ const Header = () => {
                                 offset={[0, 8]}
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
                                 btnClassName="relative group block"
-                                button={<img className="w-9 h-9 rounded-full object-cover saturate-50 group-hover:saturate-100" src="/assets/images/user-profile.jpeg" alt="userProfile" />}
+                                button={
+                                    <img
+                                        className="w-9 h-9 rounded-full object-cover saturate-50 group-hover:saturate-100"
+                                        //  src="/assets/images/user-profile.jpeg"
+                                        // src={user ? `${BASE_URL}/${user}` : '/assets/images/profile-0350.png'}
+                                        // src={user ? `${BASE_URL}/images/banner/${user}` : '/assets/images/profile-0350.png'}
+                                        //  src={user ? `${BASE_URL}/images/banner/${user.PROFILEIMAGE}` : '/assets/images/profile-0350.png'}
+                                        // src={imageUrl}
+                                        src={imageUrl}
+                                        onError={(e) => {
+                                            e.currentTarget.onerror = null; // Prevent infinite loop
+                                            e.currentTarget.src = '/assets/images/profile-0350.png';
+                                        }}
+                                        alt="userProfile"
+                                    />
+                                }
                             >
                                 <ul className="text-dark dark:text-white-dark !py-0 w-[230px] font-semibold dark:text-white-light/90">
                                     <li>
                                         <div className="flex items-center px-4 py-4">
-                                            <img className="rounded-md w-10 h-10 object-cover" src="/assets/images/user-profile.jpeg" alt="userProfile" />
+                                            <img
+                                                className="rounded-md w-10 h-10 object-cover"
+                                                // src={user ? `${BASE_URL}/images/banner/${user}` : '/assets/images/profile-0350.png'}
+                                                // src={imageUrl}
+                                                src={imageUrl}
+                                                onError={(e) => {
+                                                    e.currentTarget.onerror = null; // Prevent infinite loop
+                                                    e.currentTarget.src = '/assets/images/profile-0350.png';
+                                                }}
+                                                alt="userProfile"
+                                            />
                                             <div className="ltr:pl-4 rtl:pr-4 truncate">
-                                            <div>
-      {user && (
-        <div>
-          <h4 className="text-base">
-            {user.name}
-            <span className="text-xs bg-success-light rounded text-success px-1 ltr:ml-2 rtl:ml-2">Pro</span>
-          </h4>
-          <button type="button" className="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white">
-            {user.email}
-          </button>
-        </div>
-      )}
-    </div>
+                                                <div>
+                                                    {user && (
+                                                        <div>
+                                                            <h4 className="text-base">
+                                                                {user.name}
+                                                                <span className="text-xs bg-success-light rounded text-success px-1 ltr:ml-2 rtl:ml-2">Pro</span>
+                                                            </h4>
+                                                            <button type="button" className="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white">
+                                                                {user.email}
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
                                                 {/* <h4 className="text-base">
                                                     John Doe
                                                     <span className="text-xs bg-success-light rounded text-success px-1 ltr:ml-2 rtl:ml-2">Pro</span>
@@ -494,7 +584,6 @@ const Header = () => {
                                                 <button type="button" className="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white">
                                                     johndoe@gmail.com
                                                 </button> */}
-                                                
                                             </div>
                                         </div>
                                     </li>
@@ -517,9 +606,7 @@ const Header = () => {
                                         </Link>
                                     </li> */}
                                     <li className="border-t border-white-light dark:border-white-light/10">
-                                        <a  onClick={handleLogout} className="text-danger !py-3"
-                                        style={{cursor:'pointer'}}
-                                        >
+                                        <a onClick={handleLogout} className="text-danger !py-3" style={{ cursor: 'pointer' }}>
                                             <IconLogout className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 rotate-90 shrink-0" />
                                             Sign Out
                                         </a>

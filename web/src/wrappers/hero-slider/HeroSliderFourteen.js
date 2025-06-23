@@ -7,20 +7,19 @@ import { Link } from "react-router-dom";
 import SectionTitleWithText from "../../components/section-title/SectionTitleWithText";
 import SectionTitleHome from "../../components/section-title/SectionTitleHome.js";
 import axios from "axios";
-
 const params = {
   effect: "fade",
   fadeEffect: {
     crossFade: true,
   },
-  modules: [EffectFade,Autoplay],
+  modules: [EffectFade],
   loop: true,
   speed: 1000,
-  navigation: true,
+  pagination: true,
   autoHeight: false,
   autoplay: {
-    delay: 5000, // Auto transition every 5 seconds
-    disableOnInteraction: false, // Allow autoplay to continue after user interaction
+    delay: 3000,
+    disableOnInteraction: false,
   },
 };
 
@@ -50,7 +49,7 @@ const HeroSliderFourteen = () => {
             </SwiperSlide>  
           ))}  */}
           {banners.length >= 2 && (
-            banners.slice(35, 38).map((single, key) => (
+            banners.slice(31, 34).map((single, key) => (
               <SwiperSlide key={key}>  
                 <HeroSliderFourteenSingle data={single} />  
               </SwiperSlide>  

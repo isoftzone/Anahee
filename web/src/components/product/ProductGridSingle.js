@@ -7,8 +7,7 @@ import Rating from "./sub-components/ProductRating";
 import { getDiscountPrice } from "../../helpers/product";
 import ProductModal from "./ProductModal";
 // import { addToCart } from "../../store/slices/cart-slice";
-import { addToWishlist } from "../../store/slices/wishlist-slice";
-
+import { addToWishlist, deleteFromWishlist } from "../../store/slices/wishlist-slice";
 const ProductGridSingle = ({
   product,
   currency,
@@ -24,7 +23,6 @@ const ProductGridSingle = ({
     discountedPrice * currency.currencyRate
   ).toFixed(2);
   const dispatch = useDispatch();
-
   return (
     <Fragment>
       <div className={clsx("product-wrap", spaceBottomClass)}>
@@ -57,21 +55,25 @@ const ProductGridSingle = ({
           ) : (
             ""
           )}
-
           <div className="product-action">
             <div className="pro-same-action pro-wishlist">
               <button
-                className={wishlistItem !== undefined ? "active" : ""}
-                disabled={wishlistItem !== undefined}
-                title={
-                  wishlistItem !== undefined
-                    ? "Added to wishlist"
-                    : "Add to wishlist"
-                }
-                onClick={() => dispatch(addToWishlist(product))}
-              >
-                <i className="pe-7s-like" />
-              </button>
+              className={`transition-all duration-300 text-2xl ${
+                wishlistItem ? "text-danger" : "text-gray-400"
+              }`}
+              title={wishlistItem ? "Remove from wishlist" : "Add to wishlist"}
+              onClick={() =>
+                wishlistItem
+                  ? dispatch(deleteFromWishlist(product))
+                  : dispatch(addToWishlist(product))
+              }
+            >
+              {wishlistItem ? (
+                <i className="fa fa-heart "></i>
+              ) : (
+                <i className="fa fa-heart-o"></i>
+              )}
+            </button>
             </div>
             <div className="pro-same-action pro-cart">
               {product.affiliateLink ? (
@@ -130,7 +132,7 @@ const ProductGridSingle = ({
           </h3>
           {product.rating && product.rating > 0 ? (
             <div className="product-rating">
-              <Rating ratingValue={product.rating} />
+              <Rating ratingValue={product.rating} editable={true}/>
             </div>
           ) : (
             ""
@@ -164,7 +166,6 @@ const ProductGridSingle = ({
     </Fragment>
   );
 };
-
 ProductGridSingle.propTypes = {
   cartItem: PropTypes.shape({}),
   compareItem: PropTypes.shape({}),
@@ -174,5 +175,4 @@ ProductGridSingle.propTypes = {
   sliderClassName: PropTypes.string,
   spaceBottomClass: PropTypes.string,
 };
-
 export default ProductGridSingle;

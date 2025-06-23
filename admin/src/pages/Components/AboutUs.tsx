@@ -53,9 +53,9 @@ const AboutUs: React.FC = () => {
 
   return (
     <div className="privacy-policy-editor">
-      <h1 className="mb-3" style={{ fontWeight: "700" }}>About Us</h1>
+      <h1 className="mb-3" style={{ fontWeight: "700" }}>{sectionname}</h1>
        {/* Section Name Input */}
-       <Form.Group className="mb-3">
+       {/* <Form.Group className="mb-3">
         <Form.Label>Section Name</Form.Label>
         <Form.Control
           type="text"
@@ -63,15 +63,15 @@ const AboutUs: React.FC = () => {
           value={sectionname}
           onChange={(e) => setSectionname(e.target.value)}
         />
-      </Form.Group>
+      </Form.Group> */}
       <ReactQuill
         value={content}
         onChange={setContent}
         placeholder="Edit your Exchange policy here..."
       />
       <div className="mt-4 flex gap-3">
-        <Button onClick={handleSave} className="bg-green-500">Save</Button>
-        <Button variant="outline" onClick={() => setContent("")}>Reset</Button>
+        <Button onClick={handleSave} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm mt-4 font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Save</Button>
+        <Button variant="outline" className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm mt-4 font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500" onClick={() => setContent("")}>Reset</Button>
       </div>
     </div>
   );

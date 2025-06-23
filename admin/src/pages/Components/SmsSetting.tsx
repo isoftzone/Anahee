@@ -20,7 +20,7 @@ const SmsSetting = () => {
 
           <button
             onClick={handleAddClick}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+            className="px-4 py-2 mt-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             + Add SMS SETTINGS
           </button>
@@ -52,7 +52,7 @@ const SmsSetting = () => {
         <div className="overflow-auto">
           <table className="min-w-full border border-gray-300 text-sm">
             <thead>
-              <tr className="bg-blue-700 text-white">
+              <tr className="bg-blue-700 text-dark">
                 <th className="p-2 border">Sr. no</th>
                 <th className="p-2 border">TYPE</th>
                 <th className="p-2 border">SENDER ID</th>
@@ -71,8 +71,8 @@ const SmsSetting = () => {
                 </td>
                 <td className="p-2 border text-green-600">Active</td>
                 <td className="p-2 border">
-                  <button className="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm font-bold">
-                    ✎
+                  <button className="px-4 py-2 mt-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                    Edit
                   </button>
                 </td>
               </tr>

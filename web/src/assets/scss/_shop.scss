@@ -12,6 +12,7 @@
   }
   .select-shoing-wrap {
     display: flex;
+    
     @media #{$xs-layout} {
       display: block;
     }
@@ -98,7 +99,7 @@
       }
     }
     .product-list-price {
-      margin: 13px 0 22px;
+      // margin: 13px 0 22px;
       @media #{$xs-layout} {
         margin: 13px 0 13px;
       }
@@ -165,7 +166,7 @@
       font-size: 15px;
       line-height: 28px;
 
-      margin: 15px 0 40px;
+      // margin: 15px 0 40px;
 
       color: #8f8f8f;
       @media #{$xs-layout} {
@@ -308,7 +309,7 @@
           line-height: 20px;
         }
         .product-list-price {
-          margin: 13px 0 10px;
+          // margin: 13px 0 10px;
         }
         p {
           margin: 6px 0 20px;
@@ -327,7 +328,7 @@
           line-height: 20px;
         }
         .product-list-price {
-          margin: 13px 0 10px;
+          // margin: 13px 0 10px;
         }
         p {
           margin: 6px 0 20px;
@@ -438,5 +439,12 @@
     @media #{$xs-layout} {
       padding: 0 15px;
     }
+  }
+}
+
+@media (max-width:375px){
+  .shop-top-bar{
+            margin-bottom: 0;
+
   }
 }

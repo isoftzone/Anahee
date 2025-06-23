@@ -7,12 +7,19 @@ import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import RelatedProductSlider from "../../wrappers/product/RelatedProductSlider";
 import ProductDescriptionTab from "../../wrappers/product/ProductDescriptionTab";
 import ProductImageDescription from "../../wrappers/product/ProductImageDescription";
-
+import { useState, useEffect } from "react";
 const Product = () => {
   let { pathname } = useLocation();
   let { id } = useParams();
   const { products } = useSelector((state) => state.product);
-  const product = products.find(product => product.id === id);
+  // const product = products.find(product => product.id === id);
+  const [product, setProduct] = useState(undefined);
+  useEffect(() => {
+    if (products.length > 0) {
+      const found = products.find(p => String(p.id) === String(id));
+      setProduct(found);
+    }
+  }, [products, id]);
   console.log("products page product id",id);
   console.log("products page products data",products);
   console.log("products page  single product data",product);
@@ -25,7 +32,7 @@ const Product = () => {
     <Fragment>
       <SEO
         titleTemplate="Product Page"
-        description="Product Page of Anahee react minimalist eCommerce template."
+        description="Product Page of Anahee Anahee."
       />
 
       <LayoutOne headerTop="visible">
@@ -54,6 +61,7 @@ const Product = () => {
         <RelatedProductSlider
           spaceBottomClass="pb-20"
           category={product.category[0]}
+          product_id={id}
         />
       </LayoutOne>
     </Fragment>

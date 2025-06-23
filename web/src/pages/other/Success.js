@@ -79,7 +79,7 @@
 //     <Fragment>
 //       <SEO
 //         titleTemplate="Checkout"
-//         description="Checkout page of Anahee react minimalist eCommerce template."
+//         description="Checkout page of Anahee Anahee."
 //       />
 //       <LayoutOne headerTop="visible">
 //         <div className="checkout-area pt-10 pb-30">
@@ -215,50 +215,67 @@
 
 // export default Success;
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 const Success = () => {
   // Change this to true or false to switch views
   const [isSuccess] = useState(true); // or false
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigate("/orders");
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [navigate]);
   return (
-    <div
-      className="container py-5"
-      style={{
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      {isSuccess ? (
-        <div className="row justify-content-center" style={{ width: "800px" }}>
-          <div className="col-12 col-sm-10 col-md-8 col-lg-6">
-            <div className="success-box text-center">
-              <div className="icon-circle mb-3">
-                <i className="fa fa-check" aria-hidden="true"></i>
+    <div>
+      <div
+        className="container py-5"
+        style={{
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {isSuccess ? (
+          <div
+            className="row justify-content-center"
+            style={{ width: "800px" }}
+          >
+            <div className="col-12 col-sm-10 col-md-8 col-lg-6">
+              <div className="success-box text-center">
+                <div className="icon-circle mb-3">
+                  <i className="fa fa-check" aria-hidden="true"></i>
+                </div>
+                <h2 className="success-title fs-2">
+                  Your payment was successful
+                </h2>
+                <p className="success-message  fs-4 mb-0">
+                  Thank you for your payment. we will <br />
+                  be in contact with more details shortly
+                </p>
               </div>
-              <h2 className="success-title fs-2">
-                Your payment was successful
-              </h2>
-              <p className="success-message  fs-4 mb-0">
-                Thank you for your payment. we will <br />
-                be in contact with more details shortly
-              </p>
             </div>
           </div>
-        </div>
-      ) : (
-        <div className="row justify-content-center" style={{ width: "800px" }}>
-          <div className="col-12 col-sm-10 col-md-8 col-lg-6">
-            <div className="success-box-1 text-center">
-              <div className="icon-circle mb-3">
-                <i className="fa fa-close text-danger" aria-hidden="true"></i>
+        ) : (
+          <div
+            className="row justify-content-center"
+            style={{ width: "800px" }}
+          >
+            <div className="col-12 col-sm-10 col-md-8 col-lg-6">
+              <div className="success-box-1 text-center">
+                <div className="icon-circle mb-3">
+                  <i className="fa fa-close text-danger" aria-hidden="true"></i>
+                </div>
+                <h2 className="success-title fs-2">Your payment failed</h2>
+                <p className="success-message mb-0 fs-4">Try Again Later</p>
               </div>
-              <h2 className="success-title fs-2">Your payment failed</h2>
-              <p className="success-message mb-0 fs-4">Try Again Later</p>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

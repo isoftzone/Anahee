@@ -1,46 +1,47 @@
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
-
+import { BASE_URL } from "../../config"; // Adjust path based on your project
 const SectionTitleWithText = ({ spaceTopClass, spaceBottomClass }) => {
+  const [aboutData, setAboutData] = useState([]);
+  useEffect(() => {
+    const fetchAboutData = async () => {
+      try {
+        const response = await fetch(
+          `${BASE_URL}/get-exchange-policy?companyid=1&sectionname=About Us`
+        );
+        const data = await response.json();
+        console.log("API response:", data);
+        // If API returns { policies: [...] }
+        setAboutData(data.policies || []);
+      } catch (error) {
+        console.error("Error fetching about section:", error);
+      }
+    };
+    fetchAboutData();
+  }, []);
   return (
-    <div className={clsx("welcome-area", spaceTopClass, spaceBottomClass)}>
-      <div className="container">
-        <div className="welcome-content text-center">
-          <h5>Who Are We</h5>
-          <h1>Welcome To Anahee</h1>
-          <p>
-            Anahee redefines affordable luxury for modern women by blending
-            cultural richness with contemporary aesthetics. Our vision is to
-            craft timeless pieces that exude empowerment and confidence,
-            ensuring that style comes without the weight of a hefty price tag.
-            Our carefully curated collection harmonizes classic prints with
-            modern silhouettes, delivering premium, classy, and elegant designs.
-            Each piece is a reflection of exclusivity and high fashion, tailored
-            for women who seek not just style but also substance in their
-            wardrobe. Our band is not just a fashion; it’s a statement of
-            confidence and grace, reimagined for today’s empowered woman.{" "}
-          </p>
-        </div>
-      </div>
-      <div className="container">
-        <div className="welcome-content text-center">
-          <h1>Our Vision</h1>
-          <p>
-            At Anahee, our vision is to empower modern women with affordable
-            luxury that seamlessly blends cultural heritage and contemporary
-            aesthetics. We aim to craft timeless designs that inspire confidence
-            and grace, ensuring every woman feels elegant and empowered without
-            compromising on quality or value
-          </p>
-        </div>
+    <div className={clsx("welcome-area mb-5", spaceTopClass, spaceBottomClass)}>
+      <div className="container-fluid">
+        {aboutData.length > 0 ? (
+          aboutData.map((section, index) => (
+            <div className="welcome-content text-center" key={index}>
+              {/* <h5>{section.sectionname || "Who Are We"}</h5> */}
+              {/* <h1>{section.sectionname || "Welcome To Anahee"}</h1> */}
+              <div dangerouslySetInnerHTML={{ __html: section.content }} />
+            </div>
+          ))
+        ) : (
+          <div className="welcome-content text-center">
+            <h1>Loading...</h1>
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
-SectionTitleWithText.propTypes = { 
+SectionTitleWithText.propTypes = {
   spaceBottomClass: PropTypes.string,
   spaceTopClass: PropTypes.string,
 };
-
 export default SectionTitleWithText;

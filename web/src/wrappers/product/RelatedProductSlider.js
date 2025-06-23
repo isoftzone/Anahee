@@ -28,17 +28,17 @@ const settings = {
 };
 
 
-const RelatedProductSlider = ({ spaceBottomClass, category }) => {
+const RelatedProductSlider = ({ spaceBottomClass, category , product_id }) => {
   const { products } = useSelector((state) => state.product);
   const currency = useSelector((state) => state.currency);
   const { cartItems } = useSelector((state) => state.cart);
   const { wishlistItems } = useSelector((state) => state.wishlist);
   const { compareItems } = useSelector((state) => state.compare);
-  const prods = getProducts(products, category, null, 6);
+  const prods = getProducts(products, category, null, 6, product_id);
   
   return (
     <div className={clsx("related-product-area", spaceBottomClass)}>
-      <div className="container">
+      <div className="container-fluid">
         <SectionTitle
           titleText="Related Products"
           positionClass="text-center"

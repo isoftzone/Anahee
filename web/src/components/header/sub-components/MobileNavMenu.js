@@ -1,430 +1,234 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
 
 const MobileNavMenu = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [name, setName] = useState("");
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false); // State to control dropdown visibility
+
   const { t } = useTranslation();
+
+  const toggleDropdown = (e) => {
+    e.preventDefault();
+    setShowDropdown(!showDropdown);
+  };
+
+  const handleLogoutClick = (e) => {
+    e.preventDefault();
+    setShowLogoutPopup(true);
+  };
+
+  useEffect(() => {
+    const checkLogin = () => {
+      const customerStr = localStorage.getItem("customerinfo");
+      if (customerStr) {
+        const customer = JSON.parse(customerStr);
+        setIsLoggedIn(true);
+        setName(customer.name);
+      } else {
+        setIsLoggedIn(false);
+        setName("");
+      }
+    };
+    checkLogin();
+    window.addEventListener("storage", checkLogin);
+    return () => window.removeEventListener("storage", checkLogin);
+  }, []);
 
   return (
     <nav className="offcanvas-navigation" id="offcanvas-navigation">
-      <ul>
-        <li className="menu-item-has-children">
-          <Link to={process.env.PUBLIC_URL + "/"}>{t("home")}</Link>
-          <ul className="sub-menu">
-            <li className="menu-item-has-children">
-              <Link to={process.env.PUBLIC_URL + "/"}>
-                {t("home_group_one")}
-              </Link>
-              <ul className="sub-menu">
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-fashion"}>
-                    {t("home_fashion")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-fashion-two"}>
-                    {t("home_fashion_two")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-fashion-three"}>
-                    {t("home_fashion_three")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-fashion-four"}>
-                    {t("home_fashion_four")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-fashion-five"}>
-                    {t("home_fashion_five")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-fashion-six"}>
-                    {t("home_fashion_six")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-fashion-seven"}>
-                    {t("home_fashion_seven")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-fashion-eight"}>
-                    {t("home_fashion_eight")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-kids-fashion"}>
-                    {t("home_kids_fashion")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-cosmetics"}>
-                    {t("home_cosmetics")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-furniture"}>
-                    {t("home_furniture")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-furniture-two"}>
-                    {t("home_furniture_two")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-furniture-three"}>
-                    {t("home_furniture_three")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-furniture-four"}>
-                    {t("home_furniture_four")}
-                  </Link>
-                </li>
-              </ul>
-            </li>
-            <li className="menu-item-has-children">
-              <Link to={process.env.PUBLIC_URL + "/"}>
-                {t("home_group_two")}
-              </Link>
-              <ul className="sub-menu">
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-furniture-five"}>
-                    {t("home_furniture_five")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-furniture-six"}>
-                    {t("home_furniture_six")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-furniture-seven"}>
-                    {t("home_furniture_seven")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-electronics"}>
-                    {t("home_electronics")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-electronics-two"}>
-                    {t("home_electronics_two")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-electronics-three"}>
-                    {t("home_electronics_three")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-book-store"}>
-                    {t("home_book_store")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-book-store-two"}>
-                    {t("home_book_store_two")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-plants"}>
-                    {t("home_plants")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-flower-shop"}>
-                    {t("home_flower_shop")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-flower-shop-two"}>
-                    {t("home_flower_shop_two")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-organic-food"}>
-                    {t("home_organic_food")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-organic-food-two"}>
-                    {t("home_organic_food_two")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-onepage-scroll"}>
-                    {t("home_onepage_scroll")}
-                  </Link>
-                </li>
-              </ul>
-            </li>
-            <li className="menu-item-has-children">
-              <Link to={process.env.PUBLIC_URL + "/"}>
-                {t("home_group_three")}
-              </Link>
-              <ul className="sub-menu">
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-grid-banner"}>
-                    {t("home_grid_banner")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-auto-parts"}>
-                    {t("home_auto_parts")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-cake-shop"}>
-                    {t("home_cake_shop")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-handmade"}>
-                    {t("home_handmade")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-pet-food"}>
-                    {t("home_pet_food")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-medical-equipment"}>
-                    {t("home_medical_equipment")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-christmas"}>
-                    {t("home_christmas")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-black-friday"}>
-                    {t("home_black_friday")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-black-friday-two"}>
-                    {t("home_black_friday_two")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/home-valentines-day"}>
-                    {t("home_valentines_day")}
-                  </Link>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </li>
+      {/* User Info Section with Dropdown */}
+      {isLoggedIn && (
+        <div className="mobile-user-section" style={{ marginBottom: "15px" }}>
+          <div
+            className="mobile-user-info"
+            onClick={toggleDropdown}
+            style={{
+              padding: "15px",
+              borderBottom: "1px solid #eee",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              cursor: "pointer",
+              backgroundColor: showDropdown ? "#f5f5f5" : "transparent",
+            }}
+          >
+            <i className="pe-7s-user-female admin-name-icon" style={{ fontSize: "20px" }}></i>
+            <span
+              style={{
+                fontWeight: "500",
+                fontSize: "16px",
+                textTransform: "capitalize",
+                flexGrow: 1,
+              }}
+            >
+            {name}
+            </span>
+            <i
+              className={`pe-7s-angle-down`}
+              style={{
+                transition: "transform 0.3s ease",
+                transform: showDropdown ? "rotate(180deg)" : "rotate(0deg)",
+              }}
+            />
+          </div>
 
-        <li className="menu-item-has-children">
-          <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
-            {t("shop")}
-          </Link>
-          <ul className="sub-menu">
-            <li className="menu-item-has-children">
-              <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
-                {t("shop_layout")}
-              </Link>
-              <ul className="sub-menu">
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
-                    {t("shop_grid_standard")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/shop-grid-filter"}>
-                    {t("shop_grid_filter")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/shop-grid-two-column"}>
-                    {t("shop_grid_two_column")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/shop-grid-no-sidebar"}>
-                    {t("shop_grid_no_sidebar")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/shop-grid-full-width"}>
-                    {t("shop_grid_full_width")}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to={process.env.PUBLIC_URL + "/shop-grid-right-sidebar"}
-                  >
-                    {t("shop_grid_right_sidebar")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/shop-list-standard"}>
-                    {t("shop_list_standard")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/shop-list-full-width"}>
-                    {t("shop_list_full_width")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/shop-list-two-column"}>
-                    {t("shop_list_two_column")}
-                  </Link>
-                </li>
-              </ul>
-            </li>
-            <li className="menu-item-has-children">
-              <Link to={process.env.PUBLIC_URL + "/product/1"}>
-                {t("product_details")}
-              </Link>
-              <ul className="sub-menu">
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/product/1"}>
-                    {t("product_tab_bottom")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/product-tab-left/1"}>
-                    {t("product_tab_left")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/product-tab-right/1"}>
-                    {t("product_tab_right")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/product-sticky/1"}>
-                    {t("product_sticky")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/product-slider/1"}>
-                    {t("product_slider")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/product-fixed-image/1"}>
-                    {t("product_fixed_image")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/product/1"}>
-                    {t("product_simple")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/product/1"}>
-                    {t("product_variation")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={process.env.PUBLIC_URL + "/product/1"}>
-                    {t("product_affiliate")}
-                  </Link>
-                </li>
-              </ul>
-            </li>
-          </ul>
+          {/* Dropdown Menu */}
+          {showDropdown && (
+            <ul
+              className="mobile-user-dropdown"
+              style={{
+                padding: "0 15px",
+                backgroundColor: "#f9f9f9",
+                borderBottom: "1px solid #eee",
+              }}
+            >
+              <li style={{ borderBottom: "1px solid #eee" }}>
+                <Link
+                  to="/my-account"
+                  style={{
+                    display: "block",
+                    padding: "12px 0",
+                    color: "#333",
+                  }}
+                  onClick={() => setShowDropdown(false)}
+                >
+                  Profile
+                </Link>
+              </li>
+              <li style={{ borderBottom: "1px solid #eee" }}>
+                <Link
+                  to="/orders"
+                  style={{
+                    display: "block",
+                    padding: "12px 0",
+                    color: "#333",
+                  }}
+                  onClick={() => setShowDropdown(false)}
+                >
+                  Orders
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="#"
+                  style={{
+                    display: "block",
+                    padding: "12px 0",
+                    color: "#333",
+                  }}
+                  onClick={(e) => {
+                    handleLogoutClick(e);
+                    setShowDropdown(false);
+                  }}
+                >
+                  Log Out
+                </Link>
+              </li>
+            </ul>
+          )}
+        </div>
+      )}
+
+      {/* Main Navigation Links */}
+      <ul>
+        <li>
+          <Link to={process.env.PUBLIC_URL + "/"}>{t("Home")}</Link>
         </li>
         <li>
-          <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
-            {t("collection")}
-          </Link>
+          <Link to={process.env.PUBLIC_URL + "/about"}>{t("About Us")}</Link>
         </li>
-        <li className="menu-item-has-children">
-          <Link to={process.env.PUBLIC_URL + "/"}>{t("pages")}</Link>
-          <ul className="sub-menu">
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/cart"}>
-                {t("cart")}
-              </Link>
-            </li>
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/checkout"}>
-                {t("checkout")}
-              </Link>
-            </li>
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/wishlist"}>
-                {t("wishlist")}
-              </Link>
-            </li>
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/compare"}>
-                {t("compare")}
-              </Link>
-            </li>
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/my-account"}>
-                {t("my_account")}
-              </Link>
-            </li>
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/login-register"}>
-                {t("login_register")}
-              </Link>
-            </li>
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/about"}>
-                {t("about_us")}
-              </Link>
-            </li>
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/contact"}>
-                {t("contact_us")}
-              </Link>
-            </li>
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/not-found"}>
-                {t("404_page")}
-              </Link>
-            </li>
-          </ul>
+         <li>
+          <Link to={process.env.PUBLIC_URL + "/shop-grid-standard?category=Suits"}>{t("Suits")}</Link>
         </li>
-        <li className="menu-item-has-children">
-          <Link to={process.env.PUBLIC_URL + "/blog-standard"}>
-            {t("blog")}
-          </Link>
-          <ul className="sub-menu">
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/blog-standard"}>
-                {t("blog_standard")}
-              </Link>
-            </li>
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/blog-no-sidebar"}>
-                {t("blog_no_sidebar")}
-              </Link>
-            </li>
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/blog-right-sidebar"}>
-                {t("blog_right_sidebar")}
-              </Link>
-            </li>
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/blog-details-standard"}>
-                {t("blog_details_standard")}
-              </Link>
-            </li>
-          </ul>
+        <li>
+          <Link to={process.env.PUBLIC_URL + "/shop-grid-standard?category=westernwear"}>{t("Western Wear")}</Link>
         </li>
         <li>
           <Link to={process.env.PUBLIC_URL + "/contact"}>
             {t("contact_us")}
           </Link>
         </li>
+
+        {/* Show login/register if not logged in */}
+        {!isLoggedIn && (
+          <>
+            <li>
+              <Link to="/login-register">Login</Link>
+            </li>
+            <li>
+              <Link to="/register">Register</Link>
+            </li>
+          </>
+        )}
       </ul>
+
+      {/* Logout Confirmation Popup */}
+      {showLogoutPopup && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            height: "100vh",
+            // width: "100vw",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            zIndex: 10000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#fff",
+              padding: "20px 30px",
+              borderRadius: "10px",
+              margin: "10px",
+              boxShadow: "0 0 10px rgba(0,0,0,0.25)",
+              textAlign: "center",
+              width: "300px",
+            }}
+          >
+            <p style={{ marginBottom: "20px", fontSize: "16px" }}>
+              Are you sure you want to logout?
+            </p>
+            <div
+              style={{ display: "flex", justifyContent: "center", gap: "10px" }}
+            >
+              <button
+                onClick={() => {
+                  localStorage.removeItem("customerinfo");
+                  setIsLoggedIn(false);
+                  setShowLogoutPopup(false);
+                  window.location.reload(); // Refresh to update the UI
+                }}
+                style={{
+                  padding: "6px 12px",
+                  background: "#000",
+                  color: "#fff",
+                  borderRadius: "10px",
+                }}
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setShowLogoutPopup(false)}
+                style={{
+                  padding: "6px 12px",
+                  background: "#000",
+                  color: "#fff",
+                  borderRadius: "10px",
+                }}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

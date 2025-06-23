@@ -13,12 +13,36 @@ interface ItemState {
 interface Variation {
     color: string;
     images: ImageListType;
-    sizes: { name: string; stock: string }[];
+    sizes: Size[];
 }
 
 interface Record {
     PRIMENAME: string;
 }
+type Size = {
+    name: string;
+    stock: string;
+    RATE: string;
+    TAX: string;
+    PURPRICE: string;
+    MARKUP: string;
+    MRP: string;
+    MARKDOWN: string;
+    SALEPRICE: string;
+    SP1: string;
+    SP2: string;
+    SP3: string;
+    SP4: string;
+    lengthcm: string;
+    widthcm: string;
+    heightcm: string;
+    volumetricweight: string;
+    netweight: string;
+    grossweight: string;
+    shippingweight: string;
+    slabs: SlabItem[];
+};
+
 type SlabItem = {
     id: number;
     QuantityFrom: string;
@@ -74,22 +98,52 @@ const ItemMaster: React.FC = () => {
         DESCRIPTION: '',
         Product_Details: '',
     });
-
-    const [variations, setVariations] = useState<Variation[]>([{ color: '', images: [], sizes: [{ name: '', stock: '' }] }]);
+    const defaultSize: Size = {
+        name: '',
+        stock: '',
+        RATE: '',
+        TAX: '',
+        PURPRICE: '',
+        MARKUP: '',
+        MRP: '',
+        MARKDOWN: '',
+        SALEPRICE: '',
+        SP1: '',
+        SP2: '',
+        SP3: '',
+        SP4: '',
+        lengthcm: '',
+        widthcm: '',
+        heightcm: '',
+        volumetricweight: '',
+        netweight: '',
+        grossweight: '',
+        shippingweight: '',
+        slabs: [],
+    };
+    const defaultSlab: SlabItem = {
+        id: Date.now(),
+        QuantityFrom: '',
+        QuantityTo: '',
+        SALEPRICE: '',
+        sp1: '',
+        sp2: '',
+        sp3: '',
+        sp4: '',
+    };
+    const [variations, setVariations] = useState<Variation[]>([
+        {
+            color: '',
+            images: [],
+            sizes: [{ ...defaultSize }],
+        },
+    ]);
     const [dropdownValues, setDropdownValues] = useState<{ [key: string]: string[] }>({});
     const [loading, setLoading] = useState<boolean>(false);
-    const [slabs, setSlabs] = useState<SlabItem[]>([
-        // {
-        //     id: Date.now(),
-        //     QuantityFrom: '',
-        //     QuantityTo: '',
-        //     SALEPRICE: '',
-        //     sp1: '',
-        //     sp2: '',
-        //     sp3: '',
-        //     sp4: '',
-        // },
-    ]);
+    const [sameSizeForAll, setSameSizeForAll] = useState<boolean>(false);
+    const [sameSlabForAll, setSameSlabForAll] = useState<boolean>(false);
+    console.log('variations 001', variations);
+    console.log('item 003', item);
 
     // Fetch item data if in edit mode
     useEffect(() => {
@@ -145,15 +199,44 @@ const ItemMaster: React.FC = () => {
 
                         if (itemData.variations && itemData.variations.length > 0) {
                             setVariations(
-                                itemData.variations.map((v) => ({
+                                itemData.variations.map((v: any) => ({
                                     color: v.color || '',
                                     images: (v.images || []).map((imgUrl: string) => ({
                                         dataURL: imgUrl.startsWith('http') ? imgUrl : `${BASE_URL}/public/images/banner/${imgUrl}`,
                                     })),
+
                                     sizes:
-                                        v.sizes?.map((s) => ({
+                                        v.sizes?.map((s: any) => ({
                                             name: s.name || '',
-                                            stock: s.stock || 0,
+                                            RATE: s.RATE || '',
+                                            TAX: s.TAX || '',
+                                            PURPRICE: s.PURPRICE || '',
+                                            MARKUP: s.MARKUP || '',
+                                            MRP: s.MRP || '',
+                                            MARKDOWN: s.MARKDOWN || '',
+                                            SALEPRICE: s.SALEPRICE || '',
+                                            SP1: s.SP1 || '',
+                                            SP2: s.SP2 || '',
+                                            SP3: s.SP3 || '',
+                                            SP4: s.SP4 || '',
+                                            lengthcm: s.lengthcm || '',
+                                            widthcm: s.widthcm || '',
+                                            heightcm: s.heightcm || '',
+                                            volumetricweight: s.volumetricweight || '',
+                                            netweight: s.netweight || '',
+                                            grossweight: s.grossweight || '',
+                                            shippingweight: s.shippingweight || '',
+                                            slabs:
+                                                s.slabs?.map((slab: any) => ({
+                                                    id: slab.id, // Include slab ID for updates
+                                                    QuantityFrom: slab.QuantityFrom || '',
+                                                    QuantityTo: slab.QuantityTo || '',
+                                                    SALEPRICE: slab.SALEPRICE || '',
+                                                    sp1: slab.sp1 || '',
+                                                    sp2: slab.sp2 || '',
+                                                    sp3: slab.sp3 || '',
+                                                    sp4: slab.sp4 || '',
+                                                })) || [],
                                         })) || [],
                                 }))
                             );
@@ -212,7 +295,14 @@ const ItemMaster: React.FC = () => {
 
     // Variation handlers
     const addVariation = () => {
-        setVariations([...variations, { color: '', images: [], sizes: [{ name: '', stock: '' }] }]);
+        setVariations([
+            ...variations,
+            {
+                color: '',
+                images: [],
+                sizes: sameSizeForAll ? variations[0]?.sizes || [{ ...defaultSize }] : [{ ...defaultSize }],
+            },
+        ]);
     };
 
     const removeVariation = (index: number) => {
@@ -233,9 +323,9 @@ const ItemMaster: React.FC = () => {
         setVariations(updated);
     };
 
-    const addSize = (varIndex: number) => {
+    const addSize = (variationIndex: number) => {
         const updated = [...variations];
-        updated[varIndex].sizes.push({ name: '', stock: '' });
+        updated[variationIndex].sizes.push({ ...defaultSize });
         setVariations(updated);
     };
 
@@ -245,10 +335,65 @@ const ItemMaster: React.FC = () => {
         setVariations(updated);
     };
 
-    const handleSizeChange = (varIndex: number, sizeIndex: number, field: string, value: string) => {
+    const handleSizeChange = (variationIndex: number, sizeIndex: number, field: keyof Size, value: string) => {
         const updated = [...variations];
-        updated[varIndex].sizes[sizeIndex][field] = value;
+        updated[variationIndex].sizes[sizeIndex][field] = value;
+
+        // If same size is enabled, update all sizes in all variations
+        if (sameSizeForAll && field !== 'name' && field !== 'stock') {
+            setVariations((prev) =>
+                prev.map((variation) => ({
+                    ...variation,
+                    sizes: variation.sizes.map((size) => ({
+                        ...size,
+                        [field]: value,
+                    })),
+                }))
+            );
+        } else {
+            setVariations(updated);
+        }
+    };
+    const handleAddSlab = (variationIndex: number, sizeIndex: number) => {
+        const updated = [...variations];
+        if (!updated[variationIndex].sizes[sizeIndex].slabs) {
+            updated[variationIndex].sizes[sizeIndex].slabs = [];
+        }
+        updated[variationIndex].sizes[sizeIndex].slabs.push({ ...defaultSlab, id: Date.now() });
         setVariations(updated);
+    };
+
+    const handleRemoveSlab = (variationIndex: number, sizeIndex: number, slabId: number) => {
+        const updated = [...variations];
+        updated[variationIndex].sizes[sizeIndex].slabs = updated[variationIndex].sizes[sizeIndex].slabs.filter((slab) => slab.id !== slabId);
+        setVariations(updated);
+    };
+
+    const handleSlabChange = (variationIndex: number, sizeIndex: number, slabId: number, field: keyof SlabItem, value: string) => {
+        const updated = [...variations];
+        const slabIndex = updated[variationIndex].sizes[sizeIndex].slabs.findIndex((s) => s.id === slabId);
+
+        if (slabIndex !== -1) {
+            updated[variationIndex].sizes[sizeIndex].slabs[slabIndex][field] = value;
+
+            // If same slab is enabled, update all slabs in all sizes and variations
+            if (sameSlabForAll) {
+                setVariations((prev) =>
+                    prev.map((variation) => ({
+                        ...variation,
+                        sizes: variation.sizes.map((size) => ({
+                            ...size,
+                            slabs: size.slabs.map((slab) => ({
+                                ...slab,
+                                [field]: value,
+                            })),
+                        })),
+                    }))
+                );
+            } else {
+                setVariations(updated);
+            }
+        }
     };
 
     const resetForm = () => {
@@ -292,18 +437,16 @@ const ItemMaster: React.FC = () => {
             DESCRIPTION: '',
             Product_Details: '',
         });
-        setVariations([{ color: '', images: [], sizes: [{ name: '', stock: '' }] }]);
+        setVariations([{ color: '', images: [], sizes: [] }]);
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setItem((prev) => ({ ...prev, [name]: value }));
     };
-
     const handleProductDetailsChange = (value: string) => {
         setItem((prev) => ({ ...prev, Product_Details: value }));
     };
-
     const handleSubmit = async () => {
         setLoading(true);
         try {
@@ -317,13 +460,17 @@ const ItemMaster: React.FC = () => {
 
             formData.append('variations', JSON.stringify(variations));
 
-            variations.forEach((variation, varIndex) => {
-                variation.images.forEach((image, imgIndex) => {
-                    if (image.file) {
-                        formData.append(`variation_${varIndex}_image_${imgIndex}`, image.file);
-                    }
-                });
+             let hasNewImages = false;
+        variations.forEach((variation, varIndex) => {
+            variation.images.forEach((image, imgIndex) => {
+                if (image.file) {
+                    hasNewImages = true;
+                    formData.append(`variation_${varIndex}_image_${imgIndex}`, image.file);
+                }
             });
+        });
+
+                formData.append('updateImages', hasNewImages.toString());
 
             const endpoint = id ? `${BASE_URL}/updateItemById/${id}` : `${BASE_URL}/addItem`;
             const method = id ? 'put' : 'post';
@@ -353,6 +500,7 @@ const ItemMaster: React.FC = () => {
                 const response = await axios.delete(`${BASE_URL}/delete/${id}`);
                 if (response.data.success) {
                     alert('Item deleted successfully!');
+                    navigate('/Components/items');
                 }
             } catch (error) {
                 console.error('Error deleting item:', error);
@@ -361,32 +509,6 @@ const ItemMaster: React.FC = () => {
                 setLoading(false);
             }
         }
-    };
-
-    const handleAddSlab = () => {
-        setSlabs((prev) => [
-            ...prev,
-            {
-                id: Date.now() + Math.random(),
-                QuantityFrom: '',
-                QuantityTo: '',
-                SALEPRICE: '',
-                sp1: '',
-                sp2: '',
-                sp3: '',
-                sp4: '',
-            },
-        ]);
-    };
-
-    // Handle removing a slab
-    const handleRemoveSlab = (id: number) => {
-        setSlabs((prev) => prev.filter((slab) => slab.id !== id));
-    };
-
-    const handleChanges = (e: React.ChangeEvent<HTMLInputElement>, id: number) => {
-        const { name, value } = e.target;
-        setSlabs((prev) => prev.map((slab) => (slab.id === id ? { ...slab, [name]: value } : slab)));
     };
 
     return (
@@ -403,7 +525,7 @@ const ItemMaster: React.FC = () => {
 
             <Tab.Group>
                 <Tab.List className="flex border-b border-gray-200 mb-6">
-                    {['General Detail', 'Additional Details'].map((tab) => (
+                    {['General Detail'].map((tab) => (
                         <Tab as={Fragment} key={tab}>
                             {({ selected }) => (
                                 <button
@@ -422,10 +544,20 @@ const ItemMaster: React.FC = () => {
                     <Tab.Panel>
                         <div className="space-y-6 p-3 bg-white">
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-3 border border-gray-200 rounded-lg">
-                                {['ITEMNAME', 'BARCODE', 'PRODUCT', 'BRAND', 'CATEGORY', 'SUBCATEGORY', 'PRODUCT DETAIL'].map((field) => (
-                                    <div key={field}>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">{field}</label>
-                                        {['CATEGORY', 'SUBCATEGORY', 'BRAND', 'PRODUCT'].includes(field) ? (
+                                {[
+                                    { field: 'ITEMNAME', type: 'text', label: 'Item Name' },
+                                    { field: 'BARCODE', type: 'text', label: 'Barcode' },
+                                    { field: 'PRODUCT', type: 'select', label: 'Product' },
+                                    { field: 'BRAND', type: 'select', label: 'Brand' },
+                                    { field: 'CATEGORY', type: 'select', label: 'Category' },
+                                    { field: 'SUBCATEGORY', type: 'select', label: 'Subcategory' },
+                                    { field: 'DESCRIPTION', type: 'textarea', label: 'DESCRIPTION', fullWidth: true },
+                                    { field: 'Product_Details', type: 'quill', label: 'PRODUCT DETAILS', fullWidth: true },
+                                ].map(({ field, type, label, fullWidth }) => (
+                                    <div key={field} className={fullWidth ? 'col-span-full' : ''}>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+
+                                        {type === 'select' ? (
                                             <select
                                                 name={field}
                                                 value={typeof item[field] === 'string' ? item[field] : ''}
@@ -439,6 +571,35 @@ const ItemMaster: React.FC = () => {
                                                     </option>
                                                 ))}
                                             </select>
+                                        ) : type === 'textarea' ? (
+                                            <textarea
+                                                name={field}
+                                                value={item[field] as string}
+                                                onChange={handleChange}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-500"
+                                                rows={3}
+                                            />
+                                        ) : type === 'quill' ? (
+                                            <ReactQuill
+                                                theme="snow"
+                                                className="border border-gray-300 rounded-md shadow-sm quill-editor"
+                                                modules={{
+                                                    toolbar: [
+                                                        [{ font: [] }, { size: [] }],
+                                                        ['bold', 'italic', 'underline', 'strike'],
+                                                        [{ color: [] }, { background: [] }],
+                                                        [{ script: 'super' }, { script: 'sub' }],
+                                                        [{ header: [false, 1, 2, 3, 4, 5, 6] }, 'blockquote', 'code-block'],
+                                                        [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
+                                                        ['direction', { align: [] }],
+                                                        ['link', 'image', 'video'],
+                                                        ['clean'],
+                                                    ],
+                                                }}
+                                                value={item[field] as string}
+                                                onChange={handleProductDetailsChange}
+                                                placeholder="Edit Product Details Here..."
+                                            />
                                         ) : (
                                             <input
                                                 type="text"
@@ -446,7 +607,7 @@ const ItemMaster: React.FC = () => {
                                                 value={item[field] as string}
                                                 onChange={handleChange}
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                                placeholder={`Enter ${field}`}
+                                                placeholder={`Enter ${label}`}
                                             />
                                         )}
                                     </div>
@@ -502,7 +663,7 @@ const ItemMaster: React.FC = () => {
                                                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                                                                     {imageList.map((image, index) => (
                                                                         <div key={index} className="relative group">
-                                                                            <img src={image.dataURL} alt={`Variation ${varIndex + 1}`} className="w-full h-32 object-cover rounded-md shadow-sm" />
+                                                                            <img style={{height:"auto"}} src={image.dataURL} alt={`Variation ${varIndex + 1}`} className="w-full h-32 object-cover rounded-md shadow-sm" />
                                                                             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 flex items-center justify-center rounded-md transition-all duration-200">
                                                                                 <button
                                                                                     type="button"
@@ -527,7 +688,7 @@ const ItemMaster: React.FC = () => {
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
                                                     <select
-                                                        value={variation.color}
+                                                        value={typeof variation.color === 'string' ? variation.color : ''}
                                                         onChange={(e) => handleVariationChange(varIndex, 'color', e.target.value)}
                                                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                                     >
@@ -543,29 +704,41 @@ const ItemMaster: React.FC = () => {
                                                 </div>
 
                                                 <div className="pt-4 border-t border-gray-200">
-                                                    <div className="flex justify-between items-center mb-4 flex-col md:flex-row md:items-center">
-                                                        <h4 className="text-sm font-medium text-gray-700 mb-2 md:mb-0">Sizes</h4>
-                                                        <div className="flex flex-col items-center md:flex-row md:space-x-4">
-                                                            <div className="flex flex-col items-center md:flex-row md:space-x-4 mb-2 md:mb-0">
-                                                                <label className="flex items-center space-x-2 text-sm">
-                                                                    <input type="checkbox" className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-                                                                    <span>Same Size</span>
-                                                                </label>
-                                                                <label className="flex items-center space-x-2 text-sm">
-                                                                    <input type="checkbox" className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-                                                                    <span>Same Slab</span>
-                                                                </label>
-                                                            </div>
-                                                            <button type="button" onClick={() => addSize(varIndex)} className="mt-2 btn btn-primary md:mt-0">
-                                                                + Add Size
-                                                            </button>
-                                                        </div>
-                                                    </div>
+                                                   <div className="flex flex-wrap justify-center md:justify-between items-center text-xs md:text-sm mb-4 gap-2">
+    <h4 className="font-medium text-gray-700">Sizes</h4>
+    <div className="flex flex-wrap items-center justify-center gap-2">
+        <label className="flex items-center space-x-1">
+            <input
+                type="checkbox"
+                checked={sameSizeForAll}
+                onChange={(e) => setSameSizeForAll(e.target.checked)}
+                className="h-3.5 w-3.5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <span className="text-xs md:text-sm">Same Size</span>
+        </label>
+        <label className="flex items-center space-x-1">
+            <input
+                type="checkbox"
+                checked={sameSlabForAll}
+                onChange={(e) => setSameSlabForAll(e.target.checked)}
+                className="h-3.5 w-3.5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <span className="text-xs md:text-sm">Same Slab</span>
+        </label>
+        <button
+            type="button"
+            onClick={() => addSize(varIndex)}
+            className="btn btn-primary mt-2 px-2 py-1 text-xs md:text-sm"
+        >
+            + Add Size
+        </button>
+    </div>
+</div>
 
                                                     {variation.sizes.map((size, sizeIndex) => (
                                                         <div key={sizeIndex} className="mb-6 p-3 border border-gray-200 rounded-lg shadow-sm">
                                                             <div className="flex justify-end pt-2">
-                                                                <button type="button" onClick={() => removeSize(varIndex, sizeIndex)} className="btn btn-danger">
+                                                                <button type="button" onClick={() => removeSize(varIndex, sizeIndex)} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                                                     Remove Size
                                                                 </button>
                                                             </div>
@@ -614,8 +787,8 @@ const ItemMaster: React.FC = () => {
                                                                             <input
                                                                                 type="text"
                                                                                 name={field}
-                                                                                value={(item[field] as string) || ''}
-                                                                                onChange={handleChange}
+                                                                                value={size[field as keyof Size] || ''}
+                                                                                onChange={(e) => handleSizeChange(varIndex, sizeIndex, field as keyof Size, e.target.value)}
                                                                                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
                                                                             />
                                                                         </div>
@@ -626,20 +799,24 @@ const ItemMaster: React.FC = () => {
                                                                 <div className="mt-6">
                                                                     <div className="flex justify-end items-center mb-4">
                                                                         <div className="flex justify-end">
-                                                                            <button type="button" onClick={handleAddSlab} className="btn btn-primary">
+                                                                            <button type="button" onClick={() => handleAddSlab(varIndex, sizeIndex)} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                                                                 + Add Slab Rate
                                                                             </button>
                                                                         </div>
                                                                     </div>
 
                                                                     {/* Only render this section when there are slabs to show */}
-                                                                    {slabs.length > 0 && (
+                                                                    {size.slabs?.length > 0 && (
                                                                         <div className="space-y-4">
-                                                                            {slabs.map((slab) => (
+                                                                            {size.slabs.map((slab) => (
                                                                                 <div key={slab.id} className="p-3 border border-gray-200 rounded-lg">
                                                                                     <div className="flex justify-between items-start md:items-center mb-3">
                                                                                         <h5 className="text-sm font-bold text-gray-700">Slab Rate</h5>
-                                                                                        <button type="button" onClick={() => handleRemoveSlab(slab.id)} className="btn btn-danger text-xs">
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            onClick={() => handleRemoveSlab(varIndex, sizeIndex, slab.id)}
+                                                                                            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                                                                        >
                                                                                             Remove Slab
                                                                                         </button>
                                                                                     </div>
@@ -658,8 +835,10 @@ const ItemMaster: React.FC = () => {
                                                                                                 <input
                                                                                                     type="text"
                                                                                                     name={field}
-                                                                                                    value={slab[field as keyof SlabItem]}
-                                                                                                    onChange={(e) => handleChanges(e, slab.id)}
+                                                                                                    value={slab[field as keyof SlabItem] || ''}
+                                                                                                    onChange={(e) =>
+                                                                                                        handleSlabChange(varIndex, sizeIndex, slab.id, field as keyof SlabItem, e.target.value)
+                                                                                                    }
                                                                                                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
                                                                                                 />
                                                                                             </div>
@@ -676,7 +855,7 @@ const ItemMaster: React.FC = () => {
                                                 </div>
 
                                                 <div className="flex justify-center pt-4 border-t border-gray-200">
-                                                    <button type="button" onClick={() => removeVariation(varIndex)} className="px-4 py-2 btn btn-danger">
+                                                    <button type="button" onClick={() => removeVariation(varIndex)} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                                         Remove Variation
                                                     </button>
                                                 </div>
@@ -704,7 +883,7 @@ const ItemMaster: React.FC = () => {
                             </div>
 
                             <div className="flex justify-center space-x-4 pt-6 border-t border-gray-200">
-                                <button type="button" onClick={() => navigate('/Components/item-manager')} className="px-4 py-2 btn btn-danger">
+                                <button type="button" onClick={() => navigate('/Components/item-manager')} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500r">
                                     Cancel
                                 </button>
                                 {id && (
@@ -716,50 +895,10 @@ const ItemMaster: React.FC = () => {
                                         Delete
                                     </button>
                                 )}
-                                <button type="button" onClick={handleSubmit} className="px-4 py-2 btn btn-primary">
+                                <button type="button" onClick={handleSubmit} className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                     {id ? 'Update' : 'Save'}
                                 </button>
                             </div>
-                        </div>
-                    </Tab.Panel>
-                    <Tab.Panel>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-3 border border-gray-200 rounded-lg">
-                            {[
-                                'PRODUCT',
-                                'BRAND',
-                                'STYLE',
-                                'SUBGROUP',
-                                'Group',
-                                'GENDER',
-                                'BUYER',
-                                'SUBCATEGORY',
-                                'CATEGORY',
-                                'MATERIAL',
-                                'COMPANY',
-                                'SEASON',
-                                'PACKING',
-                                'UNIT',
-                                'DEALER',
-                                'SECTION',
-                                'STATUS',
-                            ].map((field) => (
-                                <div key={field}>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">{field}</label>
-                                    <select
-                                        name={field}
-                                        value={typeof item[field] === 'string' ? item[field] : ''}
-                                        onChange={handleChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                    >
-                                        <option value="">Select</option>
-                                        {dropdownValues[field.toLowerCase()]?.map((option, idx) => (
-                                            <option key={idx} value={option}>
-                                                {option}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            ))}
                         </div>
                     </Tab.Panel>
                 </Tab.Panels>

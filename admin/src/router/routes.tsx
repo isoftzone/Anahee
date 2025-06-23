@@ -48,6 +48,8 @@ import CustomersL from '../pages/Components/CustomerL';
 import SocialMediaSettingsPage from '../pages/Components/SocialMediaSettingsPage';
 import AboutUs from '../pages/Components/AboutUs';
 import ContactUs from '../pages/Components/ContactUs';
+import EditCustomer from '../pages/Components/EditCustomer';
+import PromotionNumber from '../pages/Components/PromotionNumber';
 
 // import ExchangePolicy from /ExchangePolicy';
 const Index = lazy(() => import('../pages/Index'));
@@ -384,6 +386,10 @@ const routes = [
         path: '/Components/discountcoupon',
         element: <DiscountCoupan />
     },
+     {
+        path: '/Components/discountcoupon/:id',
+        element: <DiscountCoupan />
+    },
     {
         path: '/Components/storemaster',
         element: <StoreMaster />
@@ -449,6 +455,10 @@ const routes = [
         element: <CaptionMaster />
     },
     {
+        path:"/components/EditCustomer/:id",
+         element:<EditCustomer />
+        },
+    {
         path: '/Components/discountcouponlist',
         element: <DiscountCouponList />
     },
@@ -467,6 +477,10 @@ const routes = [
     {
         path: '/Components/Customerl',
         element: <CustomersL/>
+    },
+      {
+        path: '/Components/promotionNumber',
+        element: <PromotionNumber/>
     },
     {
         path: '/components/AddCustomers',
@@ -509,7 +523,7 @@ const routes = [
         element: <OrderAdd />
     },
     {
-        path: '/Components/orderedit',
+        path: '/Components/orderedit/:saleId',
         element: <OrderEdit />
     },
     {

@@ -12,7 +12,9 @@ const PrivacyPolicy = () => {
   useEffect(() => {
     const fetchPolicies = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/get-exchange-policy?companyid=1&sectionname=Privacy Policy`);
+        const response = await fetch(
+          `${BASE_URL}/get-exchange-policy?companyid=1&sectionname=Privacy Policy`
+        );
         const data = await response.json();
         setPolicies(data.policies || []);
       } catch (error) {
@@ -32,12 +34,12 @@ const PrivacyPolicy = () => {
           { label: "Privacy Policy", path: pathname }
         ]}
       /> */}
-      <div className="container mt-4">
+      <div className="container-fluid mb-5 ">
         {policies.length > 0 ? (
           policies.map((policy, index) => (
-            <div key={index} className="mb-4">
-              <h3>{policy.sectionname}</h3>
-                <div dangerouslySetInnerHTML={{ __html: policy.content }} />  
+            <div key={index} className="">
+              <h3 className="fw-bold">{policy.sectionname}</h3>
+              <div dangerouslySetInnerHTML={{ __html: policy.content }} />
             </div>
           ))
         ) : (

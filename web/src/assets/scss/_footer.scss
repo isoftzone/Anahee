@@ -2,8 +2,8 @@
 
 .copyright {
   .footer-logo {
-    margin-top: 41px;
-    margin-bottom: 12px;
+    margin-top: 23px;
+    margin-bottom: -22px;
     @media #{$xs-layout} {
       margin-top: 0;
     }
@@ -444,6 +444,7 @@
 
     border-top: none;
   }
+  
 }
 
 .footer-border {
@@ -451,3 +452,10 @@
 }
 
 
+
+@media (max-width:425px) {
+  .footer-widget ul{
+  padding-top: 0px;
+  margin-top: 0px;
+  }
+}

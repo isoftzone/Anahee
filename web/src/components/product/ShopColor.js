@@ -1,90 +1,192 @@
-import React, { useEffect, useState } from "react";
+// main code
+// import PropTypes from "prop-types";
+// import { setActiveSort } from "../../helpers/product";
+// import Accordion from 'react-bootstrap/Accordion';
+// const ShopColor = ({ colors, getSortParams }) => {
+//   return (
+//     <div className="sidebar-widget mb-4">
+//      <Accordion.Item eventKey="1">
+//          <Accordion.Header><h4 className="pro-sidebar-title">Color</h4></Accordion.Header>
+//                   <Accordion.Body>
+//       <div className="sidebar-widget-list mt-20">
+//         {colors ? (
+//           <ul>
+//             <li>
+//               <div className="sidebar-widget-list-left">
+//                 <button
+//                   onClick={(e) => {
+//                     getSortParams("color", "");
+//                     setActiveSort(e);
+//                   }}
+//                 >
+//                   <span className="checkmark" /> All Colors{" "}
+//                 </button>
+//               </div>
+//             </li>
+//             {colors.map((color, key) => {
+//               return (
+//                 <li key={key}>
+//                   <div className="sidebar-widget-list-left">
+//                     <button
+//                       onClick={(e) => {
+//                         getSortParams("color", color);
+//                         setActiveSort(e);
+//                       }}
+//                     >
+//                       <span className="checkmark" /> {color}{" "}
+//                     </button>
+//                   </div>
+//                 </li>
+//               );
+//             })}
+//           </ul>
+//         ) : (
+//           "No colors found"
+//         )}
+//       </div>
+//       </Accordion.Body>
+//        </Accordion.Item>
+//     </div>
+//   );
+// };
+// ShopColor.propTypes = {
+//   colors: PropTypes.array,
+//   getSortParams: PropTypes.func,
+// };
+// export default ShopColor;
+
+
+
+// already commented
+// import PropTypes from "prop-types";
+// import { setActiveSort } from "../../helpers/product";
+// import Accordion from 'react-bootstrap/Accordion';
+// const ShopColor = ({ colors, getSortParams }) => {
+//   return (
+//     <div className="sidebar-widget mt-50">
+//      <Accordion.Item eventKey="1">
+//          <Accordion.Header><h4 className="pro-sidebar-title">Color</h4></Accordion.Header>
+//                   <Accordion.Body>
+//       <div className="sidebar-widget-list mt-20">
+//         {colors ? (
+//           <ul>
+//             <li>
+//               <div className="sidebar-widget-list-left">
+//                 <button
+//                   onClick={(e) => {
+//                     getSortParams("color", "");
+//                     setActiveSort(e);
+//                   }}
+//                 >
+//                   <span className="checkmark" /> All Colors{" "}
+//                 </button>
+//               </div>
+//             </li>
+//             {colors.map((color, key) => {
+//               return (
+//                 <li key={key}>
+//                   <div className="sidebar-widget-list-left">
+//                     <button
+//                       onClick={(e) => {
+//                         getSortParams("color", color);
+//                         setActiveSort(e);
+//                       }}
+//                     >
+//                       <span className="checkmark" /> {color}{" "}
+//                     </button>
+//                   </div>
+//                 </li>
+//               );
+//             })}
+//           </ul>
+//         ) : (
+//           "No colors found"
+//         )}
+//       </div>
+//       </Accordion.Body>
+//        </Accordion.Item>
+//     </div>
+//   );
+// };
+// ShopColor.propTypes = {
+//   colors: PropTypes.array,
+//   getSortParams: PropTypes.func,
+// };
+// export default ShopColor;
+
+
+
+import { useState } from "react";
 import PropTypes from "prop-types";
-import axios from "axios";
-import { setActiveSort } from "../../helpers/product";
-import { BASE_URL } from "../../config";
-import Accordion from 'react-bootstrap/Accordion';
+import Accordion from "react-bootstrap/Accordion";
 
-const ShopColor = ({ getSortParams }) => {
-  const [colors, setColors] = useState([]);
+const ShopColor = ({ colors, getSortParams }) => {
+  const [selectedColors, setSelectedColors] = useState([]);
 
-  // Fetch colors from the backend
-  useEffect(() => {
-    const fetchColors = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/getcmbAW`, {
-          params: {
-            TblName: "MASTER",
-            FldName: "PRIMENAME",
-            FldCode: "PRIMEKEYID",
-            OrdBy: "SEQUENCE",
-            WhFldName: ["Colour"],
-          },
-        });
+  const handleToggle = (value) => {
+    const newSelection =
+      value === ""
+        ? []
+        : selectedColors.includes(value)
+        ? selectedColors.filter((c) => c !== value)
+        : [...selectedColors, value];
 
-        //console.log(response);
-
-        if (Array.isArray(response.data)) {
-          setColors(response.data);
-        } else if (response.data.Colour && Array.isArray(response.data.Colour)) {
-          setColors(response.data.Colour);
-        } else {
-          console.error("Unexpected API response format:", response.data);
-        }
-      } catch (error) {
-        console.error("Error fetching colors:", error);
-      }
-    };
-
-    fetchColors();
-  }, []);
-
+    setSelectedColors(newSelection);
+    getSortParams("colors", newSelection);
+  };
+console.log('get====',getSortParams);
+  const isSelected = (value) => {
+    return value === ""
+      ? selectedColors.length === 0
+      : selectedColors.includes(value);
+    
+  };
+console.log('colors===',colors);
   return (
-    <div className="sidebar-widget mt-50">
+    <div className="sidebar-widget my-4">
       <Accordion.Item eventKey="1">
-      <Accordion.Header><h4 className="pro-sidebar-title">Color</h4></Accordion.Header>
-      <Accordion.Body>
-      <div className="sidebar-widget-list mt-20">
-        {colors.length > 0 ? (
-          <ul>
-            <li>
-              <div className="sidebar-widget-list-left">
-                <button
-                  onClick={(e) => {
-                    getSortParams("color", "");
-                    setActiveSort(e);
-                  }}
-                >
-                  <span className="checkmark" /> All Colors
-                </button>
-              </div>
-            </li>
-            {colors.map((color, key) => (
-              <li key={key}>
-                <div className="sidebar-widget-list-left">
-                  <button
-                    onClick={(e) => {
-                      getSortParams("color", color.PRIMENAME);
-                      setActiveSort(e);
-                    }}
-                  >
-                    <span className="checkmark" /> {color.PRIMENAME}
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          "No colors found"
-        )}
-      </div>
-      </Accordion.Body>
+        <Accordion.Header>
+          <h4 className="pro-sidebar-title">Color</h4>
+        </Accordion.Header>
+        <Accordion.Body>
+          <div className="sidebar-widget-list mt-20">
+            {colors ? (
+              <ul>
+                <li>
+                  <div className="sidebar-widget-list-left">
+                    <button
+                      onClick={() => handleToggle("")}
+                      className={isSelected("") ? "active" : ""}
+                    >
+                      <span className="checkmark" /> All Colors
+                    </button>
+                  </div>
+                </li>
+                {colors.map((color, key) => (
+                  <li key={key}>
+                    <div className="sidebar-widget-list-left">
+                      <button
+                        onClick={() => handleToggle(color)}
+                        className={isSelected(color) ? "active" : ""}
+                      >
+                        <span className="checkmark" /> {color}
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              "No colors found"
+            )}
+          </div>
+        </Accordion.Body>
       </Accordion.Item>
     </div>
   );
 };
 
 ShopColor.propTypes = {
+  colors: PropTypes.array,
   getSortParams: PropTypes.func,
 };
 

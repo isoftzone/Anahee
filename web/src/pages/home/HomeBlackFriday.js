@@ -15,7 +15,7 @@ const HomeBlackFriday = () => {
     <Fragment>
       <SEO
         titleTemplate="Black friday Home"
-        description="Black friday home of flone react minimalist eCommerce template."
+        description="Black friday home of flone Anahee."
       />
       <LayoutTen>
         {/* hero slider */}

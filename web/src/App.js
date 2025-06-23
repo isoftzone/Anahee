@@ -13,6 +13,8 @@ import { BASE_URL } from "./config"
 import axios from 'axios'; 
 import { setProducts } from "./store/slices/product-slice";
 import { store } from "./store/store";
+import OrderDetails from "./pages/home/OrderDetails";
+import ForgetPassword from "./pages/other/ForgetPassword";
 // home pages
 const HomeFashion = lazy(() => import("./pages/home/HomeFashion"));
 const HomeFashionTwo = lazy(() => import("./pages/home/HomeFashionTwo"));
@@ -117,19 +119,18 @@ const Success = lazy(() => import("./pages/other/Success"));
 const NotFound = lazy(() => import("./pages/other/NotFound"));
 
 const SectionTitleHome= lazy(()=> import("./components/section-title/SectionTitleHome"))
+const OurOrders = lazy(() => import("./pages/other/OurOrders"));
 
 const App = () => {
-
 useEffect(() => {
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/getallitems`,{
+      const response = await axios.get(`${BASE_URL}/multiplesize`,{
         headers: {
           "Content-Type": "application/json"
         }
       });
-      //console.log("Combined API response 00011:", response.data.data);
-      
+      console.log("Combined API response 00011:", response.data.data);
       store.dispatch(setProducts(response.data.data));
     } catch (error) {
       console.error("Error fetching data", error);
@@ -137,6 +138,23 @@ useEffect(() => {
   };
   fetchData();
 }, []);
+// useEffect(() => {
+//   const fetchData = async () => {
+//     try {
+//       const response = await axios.get(`${BASE_URL}/getallitems`,{
+//         headers: {
+//           "Content-Type": "application/json"
+//         }
+//       });
+//       //console.log("Combined API response 00011:", response.data.data);
+      
+//       store.dispatch(setProducts(response.data.data));
+//     } catch (error) {
+//       console.error("Error fetching data", error);
+//     }
+//   };
+//   fetchData();
+// }, []);
 
   return (
       <Router>
@@ -325,6 +343,10 @@ useEffect(() => {
                 element={<ShopGridTwoColumn/>}
               />
               <Route
+              path={process.env.PUBLIC_URL + "/forget-password"}
+              element={<ForgetPassword />}
+            />
+              <Route
                 path={process.env.PUBLIC_URL + "/shop-grid-no-sidebar"}
                 element={<ShopGridNoSidebar/>}
               />
@@ -470,6 +492,14 @@ useEffect(() => {
               <Route
                 path={process.env.PUBLIC_URL + "/success"}
                 element={<Success/>}
+              />
+              <Route
+                path={process.env.PUBLIC_URL + "/OrderDetails"}
+                element={<OrderDetails/>}
+              />
+              <Route
+                path={process.env.PUBLIC_URL + "/orders"}
+                element={<OurOrders/>}
               />
               <Route path="*" element={<NotFound/>} />
             </Routes>
