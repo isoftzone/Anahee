@@ -24,6 +24,7 @@ const salesdetail = require("../controllers/salesdetail");
 const rfmaster = require("../controllers/rfmaster");
 const upload = require("../middlewares/imageupload");
 const userMaster = require("../controllers/userMaster");
+const {promotionNumber, getpromotionNumber} = require("../controllers/promotionNumber")
 router.post("/addProducts", addProductData.addProducts);
 router.get("/getCodeTypeData", addProductData.getCodeTypeData);
 router.get("/getCodeTypeAllData", addProductData.getCodeTypeAllData);
@@ -77,6 +78,9 @@ router.put("/updateCustomerInfo/:id", customer.updateCustomerInfo);
 router.put("/updateCustomerInfo", customer.updateCustomerInfo);
 router.get("/getAllcustomer", customer.getAll);
 router.delete("/deletecustomer/:id",customer.deletecustomer);
+router.post("/sendotp", customer.sendotp);
+router.post("/verifyotp", customer.verifyotp);
+router.post("/forgetpassword", customer.forgetpassword);
 
 const { addtocartWishlistproduct, getCartWishlistProduct, deletefromcartWishlist, clearALlcartwishlist, addtocartwishlistAction, getAllWishlistItems, getAllCartItems, addtocartdata, wishlistData } = require("../controllers/addtocartWishlistController");
 
@@ -130,7 +134,8 @@ router.put("/updatecoupons/:id", discountController.updateDiscountCoupon);
 router.post("/applycoupon", discountController.applyCoupon);
 
 
-
+router.post("/promotionNumber", promotionNumber);
+router.get("/getpromotionNumber", getpromotionNumber)
 
 router.post("/addtocartWishlist",addtocartWishlistproduct)
 router.post("/addtocartAction",addtocartwishlistAction)

@@ -27,7 +27,7 @@
     }
     &--bottom {
       height: 197px;
-      background-color: #531e3f;
+      background-color: #bf408e;
       color: white;
     }
   }
@@ -52,12 +52,12 @@
     line-height: 1.3;
   }
   &__brand {
-    color: #d988ba;
+    color: #D988BA;
     font-size: 5rem;
   }
   &__shop-btn {
     align-items: center;
-    background-color: #5cae86;
+    background-color: #5CAE86;
     color: #fff;
     border-radius: 4px;
     font-weight: 500;
@@ -70,7 +70,7 @@
     transition: all 0.3s ease-in-out 0s;
     border: none;
     &:hover {
-      background-color: #d988ba;
+      background-color: #D988BA;
       color: #fff;
     }
   }
@@ -92,12 +92,12 @@
     font-weight: bold;
     margin-bottom: 0.25rem;
     font-size: 2rem;
-    color: #ffffff;
+    color: #FFFFFF;
     font-weight: 600;
   }
   &__feature-desc {
     font-size: 1.5rem;
-    color: #ffffff;
+    color: #FFFFFF;
     margin-bottom: 0;
   }
   &__discount-phrase {
@@ -255,7 +255,6 @@
     .promo-banner__section--middle {
       height: 257px;
     }
-   
     .promo-banner__discount-phrase {
       font-size: 3.25rem;
     }
@@ -268,9 +267,7 @@
     .promo-banner__shop-btn {
       font-size: 2.25rem;
     }
-   
   }
-
   @media (max-width: 375px) {
     .promo-banner__model-img {
       width: 220px;
@@ -309,7 +306,6 @@
       &__model-img {
         height: 700px;
       }
-
       &__section {
         // padding-left: 600px;
         &--top {
@@ -356,7 +352,6 @@
       }
     }
   }
-
   @media (max-width: 1024px) {
     .promo-banner {
       &__section {
@@ -366,7 +361,6 @@
       }
     }
   }
-
    @media (max-width: 1440px) {
     .promo-banner {
       &__section {
@@ -376,7 +370,6 @@
       }
     }
   }
-
    @media (max-width: 768px) {
     .promo-banner {
       &__section {
@@ -386,7 +379,6 @@
       }
     }
   }
-
    @media (max-width: 375px) {
     .promo-banner {
       &__section {

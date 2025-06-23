@@ -138,7 +138,7 @@ const MobileNavMenu = () => {
           <Link to={process.env.PUBLIC_URL + "/"}>{t("Home")}</Link>
         </li>
         <li>
-          <Link to={process.env.PUBLIC_URL + "/about"}>{t("About")}</Link>
+          <Link to={process.env.PUBLIC_URL + "/about"}>{t("About Us")}</Link>
         </li>
          <li>
           <Link to={process.env.PUBLIC_URL + "/shop-grid-standard?category=Suits"}>{t("Suits")}</Link>
@@ -173,7 +173,7 @@ const MobileNavMenu = () => {
             top: 0,
             left: 0,
             height: "100vh",
-            width: "100vw",
+            // width: "100vw",
             backgroundColor: "rgba(0, 0, 0, 0.5)",
             zIndex: 10000,
             display: "flex",
@@ -186,6 +186,7 @@ const MobileNavMenu = () => {
               backgroundColor: "#fff",
               padding: "20px 30px",
               borderRadius: "10px",
+              margin: "10px",
               boxShadow: "0 0 10px rgba(0,0,0,0.25)",
               textAlign: "center",
               width: "300px",

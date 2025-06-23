@@ -8,7 +8,7 @@ const SectionTitleHome = ({ spaceTopClass, spaceBottomClass }) => {
         <div className="welcome-content text-center py-5">
           <h5>Who Are We</h5>
           <h1>Welcome To Anahee</h1>
-          <p>
+          <p className="fs-3">
           At Anahee (Anand Fashion), we craft timeless styles that blend tradition with modern elegance. Rooted in Indian heritage and inspired by minimalism, our pieces celebrate modest fashion with a contemporary touch — effortless, graceful, and deeply soulful.
           </p>
           <p className="brand_name mt-5">@anahee</p>

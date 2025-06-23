@@ -1,5 +1,6 @@
 const express = require("express");
 const con = require("../config");
+const { sendEmail } = require("../utils/emailService.js");
 exports.getCustomer = async (req, res) => {
   await con.query("SELECT * FROM customermaster", (err, result) => {
     if (err) {
@@ -162,15 +163,15 @@ exports.updateCustomerInfo = (req, res) => {
     CCOUNTRY,
     CDISTRICT,
     CPINCODE,
-     newPassword,
-    confirmPassword,
-    // password,
+    newPassword,
+    confirmPassword
   } = req.body;
  
   if (!customerId) {
     return res.status(400).json({ error: "Customer ID is missing" });
   }
-    // Password validation
+  
+   // Password validation
     const errors = {};
     if (newPassword || confirmPassword) {
         if (!newPassword) {
@@ -178,13 +179,17 @@ exports.updateCustomerInfo = (req, res) => {
         } else if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(newPassword)) {
             errors.newPassword = 'Password must be at least 8 characters with one letter, number, and special character';
         }
+
         if (newPassword !== confirmPassword) {
             errors.confirmPassword = 'Passwords do not match';
         }
     }
+
     if (Object.keys(errors).length > 0) {
         return res.status(400).json({ errors });
     }
+
+
   // Build query
   const fields = [
     "FNAME = ?",
@@ -210,7 +215,7 @@ exports.updateCustomerInfo = (req, res) => {
     CDISTRICT,
     CPINCODE,
   ];
-      if (newPassword) {
+     if (newPassword) {
         fields.push("password = ?");
         // In production, you should hash the password here
         values.push(newPassword);
@@ -797,18 +802,32 @@ exports.getAddressesByUserId = (req, res) => {
   const { customer_id } = req.params;
   const { primary_address } = req.query; // use query string: ?primary_address=1
   console.log("Received request to get addresses for user ID:", customer_id);
-  let sql = 'SELECT * FROM customer_addresses WHERE customer_id = ?';
+
+  let sql = `
+    SELECT 
+      customer_addresses.*, 
+      customermaster.email 
+    FROM customer_addresses
+    JOIN customermaster ON customermaster.CUSTOMERID = customer_addresses.customer_id
+    WHERE customer_addresses.customer_id = ?
+  `;
+
   const values = [customer_id];
+
   if (primary_address !== undefined) {
-    sql += ' AND primary_address = ?';
+    sql += ' AND customer_addresses.primary_address = ?';
     values.push(primary_address);
   }
-  // sql += ' ORDER BY primary_address DESC';
+
+  // Optional: Add order if needed
+  // sql += ' ORDER BY customer_addresses.primary_address DESC';
+
   con.query(sql, values, (err, result) => {
     if (err) return res.status(500).json({ msg: "DB error", error: err });
     res.json(result);
   });
 };
+
 exports.deleteCustomerAddress = (req, res) => {
   const { address_id } = req.params;
   if (!address_id) return res.status(400).json({ msg: "Address ID is required" });
@@ -821,3 +840,105 @@ exports.deleteCustomerAddress = (req, res) => {
 
 
 
+
+
+exports.sendotp = (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ msg: "Email is required" });
+  }
+  const query = "SELECT * FROM customermaster WHERE email = ?";
+  con.query(query, [email], async (error, results) => {
+    if (error) return res.status(500).json({ msg: "Database error" });
+    if (results.length === 0) {
+      return res.status(404).json({ msg: "Customer does not exist" });
+    }
+    const customer = results[0];
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const subject = "Your OTP for Password Reset";
+    // const message = `
+    //   <h3>Hello ${customer.FNAME || "User"},</h3>
+    //   <p>Your OTP for password reset is: <b>${otp}</b></p>
+    //   <p>This OTP is valid for 10 minutes.</p>
+    // `;
+    const message = `
+  <div style="font-family: Arial, sans-serif; color: #333;">
+    <h2 style="color: #4CAF50;">Anahee</h2>
+    <p>Dear ${customer.FNAME || "Valued Customer"},</p>
+    <p>We received a request to reset your Anahee account password. Please use the following One-Time Password (OTP) to proceed:</p>
+    <h3 style="color: #000;">Your OTP: <span style="color: #4CAF50;">${otp}</span></h3>
+    <p>This OTP is valid for <strong>10 minutes</strong>. Do not share this OTP with anyone.</p>
+    <p>If you did not request this, please ignore this email or contact our support team immediately.</p>
+    <br />
+    <p>Warm regards,<br />Team Anahee</p>
+    <hr />
+    <p style="font-size: 12px; color: #777;">This is an automated message. Please do not reply to this email.</p>
+  </div>
+`;
+    try {
+      await sendEmail(email, subject, message);
+      const insertQuery = `
+        INSERT INTO otp_verification (email, otp, expires_at)
+        VALUES (?, ?, ?)
+        ON DUPLICATE KEY UPDATE otp = VALUES(otp), expires_at = VALUES(expires_at), verified = FALSE
+      `;
+      con.query(insertQuery, [email, otp, expiresAt], (insertErr) => {
+        if (insertErr) return res.status(500).json({ msg: "OTP save error" });
+        res.status(200).json({
+          msg: "OTP sent successfully",
+          // otp, // For testing only
+        });
+      });
+    } catch (err) {
+      console.error("Error sending email:", err);
+      return res.status(500).json({ msg: "Failed to send OTP" });
+    }
+  });
+};
+// POST /verifyotp
+exports.verifyotp = (req, res) => {
+  const { email, otp } = req.body;
+  if (!email || !otp) {
+    return res.status(400).json({ msg: "Email and OTP are required" });
+  }
+  const query = `
+    SELECT * FROM otp_verification
+    WHERE email = ? AND otp = ? AND expires_at > NOW() AND verified = FALSE
+  `;
+  con.query(query, [email, otp], (err, results) => {
+    if (err) return res.status(500).json({ msg: "Database error" });
+    if (results.length === 0) {
+      return res.status(400).json({ msg: "OTP not valid or expired" });
+    }
+    // Mark OTP as verified
+    const updateQuery = `UPDATE otp_verification SET verified = TRUE WHERE email = ? AND otp = ?`;
+    con.query(updateQuery, [email, otp], (updateErr) => {
+      if (updateErr) return res.status(500).json({ msg: "Failed to verify OTP" });
+      return res.status(200).json({ msg: "OTP verified successfully" });
+    });
+  });
+};
+exports.forgetpassword = (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password)
+    return res.status(400).json({ msg: "Email and new password are required" });
+  const checkQuery = `
+    SELECT * FROM otp_verification
+    WHERE email = ? AND verified = TRUE AND expires_at > NOW()
+  `;
+  con.query(checkQuery, [email], (err, result) => {
+    if (err) return res.status(500).json({ msg: "Database error" });
+    if (result.length === 0) {
+      return res.status(403).json({ msg: "OTP not verified or expired" });
+    }
+    const updateQuery =
+      "UPDATE customermaster SET password = ? WHERE email = ?";
+    con.query(updateQuery, [password, email], (updateErr) => {
+      if (updateErr)
+        return res.status(500).json({ msg: "Failed to update password" });
+      con.query("DELETE FROM otp_verification WHERE email = ?", [email]);
+      return res.status(200).json({ msg: "Password reset successful" });
+    });
+  });
+};

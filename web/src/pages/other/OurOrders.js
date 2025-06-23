@@ -83,7 +83,7 @@ const Orders = () => {
   const renderOrderCard = (order) => {
     let totalAmount = 0;
     const tax = 0; // percent
-    const shipping = 0; // flat rate
+    const shipping = order.shipping_charge || 0; // flat rate
     let subtotal = 0;
 
     order.ITEMS?.forEach((item) => {

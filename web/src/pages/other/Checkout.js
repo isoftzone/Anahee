@@ -31,7 +31,7 @@ const Checkout = () => {
     postcode: "",
     phone: "",
     // email: "",
-    paymentMethod: "COD",
+    paymentMethod: "paynow",
   });
   const [data, setData] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
@@ -54,12 +54,37 @@ const Checkout = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [recommendedCourier, setRecommendedCourier] = useState(null);
   const [primaryAddress, setPrimaryAddress] = useState(null);
-  const [couriers, setCouriers] = useState([]);
-  const totalWeight = cartItems.reduce((sum, item) => {
-    return sum + item.weight * item.quantity;
-  }, 0);
-  console.log("first 1 totalWeight", totalWeight);
-  console.log("first 1 cartItems", cartItems);
+  const { totalWeight, maxLength, maxBreadth, maxHeight } = cartItems.reduce(
+    (acc, item) => {
+      const variation = item.variation?.[0] || {};
+
+      const weight =
+        variation.shippingweight ||
+        variation.grossweight ||
+        variation.netweight ||
+        0.3;
+      const length = variation.lengthcm || 10;
+      const breadth = variation.widthcm || 10;
+      const height = variation.heightcm || 10;
+
+      acc.totalWeight += weight * item.quantity;
+
+      acc.maxLength = Math.max(acc.maxLength, length);
+      acc.maxBreadth = Math.max(acc.maxBreadth, breadth);
+      acc.maxHeight = Math.max(acc.maxHeight, height);
+
+      return acc;
+    },
+    {
+      totalWeight: 0,
+      maxLength: 0,
+      maxBreadth: 0,
+      maxHeight: 0,
+    }
+  );
+
+  console.log("🚚 totalWeight", totalWeight);
+  console.log("📦 Dimensions (LxBxH)", maxLength, maxBreadth, maxHeight);
   // Show popup for 3 seconds
   useEffect(() => {
     if (showPopup) {
@@ -72,7 +97,22 @@ const Checkout = () => {
       return () => clearTimeout(timer);
     }
   }, [showPopup, isSuccess, navigate]);
-useEffect(() => {
+
+  // useEffect(() => {
+  //   const script = document.createElement("script");
+  //   console.log("this is script", script)
+  //   script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
+  //   script.async = true;
+  //   // script.crossOrigin = "anonymous";
+  //   document.body.appendChild(script);
+
+  //   // return () => {
+  //   //   document.body.removeChild(script);
+  //   // };
+  // }, []);
+
+
+  useEffect(() => {
   const loadPhonePeScript = () => {
     if (window.PhonePeCheckout) return; // Already loaded
     const script = document.createElement('script');
@@ -97,37 +137,6 @@ useEffect(() => {
     loadPhonePeScript();
   }
 }, [formData.paymentMethod, orderPlaced]);
-
-
-  // useEffect(() => {
-  //   const script = document.createElement("script");
-  //   script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
-  //   script.async = true;
-  //   script.crossOrigin = "anonymous";
-
-  //   // Add error handling for script loading
-  //   script.onload = () => {
-  //     console.log("PhonePe script loaded successfully");
-  //   };
-
-  //   script.onerror = (error) => {
-  //     console.error("Failed to load PhonePe script:", error);
-  //     // setPaymentError(
-  //     //   "Failed to load payment service. Please refresh and try again."
-  //     // );
-  //   };
-  //   document.body.appendChild(script);
-
-  //   // return () => {
-  //   //   document.body.removeChild(script);
-  //   // };
-  //   return () => {
-  //     // Check if script exists before removing
-  //     if (document.body.contains(script)) {
-  //       document.body.removeChild(script);
-  //     }
-  //   };
-  // }, []);
 
   const { search } = useLocation();
   const params = new URLSearchParams(search);
@@ -235,7 +244,6 @@ useEffect(() => {
       if (serviceabilityResponse.data.success) {
         const availableCouriers =
           serviceabilityResponse.data.data.data.available_courier_companies;
-        setCouriers(availableCouriers);
 
         // Find the recommended courier
         const recommendedId =
@@ -257,6 +265,50 @@ useEffect(() => {
       console.error("Error:", error.response?.data || error.message);
       // setError("Failed to check serviceability. Please try again.");
       setRecommendedCourier(null);
+    }
+  };
+
+  const createShipment = async (saleId) => {
+    const shiprocketOrder = {
+      order_id: saleId,
+      customer_fname: primaryAddress.firstName,
+      customer_lname: primaryAddress.lastName,
+      country: primaryAddress.country,
+      address: primaryAddress.address,
+      city: primaryAddress.city,
+      pincode: primaryAddress.postcode,
+      state: primaryAddress.state,
+      email: primaryAddress.email,
+      phone: primaryAddress.phone,
+      comment: primaryAddress.description || "",
+      items: cartItems.map((item) => ({
+        name: item.name,
+        sku: item.sku || `SKU-${item.id}`,
+        units: item.quantity,
+        selling_price: item.price,
+        discount: "",
+        tax: "",
+        hsn: 441122,
+      })),
+      payment_method: formData.paymentMethod === "PAID" ? "Prepaid" : "COD",
+      total: cartTotalPrice - discount,
+      shipping_charge: recommendedCourier.rate
+        ? recommendedCourier.rate.toFixed(2)
+        : "0.00",
+      length: maxLength || 0.5,
+      breadth: maxBreadth || 0.5,
+      height: maxHeight || 0.5,
+      weight: totalWeight || 0.1,
+    };
+
+    try {
+      const shiprocketRes = await axios.post(
+        `${BASE_URL}/api/create-shiprocket-order`,
+        shiprocketOrder
+      );
+      console.log("✅ Shiprocket order created:", shiprocketRes.data);
+    } catch (shiprocketErr) {
+      console.error("❌ Shiprocket order creation failed:", shiprocketErr);
     }
   };
 
@@ -494,21 +546,14 @@ useEffect(() => {
           transaction_id: paymentDetail?.transactionId,
           saleId: orderId,
         };
-
-        console.log("Updating with data:", updateData);
-
-        const updateResponse = await axios.put(
-          `${BASE_URL}/updateSalesMaster`,
-          updateData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        console.log("Update response:", updateResponse.data);
-
+        console.log("updateData,updateData", updateData);
+        await axios.put(`${BASE_URL}/updateSalesMaster`, updateData, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        // 🚀 Create shipment after order
+        await createShipment(orderId);
         setIsSuccess(true);
         setShowPopup(true);
         resetForm();
@@ -805,6 +850,8 @@ useEffect(() => {
           await initiatePhonePePayment(saleId);
         } else {
           // For COD, show success popup
+          // 🚀 Create shipment after order
+          await createShipment(saleId);
           setIsSuccess(true);
           setShowPopup(true);
           setIsLoading(false);
@@ -1857,7 +1904,7 @@ useEffect(() => {
                               </div>
                               <div className="mt-3 d-flex justify-content-end gap-2">
                                 <button
-                                  style={{ background: "#FFEAF1" }}
+                                  style={{background:"#FFEAF1"}}
                                   type="button"
                                   className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded hover:bg-pink-400 transition d-flex align-items-center gap-2 border-0"
                                   onClick={handleCancelEdit}
@@ -1865,7 +1912,7 @@ useEffect(() => {
                                   Cancel
                                 </button>
                                 <button
-                                  style={{ background: "#FFEAF1" }}
+                                 style={{background:"#FFEAF1"}}
                                   type="button"
                                   onClick={handleUpdate}
                                   className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded  hover:bg-pink-400 transition d-flex align-items-center gap-2 border-0"
@@ -1926,23 +1973,27 @@ useEffect(() => {
                   <div className="col-lg-5">
                     <div className="your-order-area">
                       <h3>Your order</h3>
-                      {recommendedCourier ? (
-                        <div className="card mb-4">
-                          <div className="card-body">
-                            <ul className="list-group list-group-flush">
-                              <li className="list-group-item">
-                                <strong>Estimated Delivery:</strong>{" "}
-                                {recommendedCourier.etd} (
-                                {recommendedCourier.estimated_delivery_days}{" "}
-                                days)
-                              </li>
-                            </ul>
+                      {data.length > 0 ? (
+                        recommendedCourier ? (
+                          <div className="card mb-4">
+                            <div className="card-body">
+                              <ul className="list-group list-group-flush">
+                                <li className="list-group-item">
+                                  <strong>Estimated Delivery:</strong>{" "}
+                                  {recommendedCourier.etd} (
+                                  {recommendedCourier.estimated_delivery_days}{" "}
+                                  days)
+                                </li>
+                              </ul>
+                            </div>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="alert alert-warning">
+                            No delivery service available for this location.
+                          </div>
+                        )
                       ) : (
-                        <div className="alert alert-warning">
-                          No delivery service available for this location.
-                        </div>
+                        ""
                       )}
 
                       <div className="your-order-wrap gray-bg-4">
@@ -2098,7 +2149,7 @@ useEffect(() => {
                               >
                                 <div
                                   style={{
-                                    marginBottom: "16px",
+                                    // marginBottom: "16px",
                                     display: "block",
                                   }}
                                 >
@@ -2106,14 +2157,14 @@ useEffect(() => {
                                     style={{
                                       display: "flex",
                                       alignItems: "center",
-                                      marginBottom: "10px",
+                                      // marginBottom: "10px",
                                       height: "24px",
                                       position: "relative",
                                     }}
                                   >
                                     <input
                                       type="radio"
-                                      id="phonepe"
+                                      id="paynow"
                                       name="paymentMethod"
                                       value="PAID"
                                       checked={
@@ -2130,7 +2181,7 @@ useEffect(() => {
                                       }}
                                     />
                                     <label
-                                      htmlFor="phonepe"
+                                      htmlFor="paynow"
                                       style={{
                                         marginLeft: "10px",
                                         fontSize: "14px",
@@ -2145,11 +2196,11 @@ useEffect(() => {
 
                                 <div
                                   style={{
-                                    marginBottom: "16px",
+                                    // marginBottom: "16px",
                                     display: "block",
                                   }}
                                 >
-                                  <div
+                                  {/* <div
                                     style={{
                                       display: "flex",
                                       alignItems: "center",
@@ -2172,7 +2223,7 @@ useEffect(() => {
                                         width: "18px",
                                         height: "18px",
                                         cursor: "pointer",
-                                      }}
+                                      }} 
                                     />
                                     <label
                                       htmlFor="COD"
@@ -2185,7 +2236,7 @@ useEffect(() => {
                                     >
                                       Cash on Delivery
                                     </label>
-                                  </div>
+                                  </div> */}
                                 </div>
                               </div>
                             )}

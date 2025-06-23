@@ -21,7 +21,7 @@ const ShopByCollection = ({ spaceTopClass, spaceBottomClass }) => {
             </a>
             <span className="divider">|</span>
             <a href="/shop-grid-standard?category=Coordset" className="mx-2">
-              Cord Sets
+              Coord Sets
             </a>
           </div>
         </div>

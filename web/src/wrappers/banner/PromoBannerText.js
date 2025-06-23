@@ -1,5 +1,4 @@
 // import clsx from "clsx";
-
 // const PromoBannerText = ({ spaceTopClass, spaceBottomClass }) => {
 //   return (
 //     <>
@@ -25,35 +24,29 @@
 //           </div>
 //         </div>
 //       </div>
-
 //       <style>
 //         {`
 //           @keyframes scrollMarquee {
 //             0% { transform: translateX(0%); }
 //             100% { transform: translateX(-50%); }
 //           }
-
 //           @media (max-width: 768px) {
 //             .promo-text {
 //               font-size: 4vw !important;
 //               margin-right: 6vw !important;
 //             }
 //           }
-
 //           @media (max-width: 480px) {
 //             .promo-text {
 //               font-size: 5vw !important;
 //               margin-right: 8vw !important;
 //             }
-
-           
 //           }
 //         `}
 //       </style>
 //     </>
 //   );
 // };
-
 // const styles = {
 //   banner: {
 //     width: "100%",
@@ -82,9 +75,7 @@
 //     whiteSpace: "nowrap", // ensures one-line
 //   },
 // };
-
 // export default PromoBannerText;
-
 import clsx from "clsx";
 import { useEffect } from "react";
 import axios from "axios";
@@ -95,7 +86,7 @@ const PromoBannerText = ({ spaceTopClass, spaceBottomClass }) => {
     axios
       .get(`${process.env.REACT_APP_PUBLIC_URL}/images`)
       .then((response) => {
-        console.log(":white_check_mark: API Response: 999999999", response.data);
+        console.log(":white_tick: API Response: 999999999", response.data);
         setBanners(response.data.images);
       })
       .catch((error) => {

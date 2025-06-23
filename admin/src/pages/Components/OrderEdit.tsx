@@ -155,7 +155,7 @@ const OrderEdit: React.FC = () => {
 
                 setTax(sale.TAX || 0);
                 setDiscount(sale.DISCAMOUNT || 0);
-                setShipping(sale.SHIPPING || 0);
+                setShipping(sale.shipping_charge || 0);
             }
         } catch (error) {
             console.error('Error fetching sales data:', error);
@@ -232,7 +232,7 @@ const OrderEdit: React.FC = () => {
                     NETAMOUNT: netAmount,
                     AMOUNTPAID: customerDetails.paymentStatus === 'PAID' ? netAmount : 0,
                     BALANCE: customerDetails.paymentStatus === 'PAID' ? 0 : netAmount,
-                    paymentStatus: customerDetails.paymentStatus,
+                    payment_status: customerDetails.paymentStatus,
                     payment_mode: customerDetails.payment_mode,
                     ORDER_STATUS: customerDetails.ORDER_STATUS,
                     coupon_code: customerDetails.coupon_code,
@@ -323,10 +323,10 @@ const OrderEdit: React.FC = () => {
                 </table>
                 
                 <div class="totals">
-                    <div><span>Subtotal:</span><span>$${subtotal.toFixed(2)}</span></div>
+                    <div><span>Subtotal:</span><span>₹${subtotal.toFixed(2)}</span></div>
                     <div><span>Tax (${tax}%):</span><span>$${((subtotal * tax) / 100).toFixed(2)}</span></div>
-                    <div><span>Discount (${discount}%):</span><span>-$${discount.toFixed(2)}</span></div>
-                    <div><span>Shipping:</span><span>$${shipping.toFixed(2)}</span></div>
+                    <div><span>Discount (${discount}%):</span><span>-₹${discount.toFixed(2)}</span></div>
+                    <div><span>Shipping:</span><span>₹${shipping.toFixed(2)}</span></div>
                     <div class="grand-total"><span>Grand Total:</span><span>$${grandTotal.toFixed(2)}</span></div>
                 </div>
             </body>
@@ -529,7 +529,7 @@ const OrderEdit: React.FC = () => {
                             <label className=" font-semibold">Payment Mode:</label>
                             <input
                                 className="border rounded w-full p-2"
-                                value={customerDetails.payment_mode || 'N/A'}
+                                value={customerDetails.payment_mode}
                                 onChange={(e) => setCustomerDetails({ ...customerDetails, payment_mode: e.target.value })}
                             />
                         </div>
@@ -537,7 +537,7 @@ const OrderEdit: React.FC = () => {
                             <label className="block text-sm font-medium">Payment Status:</label>
                             <input
                                 className="border rounded w-full p-2"
-                                value={customerDetails.paymentStatus || 'N/A'}
+                                value={customerDetails.paymentStatus}
                                 onChange={(e) => setCustomerDetails({ ...customerDetails, paymentStatus: e.target.value })}
                             />
                         </div>
@@ -654,11 +654,11 @@ const OrderEdit: React.FC = () => {
                         <input className="border rounded w-full p-2 mt-1" type="number" min="0" value={tax} onChange={(e) => setTax(Number(e.target.value))} />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium">Discount ($)</label>
+                        <label className="block text-sm font-medium">Discount (₹)</label>
                         <input className="border rounded w-full p-2 mt-1" type="number" min="0" value={discount} onChange={(e) => setDiscount(Number(e.target.value))} />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium">Shipping ($)</label>
+                        <label className="block text-sm font-medium">Shipping (₹)</label>
                         <input className="border rounded w-full p-2 mt-1" type="number" min="0" step="0.01" value={shipping} onChange={(e) => setShipping(Number(e.target.value))} />
                     </div>
                 </div>

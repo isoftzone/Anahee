@@ -17,15 +17,16 @@ exports.getSalesMaster = (req, res) => {
       sm.payment_status,
       sm.ORDER_STATUS,
       sm.DISCAMOUNT,
+      sm.shipping_charge,
       sd.ITEMID,
       sd.QTY,
       sd.AMOUNT,
       im.ITEMNAME,
       im.DESCRIPTION
     FROM salesmaster sm
-    JOIN salesdetail sd ON sm.SALEID = sd.SALEID
-    JOIN itemmaster im ON sd.ITEMID = im.ITEMID
-    JOIN customermaster cm ON sm.CUSTOMERID = cm.CUSTOMERID
+    LEFT JOIN salesdetail sd ON sm.SALEID = sd.SALEID
+    LEFT JOIN itemmaster im ON sd.ITEMID = im.ITEMID
+    LEFT JOIN customermaster cm ON sm.CUSTOMERID = cm.CUSTOMERID
   `;
 
   const params = [];
@@ -67,6 +68,7 @@ exports.getSalesMaster = (req, res) => {
           PAYMENTSTATUS: row.payment_status,
           ORDER_STATUS: row.ORDER_STATUS,
           DISCAMOUNT: row.DISCAMOUNT,
+          shipping_charge: row.shipping_charge,
           ITEMS: [],
         };
       }
@@ -430,6 +432,7 @@ exports.getAllOrders = (req, res) => {
       sm.CREATEDON,
       sm.payment_status,
       sm.ORDER_STATUS,
+      sm.shipping_charge,
       sd.ITEMID,
       sd.QTY,
       sd.AMOUNT,
@@ -473,6 +476,7 @@ exports.getAllOrders = (req, res) => {
           CREATEDON: row.CREATEDON,
           PAYMENTSTATUS: row.payment_status,
           ORDER_STATUS: row.ORDER_STATUS,
+          shipping_charge:row.shipping_charge,
           ITEMS: [],
         };
       }
@@ -680,11 +684,7 @@ function generateOrderUpdateEmail(
     <tr>
       <td>
         <div class="product-info">
-          <img src="${
-            item.image ||
-            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Crect width='50' height='50' fill='%23667eea'/%3E%3Cpath d='M15 20h20v2H15zm0 4h20v2H15zm0 4h15v2H15z' fill='white'/%3E%3C/svg%3E"
-          }" 
-               alt="${item.ITEMNAME || "Item"}" class="product-image">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Crect width='50' height='50' fill='%23667eea'/%3E%3Cpath d='M15 20h20v2H15zm0 4h20v2H15zm0 4h15v2H15z' fill='white'/%3E%3C/svg%3E" width="50" height="50" alt="Document icon">
           <div class="product-details">
             <div class="product-name">${item.ITEMNAME || "Item"}</div>
             <div class="product-description">${

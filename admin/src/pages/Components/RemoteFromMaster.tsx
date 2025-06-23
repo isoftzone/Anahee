@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { BASE_URL } from "../../config";
 
 interface Report {
   FormName: string;
@@ -21,7 +22,7 @@ const RemoteFromMaster: React.FC = () => {
 
   const fetchSalesDetail = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/getrfmaster");
+      const response = await axios.get(`${BASE_URL}/getrfmaster`);
       console.log("API Response:", response.data);
 
       if (response.data && Array.isArray(response.data.data)) {

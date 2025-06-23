@@ -14,6 +14,7 @@ import axios from 'axios';
 import { setProducts } from "./store/slices/product-slice";
 import { store } from "./store/store";
 import OrderDetails from "./pages/home/OrderDetails";
+import ForgetPassword from "./pages/other/ForgetPassword";
 // home pages
 const HomeFashion = lazy(() => import("./pages/home/HomeFashion"));
 const HomeFashionTwo = lazy(() => import("./pages/home/HomeFashionTwo"));
@@ -179,7 +180,7 @@ useEffect(() => {
                 path={process.env.PUBLIC_URL + "/home-fashion"}
                 element={<HomeFashion/>}
               />
-              {/* <Route
+              <Route
                 path={process.env.PUBLIC_URL + "/home-fashion-two"}
                 element={<HomeFashionTwo/>}
               />
@@ -194,12 +195,12 @@ useEffect(() => {
               <Route
                 path={process.env.PUBLIC_URL + "/home-fashion-five"}
                 element={<HomeFashionFive/>}
-              /> */}
+              />
               <Route
                 path={process.env.PUBLIC_URL + "/home-fashion-six"}
                 element={<HomeFashionSix/>}
               />
-              {/* <Route
+              <Route
                 path={process.env.PUBLIC_URL + "/home-fashion-seven"}
                 element={<HomeFashionSeven/>}
               />
@@ -326,7 +327,7 @@ useEffect(() => {
               <Route
                 path={process.env.PUBLIC_URL + "/home-valentines-day"}
                 element={<HomeValentinesDay/>}
-              /> */}
+              />
 
               {/* Shop pages */}
               <Route
@@ -341,6 +342,10 @@ useEffect(() => {
                 path={process.env.PUBLIC_URL + "/shop-grid-two-column"}
                 element={<ShopGridTwoColumn/>}
               />
+              <Route
+              path={process.env.PUBLIC_URL + "/forget-password"}
+              element={<ForgetPassword />}
+            />
               <Route
                 path={process.env.PUBLIC_URL + "/shop-grid-no-sidebar"}
                 element={<ShopGridNoSidebar/>}
@@ -393,7 +398,7 @@ useEffect(() => {
               /> 
 
               {/* Blog pages */}
-              {/* <Route
+              <Route
                 path={process.env.PUBLIC_URL + "/blog-standard"}
                 element={<BlogStandard/>}
               />
@@ -408,7 +413,7 @@ useEffect(() => {
               <Route
                 path={process.env.PUBLIC_URL + "/blog-details-standard"}
                 element={<BlogDetailsStandard/>}
-              />  */}
+              /> 
 
               {/* Other pages */}
               <Route

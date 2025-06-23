@@ -20,7 +20,7 @@ const NavMenu = ({ menuWhiteClass, sidebarMenu }) => {
             <Link to={process.env.PUBLIC_URL + "/"}>{t("home")}</Link>
           </li>
           <li>
-            <Link to={process.env.PUBLIC_URL + "/about"}>{t("About")}</Link>
+            <Link to={process.env.PUBLIC_URL + "/about"}>{t("About Us")}</Link>
           </li>
           {/* <li>
              <Link to={process.env.PUBLIC_URL + "/"}>
