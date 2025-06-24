@@ -31,7 +31,7 @@ const Checkout = () => {
     postcode: "",
     phone: "",
     // email: "",
-    paymentMethod: "paynow",
+    paymentMethod: "COD",
   });
   const [data, setData] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
@@ -54,6 +54,14 @@ const Checkout = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [recommendedCourier, setRecommendedCourier] = useState(null);
   const [primaryAddress, setPrimaryAddress] = useState(null);
+  const [couriers, setCouriers] = useState([]);
+  // const totalWeight = cartItems.reduce((sum, item) => {
+  //   return sum + item.weight * item.quantity;
+  // }, 0);
+  // console.log("first 1 totalWeight", totalWeight);
+  // console.log("first 1 cartItems", cartItems);
+
+  const [isInternational, setIsInternational] = useState(false);
   const { totalWeight, maxLength, maxBreadth, maxHeight } = cartItems.reduce(
     (acc, item) => {
       const variation = item.variation?.[0] || {};
@@ -97,46 +105,63 @@ const Checkout = () => {
       return () => clearTimeout(timer);
     }
   }, [showPopup, isSuccess, navigate]);
+  useEffect(() => {
+    const loadPhonePeScript = () => {
+      if (window.PhonePeCheckout) return; // Already loaded
+      const script = document.createElement("script");
+      script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
+      script.async = true;
+      script.onload = () => {
+        console.log("PhonePe script loaded successfully");
+      };
+      script.onerror = () => {
+        console.error("Failed to load PhonePe script");
+        setPaymentError(
+          "Payment service is currently unavailable. Please try another method."
+        );
+      };
+      document.body.appendChild(script);
+      return () => {
+        // Only remove if payment isn't in progress
+        if (!orderPlaced) {
+          document.body.removeChild(script);
+        }
+      };
+    };
+    if (formData.paymentMethod === "PAID") {
+      loadPhonePeScript();
+    }
+  }, [formData.paymentMethod, orderPlaced]);
 
   // useEffect(() => {
   //   const script = document.createElement("script");
-  //   console.log("this is script", script)
   //   script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
   //   script.async = true;
-  //   // script.crossOrigin = "anonymous";
+  //   script.crossOrigin = "anonymous";
+
+  //   // Add error handling for script loading
+  //   script.onload = () => {
+  //     console.log("PhonePe script loaded successfully");
+  //   };
+
+  //   script.onerror = (error) => {
+  //     console.error("Failed to load PhonePe script:", error);
+  //     // setPaymentError(
+  //     //   "Failed to load payment service. Please refresh and try again."
+  //     // );
+  //   };
   //   document.body.appendChild(script);
 
   //   // return () => {
   //   //   document.body.removeChild(script);
   //   // };
+  //   return () => {
+  //     // Check if script exists before removing
+  //     if (document.body.contains(script)) {
+  //       document.body.removeChild(script);
+  //     }
+  //   };
   // }, []);
-
-
-  useEffect(() => {
-  const loadPhonePeScript = () => {
-    if (window.PhonePeCheckout) return; // Already loaded
-    const script = document.createElement('script');
-    script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
-    script.async = true;
-    script.onload = () => {
-      console.log('PhonePe script loaded successfully');
-    };
-    script.onerror = () => {
-      console.error('Failed to load PhonePe script');
-      setPaymentError('Payment service is currently unavailable. Please try another method.');
-    };
-    document.body.appendChild(script);
-    return () => {
-      // Only remove if payment isn't in progress
-      if (!orderPlaced) {
-        document.body.removeChild(script);
-      }
-    };
-  };
-  if (formData.paymentMethod === "PAID") {
-    loadPhonePeScript();
-  }
-}, [formData.paymentMethod, orderPlaced]);
 
   const { search } = useLocation();
   const params = new URLSearchParams(search);
@@ -148,7 +173,7 @@ const Checkout = () => {
         try {
           const response = await axios.post(`${BASE_URL}/applycoupon`, {
             coupon_code: couponCode,
-            cart_total: cartTotalPrice.toFixed(2),
+            cart_total: cartTotalPrice.toFixed(2) || 0,
           });
           if (response.data.success) {
             setDiscount(response.data.discount);
@@ -196,7 +221,9 @@ const Checkout = () => {
             address: addr.address,
             city: addr.city,
             state: addr.state,
-            postcode: addr.postal_code,
+            // postcode: addr.postal_code,
+            postcode: addr.postal_code || addr.postcode,
+
             phone: addr.mobile,
             email: addr.email,
             description: addr.description,
@@ -222,53 +249,477 @@ const Checkout = () => {
       }
     }
   }, [data]);
+  // useEffect(() => {
+  //   console.log("first primaryAddress", primaryAddress);
+  //   checkServiceability();
+  // }, [primaryAddress, formData.paymentMethod]);
   useEffect(() => {
-    console.log("first primaryAddress", primaryAddress);
-    checkServiceability();
-  }, [primaryAddress, formData.paymentMethod]);
+    if (primaryAddress) {
+      checkServiceability();
+    }
+  }, [primaryAddress, formData.paymentMethod, totalWeight]);
+  // const checkServiceability = async () => {
+  //   setIsLoading(true);
+  //   // setError(null);
+  //   try {
+  //     const serviceabilityResponse = await axios.post(
+  //       `${BASE_URL}/api/checkServiceability`,
+  //       {
+  //         pickup_postcode: "302016",
+  //         delivery_postcode: primaryAddress.postcode,
+  //         cod: formData.paymentMethod == "COD" ? 1 : 0,
+  //         weight: 1,
+  //       }
+  //     );
+
+  //     if (serviceabilityResponse.data.success) {
+  //       const availableCouriers =
+  //         serviceabilityResponse.data.data.data.available_courier_companies;
+  //       setCouriers(availableCouriers);
+
+  //       // Find the recommended courier
+  //       const recommendedId =
+  //         serviceabilityResponse.data.data.data.recommended_courier_company_id;
+  //       const recommended = availableCouriers.find(
+  //         (c) => c.courier_company_id === recommendedId
+  //       );
+  //       setRecommendedCourier(recommended);
+  //       setIsLoading(false);
+  //     } else {
+  //       // setError("No couriers available for this pincode combination");
+  //       setRecommendedCourier(null);
+  //       console.error(
+  //         "Error:",
+  //         "No couriers available for this pincode combination"
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error("Error:", error.response?.data || error.message);
+  //     // setError("Failed to check serviceability. Please try again.");
+  //     setRecommendedCourier(null);
+  //   }
+  // };
+
+  // Fetch states on country change
+
+  // const checkServiceability = async () => {
+  //   setIsLoading(true);
+  //   setPaymentError("");
+  //   setRecommendedCourier(null);
+
+  //   try {
+  //     if (!primaryAddress) {
+  //       throw new Error("No shipping address selected");
+  //     }
+
+  //     if (primaryAddress.country === "India") {
+  //       // Domestic shipping for India
+  //       if (
+  //         !primaryAddress.postcode ||
+  //         !/^[0-9]{6}$/.test(primaryAddress.postcode)
+  //       ) {
+  //         throw new Error(
+  //           "Invalid Indian postal code. Please enter a valid 6-digit pincode."
+  //         );
+  //       }
+
+  //       const serviceabilityResponse = await axios.post(
+  //         `${BASE_URL}/api/checkServiceability`,
+  //         {
+  //           pickup_postcode: "302016", // Your warehouse pincode
+  //           delivery_postcode: primaryAddress.postcode,
+  //           cod: formData.paymentMethod === "COD" ? 1 : 0,
+  //           weight: totalWeight || 1,
+  //         }
+  //       );
+
+  //       if (serviceabilityResponse.data.success) {
+  //         const availableCouriers =
+  //           serviceabilityResponse.data.data?.available_courier_companies || [];
+
+  //         if (availableCouriers.length === 0) {
+  //           throw new Error("No couriers available for this pincode");
+  //         }
+
+  //         const recommendedId =
+  //           serviceabilityResponse.data.data?.recommended_courier_company_id;
+
+  //         const recommended =
+  //           availableCouriers.find(
+  //             (c) => c.courier_company_id === recommendedId
+  //           ) || availableCouriers[0];
+
+  //         setRecommendedCourier({
+  //           ...recommended,
+  //           international: false,
+  //           rate: recommended.freight_charge || 0,
+  //         });
+  //       } else {
+  //         throw new Error(
+  //           serviceabilityResponse.data.message || "No couriers available"
+  //         );
+  //       }
+  //     } else {
+  //       // International shipping
+  //       // const internationalResponse = await axios.post(
+  //       //   `${BASE_URL}/api/checkInternationalServiceability`,
+  //       //   {
+  //       //     country: primaryAddress.country,
+  //       //     weight: totalWeight || 1,
+  //       //     payment_method: formData.paymentMethod === "COD" ? "COD" : "Prepaid",
+  //       //   }
+  //       // );
+  //       const internationalResponse = await axios.post(
+  //         `${BASE_URL}/api/checkInternationalServiceability`,
+  //         {
+  //           country: primaryAddress.country,
+  //           weight: totalWeight || 1,
+  //           payment_method:
+  //             formData.paymentMethod === "COD" ? "COD" : "Prepaid",
+  //         }
+  //       );
+
+  //       if (internationalResponse.data.success) {
+  //         const courierData = internationalResponse.data.data;
+  //         const availableCouriers =
+  //           courierData.available_courier_companies || [];
+
+  //         if (availableCouriers.length === 0) {
+  //           throw new Error(
+  //             `No couriers available for ${primaryAddress.country}`
+  //           );
+  //         }
+
+  //         // const recommended = availableCouriers[0];
+  //         const recommended =
+  //           availableCouriers.find(
+  //             (c) =>
+  //               c.courier_company_id ===
+  //               courierData.recommended_courier_company_id
+  //           ) || availableCouriers[0];
+  //         setRecommendedCourier({
+  //           ...recommended,
+  //           international: true,
+  //           // rate: courierData.rate || recommended.freight_charge || 0,
+  //           rate:
+  //             courierData.rate ??
+  //             recommended.freight_charge ??
+  //             recommended.total_rate ??
+  //             0,
+  //           etd: courierData.etd || recommended.etd,
+  //           courier_name: courierData.courier_name || recommended.courier_name,
+  //         });
+  //       } else {
+  //         throw new Error(
+  //           internationalResponse.data.message || "No couriers available"
+  //         );
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Serviceability check failed:", error);
+  //     setPaymentError(
+  //       error.response?.data?.message ||
+  //         error.message ||
+  //         "Failed to calculate shipping rates"
+  //     );
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const checkServiceability = async () => {
-    setIsLoading(true);
-    // setError(null);
-    try {
+  setIsLoading(true);
+  setPaymentError("");
+  setRecommendedCourier(null);
+  try {
+    if (!primaryAddress) {
+      throw new Error("No shipping address selected");
+    }
+    console.log("Checking serviceability for:", {
+      country: primaryAddress.country,
+      postcode: primaryAddress.postcode,
+      paymentMethod: formData.paymentMethod,
+      weight: totalWeight,
+    });
+    if (primaryAddress.country === "India") {
+      // Domestic shipping for India
+      if (
+        !primaryAddress.postcode ||
+        !/^[0-9]{6}$/.test(primaryAddress.postcode)
+      ) {
+        throw new Error(
+          "Invalid Indian postal code. Please enter a valid 6-digit pincode."
+        );
+      }
       const serviceabilityResponse = await axios.post(
         `${BASE_URL}/api/checkServiceability`,
         {
-          pickup_postcode: "302016",
+          pickup_postcode: "302016", // Your warehouse pincode
           delivery_postcode: primaryAddress.postcode,
-          cod: formData.paymentMethod == "COD" ? 1 : 0,
-          weight: 1,
+          cod: formData.paymentMethod === "COD" ? 1 : 0,
+          weight: totalWeight || 1,
         }
       );
-
+      console.log(
+        "Domestic serviceability response:",
+        serviceabilityResponse.data
+      );
       if (serviceabilityResponse.data.success) {
+        const courierData = serviceabilityResponse.data.data;
         const availableCouriers =
-          serviceabilityResponse.data.data.data.available_courier_companies;
-
-        // Find the recommended courier
-        const recommendedId =
-          serviceabilityResponse.data.data.data.recommended_courier_company_id;
-        const recommended = availableCouriers.find(
-          (c) => c.courier_company_id === recommendedId
-        );
-        setRecommendedCourier(recommended);
-        setIsLoading(false);
+          courierData.available_courier_companies || [];
+        if (availableCouriers.length === 0) {
+          throw new Error("No couriers available for this pincode");
+        }
+        const recommendedId = courierData.recommended_courier_company_id;
+        const recommended =
+          availableCouriers.find(
+            (c) => c.courier_company_id === recommendedId
+          ) || availableCouriers[0];
+        setRecommendedCourier({
+          ...recommended,
+          international: false,
+          rate: parseFloat(
+            recommended.freight_charge || courierData.rate || 0
+          ),
+          etd: recommended.etd || courierData.etd || "Not available",
+          courier_name:
+            recommended.courier_name ||
+            courierData.courier_name ||
+            "Domestic Courier",
+        });
       } else {
-        // setError("No couriers available for this pincode combination");
-        setRecommendedCourier(null);
-        console.error(
-          "Error:",
-          "No couriers available for this pincode combination"
+        throw new Error(
+          serviceabilityResponse.data.message || "No couriers available"
         );
       }
-    } catch (error) {
-      console.error("Error:", error.response?.data || error.message);
-      // setError("Failed to check serviceability. Please try again.");
-      setRecommendedCourier(null);
+    } else {
+      // International shipping
+      console.log(
+        "Checking international serviceability for:",
+        primaryAddress.country
+      );
+      const internationalResponse = await axios.post(
+        `${BASE_URL}/api/checkInternationalServiceability`,
+        {
+          country: primaryAddress.country,
+          weight: totalWeight || 1,
+          payment_method:
+            formData.paymentMethod === "COD" ? "COD" : "Prepaid",
+        }
+      );
+      console.log(
+        "International serviceability response:",
+        internationalResponse.data
+      );
+      if (internationalResponse.data.success) {
+        const courierData = internationalResponse.data.data;
+        const availableCouriers =
+          courierData.available_courier_companies || [];
+        if (availableCouriers.length === 0) {
+          throw new Error(
+            `No couriers available for ${primaryAddress.country}`
+          );
+        }
+        // Get the recommended courier or first available
+        const recommendedId = courierData.recommended_courier_company_id;
+        const recommended =
+          availableCouriers.find(
+            (c) => c.courier_company_id === recommendedId
+          ) || availableCouriers[0];
+        // Extract rate with multiple fallbacks
+        let shippingRate = 0;
+        if (courierData.rate !== undefined && courierData.rate !== null) {
+          shippingRate = parseFloat(courierData.rate);
+        } else if (
+          recommended.freight_charge !== undefined &&
+          recommended.freight_charge !== null
+        ) {
+          shippingRate = parseFloat(recommended.freight_charge);
+        } else if (
+          recommended.rate !== undefined &&
+          recommended.rate !== null
+        ) {
+          shippingRate = parseFloat(recommended.rate);
+        } else if (
+          recommended.charges !== undefined &&
+          recommended.charges !== null
+        ) {
+          shippingRate = parseFloat(recommended.charges);
+        }
+        console.log("Final shipping rate extracted:", shippingRate);
+        setRecommendedCourier({
+          ...recommended,
+          international: true,
+          rate: shippingRate,
+          etd: courierData.etd || recommended.etd || "7-15 business days",
+          courier_name:
+            courierData.courier_name ||
+            recommended.courier_name ||
+            "International Courier",
+          courier_company_id:
+            recommended.courier_company_id ||
+            courierData.recommended_courier_company_id,
+        });
+      } else {
+        throw new Error(
+          internationalResponse.data.message ||
+            `International shipping not available for ${primaryAddress.country}`
+        );
+      }
     }
+  } catch (error) {
+    console.error("Serviceability check failed:", error);
+    let errorMessage = "Failed to calculate shipping rates";
+    if (error.response?.data?.message) {
+      errorMessage = error.response.data.message;
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+    setPaymentError(errorMessage);
+    setRecommendedCourier(null);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+  // const checkServiceability = async () => {
+  //   setIsLoading(true);
+  //   setPaymentError("");
+  //   setRecommendedCourier(null);
+
+  //   try {
+  //     if (!primaryAddress) {
+  //       throw new Error("No shipping address selected");
+  //     }
+
+  //     if (primaryAddress.country === "India") {
+  //       // Domestic shipping for India
+  //       if (
+  //         !primaryAddress.postcode ||
+  //         !/^[0-9]{6}$/.test(primaryAddress.postcode)
+  //       ) {
+  //         throw new Error(
+  //           "Invalid Indian postal code. Please enter a valid 6-digit pincode."
+  //         );
+  //       }
+
+  //       const serviceabilityResponse = await axios.post(
+  //         `${BASE_URL}/api/checkServiceability`,
+  //         {
+  //           pickup_postcode: "302016", // Your warehouse pincode
+  //           delivery_postcode: primaryAddress.postcode,
+  //           cod: formData.paymentMethod === "COD" ? 1 : 0,
+  //           weight: totalWeight || 1,
+  //         }
+  //       );
+
+  //       if (
+  //         serviceabilityResponse.data.success &&
+  //         serviceabilityResponse.data.data?.available_courier_companies
+  //       ) {
+  //         const availableCouriers =
+  //           serviceabilityResponse.data.data.available_courier_companies;
+  //         const recommendedId =
+  //           serviceabilityResponse.data.data.recommended_courier_company_id;
+
+  //         if (availableCouriers.length === 0) {
+  //           throw new Error("No couriers available for this pincode");
+  //         }
+
+  //         const recommended =
+  //           availableCouriers.find(
+  //             (c) => c.courier_company_id === recommendedId
+  //           ) || availableCouriers[0];
+
+  //         setRecommendedCourier({
+  //           ...recommended,
+  //           international: false,
+  //         });
+  //       } else {
+  //         throw new Error("No couriers available for this pincode");
+  //       }
+  //     } else {
+  //       // International shipping
+  //       const internationalResponse = await axios.post(
+  //         `${BASE_URL}/api/checkInternationalServiceability`,
+  //         {
+  //           country: primaryAddress.country,
+  //           weight: totalWeight || 1,
+  //           payment_method:
+  //             formData.paymentMethod === "COD" ? "COD" : "Prepaid",
+  //         }
+  //       );
+
+  //       if (internationalResponse.data.success) {
+  //         const courierData = internationalResponse.data.data;
+
+  //         if (
+  //           !courierData.available_courier_companies ||
+  //           courierData.available_courier_companies.length === 0
+  //         ) {
+  //           throw new Error(
+  //             `No couriers available for shipping to ${primaryAddress.country}`
+  //           );
+  //         }
+
+  //         const recommended = courierData.available_courier_companies[0];
+
+  //         setRecommendedCourier({
+  //           ...recommended,
+  //           international: true,
+  //           rate: courierData.rate || recommended.freight_charge,
+  //           etd: courierData.etd || recommended.etd,
+  //           courier_name: courierData.courier_name || recommended.courier_name,
+  //           freight_charge: recommended.freight_charge,
+  //         });
+  //       } else {
+  //         throw new Error(
+  //           internationalResponse.data.message ||
+  //             "No couriers available for this country"
+  //         );
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Serviceability check failed:", error);
+  //     setRecommendedCourier(null);
+
+  //     let errorMessage = "Shipping not available";
+  //     if (error.response?.data?.message) {
+  //       errorMessage = error.response.data.message;
+  //     } else if (error.message) {
+  //       errorMessage = error.message;
+  //     }
+
+  //     setPaymentError(
+  //       `${errorMessage}. Please try a different address or contact support.`
+  //     );
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  // Additional helper function to validate international postal codes (optional)
+  const validateInternationalPostalCode = (country, postalCode) => {
+    if (!postalCode) return false;
+
+    const patterns = {
+      "United States": /^[0-9]{5}(-[0-9]{4})?$/,
+      "United Kingdom": /^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}$/i,
+      Canada: /^[A-Z][0-9][A-Z]\s?[0-9][A-Z][0-9]$/i,
+      Australia: /^[0-9]{4}$/,
+      Germany: /^[0-9]{5}$/,
+      France: /^[0-9]{5}$/,
+      // Add more patterns as needed
+    };
+
+    const pattern = patterns[country];
+    return pattern ? pattern.test(postalCode) : true; // Return true for unknown countries
   };
 
   const createShipment = async (saleId) => {
+    const isInternational = primaryAddress.country !== "India";
+
     const shiprocketOrder = {
       order_id: saleId,
       customer_fname: primaryAddress.firstName,
@@ -276,7 +727,7 @@ const Checkout = () => {
       country: primaryAddress.country,
       address: primaryAddress.address,
       city: primaryAddress.city,
-      pincode: primaryAddress.postcode,
+      pincode: isInternational ? "000000" : primaryAddress.postcode, // Use dummy for international if needed
       state: primaryAddress.state,
       email: primaryAddress.email,
       phone: primaryAddress.phone,
@@ -293,26 +744,40 @@ const Checkout = () => {
       payment_method: formData.paymentMethod === "PAID" ? "Prepaid" : "COD",
       total: cartTotalPrice - discount,
       shipping_charge: recommendedCourier.rate
-        ? recommendedCourier.rate.toFixed(2)
+        ? recommendedCourier.rate.toFixed(2) || 0
         : "0.00",
       length: maxLength || 0.5,
       breadth: maxBreadth || 0.5,
       height: maxHeight || 0.5,
       weight: totalWeight || 0.1,
+      ...(isInternational && {
+        international_order: 1,
+        country_code: getCountryCode(primaryAddress.country),
+        customs_value: cartTotalPrice - discount,
+        customs_description: "Online retail goods",
+      }),
     };
 
     try {
-      const shiprocketRes = await axios.post(
-        `${BASE_URL}/api/create-shiprocket-order`,
-        shiprocketOrder
-      );
+      const endpoint = isInternational
+        ? `${BASE_URL}/api/create-international-order`
+        : `${BASE_URL}/api/create-shiprocket-order`;
+
+      const shiprocketRes = await axios.post(endpoint, shiprocketOrder);
       console.log("✅ Shiprocket order created:", shiprocketRes.data);
+
+      // For domestic orders, generate pickup
+      if (!isInternational && shiprocketRes.data.shipment_id) {
+        await axios.post(`${BASE_URL}/api/generate-pickup`, {
+          shipment_id: shiprocketRes.data.shipment_id,
+        });
+      }
     } catch (shiprocketErr) {
       console.error("❌ Shiprocket order creation failed:", shiprocketErr);
+      throw shiprocketErr;
     }
   };
 
-  // Fetch states on country change
   useEffect(() => {
     if (formData.country || editItem?.country) {
       const fetchStates = async () => {
@@ -368,6 +833,35 @@ const Checkout = () => {
     }
   };
 
+  const getCountryCode = (countryName) => {
+    const countryCodes = {
+      "United States": "US",
+      "United Kingdom": "GB",
+      Canada: "CA",
+      Australia: "AU",
+      Germany: "DE",
+      France: "FR",
+      Japan: "JP",
+      China: "CN",
+      India: "IN",
+      // Add more countries as needed
+    };
+
+    // Try to find exact match first
+    const exactMatch = countryCodes[countryName];
+    if (exactMatch) return exactMatch;
+
+    // Try case-insensitive match
+    const lowerCountry = countryName.toLowerCase();
+    for (const [name, code] of Object.entries(countryCodes)) {
+      if (name.toLowerCase() === lowerCountry) {
+        return code;
+      }
+    }
+
+    // Fallback to first two letters
+    return countryName.substring(0, 2).toUpperCase();
+  };
   // Update handleValidation to be more concise:
 
   const handleValidation = (formValues, formType = activeForm) => {
@@ -436,8 +930,9 @@ const Checkout = () => {
         break;
       case "postcode":
         if (!trimmedValue) return "Postal code is required";
-        if (!/^[0-9]{6}$/.test(trimmedValue))
-          return "Postal code must be 6 digits";
+        if (formData.country === "" && !/^[0-9]$/.test(trimmedValue)) {
+          return "postal code must be 6 digits";
+        }
         break;
       case "phone":
         if (!trimmedValue) return "Phone is required";
@@ -464,75 +959,227 @@ const Checkout = () => {
     setPaymentError("");
   };
 
-  const phonePeCallback = (response, orderId) => {
-    setIsLoading(false);
+  // const phonePeCallback = (response, orderId) => {
+  //   setIsLoading(false);
 
-    if (response === "USER_CANCEL") {
-      setPaymentError(
-        "Payment was cancelled. Please choose a payment method to continue."
-      );
-      // Reset order state so user can try again
+  //   if (response === "USER_CANCEL") {
+  //     setPaymentError(
+  //       "Payment was cancelled. Please choose a payment method to continue."
+  //     );
+  //     // Reset order state so user can try again
+  //     setOrderPlaced(false);
+  //   } else if (response === "CONCLUDED") {
+  //     verifyPaymentStatus(orderId);
+  //   } else {
+  //     setPaymentError(
+  //       "Payment failed. Please try again or choose a different payment method."
+  //     );
+  //     setOrderPlaced(false);
+  //   }
+  // };
+
+  const phonePeCallback = (response, orderId) => {
+    try {
+      console.log("PhonePe callback received:", { response, orderId });
+
+      setIsLoading(false);
+
+      if (!orderId) {
+        throw new Error("Order ID is missing in callback");
+      }
+
+      if (response === "USER_CANCEL") {
+        setPaymentError(
+          "Payment was cancelled. Please choose a payment method to continue."
+        );
+        setOrderPlaced(false);
+      } else if (response === "CONCLUDED") {
+        // Add a small delay to ensure state is updated
+        setTimeout(() => {
+          verifyPaymentStatus(orderId);
+        }, 100);
+      } else {
+        console.warn("Unexpected PhonePe response:", response);
+        setPaymentError(
+          "Payment failed. Please try again or choose a different payment method."
+        );
+        setOrderPlaced(false);
+      }
+    } catch (error) {
+      console.error("Error in PhonePe callback:", {
+        message: error.message,
+        stack: error.stack,
+        response,
+        orderId,
+      });
+
+      setPaymentError("Payment processing error. Please contact support.");
       setOrderPlaced(false);
-    } else if (response === "CONCLUDED") {
-      verifyPaymentStatus(orderId);
-    } else {
-      setPaymentError(
-        "Payment failed. Please try again or choose a different payment method."
-      );
-      setOrderPlaced(false);
+      setIsLoading(false);
     }
   };
-
   const verifyPaymentStatus = async (orderId) => {
     try {
       const response = await axios.get(
         `${BASE_URL}/api/order-status/${orderId}`
       );
       if (response.data.success) {
-        const paymentDetail = response.data.data.paymentDetails[0];
+        const paymentDetail = response.data.data.paymentDetails?.[0];
 
-        const splitInstrument = paymentDetail?.splitInstruments[0];
+        if (!paymentDetail) {
+          throw new Error("Payment details not found in response");
+        }
+
+        const splitInstrument = paymentDetail?.splitInstruments?.[0];
 
         const updateData = {
           merchant_order_id: response?.data?.data?.orderId,
           payment_mode: "PAID",
-          provider_reference_id: splitInstrument?.rail?.utr,
+          provider_reference_id: splitInstrument?.rail?.utr || "",
           phonepe_status: response?.data?.data?.state,
           payment_status: paymentDetail?.state,
           transaction_id: paymentDetail?.transactionId,
-          saleId: orderId, // Assuming you have orderId in state
+          saleId: orderId,
         };
-        console.log("updateData,updateData", updateData);
-        await axios.put(`${BASE_URL}/updateSalesMaster`, updateData, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        // 🚀 Create shipment after order
-        await createShipment(orderId);
+
+        console.log("Updating with data:", updateData);
+
+        const updateResponse = await axios.put(
+          `${BASE_URL}/updateSalesMaster`,
+          updateData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("Update response:", updateResponse.data);
+
         setIsSuccess(true);
         setShowPopup(true);
         resetForm();
       } else {
-        setIsSuccess(false);
-        setShowPopup(true);
-        setPaymentError("Payment verification failed. Please contact support.");
-        setOrderPlaced(false);
+        throw new Error(response.data.message || "Payment verification failed");
       }
     } catch (error) {
-      console.error("Error verifying payment:", error);
+      console.error("Detailed error in verifyPaymentStatus:", {
+        message: error.message,
+        stack: error.stack,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+
       setIsSuccess(false);
       setShowPopup(true);
       setPaymentError(
-        "There was an error verifying your payment. Please contact support."
+        error.response?.data?.message ||
+          "There was an error verifying your payment. Please contact support."
       );
       setOrderPlaced(false);
     }
   };
 
+  // const initiatePhonePePayment = async (orderId) => {
+  //   try {
+  //     setIsLoading(true);
+  //     const response = await axios.post(`${BASE_URL}/api/create-order`, {
+  //       orderId: orderId,
+  //       amountInPaisa: (cartTotalPrice - discount) * 100,
+  //       customerPhone: formData.phone || "0000000000",
+  //       redirectUrl: window.location.origin + "/orders",
+  //       expireAfter: 1200,
+  //       metaInfo: {
+  //         udf1: "Additional Info 1",
+  //         udf2: "Additional Info 2",
+  //       },
+  //     });
+
+  //     if (response.data.success && response.data.data.redirectUrl) {
+  //       if (window.PhonePeCheckout && window.PhonePeCheckout.transact) {
+  //         window.PhonePeCheckout.transact({
+  //           tokenUrl: response.data.data.redirectUrl,
+  //           callback: (resp) => phonePeCallback(resp, orderId),
+  //           type: "IFRAME",
+  //         });
+  //       } else {
+  //         setPaymentError("PhonePe checkout is not ready. Please try again.");
+  //         setIsLoading(false);
+  //         setOrderPlaced(false);
+  //       }
+  //     } else {
+  //       setPaymentError(
+  //         "Failed to initiate PhonePe payment. Please try again."
+  //       );
+  //       setIsLoading(false);
+  //       setOrderPlaced(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error initiating PhonePe payment:", error);
+  //     setPaymentError(
+  //       "There was an error initiating PhonePe payment. Please try again."
+  //     );
+  //     setIsLoading(false);
+  //     setOrderPlaced(false);
+  //   }
+
+  // };
+
+  const loadPhonePeScript = () => {
+    return new Promise((resolve, reject) => {
+      if (window.PhonePeCheckout) {
+        resolve();
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = "https://mercury.phonepe.com/web/bundle/checkout.js";
+      script.async = true;
+
+      script.onload = () => {
+        // Give it a moment to initialize
+        setTimeout(() => {
+          if (window.PhonePeCheckout) {
+            resolve();
+          } else {
+            reject(new Error("PhonePe not available after load"));
+          }
+        }, 100);
+      };
+
+      script.onerror = () => reject(new Error("Failed to load PhonePe script"));
+
+      document.head.appendChild(script);
+    });
+  };
+
   const initiatePhonePePayment = async (orderId) => {
     try {
       setIsLoading(true);
+
+      // Wait for PhonePe script to be ready
+      const waitForPhonePe = () => {
+        return new Promise((resolve, reject) => {
+          let attempts = 0;
+          const maxAttempts = 50; // 5 seconds max wait
+
+          const checkPhonePe = () => {
+            if (window.PhonePeCheckout && window.PhonePeCheckout.transact) {
+              resolve();
+            } else if (attempts < maxAttempts) {
+              attempts++;
+              setTimeout(checkPhonePe, 100);
+            } else {
+              reject(new Error("PhonePe script not loaded"));
+            }
+          };
+
+          checkPhonePe();
+        });
+      };
+      await loadPhonePeScript();
+      await waitForPhonePe();
+
       const response = await axios.post(`${BASE_URL}/api/create-order`, {
         orderId: orderId,
         amountInPaisa: (cartTotalPrice - discount) * 100,
@@ -546,23 +1193,13 @@ const Checkout = () => {
       });
 
       if (response.data.success && response.data.data.redirectUrl) {
-        if (window.PhonePeCheckout && window.PhonePeCheckout.transact) {
-          window.PhonePeCheckout.transact({
-            tokenUrl: response.data.data.redirectUrl,
-            callback: (resp) => phonePeCallback(resp, orderId),
-            type: "IFRAME",
-          });
-        } else {
-          setPaymentError("PhonePe checkout is not ready. Please try again.");
-          setIsLoading(false);
-          setOrderPlaced(false);
-        }
+        window.PhonePeCheckout.transact({
+          tokenUrl: response.data.data.redirectUrl,
+          callback: (resp) => phonePeCallback(resp, orderId),
+          type: "IFRAME",
+        });
       } else {
-        setPaymentError(
-          "Failed to initiate PhonePe payment. Please try again."
-        );
-        setIsLoading(false);
-        setOrderPlaced(false);
+        throw new Error("Failed to get redirect URL");
       }
     } catch (error) {
       console.error("Error initiating PhonePe payment:", error);
@@ -574,6 +1211,43 @@ const Checkout = () => {
     }
   };
 
+  useEffect(() => {
+    const handleGlobalError = (event) => {
+      if (event.message === "Script error.") {
+        console.error("Cross-origin script error detected");
+        // Handle the error gracefully
+      }
+    };
+
+    window.addEventListener("error", handleGlobalError);
+
+    return () => {
+      window.removeEventListener("error", handleGlobalError);
+    };
+  }, []);
+  useEffect(() => {
+    // Enhanced error handling
+    const handleError = (event) => {
+      console.error("Global error caught:", event.error);
+      console.error("Error message:", event.message);
+      console.error("Error stack:", event.error?.stack);
+    };
+
+    const handleUnhandledRejection = (event) => {
+      console.error("Unhandled promise rejection:", event.reason);
+    };
+
+    window.addEventListener("error", handleError);
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener("error", handleError);
+      window.removeEventListener(
+        "unhandledrejection",
+        handleUnhandledRejection
+      );
+    };
+  }, []);
   const resetForm = async () => {
     setFormData({
       firstName: "",
@@ -650,7 +1324,7 @@ const Checkout = () => {
       payment_status: "PENDING",
       coupon_code: discount > 0 ? couponCode : "",
       shipping_charge: recommendedCourier.rate
-        ? recommendedCourier.rate.toFixed(2)
+        ? recommendedCourier.rate.toFixed(2) || 0
         : "0.00",
       items: cartItems.map((item) => ({
         productId: item.id,
@@ -678,8 +1352,6 @@ const Checkout = () => {
           await initiatePhonePePayment(saleId);
         } else {
           // For COD, show success popup
-          // 🚀 Create shipment after order
-          await createShipment(saleId);
           setIsSuccess(true);
           setShowPopup(true);
           setIsLoading(false);
@@ -704,12 +1376,10 @@ const Checkout = () => {
 
   cartItems.forEach((cartItem) => {
     const discountedPrice = getDiscountPrice(cartItem.price, cartItem.discount);
-    const finalProductPrice = (cartItem.price * currency.currencyRate).toFixed(
-      2
-    );
-    const finalDiscountedPrice = (
-      discountedPrice * currency.currencyRate
-    ).toFixed(2);
+    const finalProductPrice =
+      (cartItem.price * currency.currencyRate).toFixed(2) || 0;
+    const finalDiscountedPrice =
+      (discountedPrice * currency.currencyRate).toFixed(2) || 0;
 
     discountedPrice != null
       ? (cartTotalPrice += finalDiscountedPrice * cartItem.quantity)
@@ -1732,7 +2402,7 @@ const Checkout = () => {
                               </div>
                               <div className="mt-3 d-flex justify-content-end gap-2">
                                 <button
-                                  style={{background:"#FFEAF1"}}
+                                  style={{ background: "#FFEAF1" }}
                                   type="button"
                                   className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded hover:bg-pink-400 transition d-flex align-items-center gap-2 border-0"
                                   onClick={handleCancelEdit}
@@ -1740,7 +2410,7 @@ const Checkout = () => {
                                   Cancel
                                 </button>
                                 <button
-                                 style={{background:"#FFEAF1"}}
+                                  style={{ background: "#FFEAF1" }}
                                   type="button"
                                   onClick={handleUpdate}
                                   className="text-black fw-bold m-2 font-bold text-sm sm:text-base min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-3 sm:py-2 rounded  hover:bg-pink-400 transition d-flex align-items-center gap-2 border-0"
@@ -1801,28 +2471,190 @@ const Checkout = () => {
                   <div className="col-lg-5">
                     <div className="your-order-area">
                       <h3>Your order</h3>
-                      {data.length > 0 ? (
-                        recommendedCourier ? (
-                          <div className="card mb-4">
-                            <div className="card-body">
-                              <ul className="list-group list-group-flush">
-                                <li className="list-group-item">
-                                  <strong>Estimated Delivery:</strong>{" "}
-                                  {recommendedCourier.etd} (
-                                  {recommendedCourier.estimated_delivery_days}{" "}
-                                  days)
-                                </li>
-                              </ul>
-                            </div>
+                      {/* {recommendedCourier ? (
+                        <div className="card mb-4">
+                          <div className="card-body">
+                            <ul className="list-group list-group-flush">
+                              <li className="list-group-item">
+                                <strong>Estimated Delivery:</strong>{" "}
+                                {recommendedCourier.etd} (
+                                {recommendedCourier.estimated_delivery_days}{" "}
+                                days)
+                              </li>
+                            </ul>
                           </div>
-                        ) : (
-                          <div className="alert alert-warning">
-                            No delivery service available for this location.
-                          </div>
-                        )
+                        </div>
                       ) : (
-                        ""
-                      )}
+                        <div className="alert alert-warning">
+                          No delivery service available for this location.
+                        </div>
+                      )} */}
+
+                      {/*{recommendedCourier && (
+                        <div className="card mb-4">
+                          <div className="card-body">
+                            <ul className="list-group list-group-flush">
+                              <li className="list-group-item">
+                                <strong>Shipping Method:</strong>{" "}
+                                {recommendedCourier.international
+                                  ? "International"
+                                  : "Domestic"}{" "}
+                                - {recommendedCourier.courier_name}
+                              </li>
+                               <li className="list-group-item">
+          <strong>Shipping Cost:</strong>{" "}
+          {currency.currencySymbol + recommendedCourier.rate.toFixed(2)}
+        </li> 
+                              <li className="list-group-item">
+                                <strong>Shipping Cost:</strong>{" "}
+                                {recommendedCourier?.rate
+                                  ? currency.currencySymbol +
+                                    recommendedCourier.rate.toFixed(2)
+                                  : currency.currencySymbol + "0.00"}
+                              </li>
+                              <li className="list-group-item">
+                                <strong>Estimated Delivery:</strong>{" "}
+                                {recommendedCourier.etd}
+                              </li>
+                              {recommendedCourier.international && (
+                                <>
+                                  <li className="list-group-item">
+                                    <strong>Shipping to:</strong>{" "}
+                                    {primaryAddress.country}
+                                  </li>
+                                  <li className="list-group-item text-warning">
+                                    <strong>Note:</strong> Additional customs
+                                    duties/taxes may apply
+                                  </li>
+                                </>
+                              )}
+                            </ul>
+                          </div>
+                        </div>
+                      )}*/}
+
+                     {isLoading ? (
+  <div className="alert alert-info">
+    <div className="d-flex align-items-center">
+      <div
+        className="spinner-border spinner-border-sm me-2"
+        role="status"
+      >
+        <span className="visually-hidden">
+          Loading...
+        </span>
+      </div>
+      Checking shipping rates...
+    </div>
+  </div>
+) : paymentError ? (
+  <div className="alert alert-danger">
+    <strong>Shipping Error:</strong> {paymentError}
+    <button
+      className="btn btn-sm btn-outline-danger ms-2"
+      onClick={checkServiceability}
+    >
+      Retry
+    </button>
+  </div>
+) : recommendedCourier ? (
+  <div className="card mb-4">
+    <div className="card-body">
+      <h6 className="card-title">
+        <i className="fas fa-shipping-fast me-2"></i>
+        Shipping Information
+      </h6>
+      <ul className="list-group list-group-flush">
+        <li className="list-group-item">
+          <strong>Shipping Method:</strong>{" "}
+          <span
+            className={`badge ${
+              recommendedCourier.international
+                ? "bg-primary"
+                : "bg-success"
+            } me-2`}
+          >
+            {recommendedCourier.international
+              ? "International"
+              : "Domestic"}
+          </span>
+          {recommendedCourier.courier_name}
+        </li>
+        <li className="list-group-item">
+          <strong>Shipping Cost:</strong>{" "}
+          {recommendedCourier.rate !== undefined &&
+          recommendedCourier.rate !== null ? (
+            <span className="text-success fw-bold">
+              {currency.currencySymbol}
+              {parseFloat(
+                recommendedCourier.rate
+              ).toFixed(2)}
+            </span>
+          ) : (
+            <span className="text-muted">
+              Rate not available
+            </span>
+          )}
+        </li>
+        <li className="list-group-item">
+          <strong>Estimated Delivery:</strong>{" "}
+          <span className="text-info">
+            {recommendedCourier.etd || "Not available"}
+          </span>
+        </li>
+        {recommendedCourier.international && (
+          <>
+            <li className="list-group-item">
+              <strong>Shipping to:</strong>{" "}
+              <span className="fw-bold">
+                {primaryAddress.country}
+              </span>
+            </li>
+            <li className="list-group-item">
+              <div className="alert alert-warning mb-0 py-2">
+                <i className="fas fa-exclamation-triangle me-2"></i>
+                <strong>Note:</strong> Additional customs
+                duties/taxes may apply upon delivery
+              </div>
+            </li>
+          </>
+        )}
+        {/* Debug information - remove in production */}
+        {process.env.NODE_ENV === "development" && (
+          <li className="list-group-item">
+            <details>
+              <summary className="text-muted small">
+                Debug Info
+              </summary>
+              <pre className="small mt-2 text-muted">
+                {JSON.stringify(
+                  {
+                    rate: recommendedCourier.rate,
+                    freight_charge:
+                      recommendedCourier.freight_charge,
+                    courier_company_id:
+                      recommendedCourier.courier_company_id,
+                    international:
+                      recommendedCourier.international,
+                  },
+                  null,
+                  2
+                )}
+              </pre>
+            </details>
+          </li>
+        )}
+      </ul>
+    </div>
+  </div>
+) : (
+  <div className="alert alert-secondary">
+    <i className="fas fa-info-circle me-2"></i>
+    Click "Check Shipping Rates" to calculate shipping
+    costs
+  </div>
+)}
+
 
                       <div className="your-order-wrap gray-bg-4">
                         <div className="your-order-product-info">
@@ -1839,12 +2671,14 @@ const Checkout = () => {
                                   cartItem.price,
                                   cartItem.discount
                                 );
-                                const finalProductPrice = (
-                                  cartItem.price * currency.currencyRate
-                                ).toFixed(2);
-                                const finalDiscountedPrice = (
-                                  discountedPrice * currency.currencyRate
-                                ).toFixed(2);
+                                const finalProductPrice =
+                                  (
+                                    cartItem.price * currency.currencyRate
+                                  ).toFixed(2) || 0;
+                                const finalDiscountedPrice =
+                                  (
+                                    discountedPrice * currency.currencyRate
+                                  ).toFixed(2) || 0;
 
                                 return (
                                   <li key={key}>
@@ -1873,10 +2707,9 @@ const Checkout = () => {
                             <ul>
                               <li className="your-order-shipping">Shipping</li>
                               <li>
-                                ₹
-                                {recommendedCourier
-                                  ? recommendedCourier.rate.toFixed(2)
-                                  : "0.00"}
+                                {currency.currencySymbol +
+                                  (recommendedCourier?.rate?.toFixed(2) ||
+                                    "0.00")}
                               </li>
                             </ul>
                           </div>
@@ -1896,9 +2729,7 @@ const Checkout = () => {
                                   (
                                     cartTotalPrice -
                                     discount +
-                                    (recommendedCourier
-                                      ? recommendedCourier.rate
-                                      : 0)
+                                    (recommendedCourier?.rate || 0)
                                   ).toFixed(2)}
                               </li>
                             </ul>
@@ -1977,7 +2808,7 @@ const Checkout = () => {
                               >
                                 <div
                                   style={{
-                                    // marginBottom: "16px",
+                                    marginBottom: "16px",
                                     display: "block",
                                   }}
                                 >
@@ -1985,14 +2816,14 @@ const Checkout = () => {
                                     style={{
                                       display: "flex",
                                       alignItems: "center",
-                                      // marginBottom: "10px",
+                                      marginBottom: "10px",
                                       height: "24px",
                                       position: "relative",
                                     }}
                                   >
                                     <input
                                       type="radio"
-                                      id="paynow"
+                                      id="phonepe"
                                       name="paymentMethod"
                                       value="PAID"
                                       checked={
@@ -2009,7 +2840,7 @@ const Checkout = () => {
                                       }}
                                     />
                                     <label
-                                      htmlFor="paynow"
+                                      htmlFor="phonepe"
                                       style={{
                                         marginLeft: "10px",
                                         fontSize: "14px",
@@ -2024,11 +2855,11 @@ const Checkout = () => {
 
                                 <div
                                   style={{
-                                    // marginBottom: "16px",
+                                    marginBottom: "16px",
                                     display: "block",
                                   }}
                                 >
-                                  {/* <div
+                                  <div
                                     style={{
                                       display: "flex",
                                       alignItems: "center",
@@ -2051,7 +2882,7 @@ const Checkout = () => {
                                         width: "18px",
                                         height: "18px",
                                         cursor: "pointer",
-                                      }} 
+                                      }}
                                     />
                                     <label
                                       htmlFor="COD"
@@ -2064,7 +2895,7 @@ const Checkout = () => {
                                     >
                                       Cash on Delivery
                                     </label>
-                                  </div> */}
+                                  </div>
                                 </div>
                               </div>
                             )}

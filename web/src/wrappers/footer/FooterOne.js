@@ -269,7 +269,7 @@ const FooterOne = ({
               <div className="footer-logo mb-3">
                 <a href="/">
                   <img
-                    src="/assets/img/logo/logo.png"
+                    src="/assets/img/logo/logo3.png"
                     alt="Anahee Logo"
                     style={{ maxWidth: "120px" }}
                     className="mx-auto"
